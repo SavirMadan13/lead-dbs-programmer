@@ -72,6 +72,7 @@ function StimulationSettings({rightElectrode, setRightElectrode, leftElectrode, 
         <option value="AbbottDirected6173">Abbott Directed 6173</option>
         {/* <option value="AbbottDirectedTest">Abbott Directed</option> */}
       </select>
+      <div></div>
       <h2>Choose Right Electrode</h2>
       <select
         value={rightElectrode}
@@ -92,7 +93,7 @@ function StimulationSettings({rightElectrode, setRightElectrode, leftElectrode, 
         <option value="AbbottDirected6172">Abbott Directed 6172</option>
         <option value="AbbottDirected6173">Abbott Directed 6173</option>
       </select>
-
+      <div></div>
       <h2>Choose IPG</h2>
       <select value={IPG} onChange={(e) => handleIPGChange(e)}>
         <option value="">None</option>
