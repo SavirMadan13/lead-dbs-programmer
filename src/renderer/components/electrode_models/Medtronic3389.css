@@ -1,0 +1,276 @@
+/* BostonCartesia.css */
+.IPG {
+  flex: 1;
+}
+
+.Elmodel-center {
+  flex: 1;
+  margin-left: -85px;
+  margin-right: -100px;
+}
+
+.right-contacts {
+  flex: 1;
+  margin-top: 275px;
+}
+
+.left-contacts {
+  flex: 1;
+  margin-top: 140px;
+}
+
+.container {
+  display: flex;
+  /* justify-content: space-between; */
+  width: 100%; /* Set the desired width */
+  height: 100%; /* Set the desired height */
+}
+
+.container2 {
+  width: 33%; /* Set the desired width */
+  height: 100%; /* Set the desired height */
+  margin-right: 0px;
+}
+.image-item {
+  display: inline-block;
+  position: relative;
+  margin-top: -35px; /*This is setting the distance between the contacts
+  /* top: -100px; */
+
+}
+
+.image {
+  width: 500px; /* Adjust the width and height as needed */
+  height: 500px;
+}
+
+.Elmodel-center .image-item .triple-toggle {
+  position: absolute;
+  top: 0px;
+  left: -5px;
+  z-index: 1;
+}
+
+.triple-toggle-ipg-boston-test {
+  position: absolute;
+  /* top: -5px;
+  left: -5px; */
+  top: 5px;
+  left: 10px;
+  z-index: 1;
+}
+.triple-toggle-boston-test {
+
+  position: absolute;
+  top: 10px;
+  left: 7px;
+  z-index: 1;
+}
+
+.left-color {
+  /* background-color: transparent; */
+  fill: rgba(48, 46, 46, 0.768);
+}
+.center-color {
+  /* background-color: green; */
+  fill: rgba(229, 40, 40, 0.41);
+  /* Change the background color for the 'center' position */
+}
+
+.right-color {
+  /* background-color: blue; */
+  fill: rgba(50, 50, 244, 0.411);
+  /* Change the background color for the 'right' position */
+}
+
+.image-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: -100px;
+  /* height: 130px;
+  width: 230px; */
+  height: 200px;
+  width: 200px;
+  margin: 20px; /* This is setting the margin between the contacts   */
+  row-gap: 100px;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.export-button {
+  background-color: #007BFF;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.import-button {
+  background-color: #007BFF;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.export-button:hover {
+  background-color: #0056b3;
+}
+
+.file-input {
+  display: none;
+}
+
+/* Style for the file input label */
+.file-input + label {
+  background-color: #007BFF;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.file-input + label:hover {
+  background-color: #0056b3;
+}
+
+.active-button {
+  background-color: green; /* Set your desired active color */
+  color: white;
+}
+
+.inactive-button {
+  background-color: red; /* Set your desired inactive color */
+  color: white;
+}
+
+
+/* .image-key {
+  position: relative;
+  z-index: 1;
+  top: 100px;
+
+} */
+
+/* .image-item {
+  height: 200px;
+  width: 200px;
+} */
+
+/* Style for the buttons */
+.button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #355c8f; /* Change to your desired button color */
+  color: #ffffff; /* Text color for the buttons */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 5px;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.isAssistedButton {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #72a9f2; /* Change to your desired button color */
+  color: #ffffff; /* Text color for the buttons */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 5px;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.button:hover {
+  background-color: #005f8d; /* Change to a slightly different color for hover effect */
+}
+
+/* Style for the div containers */
+.button-container {
+  border: 2px solid #0c0c0c;
+  /* Border color for the divs */
+  padding: 20px;
+  margin: 10px;
+  border-radius: 5px;
+  background-color: #222121; /* Background color for the divs */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  /* Add a subtle shadow */
+}
+
+h2 {
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.steering-container {
+  display: flex;
+  flex-direction: horizontal;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  margin: 1px;
+}
+
+/* .ClockwiseArrow {
+  transform: translateY(50%) translateX(-50%);
+} */
+.UpArrow:hover,
+.DownArrow:hover,
+.ClockwiseArrow:hover,
+.CounterClockwiseArrow:hover {
+  fill: rgb(176, 209, 224); /* Change the fill color on hover to red, you can adjust to your desired color */
+}
+
+.new-quantity-input {
+  font-size: 14px;
+  height: 2rem;
+  padding: 0 1rem;
+  border-radius: 2rem;
+  border: 1;
+  font-weight: bold;
+  background:  #7d7c7c;
+  color: white;
+  box-shadow: 0 10px 65px -10px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  width: 70%;
+  /* box-sizing: border-box; */
+  font-weight: lighter;
+}
+
+.new-quantity-input:hover {
+  background: #b1b0b0;
+  box-shadow: 0 10px 65px -10px rgba(0, 0, 0, 0.35); /* Change the box-shadow on hover */
+
+}
+
+.label {
+  font-size: 18px;
+  color: #fff; /* Light text color */
+}
+
+.PercentageAmplitudeToggle {
+  position: relative;
+  top: -30px;
+  right: 90px;
+}
+
+.AssistedToggle {
+  position: relative;
+  top: -15px;
+  right: 110px;
+  width: 70%;
+}

@@ -1,0 +1,19 @@
+/* Image container styles for the different colors */
+.image-container {
+  width: 200px;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+}
+
+.left-color {
+  background-color: transparent; /* Change the background color for the 'left' position */
+}
+
+.center-color {
+  background-color: green; /* Change the background color for the 'center' position */
+}
+
+.right-color {
+  background-color: blue; /* Change the background color for the 'right' position */
+}

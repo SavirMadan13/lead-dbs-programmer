@@ -1,0 +1,288 @@
+
+.container {
+  display: inline-grid;
+  grid-template-columns: repeat(2, 1fr);
+  /* grid-auto-rows: 100px; */
+}
+
+.quantity-container {
+  /* max-width: 12rem; */
+  max-width: 8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 25px;
+  margin-top: 60px;
+  grid-column-start: 2;
+}
+
+.quantity-input {
+  font-size: 12px;
+  height: 1.5rem;
+  padding: 0 0.5rem;
+  border-radius: 1rem;
+  border-color: transparent;
+  /* border: 1; */
+  /* font-weight: bold; */
+  background: transparent;
+  color: white;
+  /* box-shadow: 0 10px 65px -10px rgba(0, 0, 0, 0.25); */
+  text-align: center;
+  width: 50%;
+  box-sizing: border-box;
+  font-weight: lighter;
+}
+
+.quantity-input:hover {
+  background: #b1b0b0;
+  box-shadow: 0 10px 65px -10px rgba(0, 0, 0, 0.35);
+  /* Change the box-shadow on hover */
+
+}
+
+input[type="radio"] {
+  display: none;
+}
+
+label {
+  color: white;
+  z-index: 10;
+  cursor: pointer;
+}
+
+label:hover {
+  color: #b1b0b0; /* Change label color on hover */
+  transform: scale(1.1); /* Scale up the label on hover */
+}
+
+h4 {
+  margin: 0;
+  font-weight: 500;
+}
+
+.black-font {
+  color: black !important;
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column; /* Change to column to stack elements vertically */
+  align-items: center; /* Center horizontally */
+  width: 98px;
+  height: 33px;
+  /* width: 150px; */
+  /* height: 30px; */
+  /* border-radius: 100px; */
+  border-radius: 99px;
+  /* background-color: #4d4d4d; */
+  position: absolute;
+  top: 15%;
+  left: 22%;
+  /* box-shadow: 1px 1px 10px 1px rgba(0, 0, 0, 0.5);  */
+  /* This is the shadow behind the toggle switch */
+  grid-column-start: 1;
+}
+
+/* .switch {
+  height: 25px;
+  width: 42px;
+  background-color: white;
+  border-radius: 10px;
+  position: absolute;
+  left: 0px;
+  top: -8px;
+  transition: ease-in;
+} */
+
+.switch {
+  height: 32px;
+  width: 32px;
+  background-color: white;
+  border-radius: 16px;
+  position: absolute;
+  left: 0px;
+  top: -8px;
+  transition: ease-in;
+}
+/* .switch:hover {
+  background: #b1b0b0;
+} */
+
+/*---------------- LEFT ------------------- */
+.switch.left-to-center {
+  animation-name: leftToCenter;
+  animation-duration: 0.5s;
+}
+
+.switch.left-to-right {
+  animation-name: leftToRight;
+  animation-duration: 0.5s;
+}
+
+/* .switch.left-position {
+  left: -3px;
+  bottom: 5px;
+} */
+
+.switch.left-position {
+  left: -8px;
+  bottom: 5px;
+}
+
+.left-label {
+  position: absolute;
+  /* font-size: smaller !important; */
+  top: 8px;
+  left: 1px;
+}
+
+#left + label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* font-size: 10px !important; */
+  height: 50px;
+  width: 80px;
+  border-radius: 100px;
+}
+
+#left:checked + label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  width: 80px;
+  border-radius: 100px;
+}
+
+@keyframes leftToCenter {
+  from {
+    left: -8px;
+  }
+  to {
+    left: 26px;
+  }
+}
+
+@keyframes leftToRight {
+  from {
+    left: -8px;
+  }
+  to {
+    left: 55px;
+  }
+}
+
+/* -------------------- center ------------------ */
+.switch.center-to-left {
+  animation-name: centerToLeft;
+  animation-duration: 0.5s;
+}
+
+.switch.center-to-right {
+  animation-name: centerToRight;
+  animation-duration: 0.5s;
+}
+
+.switch.center-position {
+  left: 26px;
+}
+
+.center-label {
+  position: absolute;
+  top: 7px;
+  left: 50px;
+}
+
+#center + label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  width: 80px;
+  border-radius: 100px;
+}
+
+#center:checked + label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  width: 80px;
+  border-radius: 100px;
+}
+
+@keyframes centerToLeft {
+  from {
+    left: 26px;
+  }
+  to {
+    left: -8px;
+  }
+}
+
+@keyframes centerToRight {
+  from {
+    left: 26px;
+  }
+  to {
+    right: 55px;
+  }
+}
+
+/* ------------------- RIGHT ------------------- */
+.switch.right-to-left {
+  animation-name: rightToLeft;
+  animation-duration: 0.5s;
+}
+
+.switch.right-to-center {
+  animation-name: rightToCenter;
+  animation-duration: 0.5s;
+}
+
+.switch.right-position {
+  left: 55px;
+}
+
+.right-label {
+  position: absolute;
+  top: 7px;
+  right: 12px;
+}
+
+#right + label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  width: 80px;
+  border-radius: 100px;
+}
+
+#right:checked + label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  width: 80px;
+  border-radius: 100px;
+}
+
+@keyframes rightToLeft {
+  from {
+    left: 55px;
+  }
+  to {
+    left: -8px;
+  }
+}
+
+@keyframes rightToCenter {
+  from {
+    left: 55px;
+  }
+  to {
+    right: 26px;
+  }
+}
