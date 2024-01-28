@@ -2959,12 +2959,12 @@ function BostonCartesiaTest(props, ref) {
 
   const ipgs = [<IPG key="0" />];
 
-  const rightContacts = [
+  const leftContacts = [
     <Contact key="7" level="3" face="right" />,
     <Contact key="4" level="2" face="right" />,
   ];
 
-  const leftContacts = [
+  const rightContacts = [
     <Contact key="6" level="3" face="left" />,
     <Contact key="3" level="2" face="left" />,
   ];
@@ -2980,6 +2980,8 @@ function BostonCartesiaTest(props, ref) {
     7: 3,
     8: 4,
   };
+
+  const levelArray = { 2: [2, 3, 4], 3: [5, 6, 7] };
 
   const face = {
     0: '',
@@ -3908,40 +3910,88 @@ function BostonCartesiaTest(props, ref) {
     setQuantities(updatedQuantities);
   };
 
-  // const handleClockwiseButton = () => {
-  //   const updatedQuantities = { ...quantities };
-  //   console.log(updatedQuantities);
-  //   Object.keys(selectedValues).forEach((key) => {
-  //     const currentLevel = level[key];
-  //     const nextLevel = parseFloat(key) + 1; // These aren't actually the level, but rather the keys of the contacts
-  //     const belowLevel = parseFloat(key) - 2;
-  //     const currentFace = face[key];
-  //     if (selectedValues[key] !== 'left') {
-  //       if (face[key] === 'center' || face[key] === 'left') {
-  //         // console.log('Face: ', face[key]);
-  //         // console.log(selectedValues[key]);
-  //         // console.log(key);
-  //         // console.log(nextLevel);
-  //         // console.log(selectedValues[nextLevel] === selectedValues[key]);
-  //         if (selectedValues[key] === selectedValues[nextLevel]) {
-  //           console.log('UpdatedQuantities: ', updatedQuantities);
-  //           updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
-  //           updatedQuantities[nextLevel] =
-  //             parseFloat(updatedQuantities[nextLevel]) + 10;
-  //           console.log('UpdatedQuantities: ', updatedQuantities);
-  //         }
-  //       } else if (face[key] === 'right') {
-  //         if (selectedValues[key] === selectedValues[belowLevel]) {
-  //           updatedQuantities[key] -= 10;
-  //           updatedQuantities[belowLevel] += 10;
-  //         }
-  //       }
-  //     }
-  //   });
-  //   setQuantities(updatedQuantities);
-  // };
+  function getOnContacts(aLevel) {
+    const onContacts = [];
+    Object.keys(level).forEach((key) => {
+      const numericKey = parseInt(key, 10); // Convert the string key to a number
+      if (level[key] === aLevel && selectedValues[key] !== 'left') {
+        onContacts.push(numericKey);
+      }
+    });
+    return onContacts;
+  }
 
-  const handleClockwiseButton = () => {
+  const newHandleClockwiseButton = () => {
+    const updatedQuantities = { ...quantities };
+    const updatedSelectedValues = { ...selectedValues };
+    const totalLevelArray = {};
+    const numOnContacts = {};
+    const vectorLevelAngle = {};
+    // This code allows us to determine how many contacts are on at each level and what the total sum of the contacts on that level are
+    Object.keys(levelArray).forEach((key) => {
+      totalLevelArray[key] = 0;
+      numOnContacts[key] = 0;
+      for (let i = 0; i < 3; i++) {
+        console.log(levelArray[key][i]);
+        totalLevelArray[key] =
+          parseFloat(totalLevelArray[key]) +
+          parseFloat(updatedQuantities[levelArray[key][i]]);
+        if (updatedQuantities[levelArray[key][i]] > 0) {
+          numOnContacts[key] += 1;
+        }
+      }
+    });
+    let aVec = [0, 0];
+    let bVec = [0, 0];
+    let cVec = [0, 0];
+    const baseZero = [1,0];
+    const cos60 = Math.cos((60 * Math.PI) / 180);
+    const cos30 = Math.cos((30 * Math.PI) / 180);
+    const sin60 = Math.sin((60 * Math.PI) / 180);
+    const sin30 = Math.sin((30 * Math.PI) / 180);
+    const localCoords = [0, 0];
+    // The next step is to determine the angle of the vector at that level
+    Object.keys(numOnContacts).forEach((key) => {
+      // Now we have the levels that rotation can occur
+      if (numOnContacts[key] > 0 && numOnContacts[key] < 3) {
+        console.log('here');
+        for (let i = 0; i < 3; i++) {
+          console.log(levelArray[key][i]);
+          if (face[levelArray[key][i]] === 'left') {
+            console.log('1');
+            cVec = [
+              parseFloat(-updatedQuantities[levelArray[key][i]]) / 2,
+              parseFloat(-updatedQuantities[levelArray[key][i]]) * cos30,
+            ];
+            console.log('c', cVec);
+          } else if (face[levelArray[key][i]] === 'center') {
+            console.log('center');
+            aVec = [updatedQuantities[levelArray[key][i]], 0];
+            console.log('a', aVec);
+          } else if (face[levelArray[key][i]] === 'right') {
+            bVec = [
+              parseFloat(-updatedQuantities[levelArray[key][i]]) / 2,
+              parseFloat(updatedQuantities[levelArray[key][i]]) * sin60,
+            ];
+            console.log('b', bVec);
+          }
+        }
+      }
+    });
+    for (let i = 0; i < aVec.length; i++) {
+      localCoords[i] = aVec[i] + bVec[i] + cVec[i];
+    }
+    const vecLength = Math.sqrt(
+      localCoords[0] * localCoords[0] + localCoords[1] * localCoords[1],
+    );
+    console.log('local', localCoords);
+    const vecDotProduct = 0;
+    const vecAng = Math.acos(localCoords[0] / vecLength) * 180/Math.PI;
+    const vectorAngle = (Math.atan(localCoords[1] / localCoords[0]) * 180) / Math.PI;
+    console.log('vcecof: ', vecAng);
+  };
+
+  const handleCounterClockwiseButton = () => {
     const updatedQuantities = { ...quantities };
     const updatedSelectedValues = { ...selectedValues };
     Object.keys(selectedValues)
@@ -4034,7 +4084,7 @@ function BostonCartesiaTest(props, ref) {
     // checkQuantitiesAndValues(quantities, selectedValues);
   };
 
-  const handleClockwiseButtonAmplitude = () => {
+  const handleCounterClockwiseButtonAmplitude = () => {
     const updatedQuantities = { ...quantities };
     const updatedSelectedValues = { ...selectedValues };
     Object.keys(selectedValues)
@@ -4135,7 +4185,7 @@ function BostonCartesiaTest(props, ref) {
     // checkQuantitiesAndValues(quantities, selectedValues);
   };
 
-  const handleCounterClockwiseButton = () => {
+  const handleClockwiseButton = () => {
     const updatedQuantities = { ...quantities };
     const updatedSelectedValues = { ...selectedValues };
     Object.keys(selectedValues)
@@ -4228,7 +4278,7 @@ function BostonCartesiaTest(props, ref) {
     // checkQuantitiesAndValues(quantities, selectedValues);
   };
 
-  const handleCounterClockwiseButtonAmplitude = () => {
+  const handleClockwiseButtonAmplitude = () => {
     const updatedQuantities = { ...quantities };
     const updatedSelectedValues = { ...selectedValues };
     Object.keys(selectedValues)
@@ -4401,16 +4451,6 @@ function BostonCartesiaTest(props, ref) {
     return false;
   }
 
-  function getOnContacts(aLevel) {
-    const onContacts = [];
-    Object.keys(level).forEach((key) => {
-      const numericKey = parseInt(key, 10); // Convert the string key to a number
-      if (level[key] === aLevel && selectedValues[key] !== 'left') {
-        onContacts.push(numericKey);
-      }
-    });
-    return onContacts;
-  }
   // For clear button
 
   // const newHandleUpButton = () => {
@@ -5379,7 +5419,8 @@ function BostonCartesiaTest(props, ref) {
     Object.keys(updatedQuantities).forEach((key) => {
       // keyLevel = getOnContacts[level[key]]
       if (
-        (face[key] === 'left' || face[key] === 'right') && levelQuantities[level[key]] !== 0
+        (face[key] === 'left' || face[key] === 'right') &&
+        levelQuantities[level[key]] !== 0
       ) {
         // console.log('length ', getOnContacts(level[key]).length);
         // if (getOnContacts(level[key]).length > 0) {
@@ -5565,11 +5606,11 @@ function BostonCartesiaTest(props, ref) {
       if (updatedSelectedValues[key] === 'center') {
         negativeSum += parseFloat(updatedQuantities[key]);
         centerCount += 1;
-        console.log('negativeSum: ', negativeSum);
+        // console.log('negativeSum: ', negativeSum);
       } else if (updatedSelectedValues[key] === 'right') {
         positiveSum += parseFloat(updatedQuantities[key]);
         rightCount += 1;
-        console.log('positiveSum: ', positiveSum);
+        // console.log('positiveSum: ', positiveSum);
       }
     });
 
@@ -5577,14 +5618,14 @@ function BostonCartesiaTest(props, ref) {
       if (updatedSelectedValues[key] === 'center') {
         if (key === lastChangedKey) {
           negativeModifiedKey = key;
-          console.log('negativeModifiedKey: ', negativeModifiedKey);
+          // console.log('negativeModifiedKey: ', negativeModifiedKey);
           return true; // exit loop
         }
       }
       if (updatedSelectedValues[key] === 'right') {
         if (key === lastChangedKey) {
           positiveModifiedKey = key;
-          console.log('positiveModifiedKey: ', positiveModifiedKey);
+          // console.log('positiveModifiedKey: ', positiveModifiedKey);
           return true; // exit loop
         }
       }
@@ -5605,13 +5646,13 @@ function BostonCartesiaTest(props, ref) {
           key !== negativeModifiedKey &&
           updatedSelectedValues[key] === 'center'
         ) {
-          console.log('passed');
+          // console.log('passed');
           updatedQuantities[key] =
             parseFloat(updatedQuantities[key]) +
             parseFloat(negativeDifference / (centerCount - 1));
         }
       });
-      console.log('negative difference: ', negativeDifference);
+      // console.log('negative difference: ', negativeDifference);
     }
 
     if (positiveSum !== 100) {
@@ -5645,7 +5686,7 @@ function BostonCartesiaTest(props, ref) {
     if (isAssisted) {
       assistedMode();
     }
-    console.log('isAssisted: ', isAssisted);
+    // console.log('isAssisted: ', isAssisted);
   }
 
   const handleQuantityChange = (quantity, key) => {
@@ -5859,7 +5900,7 @@ function BostonCartesiaTest(props, ref) {
 
   const handlePercAmpChangeClockwise = () => {
     if (percAmpToggle === 'left') {
-      handleClockwiseButton();
+      newHandleClockwiseButton();
     } else if (percAmpToggle === 'right') {
       handleClockwiseButtonAmplitude();
     }
@@ -5989,8 +6030,8 @@ function BostonCartesiaTest(props, ref) {
     } else if (props.IPG === 'Medtronic_Percept') {
       stimController = 3;
     }
-    console.log('stimController: ', stimController);
-    console.log('IPG', props.IPG);
+    // console.log('stimController: ', stimController);
+    // console.log('IPG', props.IPG);
   };
 
   const calculatePercentageFromAmplitude = () => {
@@ -6106,7 +6147,7 @@ function BostonCartesiaTest(props, ref) {
   return (
     <div className="container">
       <div className="button-container">
-        <div></div>
+        <div />
         <div className="PercentageAmplitudeToggle">
           {props.IPG === 'Boston' && (
             <PercentageAmplitudeToggle
@@ -6127,7 +6168,7 @@ function BostonCartesiaTest(props, ref) {
             />
           )}
         </div>
-        <div></div>
+        <div />
         <div className="button-container">
           <label className="label">Pulsewidth (us):</label>
           <input
@@ -6160,7 +6201,7 @@ function BostonCartesiaTest(props, ref) {
             onChange={handleTotalAmplitudeChange}
           />
         </div>
-        <div></div>
+        <div />
         <div>
           {/* <AssistedToggle
             value={assistedToggle}
@@ -6267,7 +6308,9 @@ function BostonCartesiaTest(props, ref) {
                 )}
               </div>
               {/* <p className="image-key">{Lcon.key}</p> */}
-              <p className="image-name-boston" style = { {color: 'white'} }>{names[Lcon.key]}</p>
+              <p className="image-name-boston" style={{ color: 'white' }}>
+                {names[Lcon.key]}
+              </p>
             </div>
           ))}
         </div>
@@ -6309,7 +6352,9 @@ function BostonCartesiaTest(props, ref) {
               )}
             </div>
             {/* <p className="image-key">{svg.key}</p> */}
-            <p className="image-name-boston" style = { {color: 'white'} }>{names[svg.key]}</p>
+            <p className="image-name-boston" style={{ color: 'white' }}>
+              {names[svg.key]}
+            </p>
           </div>
         ))}
       </div>
@@ -6346,7 +6391,9 @@ function BostonCartesiaTest(props, ref) {
               )}
             </div>
             {/* <p className="image-key">{rCon.key}</p> */}
-            <p className="image-name-boston" style = { {color: 'white'} }>{names[rCon.key]}</p>
+            <p className="image-name-boston" style={{ color: 'white' }}>
+              {names[rCon.key]}
+            </p>
           </div>
         ))}
       </div>

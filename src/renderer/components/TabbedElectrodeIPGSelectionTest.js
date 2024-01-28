@@ -1412,8 +1412,8 @@ function TabbedElectrodeIPGSelection({
     <div>
       <Tabs>
         <TabList>
-          <Tab>Left Hemisphere</Tab>
-          <Tab>Right Hemisphere</Tab>
+          <Tab onClick={() => handleTabChange('1')}>Left Hemisphere</Tab>
+          <Tab onClick={() => handleTabChange('5')}>Right Hemisphere</Tab>
         </TabList>
 
         <TabPanel>
