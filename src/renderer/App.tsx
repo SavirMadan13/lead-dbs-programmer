@@ -65,6 +65,10 @@ export default function App() {
   // const [key, setKey] = useState('1');
   const [allQuantities, setAllQuantities] = useState({});
   const [allSelectedValues, setAllSelectedValues] = useState({});
+  const [allTotalAmplitudes, setAllTotalAmplitudes] = useState({});
+  const [allStimulationParameters, setAllStimulationParameters] = useState({});
+  const [visModel, setVisModel] = useState('');
+  const [sessionTitle, setSessionTitle] = useState('');
 
   return (
     <Router>
@@ -106,6 +110,8 @@ export default function App() {
                 setAllQuantities={setAllQuantities}
                 allSelectedValues={allSelectedValues}
                 setAllSelectedValues={setAllSelectedValues}
+                allTotalAmplitudes={allTotalAmplitudes}
+                setAllTotalAmplitudes={setAllTotalAmplitudes}
               />
               <Link to="/tabbed-selection">
                 <button className="button">Next</button>
@@ -126,6 +132,14 @@ export default function App() {
               setAllQuantities={setAllQuantities}
               allSelectedValues={allSelectedValues}
               setAllSelectedValues={setAllSelectedValues}
+              allTotalAmplitudes={allTotalAmplitudes}
+              setAllTotalAmplitudes={setAllTotalAmplitudes}
+              allStimulationParameters={allStimulationParameters}
+              setAllStimulationParameters={setAllStimulationParameters}
+              visModel={visModel}
+              setVisModel={setVisModel}
+              sessionTitle={sessionTitle}
+              setSessionTitle={setSessionTitle}
             />
           }
         />

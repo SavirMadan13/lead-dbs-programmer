@@ -5,49 +5,89 @@
 /* @import '~bootstrap/dist/css/bootstrap.min.css'; */
 
 .IPG {
+  /* margin-top: 350px; */
   flex: 1;
+}
+
+.spacing {
+  position: absolute;
+  margin-top: 800px;
 }
 
 .Elmodel-center {
   flex: 1;
-  margin-left: -85px;
-  margin-right: -100px;
+  /* margin-left: -100px; */
+  /* margin-right: -1050px; */
 }
 
 .right-contacts {
   flex: 1;
-  margin-top: 275px;
+  /* margin-top: 475px; */
+  /* margin-bottom: -450px; */
+  /* padding-top: 350px; */
+  margin-right: -50px;
+  padding-left: 10px;;
 }
 
 .left-contacts {
   flex: 1;
   margin-top: 140px;
+  /* margin-right: 10px; */
+  /* margin-right: -0px; */
 }
 
 .container {
   display: flex;
+
+  /* margin-top: 30px; */
+  /* margin-bottom: -10px; */
   /* justify-content: space-between; */
-  width: 100%; /* Set the desired width */
-  height: 100%; /* Set the desired height */
+  /* width: 100%;  */
+  /* Set the desired width */
+  /* height: 100%;  */
+  /* Set the desired height */
+  /* overflow-y: auto; */
+  /* flex-wrap: nowrap;s */
+  /* margin-top: 100px;; */
+  /* overflow-x: auto; */
+  /* margin-left: -100px; */
 }
 
 .container2 {
-  width: 33%; /* Set the desired width */
-  height: 100%; /* Set the desired height */
-  margin-right: 0px;
+  /* width: 33%; */
+  /* Set the desired width */
+  /* height: 100%;  */
+  /* Set the desired height */
+  /* margin-left: -70px; */
+  /* margin-right: -5px; */
 }
 .image-item {
-  display: inline-block;
+  /* display: inline-block; */
   position: relative;
-  margin-top: -35px; /*This is setting the distance between the contacts
+  margin-left: -80px;
+  margin-right: 80px;
+  /* margin-top: -55px; */
+  /*This is setting the distance between the contacts
   /* top: -100px; */
 
 }
 
-.image {
-  width: 500px; /* Adjust the width and height as needed */
-  height: 500px;
+.image-item-right {
+  /* display: inline-block; */
+  /* z-index: 1; */
+  position: relative;
+  margin-left: -65px;
+  margin-right: 0px;
+  margin-top: -35px;
+  /*This is setting the distance between the contacts
+  /* top: -100px; */
+  /* margin-bottom: -10px; */
 }
+
+/* .image {
+  width: 500px;
+  height: 500px;
+} */
 
 .Elmodel-center .image-item .triple-toggle {
   position: absolute;
@@ -60,7 +100,7 @@
   position: absolute;
   /* top: -5px;
   left: -5px; */
-  top: 5px;
+  top: 8px;
   left: 10px;
   z-index: 1;
 }
@@ -69,7 +109,15 @@
   position: absolute;
   top: 10px;
   left: 7px;
-  z-index: 1;
+  z-index: 6;
+}
+
+.triple-toggle-boston-right-test {
+
+  position: absolute;
+  top: -5px;
+  left: 8px;
+  z-index: 6;
 }
 
 .left-color {
@@ -92,20 +140,44 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: -100px;
+  /* margin-bottom: -100px; */
   /* height: 130px;
   width: 230px; */
-  height: 200px;
-  width: 200px;
-  margin: 20px; /* This is setting the margin between the contacts   */
-  row-gap: 100px;
+  /* height: 200px;
+  width: 200px; */
+  margin: 20px;
+  /* This is setting the margin between the contacts   */
+  /* row-gap: 100px; */
+}
+
+.image-container-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* margin-bottom: -100px; */
+  /* height: 130px;
+  width: 230px; */
+  /* height: 200px;
+  width: 200px; */
+  margin-top: 10px;
+  margin: -10px;
+  /* This is setting the margin between the contacts   */
+  z-index: 0;
+  /* row-gap: 0px; */
 }
 
 .button-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  /* gap: 10px; */
+}
+
+.button-container-2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* gap: 10px; */
 }
 
 .export-button {
@@ -206,13 +278,13 @@
 
 /* Style for the div containers */
 .button-container {
-  border: 2px solid #0c0c0c;
+  /* border: 2px solid #0c0c0c; */
   /* Border color for the divs */
-  padding: 20px;
-  margin: 10px;
-  border-radius: 5px;
+  /* padding: 20px; */
+  /* margin: 10px; */
+  /* border-radius: 5px; */
   background-color: #222121; /* Background color for the divs */
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  /* box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); */
   /* Add a subtle shadow */
 }
 
@@ -227,7 +299,7 @@ h2 {
   align-items: center;
   text-align: center;
   position: relative;
-  margin: 1px;
+  /* margin: 1px; */
 }
 
 /* .ClockwiseArrow {
@@ -245,7 +317,7 @@ h2 {
   height: 2rem;
   padding: 0 1rem;
   border-radius: 2rem;
-  border: 1;
+  border: transparent;
   font-weight: bold;
   background:  #7d7c7c;
   color: white;
@@ -284,7 +356,16 @@ h2 {
   position: absolute;
   /* font */
   font-size: 12px;
-  top: 93px;
+  top: 103px;
   left: 70px;
-  z-index: 20;
+  z-index: 2;
+}
+
+.image-name-right-boston {
+  position: absolute;
+  /* font */
+  font-size: 12px;
+  top: 83px;
+  left: 70px;
+  z-index: 2;
 }

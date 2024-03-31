@@ -1,5 +1,6 @@
 .test-IPG {
   flex: 1;
+  margin-top: 30px;
   /* position: relative; */
   /* display: flex; */
   /* /margin-right: 250px; */
@@ -40,8 +41,8 @@
   /* Set the desired width */
   width: 33%;
   height: 100%; /* Set the desired height */
-  margin-left: 70px;
-  margin-right: 230px;
+  margin-left: -70px;
+  margin-right: 0px;
   /* background-color:rgba(0, 0, 0, 0.656); */
 }
 .test-image-item {
@@ -57,10 +58,9 @@
 
 .test-Elmodel-center .test-image-item .test-triple-toggle {
   position: absolute;
-  /* top: 30px;
-  left: 40px; This works for the older model*/
-  top: 10px;
-  z-index: 5;
+  top: 0px;
+  left: -5px;
+  z-index: 1;
 }
 
 .test-triple-toggle-ipg {
@@ -152,6 +152,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-right: -1000px;
   gap: 10px;
 }
 

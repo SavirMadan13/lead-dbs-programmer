@@ -1,3 +1,8 @@
+// /* eslint-disable no-restricted-globals */
+// /* eslint-disable react/prop-types */
+// /* eslint-disable @typescript-eslint/no-unused-vars */
+// /* eslint-disable react/function-component-definition */
+
 import React, {
   useState,
   useEffect,
@@ -5,17 +10,23 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from 'react';
+import Button from 'react-bootstrap/Button';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import Modal from 'react-bootstrap/Modal';
+import Form from 'react-bootstrap/Form';
+import ToggleButton from 'react-bootstrap/ToggleButton';
+import Dropdown from 'react-bootstrap/Dropdown';
+// import Popup from 'reactjs-popup';
 import TripleToggleTest from '../TripleToggleTest'; // Make sure to import TripleToggle correctly
 import calculateQuantities from '../CalculateQuantities'; // Correct the path to quantityUtils
 import './NewBostonCartesiaTest.css';
 import { ReactComponent as IPG } from './images/IPG.svg';
-import { ReactComponent as Contact } from './images/TrialContact.svg';
+import { ReactComponent as Contact } from './images/Contact.svg';
 import { ReactComponent as Tail } from './images/Tail.svg';
-import { ReactComponent as RightContact } from './images/TrialRightContact.svg';
-import { ReactComponent as LeftContact } from './images/TrialLeftContact.svg';
-import { ReactComponent as HeadTop } from './images/ElecTop.svg';
+import { ReactComponent as RightContact } from './images/RightContact.svg';
+import { ReactComponent as LeftContact } from './images/LeftContact.svg';
+import { ReactComponent as HeadTop } from './images/head_top.svg';
 import { ReactComponent as HeadBottom } from './images/head_bottom.svg';
-import { ReactComponent as NonSegmentedContact } from './images/TrialWholeContact.svg';
 import { ReactComponent as UpArrow } from './images/UpArrow.svg';
 import { ReactComponent as DownArrow } from './images/DownArrow.svg';
 import { ReactComponent as ClockwiseArrow } from './images/ClockwiseArrow.svg';
@@ -25,7 +36,7 @@ import { ReactComponent as BackButton } from './images/BackButton.svg';
 import { ReactComponent as LeftButton } from './images/LeftButton.svg';
 import { ReactComponent as RightButton } from './images/RightButton.svg';
 import { ReactComponent as SplitEvenButton } from './images/SplitEvenButton.svg';
-import { ReactComponent as ElecBackdrop } from './images/ElecBackdrop.svg';
+import StaticExample from '../StaticExample';
 // import {
 //   IPG,
 //   Contact,
@@ -36,29 +47,35 @@ import { ReactComponent as ElecBackdrop } from './images/ElecBackdrop.svg';
 //   HeadBottom,
 // } from './BostonCartesiaSVG'; // Import SVG components from the new file
 import BostonElectrodeRenderer from './BostonElectrodeRenderer';
+import PercentageAmplitudeToggle from '../PercentageAmplitudeToggle';
+import AssistedToggle from '../AssistedToggle';
+import VoltageAmplitudeToggle from '../VoltageAmplitudeToggle';
+import MAToggleSwitch from '../MAToggleSwitch';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+
 // import { relative } from 'path';
 
 function NewBostonCartesiaTest(props, ref) {
   // console.log('bc name=', props.name);
   const svgs = [
-    // <HeadTop key="headTop" />,
-    // <HeadBottom key="headBottom" />,
-    <NonSegmentedContact key="8" level="4" />,
+    <HeadTop key="headTop" />,
+    <HeadBottom key="headBottom" />,
+    <Contact key="8" level="4" />,
     <Contact key="5" level="3" face="center" />,
     <Contact key="2" level="2" face="center" />,
-    <NonSegmentedContact key="1" level="1" />,
+    <Tail key="1" level="1" />,
   ];
 
   const ipgs = [<IPG key="0" />];
 
-  const rightContacts = [
-    <RightContact key="7" level="3" face="right" />,
-    <RightContact key="4" level="2" face="right" />,
+  const leftContacts = [
+    <Contact key="7" level="3" face="right" />,
+    <Contact key="4" level="2" face="right" />,
   ];
 
-  const leftContacts = [
-    <LeftContact key="6" level="3" face="left" />,
-    <LeftContact key="3" level="2" face="left" />,
+  const rightContacts = [
+    <Contact key="6" level="3" face="left" />,
+    <Contact key="3" level="2" face="left" />,
   ];
 
   const level = {
@@ -72,6 +89,8 @@ function NewBostonCartesiaTest(props, ref) {
     7: 3,
     8: 4,
   };
+
+  const levelArray = { 2: [2, 3, 4], 3: [5, 6, 7] };
 
   const face = {
     0: '',
@@ -96,6 +115,8 @@ function NewBostonCartesiaTest(props, ref) {
     7: 6,
     8: 8,
   };
+
+  const [percAmpToggle, setPercAmpToggle] = useState('left');
 
   const [calculateQuantities, setCalculateQuantities] = useState(false);
 
@@ -125,6 +146,10 @@ function NewBostonCartesiaTest(props, ref) {
     minus: 0,
   };
 
+  const [totalAmplitude, setTotalAmplitude] = useState(
+    props.totalAmplitude || 0,
+  );
+
   const [selectedValues, setSelectedValues] = useState(
     props.selectedValues || {
       0: 'right',
@@ -139,6 +164,19 @@ function NewBostonCartesiaTest(props, ref) {
       // Initialize other images here
     },
   );
+
+  const [animation, setAnimation] = useState({
+    0: null,
+    1: null,
+    2: null,
+    3: null,
+    4: null,
+    5: null,
+    6: null,
+    7: null,
+    8: null,
+  });
+
   const [quantities, setQuantities] = useState(
     props.quantities || {
       0: 100,
@@ -153,6 +191,18 @@ function NewBostonCartesiaTest(props, ref) {
     },
   );
   // const [userQuantities, setUserQuantities] = useState({}); // Store user input quantities
+
+  const [parameters, setParameters] = useState(
+    props.parameters || {
+      parameter1: '60',
+      parameter2: '130',
+      parameter3: '0',
+    },
+  );
+
+  const [visModel, setVisModel] = useState(props.visModel || '');
+
+  const [sessionTitle, setSessionTitle] = useState(props.sessionTitle || '');
 
   const totalQuantity = quantities.plus + quantities.minus;
   let isAssisted = false;
@@ -176,9 +226,6 @@ function NewBostonCartesiaTest(props, ref) {
     });
     return levelTotals;
   };
-
-  // console.log('lastChangedInstance:', lastChangedInstance); // Add this line to log the value
-
   // const calculateQuantitiesWithDistribution = (selectedValues) => {
   //   const quantities = {
   //     left: 0,
@@ -250,24 +297,26 @@ function NewBostonCartesiaTest(props, ref) {
   //   setQuantities(newQuantities);
   // };
 
-  const handleTripleToggleChange = (value, key) => {
-    const updatedSelectedValues = { ...selectedValues, [key]: value };
-    setSelectedValues(updatedSelectedValues);
-  };
   // console.log('Values: ', selectedValues);
 
   const calculateQuantitiesForTwo = () => {
     // Calculate the quantity increment for 'center' and 'right' values
     // This is effectively the number of TripleToggle components that have a value of 'center'
+    let total = 0;
+    if (percAmpToggle === 'left') {
+      total = 100;
+    } else if (percAmpToggle === 'right') {
+      total = totalAmplitude;
+    }
     const centerCount = Object.values(selectedValues).filter(
       (value) => value === 'center',
     ).length;
-    let centerQuantityIncrement = centerCount > 0 ? 100 / centerCount : 0;
+    let centerQuantityIncrement = centerCount > 0 ? total / centerCount : 0;
     // THis is effectively the number of TripleToggle components that have a value of 'right'
     const rightCount = Object.values(selectedValues).filter(
       (value) => value === 'right',
     ).length;
-    let rightQuantityIncrement = rightCount > 0 ? 100 / rightCount : 0;
+    let rightQuantityIncrement = rightCount > 0 ? total / rightCount : 0;
 
     // This finds the difference between
     if (lastChangedInstance.value === 'center') {
@@ -301,42 +350,25 @@ function NewBostonCartesiaTest(props, ref) {
     return quantities;
   };
 
-  // Define the handleQuantityChange function to update the quantity for a specific key and value
-  // const handleQuantityChange = (quantity, key) => {
-  //   // setQuantities((prevQuantities) => ({
-  //   //   ...prevQuantities,
-  //   //   [key]: quantity,
-  //   // }));
-  //   const updatedQuantities = { ...quantities, [key]: quantity };
-  //   ////////Steering for two components logic///////
-  //   const centerCount = Object.values(selectedValues).filter(
-  //     (value) => value === 'center',
-  //   ).length;
-  //   // console.log('Center Count: ', centerCount);
-  //   const rightCount = Object.values(selectedValues).filter(
-  //     (value) => value === 'right',
-  //   ).length;
-
-  //   if (centerCount === 2 || rightCount === 2) {
-  //     const newQuantities = calculateQuantitiesForTwo();
-  //     setQuantities(newQuantities);
-  //   }
-  //   setQuantities(updatedQuantities);
-  //   assist();
-  // };
-
   const calculateQuantitiesWithDistribution = () => {
     // Calculate the quantity increment for 'center' and 'right' values
+    let total = 0;
+    if (percAmpToggle === 'left') {
+      total = 100;
+    } else if (percAmpToggle === 'right') {
+      total = totalAmplitude;
+    }
+    console.log('total: ', total);
     const centerCount = Object.values(selectedValues).filter(
       (value) => value === 'center',
     ).length;
-    const centerQuantityIncrement = centerCount > 0 ? 100 / centerCount : 0;
+    const centerQuantityIncrement = centerCount > 0 ? total / centerCount : 0;
     // console.log('CenterCount: ', centerCount);
 
     const rightCount = Object.values(selectedValues).filter(
       (value) => value === 'right',
     ).length;
-    const rightQuantityIncrement = rightCount > 0 ? 100 / rightCount : 0;
+    const rightQuantityIncrement = rightCount > 0 ? total / rightCount : 0;
 
     const updatedQuantities = { ...quantities }; // Create a copy of the quantities object
 
@@ -347,7 +379,9 @@ function NewBostonCartesiaTest(props, ref) {
       if (value === 'left') {
         updatedQuantities[key] = 0;
       } else if (value === 'center') {
+        console.log('CENTER: ', centerQuantityIncrement);
         updatedQuantities[key] = centerQuantityIncrement;
+        console.log('updated: ', updatedQuantities);
       } else if (value === 'right') {
         updatedQuantities[key] = rightQuantityIncrement;
       }
@@ -356,9 +390,48 @@ function NewBostonCartesiaTest(props, ref) {
 
     // console.log(quantities);
     setQuantities(updatedQuantities);
-    setSelectedValues(selectedValues);
+    // setSelectedValues(selectedValue);
 
-    console.log(quantities); // Update the state with the new quantities
+    console.log(quantities);
+    // Update the state with the new quantities
+  };
+
+  const handleIPGLogic = () => {
+    if (props.IPG === 'Abbott') {
+      calculateQuantitiesWithDistribution();
+    }
+  };
+
+  const handleTripleToggleChange = (value, anime, key) => {
+    const updatedSelectedValues = { ...selectedValues, [key]: value };
+    const updatedAnimationValues = { ...animation, [key]: anime };
+    const updatedQuantities = { ...quantities };
+    setSelectedValues(updatedSelectedValues);
+    setAnimation(updatedAnimationValues);
+    console.log(animation);
+    if (props.IPG === 'Abbott') {
+      console.log('1');
+      console.log(selectedValues);
+      Object.keys(updatedSelectedValues).forEach((thing) => {
+        const newvalue = updatedSelectedValues[thing];
+        // console.log("key="+key + ", value=" + value);
+        if (newvalue === 'left') {
+          updatedQuantities[key] = 0;
+        } else if (newvalue === 'center') {
+          // console.log('CENTER: ', centerQuantityIncrement);
+          updatedQuantities[key] = 10;
+          console.log('updated: ', updatedQuantities);
+        } else if (newvalue === 'right') {
+          updatedQuantities[key] = 10;
+          console.log('updated: ', updatedQuantities);
+        }
+        // updatedQuantities[key] = 20;
+      });
+      console.log('2');
+    }
+    setQuantities(updatedQuantities);
+    // console.log('quani: ', quantities);
+    // // handleIPGLogic();
   };
 
   const roundToHundred = () => {
@@ -366,6 +439,13 @@ function NewBostonCartesiaTest(props, ref) {
     let totalCenterSum = 0;
     let totalRightSum = 0;
     const roundUpdatedQuantities = { ...quantities };
+
+    let total = 0;
+    if (percAmpToggle === 'left') {
+      total = 100;
+    } else if (percAmpToggle === 'right') {
+      total = totalAmplitude;
+    }
 
     // Calculate the sums for 'center' and 'right' values
     Object.keys(selectedValues).forEach((key) => {
@@ -383,13 +463,13 @@ function NewBostonCartesiaTest(props, ref) {
     const centerCount = Object.values(selectedValues).filter(
       (value) => value === 'center',
     ).length;
-    const centerQuantityIncrement = (100 - totalCenterSum) / centerCount;
+    const centerQuantityIncrement = (total - totalCenterSum) / centerCount;
     console.log('Center increment:', centerQuantityIncrement);
 
     const rightCount = Object.values(selectedValues).filter(
       (value) => value === 'right',
     ).length;
-    const rightQuantityIncrement = (100 - totalRightSum) / rightCount;
+    const rightQuantityIncrement = (total - totalRightSum) / rightCount;
 
     // const updatedQuantities = { ...quantities }; // Create a copy of the quantities object
 
@@ -408,6 +488,62 @@ function NewBostonCartesiaTest(props, ref) {
     });
     setQuantities(roundUpdatedQuantities); // Update the state with the new quantities
     console.log(roundUpdatedQuantities);
+  };
+
+  const newRoundToHundred = () => {
+    // Initialize sum variables
+    let totalCenterSum = 0;
+    let totalRightSum = 0;
+    const roundUpdatedQuantities = { ...quantities };
+
+    let total = 0;
+    if (percAmpToggle === 'left') {
+      total = 100;
+    } else if (percAmpToggle === 'right') {
+      total = totalAmplitude;
+    }
+
+    // Calculate the sums for 'center' and 'right' values
+    Object.keys(selectedValues).forEach((key) => {
+      const value = selectedValues[key];
+      if (value === 'center') {
+        totalCenterSum += parseFloat(roundUpdatedQuantities[key]);
+        console.log('CenterSum: ', totalCenterSum);
+      } else if (value === 'right') {
+        totalRightSum += parseFloat(roundUpdatedQuantities[key]);
+        console.log('RightSum: ', totalRightSum);
+      }
+    });
+
+    // Calculate the quantity increments
+    const centerCount = Object.values(selectedValues).filter(
+      (value) => value === 'center',
+    ).length;
+    const centerQuantityIncrement = (total - totalCenterSum) / centerCount;
+    console.log('Center increment:', centerQuantityIncrement);
+
+    const rightCount = Object.values(selectedValues).filter(
+      (value) => value === 'right',
+    ).length;
+    const rightQuantityIncrement = (total - totalRightSum) / rightCount;
+
+    // const updatedQuantities = { ...quantities }; // Create a copy of the quantities object
+
+    // Update the quantities based on selected values
+    Object.keys(selectedValues).forEach((key) => {
+      const value = selectedValues[key];
+      if (value === 'left') {
+        roundUpdatedQuantities[key] = 0;
+      } else if (value === 'center') {
+        roundUpdatedQuantities[key] =
+          parseFloat(roundUpdatedQuantities[key]) + centerQuantityIncrement;
+      } else if (value === 'right') {
+        roundUpdatedQuantities[key] =
+          parseFloat(roundUpdatedQuantities[key]) + rightQuantityIncrement;
+      }
+    });
+    return roundUpdatedQuantities;
+    // console.log(roundUpdatedQuantities);
   };
 
   function checkQuantitiesAndValues(quantity, value) {
@@ -454,6 +590,77 @@ function NewBostonCartesiaTest(props, ref) {
           parseFloat(
             (levelQuantity * parseFloat(levelQuantities[levelQuantity])) / 100,
           );
+      }
+    });
+    console.log('VectorLevel: ', vectorLevel);
+    console.log('LevelQuantities: ', levelQuantities);
+
+    // Calculating the direction
+    const faceTotals = {};
+    // We want to get the faceTotals
+    // Start by initializing the faceTotals variables
+    Object.keys(face).forEach((key) => {
+      faceTotals[face[key]] = 0;
+    });
+    // console.log(faceTotals);
+    Object.keys(face).forEach((key) => {
+      faceTotals[face[key]] =
+        parseFloat(faceTotals[face[key]]) + parseFloat(updatedQuantities[key]);
+    });
+    // console.log(faceTotals);
+    // Coordinates for each
+    let aVec = [0, 0];
+    let bVec = [0, 0];
+    let cVec = [0, 0];
+    const cos60 = Math.cos((60 * Math.PI) / 180);
+    const cos30 = Math.cos((30 * Math.PI) / 180);
+    const sin60 = Math.sin((60 * Math.PI) / 180);
+    const sin30 = Math.sin((30 * Math.PI) / 180);
+    Object.keys(faceTotals).forEach((key) => {
+      if (key === 'left') {
+        cVec = [
+          parseFloat(-faceTotals[key]) / 2,
+          parseFloat(-faceTotals[key]) * cos30,
+        ];
+      } else if (key === 'center') {
+        aVec = [faceTotals[key], 0];
+      } else if (key === 'right') {
+        bVec = [
+          parseFloat(-faceTotals[key]) / 2,
+          parseFloat(faceTotals[key]) * sin60,
+        ];
+      }
+    });
+    for (let i = 0; i < aVec.length; i++) {
+      vecCoords[i] = aVec[i] + bVec[i] + cVec[i];
+    }
+    vectorDirection = (Math.atan(vecCoords[1] / vecCoords[0]) * 180) / Math.PI;
+    console.log('VecCoords', vecCoords);
+    console.log(bVec);
+  };
+
+  const vectorMakeUpAmplitude = () => {
+    // Calculating the level
+    const updatedQuantities = { ...quantities };
+    // console.log(vectorLevel);
+    Object.keys(level).forEach((key) => {
+      levelQuantities[level[key]] = 0;
+    });
+    Object.keys(level).forEach((key) => {
+      levelQuantities[level[key]] =
+        parseFloat(levelQuantities[level[key]]) +
+        parseFloat(updatedQuantities[key]);
+      // console.log(levelQuantities);
+    });
+    Object.keys(levelQuantities).forEach((levelQuantity) => {
+      // console.log(vectorLevel);
+      if (levelQuantity !== 0) {
+        vectorLevel =
+          parseFloat(vectorLevel) +
+          parseFloat(
+            (levelQuantity * parseFloat(levelQuantities[levelQuantity])) /
+              totalAmplitude,
+          ); // levelQuantity here is the actual level, and then levelQuantities[levelQuantity] is the total quantity at that level
       }
     });
     console.log('VectorLevel: ', vectorLevel);
@@ -582,6 +789,7 @@ function NewBostonCartesiaTest(props, ref) {
   // };
 
   const handleUpButton = () => {
+    roundToHundred();
     const updatedQuantities = { ...quantities };
     const updatedSelectedValues = { ...selectedValues };
     Object.keys(selectedValues).forEach((key) => {
@@ -765,6 +973,7 @@ function NewBostonCartesiaTest(props, ref) {
 
   const handleDownButton = () => {
     // Create a copy of the current quantities
+    roundToHundred();
     const updatedQuantities = { ...quantities };
     const updatedSelectedValues = { ...selectedValues };
     Object.keys(selectedValues).forEach((key) => {
@@ -797,40 +1006,198 @@ function NewBostonCartesiaTest(props, ref) {
     setQuantities(updatedQuantities);
   };
 
-  // const handleClockwiseButton = () => {
-  //   const updatedQuantities = { ...quantities };
-  //   console.log(updatedQuantities);
-  //   Object.keys(selectedValues).forEach((key) => {
-  //     const currentLevel = level[key];
-  //     const nextLevel = parseFloat(key) + 1; // These aren't actually the level, but rather the keys of the contacts
-  //     const belowLevel = parseFloat(key) - 2;
-  //     const currentFace = face[key];
-  //     if (selectedValues[key] !== 'left') {
-  //       if (face[key] === 'center' || face[key] === 'left') {
-  //         // console.log('Face: ', face[key]);
-  //         // console.log(selectedValues[key]);
-  //         // console.log(key);
-  //         // console.log(nextLevel);
-  //         // console.log(selectedValues[nextLevel] === selectedValues[key]);
-  //         if (selectedValues[key] === selectedValues[nextLevel]) {
-  //           console.log('UpdatedQuantities: ', updatedQuantities);
-  //           updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
-  //           updatedQuantities[nextLevel] =
-  //             parseFloat(updatedQuantities[nextLevel]) + 10;
-  //           console.log('UpdatedQuantities: ', updatedQuantities);
-  //         }
-  //       } else if (face[key] === 'right') {
-  //         if (selectedValues[key] === selectedValues[belowLevel]) {
-  //           updatedQuantities[key] -= 10;
-  //           updatedQuantities[belowLevel] += 10;
-  //         }
-  //       }
-  //     }
-  //   });
-  //   setQuantities(updatedQuantities);
-  // };
+  function getOnContacts(aLevel) {
+    const onContacts = [];
+    Object.keys(level).forEach((key) => {
+      const numericKey = parseInt(key, 10); // Convert the string key to a number
+      if (level[key] === aLevel && selectedValues[key] !== 'left') {
+        onContacts.push(numericKey);
+      }
+    });
+    return onContacts;
+  }
 
-  const handleClockwiseButton = () => {
+  const newHandleClockwiseButton = () => {
+    const updatedQuantities = { ...quantities };
+    const updatedSelectedValues = { ...selectedValues };
+    const totalLevelArray = {};
+    const numOnContacts = {};
+    const vectorLevelAngle = {};
+    // This code allows us to determine how many contacts are on at each level and what the total sum of the contacts on that level are
+    Object.keys(levelArray).forEach((key) => {
+      totalLevelArray[key] = 0;
+      numOnContacts[key] = 0;
+      for (let i = 0; i < 3; i++) {
+        console.log(levelArray[key][i]);
+        totalLevelArray[key] =
+          parseFloat(totalLevelArray[key]) +
+          parseFloat(updatedQuantities[levelArray[key][i]]);
+        if (updatedQuantities[levelArray[key][i]] > 0) {
+          numOnContacts[key] += 1;
+        }
+      }
+    });
+    let aVec = [0, 0];
+    let bVec = [0, 0];
+    let cVec = [0, 0];
+    const baseZero = [1, 0];
+    const cos60 = Math.cos((60 * Math.PI) / 180);
+    const cos30 = Math.cos((30 * Math.PI) / 180);
+    const sin60 = Math.sin((60 * Math.PI) / 180);
+    const sin30 = Math.sin((30 * Math.PI) / 180);
+    const localCoords = [0, 0];
+    // The next step is to determine the angle of the vector at that level
+    Object.keys(numOnContacts).forEach((key) => {
+      // Now we have the levels that rotation can occur
+      if (numOnContacts[key] > 0 && numOnContacts[key] < 3) {
+        console.log('here');
+        for (let i = 0; i < 3; i++) {
+          console.log(levelArray[key][i]);
+          if (face[levelArray[key][i]] === 'left') {
+            console.log('1');
+            cVec = [
+              parseFloat(-updatedQuantities[levelArray[key][i]]) / 2,
+              parseFloat(-updatedQuantities[levelArray[key][i]]) * cos30,
+            ];
+            console.log('c', cVec);
+          } else if (face[levelArray[key][i]] === 'center') {
+            console.log('center');
+            aVec = [updatedQuantities[levelArray[key][i]], 0];
+            console.log('a', aVec);
+          } else if (face[levelArray[key][i]] === 'right') {
+            bVec = [
+              parseFloat(-updatedQuantities[levelArray[key][i]]) / 2,
+              parseFloat(updatedQuantities[levelArray[key][i]]) * sin60,
+            ];
+            console.log('b', bVec);
+          }
+        }
+      }
+    });
+    for (let i = 0; i < aVec.length; i++) {
+      localCoords[i] = aVec[i] + bVec[i] + cVec[i];
+    }
+    const vecLength = Math.sqrt(
+      localCoords[0] * localCoords[0] + localCoords[1] * localCoords[1],
+    );
+    console.log('local', localCoords);
+    const vecDotProduct = 0;
+    const vecAng = (Math.acos(localCoords[0] / vecLength) * 180) / Math.PI;
+    const vectorAngle =
+      (Math.atan(localCoords[1] / localCoords[0]) * 180) / Math.PI;
+    console.log('vcecof: ', vecAng);
+  };
+
+  const handleCounterClockwiseButton = () => {
+    const updatedQuantities = { ...quantities };
+    const updatedSelectedValues = { ...selectedValues };
+    Object.keys(selectedValues)
+      .reverse()
+      .forEach((key) => {
+        const currentLevel = level[key];
+        const nextKey = parseFloat(key) + 1;
+        const previousKey = parseFloat(key) - 1;
+        const rightNextKey = parseFloat(key) - 2;
+        const centerpreviousKey = parseFloat(key) + 2;
+        const currentFace = face[key];
+
+        if (updatedQuantities[key] === 0) {
+          updatedSelectedValues[key] = 'left';
+        }
+        const currentKeys = Object.keys(level).filter(
+          (k) => level[k] === currentLevel,
+        );
+        const levelTotals = calculateLevelTotals();
+        console.log(levelTotals);
+        let currentLevelTotal = 0;
+        Object.keys(levelTotals).forEach((levels) => {
+          if (level[key] === parseFloat(levels)) {
+            currentLevelTotal = levelTotals[levels];
+            console.log('leveltot: ', currentLevelTotal);
+          }
+        });
+        let currentLeftCount = 0;
+        let currentCenterCount = 0;
+        let currentRightCount = 0;
+        currentKeys.forEach((currentKey) => {
+          const value = updatedSelectedValues[currentKey];
+          if (value === 'left') {
+            currentLeftCount += 1;
+          } else if (value === 'center') {
+            currentCenterCount += 1;
+          } else if (value === 'right') {
+            currentRightCount += 1;
+          }
+        });
+        if (face[key] === 'left' && updatedQuantities[previousKey] === 0) {
+          if (updatedSelectedValues[key] !== 'left') {
+            if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
+              updatedQuantities[nextKey] =
+                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+            } else if (updatedSelectedValues[nextKey] === 'left') {
+              console.log('HelloHello');
+              updatedSelectedValues[nextKey] = updatedSelectedValues[key];
+              updatedQuantities[nextKey] =
+                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+            }
+          }
+        }
+        if (
+          face[key] === 'center' &&
+          updatedQuantities[centerpreviousKey] === 0
+        ) {
+          if (updatedSelectedValues[key] !== 'left') {
+            if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
+              updatedQuantities[nextKey] =
+                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+            } else if (updatedSelectedValues[nextKey] === 'left') {
+              console.log('HelloHello');
+              updatedSelectedValues[nextKey] = updatedSelectedValues[key];
+              updatedQuantities[nextKey] =
+                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+            }
+          }
+        }
+        if (face[key] === 'right' && updatedQuantities[previousKey] === 0) {
+          if (updatedSelectedValues[key] !== 'left') {
+            if (
+              updatedSelectedValues[key] === updatedSelectedValues[rightNextKey]
+            ) {
+              updatedQuantities[rightNextKey] =
+                parseFloat(updatedQuantities[rightNextKey]) +
+                currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+            } else if (updatedSelectedValues[rightNextKey] === 'left') {
+              updatedSelectedValues[rightNextKey] = updatedSelectedValues[key];
+              updatedQuantities[rightNextKey] =
+                parseFloat(updatedQuantities[rightNextKey]) +
+                currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+            }
+          }
+        }
+        if (updatedQuantities[key] === 0) {
+          updatedSelectedValues[key] = 'left';
+        }
+      });
+    setSelectedValues(updatedSelectedValues);
+    setQuantities(updatedQuantities);
+    // vectorMakeUp();
+    // console.log('VecDirection: ', vectorDirection);
+    checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+  };
+
+  const handleCounterClockwiseButtonAmplitude = () => {
     const updatedQuantities = { ...quantities };
     const updatedSelectedValues = { ...selectedValues };
     Object.keys(selectedValues)
@@ -866,14 +1233,16 @@ function NewBostonCartesiaTest(props, ref) {
           if (updatedSelectedValues[key] !== 'left') {
             if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + totalAmplitude / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
             } else if (updatedSelectedValues[nextKey] === 'left') {
               console.log('HelloHello');
               updatedSelectedValues[nextKey] = updatedSelectedValues[key];
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + totalAmplitude / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - totalAmplitude;
             }
           }
         }
@@ -884,14 +1253,16 @@ function NewBostonCartesiaTest(props, ref) {
           if (updatedSelectedValues[key] !== 'left') {
             if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + totalAmplitude / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
             } else if (updatedSelectedValues[nextKey] === 'left') {
               console.log('HelloHello');
               updatedSelectedValues[nextKey] = updatedSelectedValues[key];
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + totalAmplitude / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
             }
           }
         }
@@ -901,14 +1272,18 @@ function NewBostonCartesiaTest(props, ref) {
               updatedSelectedValues[key] === updatedSelectedValues[rightNextKey]
             ) {
               updatedQuantities[rightNextKey] =
-                parseFloat(updatedQuantities[rightNextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[rightNextKey]) +
+                totalAmplitude / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
             } else if (updatedSelectedValues[rightNextKey] === 'left') {
               console.log('HelloHello');
               updatedSelectedValues[rightNextKey] = updatedSelectedValues[key];
               updatedQuantities[rightNextKey] =
-                parseFloat(updatedQuantities[rightNextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[rightNextKey]) +
+                totalAmplitude / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
             }
           }
         }
@@ -923,7 +1298,150 @@ function NewBostonCartesiaTest(props, ref) {
     // checkQuantitiesAndValues(quantities, selectedValues);
   };
 
-  const handleCounterClockwiseButton = () => {
+  const handleClockwiseButton = () => {
+    const updatedQuantities = { ...quantities };
+    const updatedSelectedValues = { ...selectedValues };
+    Object.keys(selectedValues)
+      .reverse()
+      .forEach((key) => {
+        const currentLevel = level[key];
+        const nextKey = parseFloat(key) - 1;
+        const previousKey = parseFloat(key) + 1;
+        const centerNextKey = parseFloat(key) + 2;
+        // const centerpreviousKey = parseFloat(key) - 1;
+        const rightPreviousKey = parseFloat(key) - 2;
+        const currentFace = face[key];
+
+        if (updatedQuantities[key] === 0) {
+          updatedSelectedValues[key] = 'left';
+        }
+        const currentKeys = Object.keys(level).filter(
+          (k) => level[k] === currentLevel,
+        );
+        const levelTotals = calculateLevelTotals();
+        // console.log(levelTotals);
+        let currentLevelTotal = 0;
+        Object.keys(levelTotals).forEach((levels) => {
+          if (level[key] === parseFloat(levels)) {
+            currentLevelTotal = levelTotals[levels];
+          }
+        });
+        let currentLeftCount = 0;
+        let currentCenterCount = 0;
+        let currentRightCount = 0;
+        currentKeys.forEach((currentKey) => {
+          const value = updatedSelectedValues[currentKey];
+          if (value === 'left') {
+            currentLeftCount += 1;
+          } else if (value === 'center') {
+            currentCenterCount += 1;
+          } else if (value === 'right') {
+            currentRightCount += 1;
+          }
+        });
+        if (face[key] === 'left' && updatedQuantities[previousKey] === 0) {
+          if (updatedSelectedValues[key] !== 'left') {
+            if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
+              if (updatedQuantities[key] < currentLevelTotal / 10) {
+                updatedQuantities[nextKey] =
+                  parseFloat(updatedQuantities[nextKey]) +
+                  parseFloat(updatedQuantities[key]);
+                updatedQuantities[key] = 0;
+              } else {
+                updatedQuantities[nextKey] =
+                  parseFloat(updatedQuantities[nextKey]) +
+                  currentLevelTotal / 10;
+                updatedQuantities[key] =
+                  parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+              }
+              // updatedQuantities[nextKey] =
+              //   parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              // updatedQuantities[key] = parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+            } else if (updatedSelectedValues[nextKey] === 'left') {
+              updatedSelectedValues[nextKey] = updatedSelectedValues[key];
+              updatedQuantities[nextKey] =
+                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+            }
+          }
+        }
+        if (face[key] === 'center' && updatedQuantities[previousKey] === 0) {
+          if (updatedSelectedValues[key] !== 'left') {
+            if (
+              updatedSelectedValues[key] ===
+              updatedSelectedValues[centerNextKey]
+            ) {
+              // updatedQuantities[centerNextKey] =
+              //   parseFloat(updatedQuantities[centerNextKey]) +
+              //   currentLevelTotal / 10;
+              // updatedQuantities[key] =
+              //   parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+              if (updatedQuantities[key] < currentLevelTotal / 10) {
+                console.log('true');
+                updatedQuantities[centerNextKey] =
+                  parseFloat(updatedQuantities[centerNextKey]) +
+                  parseFloat(updatedQuantities[key]);
+                updatedQuantities[key] = 0;
+              } else {
+                updatedQuantities[centerNextKey] =
+                  parseFloat(updatedQuantities[centerNextKey]) +
+                  currentLevelTotal / 10;
+                updatedQuantities[key] =
+                  parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+              }
+            } else if (updatedSelectedValues[centerNextKey] === 'left') {
+              updatedSelectedValues[centerNextKey] = updatedSelectedValues[key];
+              updatedQuantities[centerNextKey] =
+                parseFloat(updatedQuantities[centerNextKey]) +
+                currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+            }
+          }
+        }
+        if (
+          face[key] === 'right' &&
+          updatedQuantities[rightPreviousKey] === 0
+        ) {
+          if (updatedSelectedValues[key] !== 'left') {
+            if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
+              if (updatedQuantities[key] < currentLevelTotal / 10) {
+                updatedQuantities[nextKey] =
+                  parseFloat(updatedQuantities[nextKey]) +
+                  parseFloat(updatedQuantities[key]);
+                updatedQuantities[key] = 0;
+              } else {
+                updatedQuantities[nextKey] =
+                  parseFloat(updatedQuantities[nextKey]) +
+                  currentLevelTotal / 10;
+                updatedQuantities[key] =
+                  parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+              }
+              // console.log('true');
+              // updatedQuantities[nextKey] =
+              //   parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              // updatedQuantities[key] =
+              //   parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+            } else if (updatedSelectedValues[nextKey] === 'left') {
+              updatedSelectedValues[nextKey] = updatedSelectedValues[key];
+              updatedQuantities[nextKey] =
+                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+            }
+          }
+        }
+        if (updatedQuantities[key] === 0) {
+          updatedSelectedValues[key] = 'left';
+        }
+      });
+    setSelectedValues(updatedSelectedValues);
+    setQuantities(updatedQuantities);
+    checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+  };
+
+  const handleClockwiseButtonAmplitude = () => {
     const updatedQuantities = { ...quantities };
     const updatedSelectedValues = { ...selectedValues };
     Object.keys(selectedValues)
@@ -960,14 +1478,16 @@ function NewBostonCartesiaTest(props, ref) {
           if (updatedSelectedValues[key] !== 'left') {
             if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + totalAmplitude / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
             } else if (updatedSelectedValues[nextKey] === 'left') {
               console.log('HelloHello');
               updatedSelectedValues[nextKey] = updatedSelectedValues[key];
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + totalAmplitude / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
             }
           }
         }
@@ -978,14 +1498,18 @@ function NewBostonCartesiaTest(props, ref) {
               updatedSelectedValues[centerNextKey]
             ) {
               updatedQuantities[centerNextKey] =
-                parseFloat(updatedQuantities[centerNextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[centerNextKey]) +
+                totalAmplitude / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
             } else if (updatedSelectedValues[centerNextKey] === 'left') {
               console.log('HelloHello');
               updatedSelectedValues[centerNextKey] = updatedSelectedValues[key];
               updatedQuantities[centerNextKey] =
-                parseFloat(updatedQuantities[centerNextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[centerNextKey]) +
+                totalAmplitude / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
             }
           }
         }
@@ -996,14 +1520,16 @@ function NewBostonCartesiaTest(props, ref) {
           if (updatedSelectedValues[key] !== 'left') {
             if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + totalAmplitude / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
             } else if (updatedSelectedValues[nextKey] === 'left') {
               console.log('HelloHello');
               updatedSelectedValues[nextKey] = updatedSelectedValues[key];
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + totalAmplitude / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
             }
           }
         }
@@ -1088,21 +1614,189 @@ function NewBostonCartesiaTest(props, ref) {
     return false;
   }
 
-  function getOnContacts(aLevel) {
-    const onContacts = [];
-    Object.keys(level).forEach((key) => {
-      const numericKey = parseInt(key, 10); // Convert the string key to a number
-      if (level[key] === aLevel && selectedValues[key] !== 'left') {
-        onContacts.push(numericKey);
+  function roundAlloc(
+    beforeLevel,
+    nextLevel,
+    levelAboveTotal,
+    levelBelowTotal,
+    values,
+    amtOnContacts,
+  ) {
+    // let oldTotal = 0;
+    let newAboveTotal = 0;
+    let newBelowTotal = 0;
+    let belowTotal = levelBelowTotal;
+    let aboveTotal = levelAboveTotal;
+    Object.keys(values).forEach((key) => {
+      if (level[key] === beforeLevel) {
+        values[key] = Math.floor(values[key] + 0.5);
+        newBelowTotal += values[key];
+      } else if (level[key] === nextLevel) {
+        values[key] = Math.floor(values[key] + 0.5);
+        newAboveTotal += values[key];
+      }
+      // values[key] = Math.floor(values[key] + 0.5);
+      // newTotal += values[key];
+    });
+    // console.log('old', oldTotal);
+    // console.log('new', newTotal);
+    belowTotal = Math.floor(belowTotal + 0.5);
+    const belowDiff = belowTotal - newBelowTotal;
+    aboveTotal = Math.floor(aboveTotal + 0.5);
+    const aboveDiff = aboveTotal - newAboveTotal;
+    let doneUpdate = 0;
+    console.log('above', aboveDiff);
+    console.log('below', belowDiff);
+    Object.keys(values).forEach((key) => {
+      if (values[key] !== 0 && doneUpdate === 0 && level[key] === beforeLevel) {
+        values[key] += belowDiff;
+        doneUpdate = 1;
       }
     });
-    return onContacts;
+    doneUpdate = 0;
+    console.log('below level total: ', belowTotal);
+    Object.keys(values).forEach((key) => {
+      if (values[key] !== 0 && doneUpdate === 0 && level[key] === nextLevel) {
+        values[key] += aboveDiff;
+        doneUpdate = 1;
+      }
+      if (amtOnContacts === 3) {
+        if (aboveTotal % 3 === 0) {
+          if (level[key] === nextLevel) {
+            values[key] = aboveTotal / 3;
+          }
+        }
+        if (belowTotal % 3 === 0) {
+          if (level[key] === beforeLevel) {
+            values[key] = belowTotal / 3;
+            console.log('values[key]', values[key]);
+          }
+        }
+      } else if (amtOnContacts === 1) {
+        console.log('made it here');
+        if (belowTotal % 3 === 0) {
+          console.log(beforeLevel);
+          if (level[key] === beforeLevel) {
+            console.log('yes');
+            values[key] = belowTotal / 3;
+            console.log('values[key]', values[key]);
+          }
+        }
+      }
+    });
+    return values;
   }
+
   // For clear button
 
+  // const newHandleUpButton = () => {
+  //   vectorMakeUp();
+  //   const updatedQuantities = { ...quantities };
+  //   const updatedSelectedValues = { ...selectedValues };
+  //   const levelIncrement = 0.1;
+  //   const previousLevel = Math.floor(vectorLevel);
+  //   vectorLevel += levelIncrement;
+  //   const currentLevel = Math.floor(vectorLevel);
+  //   console.log('currentLevel: ', currentLevel);
+  //   console.log('previousLevel: ', previousLevel);
+  //   const levelBelow =
+  //     currentLevel !== previousLevel ? previousLevel : Math.floor(vectorLevel);
+  //   // const levelBelow = Math.floor(vectorLevel);
+  //   // const levelAbove = Math.ceil(vectorLevel);
+  //   const levelAbove = levelBelow + 1;
+  //   console.log('Level Below', levelBelow);
+  //   console.log('level Above', levelAbove);
+  //   const percDiff = vectorLevel - levelBelow;
+  //   const levelBelowQuantityTotal = 100 * (1 - percDiff);
+  //   const levelAboveQuantityTotal = 100 - levelBelowQuantityTotal;
+  //   // Want to figure out how many contacts are "on" at a level
+  //   // const levelBelowCount = 0;
+  //   // const levelAboveCount = 0;
+  //   // Object.keys(selectedValues).forEach((key) => {
+  //   //   if ((level[key] === levelBelow) && (selectedValues[key] !== 'left')) {
+  //   //     levelBelowCount += 1;
+  //   //   }
+  //   //   if ((level[key] === levelAbove) && (selectedValues[key] !== )) {
+
+  //   //   }
+  //   // });
+  //   const onContacts = getOnContacts(levelBelow);
+  //   const numOnContacts = getOnContacts(levelBelow).length;
+  //   const aboveOnContacts = getOnContacts(levelAbove);
+  //   const numAboveOnContacts = aboveOnContacts.length;
+  //   console.log('On Contacts', onContacts);
+  //   Object.keys(level).forEach((key) => {
+  //     // dealing with level below
+  //     // vectorMakeUp();
+  //     if (level[key] === levelBelow) {
+  //       if (face[key] === 'all') {
+  //         updatedQuantities[key] = levelBelowQuantityTotal;
+  //       } else if (face[key] !== 'all' && numOnContacts !== 0) {
+  //         for (let i = 0; i < numOnContacts; i++) {
+  //           updatedQuantities[onContacts[i]] =
+  //             levelBelowQuantityTotal / parseFloat(numOnContacts);
+  //             // console.log('numOnContacts: ', numOnContacts);
+  //             // console.log('numOnContactsQuantities', updatedQuantities[onContacts[i]]);
+  //             // parseFloat(updatedQuantities[onContacts[i]]) -
+  //             // 1 / levelIncrement / numOnContacts;
+  //         }
+  //         // checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+  //       }
+  //       // if (levelBelowQuantityTotal === 0) {
+  //       //   updatedSelectedValues[key] = 'left';
+  //       // }
+  //     }
+  //     if (level[key] === levelAbove) {
+  //       if (face[key] !== 'all') {
+  //         for (let i = 0; i < numAboveOnContacts; i++) {
+  //           if (face[key] === face[aboveOnContacts[i]]) {
+  //             updatedQuantities[key] =
+  //               levelAboveQuantityTotal / numAboveOnContacts;
+  //             console.log('UpdatedQuantitie: ', updatedQuantities);
+  //             if (updatedQuantities[key] !== 0) {
+  //               updatedSelectedValues[key] =
+  //                 updatedSelectedValues[aboveOnContacts[i]];
+  //             }
+  //           }
+  //         }
+  //         setSelectedValues(updatedSelectedValues);
+  //         setQuantities(updatedQuantities);
+  //         const newaboveOnContacts = getOnContacts(levelAbove);
+  //         const newnumAboveOnContacts = newaboveOnContacts.length;
+  //         if (newnumAboveOnContacts === 0) {
+  //           console.log('hello');
+  //           updatedQuantities[key] = levelAboveQuantityTotal / 3;
+  //           updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
+  //           // if (updatedQuantities[key] !== 0) {
+  //           //   updatedSelectedValues[key] = updatedSelectedValues[aboveOnContacts[0]];
+  //           // }
+  //         }
+  //       } else if (face[key] === 'all') {
+  //         updatedQuantities[key] = levelAboveQuantityTotal;
+  //         if (updatedQuantities[key] !== 0) {
+  //           updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
+  //         }
+  //       }
+  //     }
+  //   });
+  //   // Object.keys(updatedQuantities).forEach((key) => {
+  //   //   if (level[key] !== levelAbove || levelBelow) {
+  //   //     updatedQuantities[key] = 0;
+  //   //     updatedSelectedValues[key] = 'left';
+  //   //   }
+  //   // });
+  //   setSelectedValues(updatedSelectedValues);
+  //   setQuantities(updatedQuantities);
+  //   checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+  // };
   const newHandleUpButton = () => {
+    // newRoundToHundred();
+    console.log('passed');
+    console.log('quantities: ', quantities);
     vectorMakeUp();
-    const updatedQuantities = { ...quantities };
+    const newQuantities = newRoundToHundred();
+    console.log('newQuantities: ', newQuantities);
+    const updatedQuantities = { ...newQuantities };
     const updatedSelectedValues = { ...selectedValues };
     const levelIncrement = 0.1;
     const previousLevel = Math.floor(vectorLevel);
@@ -1142,16 +1836,33 @@ function NewBostonCartesiaTest(props, ref) {
       if (level[key] === levelBelow) {
         if (face[key] === 'all') {
           updatedQuantities[key] = levelBelowQuantityTotal;
-        } else if (face[key] !== 'all' && numOnContacts !== 0) {
-          for (let i = 0; i < numOnContacts; i++) {
-            updatedQuantities[onContacts[i]] =
-              levelBelowQuantityTotal / parseFloat(numOnContacts);
-            // console.log('numOnContacts: ', numOnContacts);
-            // console.log('numOnContactsQuantities', updatedQuantities[onContacts[i]]);
-            // parseFloat(updatedQuantities[onContacts[i]]) -
-            // 1 / levelIncrement / numOnContacts;
-          }
+        } else if (
+          face[key] !== 'all' &&
+          numOnContacts !== 0 &&
+          updatedQuantities[key] !== 0
+        ) {
+          // for (let i = 0; i < numOnContacts; i++) {
+          //   console.log('numOnContactsQuantities', key);
+          //   if (key === onContacts[i]) {
+          //     console.log('numOnContactsQuantities', updatedQuantities[onContacts[i]]);
+          //     updatedQuantities[onContacts[i]] =
+          //     // levelBelowQuantityTotal / parseFloat(numOnContacts);
+          //     // console.log('numOnContacts: ', numOnContacts);
+          //     // console.log('numOnContactsQuantities', updatedQuantities[onContacts[i]]);
+          //     parseFloat(updatedQuantities[onContacts[i]]) -
+          //     (100 * levelIncrement) / numOnContacts;
+          //   }
+          // }
           // checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+          Object.keys(onContacts).forEach((contact) => {
+            console.log('key: ', key);
+            if (parseFloat(key) === onContacts[contact]) {
+              // console.log('madeItHere');
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) -
+                (100 * levelIncrement) / numOnContacts;
+            }
+          });
         }
         // if (levelBelowQuantityTotal === 0) {
         //   updatedSelectedValues[key] = 'left';
@@ -1159,35 +1870,62 @@ function NewBostonCartesiaTest(props, ref) {
       }
       if (level[key] === levelAbove) {
         if (face[key] !== 'all') {
-          for (let i = 0; i < numAboveOnContacts; i++) {
-            if (face[key] === face[aboveOnContacts[i]]) {
-              updatedQuantities[key] =
-                levelAboveQuantityTotal / numAboveOnContacts;
-              console.log('UpdatedQuantitie: ', updatedQuantities);
-              if (updatedQuantities[key] !== 0) {
+          if (segmentedContact(levelBelow)) {
+            Object.keys(onContacts).forEach((contact) => {
+              if (face[key] === face[onContacts[contact]]) {
+                updatedQuantities[key] =
+                  parseFloat(updatedQuantities[key]) +
+                  (100 * levelIncrement) / numOnContacts;
                 updatedSelectedValues[key] =
-                  updatedSelectedValues[aboveOnContacts[i]];
+                  updatedSelectedValues[onContacts[contact]];
               }
-            }
-          }
-          setSelectedValues(updatedSelectedValues);
-          setQuantities(updatedQuantities);
-          const newaboveOnContacts = getOnContacts(levelAbove);
-          const newnumAboveOnContacts = newaboveOnContacts.length;
-          if (newnumAboveOnContacts === 0) {
-            console.log('hello');
-            updatedQuantities[key] = levelAboveQuantityTotal / 3;
-            updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
-            // if (updatedQuantities[key] !== 0) {
-            //   updatedSelectedValues[key] = updatedSelectedValues[aboveOnContacts[0]];
-            // }
-          }
-        } else if (face[key] === 'all') {
-          updatedQuantities[key] = levelAboveQuantityTotal;
-          if (updatedQuantities[key] !== 0) {
-            updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
+            });
+          } else {
+            let levelBelowKey = 0;
+            Object.keys(level).forEach((keys) => {
+              if (level[keys] === levelBelow) {
+                levelBelowKey = keys;
+              }
+            });
+            updatedQuantities[key] =
+              parseFloat(updatedQuantities[key]) + (100 * levelIncrement) / 3;
+            updatedSelectedValues[key] = updatedSelectedValues[levelBelowKey];
           }
         }
+        if (face[key] === 'all') {
+          updatedQuantities[key] = levelAboveQuantityTotal;
+          updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
+        }
+        // if (face[key] !== 'all') {
+        //   for (let i = 0; i < numAboveOnContacts; i++) {
+        //     if (face[key] === face[aboveOnContacts[i]]) {
+        //       updatedQuantities[key] =
+        //         levelAboveQuantityTotal / numAboveOnContacts;
+        //       console.log('UpdatedQuantities: ', updatedQuantities);
+        //       if (updatedQuantities[key] !== 0) {
+        //         updatedSelectedValues[key] =
+        //           updatedSelectedValues[aboveOnContacts[i]];
+        //       }
+        //     }
+        //   }
+        //   setSelectedValues(updatedSelectedValues);
+        //   setQuantities(updatedQuantities);
+        //   const newaboveOnContacts = getOnContacts(levelAbove);
+        //   const newnumAboveOnContacts = newaboveOnContacts.length;
+        //   if (newnumAboveOnContacts === 0) {
+        //     console.log('hello');
+        //     updatedQuantities[key] = levelAboveQuantityTotal / 3;
+        //     updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
+        //     // if (updatedQuantities[key] !== 0) {
+        //     //   updatedSelectedValues[key] = updatedSelectedValues[aboveOnContacts[0]];
+        //     // }
+        //   }
+        // } else if (face[key] === 'all') {
+        //   updatedQuantities[key] = levelAboveQuantityTotal;
+        //   if (updatedQuantities[key] !== 0) {
+        //     updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
+        //   }
+        // }
       }
     });
     // Object.keys(updatedQuantities).forEach((key) => {
@@ -1197,34 +1935,124 @@ function NewBostonCartesiaTest(props, ref) {
     //   }
     // });
     setSelectedValues(updatedSelectedValues);
+    console.log('before level', previousLevel);
+    roundAlloc(
+      previousLevel,
+      levelAbove,
+      levelAboveQuantityTotal,
+      levelBelowQuantityTotal,
+      updatedQuantities,
+      numAboveOnContacts,
+    );
     setQuantities(updatedQuantities);
     checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
   };
+  // const newHandleUpButton = () => {
+  //   vectorMakeUp();
+  //   const updatedQuantities = { ...quantities };
+  //   const updatedSelectedValues = { ...selectedValues };
+  //   let total = 0;
+  //   if (percAmpToggle === 'left') {
+  //     total = 100;
+  //   } else if (percAmpToggle === 'right') {
+  //     total = totalAmplitude;
+  //   }
+  //   const levelIncrement = 0.1;
+  //   const previousLevel = Math.floor(vectorLevel);
+  //   vectorLevel += levelIncrement;
+  //   const currentLevel = Math.floor(vectorLevel);
+  //   console.log('currentLevel: ', currentLevel);
+  //   console.log('previousLevel: ', previousLevel);
+  //   const levelBelow =
+  //     currentLevel !== previousLevel ? previousLevel : Math.floor(vectorLevel);
+  //   const levelAbove = levelBelow + 1;
+  //   console.log('Level Below', levelBelow);
+  //   console.log('level Above', levelAbove);
+  //   const percDiff = vectorLevel - levelBelow;
+  //   const levelBelowQuantityTotal = total * (1 - percDiff);
+  //   const levelAboveQuantityTotal = total - levelBelowQuantityTotal;
+  //   const onContacts = getOnContacts(levelBelow);
+  //   const numOnContacts = getOnContacts(levelBelow).length;
+  //   const aboveOnContacts = getOnContacts(levelAbove);
+  //   const numAboveOnContacts = aboveOnContacts.length;
+  //   console.log('On Contacts', onContacts);
+  //   Object.keys(level).forEach((key) => {
+  //     // dealing with level below
+  //     // vectorMakeUp();
+  //     if (level[key] === levelBelow) {
+  //       if (face[key] === 'all') {
+  //         updatedQuantities[key] = levelBelowQuantityTotal;
+  //       } else if (
+  //         face[key] !== 'all' &&
+  //         numOnContacts !== 0 &&
+  //         updatedQuantities[key] !== 0
+  //       ) {
+  //         Object.keys(onContacts).forEach((contact) => {
+  //           console.log('key: ', key);
+  //           if (parseFloat(key) === onContacts[contact]) {
+  //             // console.log('madeItHere');
+  //             updatedQuantities[key] =
+  //               parseFloat(updatedQuantities[key]) -
+  //               (total * levelIncrement) / numOnContacts;
+  //           }
+  //         });
+  //       }
+  //     }
+  //     if (level[key] === levelAbove) {
+  //       if (face[key] !== 'all') {
+  //         if (segmentedContact(levelBelow)) {
+  //           Object.keys(onContacts).forEach((contact) => {
+  //             if (face[key] === face[onContacts[contact]]) {
+  //               updatedQuantities[key] =
+  //                 parseFloat(updatedQuantities[key]) +
+  //                 (total * levelIncrement) / numOnContacts;
+  //               updatedSelectedValues[key] =
+  //                 updatedSelectedValues[onContacts[contact]];
+  //             }
+  //           });
+  //         } else {
+  //           let levelBelowKey = 0;
+  //           Object.keys(level).forEach((keys) => {
+  //             if (level[keys] === levelBelow) {
+  //               levelBelowKey = keys;
+  //             }
+  //           });
+  //           updatedQuantities[key] =
+  //             parseFloat(updatedQuantities[key]) + (total * levelIncrement) / 3;
+  //           updatedSelectedValues[key] = updatedSelectedValues[levelBelowKey];
+  //         }
+  //       }
+  //       if (face[key] === 'all') {
+  //         updatedQuantities[key] = levelAboveQuantityTotal;
+  //         updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
+  //       }
+  //     }
+  //   });
+  //   setSelectedValues(updatedSelectedValues);
+  //   setQuantities(updatedQuantities);
+  //   checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+  // };
 
-  const newHandleDownButton = () => {
-    vectorMakeUp();
+  const newHandleUpButtonAmplitude = () => {
+    vectorMakeUpAmplitude();
     const updatedQuantities = { ...quantities };
     const updatedSelectedValues = { ...selectedValues };
-    checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
     const levelIncrement = 0.1;
-    const previousLevel = Math.ceil(vectorLevel);
-    vectorLevel -= levelIncrement;
-    const currentLevel = Math.ceil(vectorLevel);
+    const previousLevel = Math.floor(vectorLevel);
+    vectorLevel += levelIncrement;
+    const currentLevel = Math.floor(vectorLevel);
     console.log('currentLevel: ', currentLevel);
     console.log('previousLevel: ', previousLevel);
-    const levelAbove =
-      currentLevel !== previousLevel ? previousLevel : Math.ceil(vectorLevel);
+    const levelBelow =
+      currentLevel !== previousLevel ? previousLevel : Math.floor(vectorLevel);
     // const levelBelow = Math.floor(vectorLevel);
     // const levelAbove = Math.ceil(vectorLevel);
-    const levelBelow = levelAbove - 1;
-    // if (vectorLevel % 1 === 0) {
-    //   levelBelow -= 1;
-    // }
+    const levelAbove = levelBelow + 1;
     console.log('Level Below', levelBelow);
     console.log('level Above', levelAbove);
-    const percDiff = Math.abs(vectorLevel - levelAbove);
-    const levelAboveQuantityTotal = 100 * (1 - percDiff);
-    const levelBelowQuantityTotal = 100 - levelAboveQuantityTotal;
+    const percDiff = vectorLevel - levelBelow;
+    const levelBelowQuantityTotal = totalAmplitude * (1 - percDiff);
+    const levelAboveQuantityTotal = totalAmplitude - levelBelowQuantityTotal;
     // Want to figure out how many contacts are "on" at a level
     // const levelBelowCount = 0;
     // const levelAboveCount = 0;
@@ -1240,68 +2068,106 @@ function NewBostonCartesiaTest(props, ref) {
     const numOnContacts = getOnContacts(levelBelow).length;
     const aboveOnContacts = getOnContacts(levelAbove);
     const numAboveOnContacts = aboveOnContacts.length;
-    console.log('On Contacts', aboveOnContacts);
-    Object.keys(level)
-      .reverse()
-      .forEach((key) => {
-        // dealing with level above, the one that is passing current
-        // vectorMakeUp();
-        if (level[key] === levelAbove) {
-          console.log('level Above: ', levelAbove);
-          if (face[key] === 'all') {
-            updatedQuantities[key] = levelAboveQuantityTotal;
-          } else if (face[key] !== 'all' && numAboveOnContacts !== 0) {
-            for (let i = 0; i < numAboveOnContacts; i++) {
-              updatedQuantities[aboveOnContacts[i]] =
-                // parseFloat(updatedQuantities[onContacts[i]]) -
-                levelAboveQuantityTotal / parseFloat(numAboveOnContacts);
-            }
-            // checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
-          }
-          // if (levelBelowQuantityTotal === 0) {
-          //   updatedSelectedValues[key] = 'left';
+    console.log('On Contacts', onContacts);
+    Object.keys(level).forEach((key) => {
+      // dealing with level below
+      // vectorMakeUp();
+      if (level[key] === levelBelow) {
+        if (face[key] === 'all') {
+          updatedQuantities[key] = levelBelowQuantityTotal;
+        } else if (
+          face[key] !== 'all' &&
+          numOnContacts !== 0 &&
+          updatedQuantities[key] !== 0
+        ) {
+          // for (let i = 0; i < numOnContacts; i++) {
+          //   console.log('numOnContactsQuantities', key);
+          //   if (key === onContacts[i]) {
+          //     console.log('numOnContactsQuantities', updatedQuantities[onContacts[i]]);
+          //     updatedQuantities[onContacts[i]] =
+          //     // levelBelowQuantityTotal / parseFloat(numOnContacts);
+          //     // console.log('numOnContacts: ', numOnContacts);
+          //     // console.log('numOnContactsQuantities', updatedQuantities[onContacts[i]]);
+          //     parseFloat(updatedQuantities[onContacts[i]]) -
+          //     (100 * levelIncrement) / numOnContacts;
+          //   }
           // }
+          // checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+          Object.keys(onContacts).forEach((contact) => {
+            console.log('key: ', key);
+            if (parseFloat(key) === onContacts[contact]) {
+              // console.log('madeItHere');
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) -
+                (totalAmplitude * levelIncrement) / numOnContacts;
+            }
+          });
         }
-        if (level[key] === levelBelow) {
-          if (face[key] !== 'all') {
-            for (let i = 0; i < numAboveOnContacts; i++) {
-              if (face[key] === face[aboveOnContacts[i]]) {
-                console.log('passed');
+        // if (levelBelowQuantityTotal === 0) {
+        //   updatedSelectedValues[key] = 'left';
+        // }
+      }
+      if (level[key] === levelAbove) {
+        if (face[key] !== 'all') {
+          if (segmentedContact(levelBelow)) {
+            Object.keys(onContacts).forEach((contact) => {
+              if (face[key] === face[onContacts[contact]]) {
                 updatedQuantities[key] =
-                  levelBelowQuantityTotal / numAboveOnContacts;
-                console.log('UpdatedQuantitie: ', updatedQuantities);
-                if (updatedQuantities[key] !== 0) {
-                  updatedSelectedValues[key] =
-                    updatedSelectedValues[aboveOnContacts[i]];
-                }
+                  parseFloat(updatedQuantities[key]) +
+                  (totalAmplitude * levelIncrement) / numOnContacts;
+                updatedSelectedValues[key] =
+                  updatedSelectedValues[onContacts[contact]];
               }
-            }
-            // console.log(updatedQuantities);
-            // console.log(updatedSelectedValues);
-            setSelectedValues(updatedSelectedValues);
-            setQuantities(updatedQuantities);
-            const newaboveOnContacts = getOnContacts(levelBelow);
-            const newnumAboveOnContacts = newaboveOnContacts.length;
-            if (newnumAboveOnContacts === 0) {
-              console.log('hello');
-              updatedQuantities[key] = levelBelowQuantityTotal / 3;
-              updatedSelectedValues[key] =
-                updatedSelectedValues[aboveOnContacts[0]];
-              // if (updatedQuantities[key] !== 0) {
-              //   updatedSelectedValues[key] = updatedSelectedValues[aboveOnContacts[0]];
-              // }
-            } else if (newnumAboveOnContacts !== 0) {
-              updatedQuantities[key] = levelBelowQuantityTotal / 3;
-            }
-          } else if (face[key] === 'all') {
-            updatedQuantities[key] = levelBelowQuantityTotal;
-            if (updatedQuantities[key] !== 0) {
-              updatedSelectedValues[key] =
-                updatedSelectedValues[aboveOnContacts[0]];
-            }
+            });
+          } else {
+            let levelBelowKey = 0;
+            Object.keys(level).forEach((keys) => {
+              if (level[keys] === levelBelow) {
+                levelBelowKey = keys;
+              }
+            });
+            updatedQuantities[key] =
+              parseFloat(updatedQuantities[key]) +
+              (totalAmplitude * levelIncrement) / 3;
+            updatedSelectedValues[key] = updatedSelectedValues[levelBelowKey];
           }
         }
-      });
+        if (face[key] === 'all') {
+          updatedQuantities[key] = levelAboveQuantityTotal;
+          updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
+        }
+        // if (face[key] !== 'all') {
+        //   for (let i = 0; i < numAboveOnContacts; i++) {
+        //     if (face[key] === face[aboveOnContacts[i]]) {
+        //       updatedQuantities[key] =
+        //         levelAboveQuantityTotal / numAboveOnContacts;
+        //       console.log('UpdatedQuantities: ', updatedQuantities);
+        //       if (updatedQuantities[key] !== 0) {
+        //         updatedSelectedValues[key] =
+        //           updatedSelectedValues[aboveOnContacts[i]];
+        //       }
+        //     }
+        //   }
+        //   setSelectedValues(updatedSelectedValues);
+        //   setQuantities(updatedQuantities);
+        //   const newaboveOnContacts = getOnContacts(levelAbove);
+        //   const newnumAboveOnContacts = newaboveOnContacts.length;
+        //   if (newnumAboveOnContacts === 0) {
+        //     console.log('hello');
+        //     updatedQuantities[key] = levelAboveQuantityTotal / 3;
+        //     updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
+        //     // if (updatedQuantities[key] !== 0) {
+        //     //   updatedSelectedValues[key] = updatedSelectedValues[aboveOnContacts[0]];
+        //     // }
+        //   }
+        // } else if (face[key] === 'all') {
+        //   updatedQuantities[key] = levelAboveQuantityTotal;
+        //   if (updatedQuantities[key] !== 0) {
+        //     updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
+        //   }
+        // }
+      }
+    });
     // Object.keys(updatedQuantities).forEach((key) => {
     //   if (level[key] !== levelAbove || levelBelow) {
     //     updatedQuantities[key] = 0;
@@ -1312,6 +2178,118 @@ function NewBostonCartesiaTest(props, ref) {
     setQuantities(updatedQuantities);
     checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
   };
+
+  // const newHandleDownButton = () => {
+  //   vectorMakeUp();
+  //   const updatedQuantities = { ...quantities };
+  //   const updatedSelectedValues = { ...selectedValues };
+  //   checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+  //   const levelIncrement = 0.1;
+  //   const previousLevel = Math.ceil(vectorLevel);
+  //   vectorLevel -= levelIncrement;
+  //   const currentLevel = Math.ceil(vectorLevel);
+  //   console.log('currentLevel: ', currentLevel);
+  //   console.log('previousLevel: ', previousLevel);
+  //   const levelAbove =
+  //     currentLevel !== previousLevel ? previousLevel : Math.ceil(vectorLevel);
+  //   // const levelBelow = Math.floor(vectorLevel);
+  //   // const levelAbove = Math.ceil(vectorLevel);
+  //   const levelBelow = levelAbove - 1;
+  //   // if (vectorLevel % 1 === 0) {
+  //   //   levelBelow -= 1;
+  //   // }
+  //   console.log('Level Below', levelBelow);
+  //   console.log('level Above', levelAbove);
+  //   const percDiff = Math.abs(vectorLevel - levelAbove);
+  //   const levelAboveQuantityTotal = 100 * (1 - percDiff);
+  //   const levelBelowQuantityTotal = 100 - levelAboveQuantityTotal;
+  //   // Want to figure out how many contacts are "on" at a level
+  //   // const levelBelowCount = 0;
+  //   // const levelAboveCount = 0;
+  //   // Object.keys(selectedValues).forEach((key) => {
+  //   //   if ((level[key] === levelBelow) && (selectedValues[key] !== 'left')) {
+  //   //     levelBelowCount += 1;
+  //   //   }
+  //   //   if ((level[key] === levelAbove) && (selectedValues[key] !== )) {
+
+  //   //   }
+  //   // });
+  //   const onContacts = getOnContacts(levelBelow);
+  //   const numOnContacts = getOnContacts(levelBelow).length;
+  //   const aboveOnContacts = getOnContacts(levelAbove);
+  //   const numAboveOnContacts = aboveOnContacts.length;
+  //   console.log('On Contacts', aboveOnContacts);
+  //   Object.keys(level)
+  //     .reverse()
+  //     .forEach((key) => {
+  //       // dealing with level above, the one that is passing current
+  //       // vectorMakeUp();
+  //       if (level[key] === levelAbove) {
+  //         console.log('level Above: ', levelAbove);
+  //         if (face[key] === 'all') {
+  //           updatedQuantities[key] = levelAboveQuantityTotal;
+  //         } else if (face[key] !== 'all' && numAboveOnContacts !== 0) {
+  //           for (let i = 0; i < numAboveOnContacts; i++) {
+  //             updatedQuantities[aboveOnContacts[i]] =
+  //               // parseFloat(updatedQuantities[onContacts[i]]) -
+  //               levelAboveQuantityTotal / parseFloat(numAboveOnContacts);
+  //           }
+  //           // checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+  //         }
+  //         // if (levelBelowQuantityTotal === 0) {
+  //         //   updatedSelectedValues[key] = 'left';
+  //         // }
+  //       }
+  //       if (level[key] === levelBelow) {
+  //         if (face[key] !== 'all') {
+  //           for (let i = 0; i < numAboveOnContacts; i++) {
+  //             if (face[key] === face[aboveOnContacts[i]]) {
+  //               console.log('passed');
+  //               updatedQuantities[key] =
+  //                 levelBelowQuantityTotal / numAboveOnContacts;
+  //               console.log('UpdatedQuantitie: ', updatedQuantities);
+  //               if (updatedQuantities[key] !== 0) {
+  //                 updatedSelectedValues[key] =
+  //                   updatedSelectedValues[aboveOnContacts[i]];
+  //               }
+  //             }
+  //           }
+  //           // console.log(updatedQuantities);
+  //           // console.log(updatedSelectedValues);
+  //           setSelectedValues(updatedSelectedValues);
+  //           setQuantities(updatedQuantities);
+  //           const newaboveOnContacts = getOnContacts(levelBelow);
+  //           const newnumAboveOnContacts = newaboveOnContacts.length;
+  //           if (newnumAboveOnContacts === 0) {
+  //             console.log('hello');
+  //             updatedQuantities[key] = levelBelowQuantityTotal / 3;
+  //             updatedSelectedValues[key] =
+  //               updatedSelectedValues[aboveOnContacts[0]];
+  //             // if (updatedQuantities[key] !== 0) {
+  //             //   updatedSelectedValues[key] = updatedSelectedValues[aboveOnContacts[0]];
+  //             // }
+  //           } else if (newnumAboveOnContacts !== 0) {
+  //             updatedQuantities[key] = levelBelowQuantityTotal / 3;
+  //           }
+  //         } else if (face[key] === 'all') {
+  //           updatedQuantities[key] = levelBelowQuantityTotal;
+  //           if (updatedQuantities[key] !== 0) {
+  //             updatedSelectedValues[key] =
+  //               updatedSelectedValues[aboveOnContacts[0]];
+  //           }
+  //         }
+  //       }
+  //     });
+  //   // Object.keys(updatedQuantities).forEach((key) => {
+  //   //   if (level[key] !== levelAbove || levelBelow) {
+  //   //     updatedQuantities[key] = 0;
+  //   //     updatedSelectedValues[key] = 'left';
+  //   //   }
+  //   // });
+  //   setSelectedValues(updatedSelectedValues);
+  //   setQuantities(updatedQuantities);
+  //   checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+  // };
   // const newHandleClockwiseButton = () => {
 
   // const assistedMode = () => {
@@ -1372,6 +2350,198 @@ function NewBostonCartesiaTest(props, ref) {
   //     });
   //   }
   // };
+
+  const newHandleDownButton = () => {
+    vectorMakeUp();
+    const updatedQuantities = { ...quantities };
+    const updatedSelectedValues = { ...selectedValues };
+    checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+    const levelIncrement = 0.1;
+    const previousLevel = Math.ceil(vectorLevel);
+    vectorLevel -= levelIncrement;
+    const currentLevel = Math.ceil(vectorLevel);
+    console.log('currentLevel: ', currentLevel);
+    console.log('previousLevel: ', previousLevel);
+    const levelAbove =
+      currentLevel !== previousLevel ? previousLevel : Math.ceil(vectorLevel);
+    // const levelBelow = Math.floor(vectorLevel);
+    // const levelAbove = Math.ceil(vectorLevel);
+    const levelBelow = levelAbove - 1;
+    console.log('Level Below', levelBelow);
+    console.log('level Above', levelAbove);
+    const percDiff = Math.abs(vectorLevel - levelAbove);
+    const levelAboveQuantityTotal = 100 * (1 - percDiff);
+    const levelBelowQuantityTotal = 100 - levelAboveQuantityTotal;
+    const onContacts = getOnContacts(levelBelow);
+    const numOnContacts = getOnContacts(levelBelow).length;
+    const aboveOnContacts = getOnContacts(levelAbove);
+    const numAboveOnContacts = aboveOnContacts.length;
+    console.log('On Contacts', aboveOnContacts);
+    Object.keys(level)
+      .reverse()
+      .forEach((key) => {
+        // dealing with level above, the one that is passing current
+        // vectorMakeUp();
+        if (level[key] === levelAbove) {
+          if (face[key] === 'all') {
+            updatedQuantities[key] = levelAboveQuantityTotal;
+          } else if (
+            face[key] !== 'all' &&
+            numAboveOnContacts !== 0 &&
+            updatedQuantities[key] !== 0
+          ) {
+            Object.keys(aboveOnContacts).forEach((contact) => {
+              if (parseFloat(key) === aboveOnContacts[contact]) {
+                updatedQuantities[key] =
+                  parseFloat(updatedQuantities[key]) -
+                  (100 * levelIncrement) / numAboveOnContacts;
+              }
+            });
+          }
+          // if (levelBelowQuantityTotal === 0) {
+          //   updatedSelectedValues[key] = 'left';
+          // }
+        }
+        if (level[key] === levelBelow) {
+          if (face[key] !== 'all') {
+            if (segmentedLevel(levelAbove)) {
+              // console.log(levelAbove);
+              console.log('Madeit: ', levelAbove);
+              Object.keys(aboveOnContacts).forEach((contact) => {
+                if (face[key] === face[aboveOnContacts[contact]]) {
+                  updatedQuantities[key] =
+                    parseFloat(updatedQuantities[key]) +
+                    (100 * levelIncrement) / numAboveOnContacts;
+                  updatedSelectedValues[key] =
+                    updatedSelectedValues[aboveOnContacts[contact]];
+                }
+              });
+            } else {
+              console.log('Made it');
+              let levelAboveKey = 0;
+              Object.keys(level).forEach((keys) => {
+                if (level[keys] === levelAbove) {
+                  levelAboveKey = keys;
+                }
+              });
+              updatedSelectedValues[key] = updatedSelectedValues[levelAboveKey];
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) + (100 * levelIncrement) / 3;
+            }
+          } else if (face[key] === 'all') {
+            updatedQuantities[key] = levelBelowQuantityTotal;
+            updatedSelectedValues[key] =
+              updatedSelectedValues[aboveOnContacts[0]];
+          }
+        }
+      });
+    // Object.keys(updatedQuantities).forEach((key) => {
+    //   if (level[key] !== levelAbove || levelBelow) {
+    //     updatedQuantities[key] = 0;
+    //     updatedSelectedValues[key] = 'left';
+    //   }
+    // });
+    setSelectedValues(updatedSelectedValues);
+    setQuantities(updatedQuantities);
+    checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+  };
+
+  const newHandleDownButtonAmplitude = () => {
+    vectorMakeUpAmplitude();
+    const updatedQuantities = { ...quantities };
+    const updatedSelectedValues = { ...selectedValues };
+    checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+    const levelIncrement = 0.1;
+    const previousLevel = Math.ceil(vectorLevel);
+    vectorLevel -= levelIncrement;
+    const currentLevel = Math.ceil(vectorLevel);
+    console.log('currentLevel: ', currentLevel);
+    console.log('previousLevel: ', previousLevel);
+    const levelAbove =
+      currentLevel !== previousLevel ? previousLevel : Math.ceil(vectorLevel);
+    // const levelBelow = Math.floor(vectorLevel);
+    // const levelAbove = Math.ceil(vectorLevel);
+    const levelBelow = levelAbove - 1;
+    console.log('Level Below', levelBelow);
+    console.log('level Above', levelAbove);
+    const percDiff = Math.abs(vectorLevel - levelAbove);
+    const levelAboveQuantityTotal = totalAmplitude * (1 - percDiff);
+    const levelBelowQuantityTotal = totalAmplitude - levelAboveQuantityTotal;
+    const onContacts = getOnContacts(levelBelow);
+    const numOnContacts = getOnContacts(levelBelow).length;
+    const aboveOnContacts = getOnContacts(levelAbove);
+    const numAboveOnContacts = aboveOnContacts.length;
+    console.log('On Contacts', aboveOnContacts);
+    Object.keys(level)
+      .reverse()
+      .forEach((key) => {
+        // dealing with level above, the one that is passing current
+        // vectorMakeUp();
+        if (level[key] === levelAbove) {
+          if (face[key] === 'all') {
+            updatedQuantities[key] = levelAboveQuantityTotal;
+          } else if (
+            face[key] !== 'all' &&
+            numAboveOnContacts !== 0 &&
+            updatedQuantities[key] !== 0
+          ) {
+            Object.keys(aboveOnContacts).forEach((contact) => {
+              if (parseFloat(key) === aboveOnContacts[contact]) {
+                updatedQuantities[key] =
+                  parseFloat(updatedQuantities[key]) -
+                  (totalAmplitude * levelIncrement) / numAboveOnContacts;
+              }
+            });
+          }
+          // if (levelBelowQuantityTotal === 0) {
+          //   updatedSelectedValues[key] = 'left';
+          // }
+        }
+        if (level[key] === levelBelow) {
+          if (face[key] !== 'all') {
+            if (segmentedLevel(levelAbove)) {
+              // console.log(levelAbove);
+              console.log('Madeit: ', levelAbove);
+              Object.keys(aboveOnContacts).forEach((contact) => {
+                if (face[key] === face[aboveOnContacts[contact]]) {
+                  updatedQuantities[key] =
+                    parseFloat(updatedQuantities[key]) +
+                    (totalAmplitude * levelIncrement) / numAboveOnContacts;
+                  updatedSelectedValues[key] =
+                    updatedSelectedValues[aboveOnContacts[contact]];
+                }
+              });
+            } else {
+              console.log('Made it');
+              let levelAboveKey = 0;
+              Object.keys(level).forEach((keys) => {
+                if (level[keys] === levelAbove) {
+                  levelAboveKey = keys;
+                }
+              });
+              updatedSelectedValues[key] = updatedSelectedValues[levelAboveKey];
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) +
+                (totalAmplitude * levelIncrement) / 3;
+            }
+          } else if (face[key] === 'all') {
+            updatedQuantities[key] = levelBelowQuantityTotal;
+            updatedSelectedValues[key] =
+              updatedSelectedValues[aboveOnContacts[0]];
+          }
+        }
+      });
+    // Object.keys(updatedQuantities).forEach((key) => {
+    //   if (level[key] !== levelAbove || levelBelow) {
+    //     updatedQuantities[key] = 0;
+    //     updatedSelectedValues[key] = 'left';
+    //   }
+    // });
+    setSelectedValues(updatedSelectedValues);
+    setQuantities(updatedQuantities);
+    checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+  };
+
   let facesVec = [];
 
   const getOnFacesCount = () => {
@@ -1493,8 +2663,8 @@ function NewBostonCartesiaTest(props, ref) {
     Object.keys(updatedQuantities).forEach((key) => {
       // keyLevel = getOnContacts[level[key]]
       if (
-        face[key] === 'left' ||
-        (face[key] === 'right' && levelQuantities[level[key]] !== 0)
+        (face[key] === 'left' || face[key] === 'right') &&
+        levelQuantities[level[key]] !== 0
       ) {
         // console.log('length ', getOnContacts(level[key]).length);
         // if (getOnContacts(level[key]).length > 0) {
@@ -1680,11 +2850,11 @@ function NewBostonCartesiaTest(props, ref) {
       if (updatedSelectedValues[key] === 'center') {
         negativeSum += parseFloat(updatedQuantities[key]);
         centerCount += 1;
-        console.log('negativeSum: ', negativeSum);
+        // console.log('negativeSum: ', negativeSum);
       } else if (updatedSelectedValues[key] === 'right') {
         positiveSum += parseFloat(updatedQuantities[key]);
         rightCount += 1;
-        console.log('positiveSum: ', positiveSum);
+        // console.log('positiveSum: ', positiveSum);
       }
     });
 
@@ -1692,14 +2862,14 @@ function NewBostonCartesiaTest(props, ref) {
       if (updatedSelectedValues[key] === 'center') {
         if (key === lastChangedKey) {
           negativeModifiedKey = key;
-          console.log('negativeModifiedKey: ', negativeModifiedKey);
+          // console.log('negativeModifiedKey: ', negativeModifiedKey);
           return true; // exit loop
         }
       }
       if (updatedSelectedValues[key] === 'right') {
         if (key === lastChangedKey) {
           positiveModifiedKey = key;
-          console.log('positiveModifiedKey: ', positiveModifiedKey);
+          // console.log('positiveModifiedKey: ', positiveModifiedKey);
           return true; // exit loop
         }
       }
@@ -1720,13 +2890,13 @@ function NewBostonCartesiaTest(props, ref) {
           key !== negativeModifiedKey &&
           updatedSelectedValues[key] === 'center'
         ) {
-          console.log('passed');
+          // console.log('passed');
           updatedQuantities[key] =
             parseFloat(updatedQuantities[key]) +
             parseFloat(negativeDifference / (centerCount - 1));
         }
       });
-      console.log('negative difference: ', negativeDifference);
+      // console.log('negative difference: ', negativeDifference);
     }
 
     if (positiveSum !== 100) {
@@ -1758,9 +2928,9 @@ function NewBostonCartesiaTest(props, ref) {
   function assist() {
     isAssisted = !isAssisted;
     if (isAssisted) {
-      console.log('isAssisted: ', isAssisted);
       assistedMode();
     }
+    // console.log('isAssisted: ', isAssisted);
   }
 
   const handleQuantityChange = (quantity, key) => {
@@ -1770,26 +2940,26 @@ function NewBostonCartesiaTest(props, ref) {
     // }));
     const updatedQuantities = { ...quantities, [key]: quantity };
     /// /////Steering for two components logic///////
-    const centerCount = Object.values(selectedValues).filter(
-      (value) => value === 'center',
-    ).length;
-    // console.log('Center Count: ', centerCount);
-    const rightCount = Object.values(selectedValues).filter(
-      (value) => value === 'right',
-    ).length;
+    // const centerCount = Object.values(selectedValues).filter(
+    //   (value) => value === 'center',
+    // ).length;
+    // // console.log('Center Count: ', centerCount);
+    // const rightCount = Object.values(selectedValues).filter(
+    //   (value) => value === 'right',
+    // ).length;
 
     // if (centerCount === 2 || rightCount === 2) {
     //   const newQuantities = calculateQuantitiesForTwo();
     //   setQuantities(newQuantities);
     // }
     // assist();
-    setQuantities(updatedQuantities);
-    setLastChangedKey(key);
-    console.log('lastChangedKey: ', lastChangedKey);
     if (assistedModeEnabled) {
       const newQuantities = assistedMode();
       setQuantities(newQuantities);
     }
+    setQuantities(updatedQuantities);
+    setLastChangedKey(key);
+    console.log('lastChangedKey: ', lastChangedKey);
   };
 
   // useEffect(() => {
@@ -1962,6 +3132,40 @@ function NewBostonCartesiaTest(props, ref) {
     }
   }
 
+  const handlePercAmpChangeUp = () => {
+    // console.log('PercAmpButton: ', percAmpToggle);
+    roundToHundred();
+    if (percAmpToggle === 'left') {
+      newHandleUpButton();
+    } else if (percAmpToggle === 'right') {
+      newHandleUpButtonAmplitude();
+    }
+  };
+
+  const handlePercAmpChangeClockwise = () => {
+    if (percAmpToggle === 'left') {
+      handleClockwiseButton();
+    } else if (percAmpToggle === 'right') {
+      handleClockwiseButtonAmplitude();
+    }
+  };
+
+  const handlePercAmpChangeCounterClockwise = () => {
+    if (percAmpToggle === 'left') {
+      handleCounterClockwiseButton();
+    } else if (percAmpToggle === 'right') {
+      handleCounterClockwiseButtonAmplitude();
+    }
+  };
+
+  const handlePercAmpChangeDown = () => {
+    if (percAmpToggle === 'left') {
+      newHandleDownButton();
+    } else if (percAmpToggle === 'right') {
+      newHandleDownButtonAmplitude();
+    }
+  };
+
   useEffect(() => {
     if (importedData) {
       updateDataFromJson(importedData);
@@ -1996,79 +3200,487 @@ function NewBostonCartesiaTest(props, ref) {
     return selectedValues;
   };
 
+  const getStateAmplitude = () => {
+    return totalAmplitude;
+  };
+
+  const getStateStimulationParameters = () => {
+    return parameters;
+  };
+
+  const getStateSessionTitle = () => {
+    return sessionTitle;
+  };
+
+  const getStateVisModel = () => {
+    return visModel;
+  };
+
   useImperativeHandle(ref, () => ({
     getCartesiaData,
     getStateQuantities,
     getStateSelectedValues,
+    getStateAmplitude,
+    getStateStimulationParameters,
+    getStateSessionTitle,
+    getStateVisModel,
   }));
 
+  const handleParameterChange = (parameter) => (e) => {
+    const newValue = e.target.value;
+    setParameters((prevParams) => ({
+      ...prevParams,
+      [parameter]: newValue,
+    }));
+  };
+
+  // const [totalAmplitude, setTotalAmplitude] = useState(0);
+
+  const handleActivaVoltage = () => {
+    const updatedQuantities = { ...quantities };
+    Object.keys(updatedQuantities).forEach((key) => {
+      if (selectedValues[key] !== 'left') {
+        updatedQuantities[key] = totalAmplitude;
+      }
+    });
+    setQuantities(updatedQuantities);
+  };
+
+  const handleActivaAmplitude = () => {
+    const updatedQuantities = { ...quantities };
+    const updatedSelectedValues = { ...selectedValues };
+    // let numActiveContacts = 0;
+    // const activeContacts = [];
+    // Object.keys(quantities).forEach((key) => {
+    //   if (quantities[key] > 0) {
+    //     numActiveContacts += 1;
+    //     activeContacts.push(key);
+    //   }
+    // });
+    // if (numActiveContacts > 1) {
+    //   for (let i = 0; i < numActiveContacts - 1; i++) {
+    //     updatedQuantities[numActiveContacts[i]] = 0;
+    //     updatedSelectedValues[numActiveContacts[i]] = 'left';
+    //   }
+    // }
+    Object.keys(updatedQuantities).forEach((key) => {
+      if (key !== lastChangedKey) {
+        updatedQuantities[key] = 0;
+        updatedSelectedValues[key] = 'left';
+      }
+    });
+    setQuantities(updatedQuantities);
+    setSelectedValues(updatedSelectedValues);
+  };
+
+  const handleTotalAmplitudeChange = (e) => {
+    const newTotalAmplitude = e.target.value;
+    setTotalAmplitude(newTotalAmplitude);
+  };
+
+  let stimController = 0;
+  // Generating here a more simple key code for the IPG that is selected
+  const handleIPG = () => {
+    if (props.IPG === 'Medtronic_Activa') {
+      stimController = 1;
+    } else if (props.IPG === 'Abbott') {
+      stimController = 2;
+    } else if (props.IPG === 'Medtronic_Percept') {
+      stimController = 3;
+    }
+    // console.log('stimController: ', stimController);
+    // console.log('IPG', props.IPG);
+  };
+
+  const calculatePercentageFromAmplitude = () => {
+    const updatedQuantities = { ...quantities };
+    Object.keys(updatedQuantities).forEach((key) => {
+      updatedQuantities[key] = (updatedQuantities[key] * 100) / totalAmplitude;
+    });
+    setQuantities(updatedQuantities);
+  };
+
+  const calculateAmplitudeFromPercentage = () => {
+    const updatedQuantities = { ...quantities };
+    Object.keys(updatedQuantities).forEach((key) => {
+      updatedQuantities[key] = (updatedQuantities[key] * totalAmplitude) / 100;
+    });
+    setQuantities(updatedQuantities);
+  };
+
+  // Percentage vs mA toggle switch
+  const handlePercAmpToggleChange = (value) => {
+    const newValue = value;
+    if (newValue === 'left') {
+      // setTotalAmplitude(0);
+      calculatePercentageFromAmplitude();
+    } else if (newValue === 'right') {
+      // let totalSum = 0;
+      // Object.keys(quantities).forEach((key) => {
+      //   totalSum += parseFloat(quantities[key]);
+      // });
+      // setTotalAmplitude(totalSum);
+      calculateAmplitudeFromPercentage();
+    }
+    setPercAmpToggle(value);
+  };
+
+  const [assistedToggle, setAssistedToggle] = useState('left');
+
+  const handleAssistedToggleChange = (value) => {
+    setAssistedToggle(value);
+  };
+
+  const [volAmpToggle, setVolAmpToggle] = useState('left');
+  const ampToggle = 'left';
+
+  const handleVolAmpToggleChange = (value) => {
+    const newValue = value;
+    // if (newValue === 'left') {
+    //   handleActivaAmplitude();
+    // } else if (newValue === 'right') {
+    //   handleActivaVoltage();
+    // }
+    setVolAmpToggle(volAmpToggle);
+  };
+
+  const [show, setShow] = useState(false);
+
+  const handleCheck = () => {
+    handleIPG();
+    if (stimController === 0) {
+      if (percAmpToggle === 'left') {
+        let negSum = 0;
+        let posSum = 0;
+        console.log('1');
+        Object.keys(quantities).forEach((key) => {
+          if (selectedValues[key] === 'center') {
+            negSum += parseFloat(quantities[key]);
+          } else if (selectedValues[key] === 'right') {
+            posSum += parseFloat(quantities[key]);
+          }
+        });
+        console.log('2');
+        if ((negSum > 0 && negSum !== 100) || (posSum > 0 && posSum !== 100)) {
+          // Popup logic
+          console.log('3');
+          setShow(true);
+        }
+      }
+    }
+  };
+
+  const handleClose = () => {
+    setShow(false);
+    console.log('made it');
+    handleCheck();
+  };
+
+  const [radioValue, setRadioValue] = useState('1');
+
+  const radios = [
+    { name: 'None', value: '1' },
+    { name: 'Assisted', value: '2' },
+  ];
+
+  const handleVisModelChange = (event) => {
+    setVisModel(event.target.value);
+  };
+
+  const handleTitleChange = (event) => {
+    setSessionTitle(event.target.value);
+  };
+
+  useEffect(() => {
+    if (props.IPG === 'Abbott') {
+      // const newQuantities = { ...quantities };
+      calculateQuantitiesWithDistribution();
+    }
+    if (radioValue === '2') {
+      assistedMode();
+    }
+    // if (props.IPG === 'Medtronic_Activa') {
+    //   if (volAmpToggle === 'left') {
+    //     handleActivaAmplitude();
+    //   } else if (volAmpToggle === 'right') {
+    //     handleActivaVoltage();
+    //   }
+    // }
+    // assist();
+  });
   /// //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   return (
-    <div className="test-container">
-      <div className="test-IPG">
-        {ipgs.map((ipg) => (
-          <div className="test-image-item">
-            <div className="test-image-container">
-              {React.cloneElement(ipg, {
-                key: ipg.key,
-                className: `${selectedValues[ipg.key]}-test-color`,
-              })}
-              {!isNaN(Number(ipg.key)) && (
-                <div className="test-triple-toggle-ipg">
-                  <TripleToggleTest
-                    key={ipg.key}
-                    value={selectedValues[ipg.key]}
-                    // quantity={quantities[selectedValues[ipg.key]]} // Pass the quantity prop
-                    quantity={quantities[ipg.key]}
-                    onChange={(value) =>
-                      handleTripleToggleChange(value, ipg.key)
-                    }
-                    onQuantityChange={(value, animation, quantity) =>
-                      handleQuantityChange(quantity, ipg.key)
-                    }
-                    // onQuantityChange={(value, animation, quantity) =>
-                    //   handleQuantityChange(
-                    //     value,
-                    //     animation,
-                    //     quantity,
-                    //     ipg.key,
-                    //   )
-                    // }
-                  />
-                </div>
-              )}
-            </div>
-            {/* <p className="image-key">{ipg.key}</p> */}
-          </div>
-        ))}
-      </div>
+    <div className="container">
+      {/* <div className="button-container">
+        <Form.Group className="mb-3">
+          <Form.Control
+            type="email"
+            placeholder="Enter session ID"
+            value={sessionTitle}
+            onChange={handleTitleChange}
+          />
+        </Form.Group>
+        <Form.Select
+          aria-label="Default select example"
+          value={visModel}
+          onChange={handleVisModelChange}
+        >
+          <option>Choose a model</option>
+          <option value="1">Dembek 2017</option>
+          <option value="2">FastField (Baniasadi 2020)</option>
+          <option value="3">SimBio/FieldTrip (see Horn 2017)</option>
+          <option value="4">Kuncel 2008</option>
+          <option value="5">Maedler 2012</option>
+        </Form.Select>
+        <div />
+        <div className="PercentageAmplitudeToggle">
+          {props.IPG === 'Boston' && (
+            <PercentageAmplitudeToggle
+              value={percAmpToggle}
+              onChange={(value) => handlePercAmpToggleChange(value)}
+            />
+          )}
+          {props.IPG === 'Medtronic_Activa' && (
+            <VoltageAmplitudeToggle
+              value={volAmpToggle}
+              onChange={(value) => handleVolAmpToggleChange(value)}
+            />
+          )}
+          {props.IPG === 'Abbott' && (
+            <MAToggleSwitch
+              value={ampToggle}
+              // onChange={(value) => handleVolAmpToggleChange(value)}
+            />
+          )}
+        </div>
+        <div />
+        <div className="button-container">
+          <label className="label">Pulsewidth (us):</label>
+          <input
+            className="new-quantity-input"
+            type="number"
+            name="quantity"
+            pattern="[0-9]+"
+            value={parameters.parameter1}
+            onChange={handleParameterChange('parameter1')}
+          />
+          <label className="label">Frequency (Hz):</label>
+          <input
+            className="new-quantity-input"
+            type="number"
+            name="quantity"
+            pattern="[0-9]+"
+            value={parameters.parameter2}
+            onChange={handleParameterChange('parameter2')}
+          />
+        </div>
+        <div className="button-container">
+          <label className="label">Total Amplitude</label>
+          <input
+            className="new-quantity-input"
+            type="number"
+            name="quantity"
+            pattern="[0-9]+"
+            value={totalAmplitude}
+            onChange={handleTotalAmplitudeChange}
+          />
+        </div>
+        <div>
+          <ButtonGroup>
+            {radios.map((radio, idx) => (
+              <ToggleButton
+                key={idx}
+                id={`radio-${idx}`}
+                type="radio"
+                variant={idx % 2 ? 'outline-success' : 'outline-danger'}
+                name="radio"
+                value={radio.value}
+                checked={radioValue === radio.value}
+                onChange={(e) => setRadioValue(e.currentTarget.value)}
+              >
+                {radio.name}
+              </ToggleButton>
+            ))}
+          </ButtonGroup>
+        </div>
+      </div> */}
       <div className="test-container2">
-        {/* <div className="backdrop">
-          <ElecBackdrop />
-          <div className="backdrop2">
-            <ElecBackdrop />
-          </div>
-        </div> */}
-        <div className="test-left-contacts">
+        <Dropdown>
+          <Dropdown.Toggle variant="success" id="dropdown-button-dark-example1">
+            Dropdown Button
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu>
+            <div className="test-button-container">
+              {/* <div /> */}
+              <Form.Group className="mb-3">
+                {/* <Form.Label>Stim Session Title</Form.Label> */}
+                <Form.Control
+                  type="email"
+                  placeholder="Enter session ID"
+                  value={sessionTitle}
+                  onChange={handleTitleChange}
+                />
+              </Form.Group>
+              <Form.Select
+                aria-label="Default select example"
+                value={visModel}
+                onChange={handleVisModelChange}
+              >
+                <option>Choose a model</option>
+                <option value="1">Dembek 2017</option>
+                <option value="2">FastField (Baniasadi 2020)</option>
+                <option value="3">SimBio/FieldTrip (see Horn 2017)</option>
+                <option value="4">Kuncel 2008</option>
+                <option value="5">Maedler 2012</option>
+              </Form.Select>
+              <div />
+              <div className="PercentageAmplitudeToggle">
+                {props.IPG === 'Boston' && (
+                  <PercentageAmplitudeToggle
+                    value={percAmpToggle}
+                    onChange={(value) => handlePercAmpToggleChange(value)}
+                  />
+                )}
+                {props.IPG === 'Medtronic_Activa' && (
+                  <VoltageAmplitudeToggle
+                    value={volAmpToggle}
+                    onChange={(value) => handleVolAmpToggleChange(value)}
+                  />
+                )}
+                {props.IPG === 'Abbott' && (
+                  <MAToggleSwitch
+                    value={ampToggle}
+                    // onChange={(value) => handleVolAmpToggleChange(value)}
+                  />
+                )}
+              </div>
+              <div />
+              <div className="button-container">
+                <label className="label">Pulsewidth (us):</label>
+                <input
+                  className="new-quantity-input"
+                  type="number"
+                  name="quantity"
+                  pattern="[0-9]+"
+                  value={parameters.parameter1}
+                  onChange={handleParameterChange('parameter1')}
+                />
+                <label className="label">Frequency (Hz):</label>
+                <input
+                  className="new-quantity-input"
+                  type="number"
+                  name="quantity"
+                  pattern="[0-9]+"
+                  value={parameters.parameter2}
+                  onChange={handleParameterChange('parameter2')}
+                />
+                {/* <PercentageAmplitudeToggle /> */}
+              </div>
+              <div className="button-container">
+                <label className="label">Total Amplitude</label>
+                <input
+                  className="new-quantity-input"
+                  type="number"
+                  name="quantity"
+                  pattern="[0-9]+"
+                  value={totalAmplitude}
+                  onChange={handleTotalAmplitudeChange}
+                />
+              </div>
+              <div>
+                {/* <AssistedToggle
+            value={assistedToggle}
+            onChange={(value) => handleAssistedToggleChange(value)}
+          /> */}
+                {/* <ButtonGroup aria-label="Basic example" className="mb-2">
+            <Button variant="secondary">Left</Button>
+            <Button variant="secondary">Middle</Button>
+            <Button variant="secondary">Right</Button>
+          </ButtonGroup> */}
+                <ButtonGroup>
+                  {radios.map((radio, idx) => (
+                    <ToggleButton
+                      key={idx}
+                      id={`radio-${idx}`}
+                      type="radio"
+                      variant={idx % 2 ? 'outline-success' : 'outline-danger'}
+                      name="radio"
+                      value={radio.value}
+                      checked={radioValue === radio.value}
+                      onChange={(e) => setRadioValue(e.currentTarget.value)}
+                    >
+                      {radio.name}
+                    </ToggleButton>
+                  ))}
+                </ButtonGroup>
+              </div>
+            </div>
+          </Dropdown.Menu>
+        </Dropdown>
+        <div></div>
+        <div></div>
+        <div className="test-IPG">
+          {ipgs.map((ipg) => (
+            <div className="image-item">
+              <div className="image-container">
+                {React.cloneElement(ipg, {
+                  key: ipg.key,
+                  className: `${selectedValues[ipg.key]}-color`,
+                })}
+                {!isNaN(Number(ipg.key)) && (
+                  <div className="triple-toggle-ipg-boston-test">
+                    <TripleToggleTest
+                      key={ipg.key}
+                      value={selectedValues[ipg.key]}
+                      switchPosition={selectedValues[ipg.key]}
+                      animation={animation[ipg.key]}
+                      // quantity={quantities[selectedValues[ipg.key]]} // Pass the quantity prop
+                      quantity={quantities[ipg.key]}
+                      onChange={(value, anime) =>
+                        handleTripleToggleChange(value, anime, ipg.key)
+                      }
+                      onQuantityChange={(value, anime, quantity) =>
+                        handleQuantityChange(quantity, ipg.key)
+                      }
+                      // onQuantityChange={(value, animation, quantity) =>
+                      //   handleQuantityChange(
+                      //     value,
+                      //     animation,
+                      //     quantity,
+                      //     ipg.key,
+                      //   )
+                      // }
+                    />
+                  </div>
+                )}
+              </div>
+              {/* <p className="image-key">{ipg.key}</p> */}
+            </div>
+          ))}
+        </div>
+        <div className="left-contacts">
           {leftContacts.map((Lcon) => (
-            <div className="test-image-item">
-              <div className="test-image-container-left">
+            <div className="image-item">
+              <div className="image-container">
                 {React.cloneElement(Lcon, {
                   key: Lcon.key,
-                  className: `${selectedValues[Lcon.key]}-test-color`,
+                  className: `${selectedValues[Lcon.key]}-color`,
                 })}
                 {!isNaN(Number(Lcon.key)) && (
-                  <div className="test-triple-toggle-left">
+                  <div className="triple-toggle-boston-test">
                     <TripleToggleTest
                       key={Lcon.key}
                       value={selectedValues[Lcon.key]}
+                      switchPosition={selectedValues[Lcon.key]}
+                      animation={animation[Lcon.key]}
                       // quantity={quantities[selectedValues[Lcon.key]]} // Pass the quantity prop
                       quantity={quantities[Lcon.key]} // Pass the quantity prop
-                      onChange={(value) =>
-                        handleTripleToggleChange(value, Lcon.key)
+                      onChange={(value, anime) =>
+                        handleTripleToggleChange(value, anime, Lcon.key)
                       }
-                      onQuantityChange={(value, animation, quantity) =>
+                      onQuantityChange={(value, anime, quantity) =>
                         handleQuantityChange(quantity, Lcon.key)
                       }
                       level={Lcon.level}
@@ -2086,33 +3698,38 @@ function NewBostonCartesiaTest(props, ref) {
                 )}
               </div>
               {/* <p className="image-key">{Lcon.key}</p> */}
+              <p className="image-name-boston" style={{ color: 'white' }}>
+                {names[Lcon.key]}
+              </p>
             </div>
           ))}
         </div>
       </div>
-      <div className="test-Elmodel-center">
+      <div className="Elmodel-center">
         {svgs.map((svg) => (
           <div
-            className="test-image-item"
+            className="image-item"
             style={{ zIndex: calculateZIndex(svg.key) }}
           >
-            <div className="test-image-container">
+            <div className="image-container">
               {React.cloneElement(svg, {
                 key: svg.key,
-                className: `${selectedValues[svg.key]}-test-color`,
+                className: `${selectedValues[svg.key]}-color`,
               })}
               {!isNaN(Number(svg.key)) && (
-                <div className="test-triple-toggle">
+                <div className="triple-toggle-boston-test">
                   <TripleToggleTest
                     key={svg.key}
                     value={selectedValues[svg.key]}
+                    switchPosition={selectedValues[svg.key]}
+                    animation={animation[svg.key]}
                     // quantity={quantities[selectedValues[svg.key]]} // Pass the quantity prop
                     quantity={quantities[svg.key]}
                     // quantity={100}
-                    onChange={(value) =>
-                      handleTripleToggleChange(value, svg.key)
+                    onChange={(value, anime) =>
+                      handleTripleToggleChange(value, anime, svg.key)
                     }
-                    onQuantityChange={(value, animation, quantity) =>
+                    onQuantityChange={(value, anime, quantity) =>
                       handleQuantityChange(quantity, svg.key)
                     }
                     level={svg.level}
@@ -2125,28 +3742,33 @@ function NewBostonCartesiaTest(props, ref) {
               )}
             </div>
             {/* <p className="image-key">{svg.key}</p> */}
+            <p className="image-name-boston" style={{ color: 'white' }}>
+              {names[svg.key]}
+            </p>
           </div>
         ))}
       </div>
-      <div className="test-right-contacts">
+      <div className="right-contacts">
         {rightContacts.map((rCon) => (
-          <div className="test-image-item">
-            <div className="test-image-container-right">
+          <div className="image-item">
+            <div className="image-container">
               {React.cloneElement(rCon, {
                 key: rCon.key,
-                className: `${selectedValues[rCon.key]}-test-color`,
+                className: `${selectedValues[rCon.key]}-color`,
               })}
               {!isNaN(Number(rCon.key)) && (
-                <div className="test-triple-toggle-right">
+                <div className="triple-toggle-boston-test">
                   <TripleToggleTest
                     key={rCon.key}
                     value={selectedValues[rCon.key]}
+                    switchPosition={selectedValues[rCon.key]}
+                    animation={animation[rCon.key]}
                     // quantity={quantities[selectedValues[rCon.key]]} // Pass the quantity prop
                     quantity={quantities[rCon.key]}
-                    onChange={(value) =>
-                      handleTripleToggleChange(value, rCon.key)
+                    onChange={(value, anime) =>
+                      handleTripleToggleChange(value, anime, rCon.key)
                     }
-                    onQuantityChange={(value, animation, quantity) =>
+                    onQuantityChange={(value, anime, quantity) =>
                       handleQuantityChange(quantity, rCon.key)
                     }
                     level={rCon.level}
@@ -2159,30 +3781,33 @@ function NewBostonCartesiaTest(props, ref) {
               )}
             </div>
             {/* <p className="image-key">{rCon.key}</p> */}
+            <p className="image-name-boston" style={{ color: 'white' }}>
+              {names[rCon.key]}
+            </p>
           </div>
         ))}
       </div>
-      <div className="test-button-container">
+      <div className="button-container">
         {/* <button
           className="import-button"
           onClick={() => fileInputRef.current.click()}
         >
-          Import from LeadDBS
-        </button>
-        <button
+          Import Data
+        </button> */}
+        {/* <button
           className="export-button"
           onClick={() => exportToJsonFile(tripleToggleData)}
         >
           Export to LeadDBS
         </button> */}
-        <input
+        {/* <input
           ref={fileInputRef}
           className="file-input"
           type="file"
           accept=".json"
           onChange={handleFileChange}
           style={{ display: 'none' }} // Hide the input element
-        />
+        /> */}
         {/* <button
           className={calculateQuantities ? 'active-button' : 'inactive-button'}
           onClick={handleCalculateQuantitiesButtonClick}
@@ -2203,53 +3828,1293 @@ function NewBostonCartesiaTest(props, ref) {
           <button onClick={handleClearButton} className="button">
             Clear
           </button>
-          <button
+          {/* <button onClick={handleCheck} className="button">
+            Check
+          </button> */}
+          {/* <StaticExample
+            show={show}
+            setShow={setShow}
+            handleClose={handleClose}
+          /> */}
+          {/* <button
             onClick={assist}
             className={isAssisted ? 'isAssistedButton' : 'button'}
           >
             Assisted
-          </button>
+          </button> */}
         </div>
-        <div className="button-container">
-          <h2>Steering</h2>
-          <div className="steering-container">
-            {/* <UpArrow onClick={handleUpButton} /> */}
-            <UpArrow onClick={newHandleUpButton} />
-            {/* <DownArrow onClick={handleDownButton} /> */}
+        {handleIPG()}
+        {(stimController === 0 || stimController === 3) && (
+          <div className="button-container">
+            <h2>Steering</h2>
+            {/* <div className="steering-container">
+            <UpArrow onClick={handlePercAmpChange} />
             <DownArrow onClick={newHandleDownButton} />
-            {/* </div> */}
-            {/* <div> */}
             <ClockwiseArrow onClick={handleClockwiseButton} />
             <CounterClockwiseArrow onClick={handleCounterClockwiseButton} />
-          </div>
-          <div className="steering-container">
-            {/* <button onClick={handleForwardButton}>Forward</button> */}
+          </div> */}
+            {(stimController === 0 || stimController === 3) && (
+              <div className="steering-container">
+                <UpArrow onClick={handlePercAmpChangeUp} />
+                {/* <UpArrow onClick={newHandleUpButton} /> */}
+                <DownArrow onClick={handlePercAmpChangeDown} />
+                <ClockwiseArrow onClick={handlePercAmpChangeClockwise} />
+                <CounterClockwiseArrow
+                  onClick={handlePercAmpChangeCounterClockwise}
+                />
+              </div>
+            )}
+            {/* <div className="steering-container">
             <SplitEvenButton onClick={handleSplitEvenButton} />
             <ForwardButton onClick={handleForwardButton} />
             <BackButton onClick={handleBackButton} />
             <LeftButton onClick={handleLeftButton} />
             <RightButton onClick={handleRightButton} />
-            {/* <button onClick={handleBackButton}>Back</button> */}
-            {/* <button onClick={handleLeftButton}>Left</button> */}
-            {/* <button onClick={handleRightButton}>Right</button> */}
+          </div> */}
           </div>
-          {/* <button onClick={vectorMakeUp}>Vector</button> */}
+        )}
+        <div className="steering-container">
+          <SplitEvenButton onClick={handleSplitEvenButton} />
+          <ForwardButton onClick={handleForwardButton} />
+          <BackButton onClick={handleBackButton} />
+          <LeftButton onClick={handleRightButton} />
+          <RightButton onClick={handleLeftButton} />
         </div>
-        {/* <button onClick={handleUpButton} className="button">Up</button>
-          <button onClick={handleDownButton} className="button">Down</button>
-          <button onClick={handleClockwiseButton} className="button">Clockwise</button>
-          <button onClick={handleCounterClockwiseButton} className="button">
-            Counter Clockwise
-          </button> */}
-        {/* <button onClick={handleClockwiseButton}>
-          Clockwise
-        </button>
-        <button onClick={handleCounterClockwiseButton}>
-          Counterclockwise
-        </button> */}
       </div>
     </div>
   );
 }
 
 export default forwardRef(NewBostonCartesiaTest);
+
+// const calculateQuantitiesWithDistribution = (selectedValues) => {
+//   const quantities = {
+//     left: 0,
+//     center: 0,
+//     right: 0,
+//   };
+
+//   // Calculate the quantity increment for 'center' and 'right' values
+//   // This is effectively the number of TripleToggle components that have a value of 'center'
+//   const centerCount = Object.values(selectedValues).filter(
+//     (value) => value === 'center',
+//   ).length;
+//   let centerQuantityIncrement = centerCount > 0 ? 100 / centerCount : 0;
+//   // THis is effectively the number of TripleToggle components that have a value of 'right'
+//   const rightCount = Object.values(selectedValues).filter(
+//     (value) => value === 'right',
+//   ).length;
+//   let rightQuantityIncrement = rightCount > 0 ? 100 / rightCount : 0;
+
+//   // This finds the difference between
+//   if (lastChangedInstance.value === 'center') {
+//     centerQuantityIncrement =
+//       centerCount > 0
+//         ? (100 - lastChangedInstance.animation) / centerCount
+//         : 0;
+//   } else if (lastChangedInstance.value === 'right') {
+//     rightQuantityIncrement =
+//       rightCount > 0 ? (100 - lastChangedInstance.animation) / rightCount : 0;
+//   } else if (lastChangedInstance.value === 'left') {
+//     centerQuantityIncrement = centerCount > 0 ? 100 / centerCount : 0;
+//     rightQuantityIncrement = rightCount > 0 ? 100 / rightCount : 0;
+//   }
+
+//   Object.keys(selectedValues).forEach((key) => {
+//     const value = selectedValues[key];
+//     if (key !== lastChangedInstance.key) {
+//       if (value === 'left') {
+//         quantities[value] = 0;
+//       } else if (value === 'center') {
+//         quantities[value] = centerQuantityIncrement;
+//       } else if (value === 'right') {
+//         quantities[value] = rightQuantityIncrement;
+//       }
+//     } else if (key === lastChangedInstance.key) {
+//       quantities[value] = lastChangedInstance.quantity;
+//     }
+//   });
+
+//   return quantities;
+// };
+
+// const calculateQuantitiesWithDistribution = (selectedValues) => {
+//   if (calculateQuantities) {
+//     const quantities = {
+//       left: 0,
+//       center: 0,
+//       right: 0,
+//     };
+//     // Calculate the quantity increment for 'center' and 'right' values
+//     // This is effectively the number of TripleToggle components that have a value of 'center'
+//     const centerCount = Object.values(selectedValues).filter(
+//       (value) => value === 'center',
+//     ).length;
+//     let centerQuantityIncrement = centerCount > 0 ? 100 / centerCount : 0;
+//     // THis is effectively the number of TripleToggle components that have a value of 'right'
+//     const rightCount = Object.values(selectedValues).filter(
+//       (value) => value === 'right',
+//     ).length;
+//     let rightQuantityIncrement = rightCount > 0 ? 100 / rightCount : 0;
+
+//     // This finds the difference between
+//     if (lastChangedInstance.value === 'center') {
+//       centerQuantityIncrement =
+//         centerCount > 0
+//           ? (100 - lastChangedInstance.animation) / centerCount
+//           : 0;
+//     } else if (lastChangedInstance.value === 'right') {
+//       rightQuantityIncrement =
+//         rightCount > 0
+//           ? (100 - lastChangedInstance.animation) / rightCount
+//           : 0;
+//     } else if (lastChangedInstance.value === 'left') {
+//       centerQuantityIncrement = centerCount > 0 ? 100 / centerCount : 0;
+//       rightQuantityIncrement = rightCount > 0 ? 100 / rightCount : 0;
+//     }
+
+//     Object.keys(selectedValues).forEach((key) => {
+//       const value = selectedValues[key];
+//       if (key !== lastChangedInstance.key) {
+//         if (value === 'left') {
+//           quantities[value] = 0;
+//         } else if (value === 'center') {
+//           quantities[value] = centerQuantityIncrement;
+//         } else if (value === 'right') {
+//           quantities[value] = rightQuantityIncrement;
+//         }
+//       } else if (key === lastChangedInstance.key) {
+//         quantities[value] = lastChangedInstance.quantity;
+//       }
+//     });
+
+//     return quantities;
+//   }
+//   return quantities;
+// };
+
+// {/* <BostonElectrodeRenderer
+//   handleFileChange={handleFileChange}
+//   fileInputRef={fileInputRef}
+//   calculateZIndex={calculateZIndex}
+//   selectedValues={selectedValues}
+//   quantities={quantities}
+//   svgs={svgs}
+//   ipgs={ipgs}
+//   rightContacts={rightContacts}
+//   leftContacts={leftContacts}
+// /> */}
+
+// export default BostonCartesia;
+// if (lastChangedInstance.key === 'center') {
+//   if (centerCount > 1) {
+//     centerQuantityIncrement =
+//       (100 - lastChangedInstance.animation) / (centerCount - 1);
+//   } else if (centerCount < 1) {
+//     centerQuantityIncrement = 0;
+//   }
+// } else if (lastChangedInstance.key === 'right') {
+//   if (rightCount > 1) {
+//     rightQuantityIncrement =
+//       (100 - lastChangedInstance.animation) / (rightCount - 1);
+//   } else if (rightCount < 1) {
+//     rightQuantityIncrement = 0;
+//   }
+// } else if (lastChangedInstance.key === 'left') {
+//   centerQuantityIncrement = centerCount > 0 ? 100 / centerCount : 0;
+//   rightQuantityIncrement = rightCount > 0 ? 100 / rightCount : 0;
+// }
+// console.log(centerCount);
+// console.log(centerQuantityIncrement);
+
+// Object.keys(selectedValues).forEach((key) => {
+//   const value = selectedValues[key];
+//   if (key !== lastChangedInstance.key) {
+//     if (value === 'left') {
+//       quantities[value] = 0;
+//     } else if (value === 'center') {
+//       quantities[value] = centerQuantityIncrement;
+//     } else if (value === 'right') {
+//       quantities[value] = rightQuantityIncrement;
+//     }
+//   } else if (key === lastChangedInstance.key) {
+//     quantities[value] = 100 - lastChangedInstance.animation;
+//   }
+// });
+
+// import React, {
+//   useState,
+//   useEffect,
+//   useRef,
+//   forwardRef,
+//   useImperativeHandle,
+// } from 'react';
+// import TripleToggle from '../TripleToggle'; // Make sure to import TripleToggle correctly
+// import calculateQuantities from '../CalculateQuantities'; // Correct the path to quantityUtils
+// import NewCalculateQuantities from '../NewCalculateQuantities';
+// import './BostonCartesia.css';
+// import { ReactComponent as IPG } from './images/IPG.svg';
+// import { ReactComponent as Contact } from './images/Contact.svg';
+// import { ReactComponent as Tail } from './images/Tail.svg';
+// import { ReactComponent as RightContact } from './images/RightContact.svg';
+// import { ReactComponent as LeftContact } from './images/LeftContact.svg';
+// import { ReactComponent as HeadTop } from './images/head_top.svg';
+// import { ReactComponent as HeadBottom } from './images/head_bottom.svg';
+// import BostonElectrodeRenderer from './BostonElectrodeRenderer';
+
+// function BostonCartesia(props, ref) {
+//   const svgs = [
+//     <HeadTop key="headTop" />,
+//     <HeadBottom key="headBottom" />,
+//     <Contact key="8" />,
+//     <Contact key="5" />,
+//     <Contact key="2" />,
+//     <Tail key="1" />,
+//   ];
+
+//   const ipgs = [<IPG key="0" />];
+
+//   const rightContacts = [<Contact key="7" />, <Contact key="4" />];
+
+//   const leftContacts = [<Contact key="6" />, <Contact key="3" />];
+
+//   const [calculateQuantity, setCalculateQuantity] = useState(false);
+
+//   const handleCalculateQuantitiesButtonClick = () => {
+//     setCalculateQuantity((prev) => !prev);
+//   };
+
+//   const calculateZIndex = (key) => {
+//     // Define a mapping of key to z-index
+//     const zIndexMap = {
+//       8: 2,
+//       5: 2,
+//       2: 2,
+//       1: 2,
+//       0: 2,
+//       // Add more key-to-z-index mappings as needed
+//     };
+
+//     // Return the calculated z-index or a default value
+//     return zIndexMap[key] || 0;
+//   };
+
+//   const initialQuantities = {
+//     plus: 0,
+//     minus: 0,
+//   };
+
+//   const [selectedValues, setSelectedValues] = useState({
+//     0: 'left',
+//     1: 'left',
+//     2: 'left',
+//     3: 'left',
+//     4: 'left',
+//     5: 'left',
+//     6: 'left',
+//     7: 'left',
+//     8: 'left',
+//     // Initialize other images here
+//   });
+//   const [quantities, setQuantities] = useState({ initialQuantities });
+
+//   const [quantityMap, setQuantityMap] = useState({});
+
+//   // const [userQuantities, setUserQuantities] = useState({}); // Store user input quantities
+
+//   const totalQuantity = quantities.plus + quantities.minus;
+
+//   const [lastChangedInstance, setLastChangedInstance] = useState({
+//     key: null,
+//     quantity: null,
+//     value: null,
+//     animation: null,
+//   });
+
+//   console.log('lastChangedInstance:', lastChangedInstance); // Add this line to log the value
+
+//   // const calculateQuantitiesWithDistribution = (selectedValues) => {
+//   //   const quantities = {
+//   //     left: 0,
+//   //     center: 0,
+//   //     right: 0,
+//   //   };
+
+//   //   // Calculate the quantity increment for 'center' and 'right' values
+//   //   // This is effectively the number of TripleToggle components that have a value of 'center'
+//   //   const centerCount = Object.values(selectedValues).filter(
+//   //     (value) => value === 'center',
+//   //   ).length;
+//   //   let centerQuantityIncrement = centerCount > 0 ? 100 / centerCount : 0;
+//   //   // THis is effectively the number of TripleToggle components that have a value of 'right'
+//   //   const rightCount = Object.values(selectedValues).filter(
+//   //     (value) => value === 'right',
+//   //   ).length;
+//   //   let rightQuantityIncrement = rightCount > 0 ? 100 / rightCount : 0;
+
+//   //   // This finds the difference between
+//   //   if (lastChangedInstance.value === 'center') {
+//   //     centerQuantityIncrement =
+//   //       centerCount > 0
+//   //         ? (100 - lastChangedInstance.animation) / centerCount
+//   //         : 0;
+//   //   } else if (lastChangedInstance.value === 'right') {
+//   //     rightQuantityIncrement =
+//   //       rightCount > 0 ? (100 - lastChangedInstance.animation) / rightCount : 0;
+//   //   } else if (lastChangedInstance.value === 'left') {
+//   //     centerQuantityIncrement = centerCount > 0 ? 100 / centerCount : 0;
+//   //     rightQuantityIncrement = rightCount > 0 ? 100 / rightCount : 0;
+//   //   }
+
+//   //   Object.keys(selectedValues).forEach((key) => {
+//   //     const value = selectedValues[key];
+//   //     if (key !== lastChangedInstance.key) {
+//   //       if (value === 'left') {
+//   //         quantities[value] = 0;
+//   //       } else if (value === 'center') {
+//   //         quantities[value] = centerQuantityIncrement;
+//   //       } else if (value === 'right') {
+//   //         quantities[value] = rightQuantityIncrement;
+//   //       }
+//   //     } else if (key === lastChangedInstance.key) {
+//   //       quantities[value] = lastChangedInstance.quantity;
+//   //     }
+//   //   });
+
+//   //   return quantities;
+//   // };
+
+//   // const calculateQuantitiesWithDistribution = (selectedValues) => {
+//   //   if (calculateQuantities) {
+//   //     const quantities = {
+//   //       left: 0,
+//   //       center: 0,
+//   //       right: 0,
+//   //     };
+//   //     // Calculate the quantity increment for 'center' and 'right' values
+//   //     // This is effectively the number of TripleToggle components that have a value of 'center'
+//   //     const centerCount = Object.values(selectedValues).filter(
+//   //       (value) => value === 'center',
+//   //     ).length;
+//   //     let centerQuantityIncrement = centerCount > 0 ? 100 / centerCount : 0;
+//   //     // THis is effectively the number of TripleToggle components that have a value of 'right'
+//   //     const rightCount = Object.values(selectedValues).filter(
+//   //       (value) => value === 'right',
+//   //     ).length;
+//   //     let rightQuantityIncrement = rightCount > 0 ? 100 / rightCount : 0;
+
+//   //     // This finds the difference between
+//   //     if (lastChangedInstance.value === 'center') {
+//   //       centerQuantityIncrement =
+//   //         centerCount > 0
+//   //           ? (100 - lastChangedInstance.animation) / centerCount
+//   //           : 0;
+//   //     } else if (lastChangedInstance.value === 'right') {
+//   //       rightQuantityIncrement =
+//   //         rightCount > 0
+//   //           ? (100 - lastChangedInstance.animation) / rightCount
+//   //           : 0;
+//   //     } else if (lastChangedInstance.value === 'left') {
+//   //       centerQuantityIncrement = centerCount > 0 ? 100 / centerCount : 0;
+//   //       rightQuantityIncrement = rightCount > 0 ? 100 / rightCount : 0;
+//   //     }
+
+//   //     Object.keys(selectedValues).forEach((key) => {
+//   //       const value = selectedValues[key];
+//   //       if (key !== lastChangedInstance.key) {
+//   //         if (value === 'left') {
+//   //           quantities[value] = 0;
+//   //         } else if (value === 'center') {
+//   //           quantities[value] = centerQuantityIncrement;
+//   //         } else if (value === 'right') {
+//   //           quantities[value] = rightQuantityIncrement;
+//   //         }
+//   //       } else if (key === lastChangedInstance.key) {
+//   //         quantities[value] = lastChangedInstance.quantity;
+//   //       }
+//   //     });
+
+//   //     return quantities;
+//   //   }
+//   //   return quantities;
+//   // };
+
+//   const calculateQuantitiesWithDistribution = (selectedValues) => {
+//     const quantities = {
+//       left: 0,
+//       center: 0,
+//       right: 0,
+//     };
+
+//     // Calculate the quantity increment for 'center' and 'right' values
+//     // This is effectively the number of TripleToggle components that have a value of 'center'
+//     const centerCount = Object.values(selectedValues).filter(
+//       (value) => value === 'center',
+//     ).length;
+//     let centerQuantityIncrement = centerCount > 0 ? 100 / centerCount : 0;
+//     // THis is effectively the number of TripleToggle components that have a value of 'right'
+//     const rightCount = Object.values(selectedValues).filter(
+//       (value) => value === 'right',
+//     ).length;
+//     let rightQuantityIncrement = rightCount > 0 ? 100 / rightCount : 0;
+
+//     // This finds the difference between
+//     if (lastChangedInstance.value === 'center') {
+//       centerQuantityIncrement =
+//         centerCount > 0
+//           ? (100 - lastChangedInstance.animation) / centerCount
+//           : 0;
+//     } else if (lastChangedInstance.value === 'right') {
+//       rightQuantityIncrement =
+//         rightCount > 0 ? (100 - lastChangedInstance.animation) / rightCount : 0;
+//     } else if (lastChangedInstance.value === 'left') {
+//       centerQuantityIncrement = centerCount > 0 ? 100 / centerCount : 0;
+//       rightQuantityIncrement = rightCount > 0 ? 100 / rightCount : 0;
+//     }
+
+//     Object.keys(selectedValues).forEach((key) => {
+//       const value = selectedValues[key];
+//       if (key !== lastChangedInstance.key) {
+//         if (value === 'left') {
+//           quantities[value] = 0;
+//         } else if (value === 'center') {
+//           quantities[value] = centerQuantityIncrement;
+//         } else if (value === 'right') {
+//           quantities[value] = rightQuantityIncrement;
+//         }
+//       } else if (key === lastChangedInstance.key) {
+//         quantities[value] = lastChangedInstance.quantity;
+//       }
+//     });
+
+//     return quantities;
+//   };
+
+//   const handleTripleToggleChange = (value, key) => {
+//     const updatedSelectedValues = { ...selectedValues };
+//     updatedSelectedValues[key] = value;
+//     setSelectedValues(updatedSelectedValues);
+
+//     // Initialize quantity for this TripleToggle if not already set
+//     // if (!quantityMap[key]) {
+//     //   setQuantityMap({ ...quantityMap, [key]: 0 });
+//     // }
+//   };
+
+//   const [userQuantities, setUserQuantities] = useState({});
+
+//   const handleQuantityChange = (key, quantity) => {
+//     const updatedUserQuantities = { ...userQuantities };
+//     updatedUserQuantities[key] = quantity;
+//     setUserQuantities(updatedUserQuantities);
+//   };
+
+//   useEffect(() => {
+//     if (calculateQuantity) {
+//       // Calculate quantities based on selected values with distribution
+//       const newQuantities = calculateQuantitiesWithDistribution(selectedValues);
+//       setQuantities(newQuantities);
+//     } else {
+//       // When calculateQuantity is false, use the quantities from quantityMap
+//       // If userQuantities exist, set the quantities to be the user input quantities
+//       const newQuantities = { ...quantities };
+//       Object.keys(selectedValues).forEach((key) => {
+//         const value = selectedValues[key];
+//         if (userQuantities[key] !== undefined) {
+//           // Handle user input quantities here
+//           newQuantities[value] = userQuantities[key];
+//         } else {
+//           newQuantities[value] = quantityMap[key] || 0;
+//         }
+//       });
+//       setQuantities(newQuantities);
+//     }
+//   }, [calculateQuantity, selectedValues, quantityMap, userQuantities]);
+
+//   /// ///////////////////////      Exporting Data ////////////////////
+//   function gatherTripleToggleData(selectedValues, quantities) {
+//     const data = [];
+
+//     // Create a mapping object for the values
+//     const valueMapping = {
+//       left: 'OFF',
+//       center: '-',
+//       right: '+',
+//     };
+
+//     // Iterate through the selectedValues object and collect the data for each instance
+//     for (const key in selectedValues) {
+//       if (selectedValues.hasOwnProperty(key)) {
+//         const value = selectedValues[key];
+//         data.push({
+//           key,
+//           value: valueMapping[value] || value, // Use the mapped value or the original value
+//           quantity: quantities[value],
+//         });
+//       }
+//     }
+
+//     return data;
+//   }
+//   const tripleToggleData = gatherTripleToggleData(selectedValues, quantities);
+
+//   function exportToJsonFile(data) {
+//     const json = JSON.stringify(data, null, 2);
+//     const blob = new Blob([json], { type: 'application/json' });
+//     const url = URL.createObjectURL(blob);
+//     const a = document.createElement('a');
+//     a.style.display = 'none';
+//     a.href = url;
+//     a.download = 'tripleToggleData.json';
+//     document.body.appendChild(a);
+//     a.click();
+//     window.URL.revokeObjectURL(url);
+//   }
+//   /// /////////////////////////////////////////////////////////////////////////
+
+//   /// /////////////////////           Importing Data - doesn't really work yet ////////////////////////
+
+//   const [importedData, setImportedData] = useState(null);
+
+//   const reverseValueMapping = {
+//     OFF: 'left',
+//     '-': 'center',
+//     '+': 'right',
+//   };
+
+//   function getSwitchAnimation(from, to) {
+//     // Use the animation logic from TripleToggle to update the state
+//     // This is a simplified version; you may need to adjust it
+//     if (from === 'left' && to === 'center') {
+//       // Apply animation logic here
+//     } else if (from === 'center' && to === 'right') {
+//       // Apply animation logic here
+//     } else if (from === 'right' && to === 'center') {
+//       // Apply animation logic here
+//     } else if (from === 'center' && to === 'left') {
+//       // Apply animation logic here
+//     } else if (from === 'right' && to === 'left') {
+//       // Apply animation logic here
+//     } else if (from === 'left' && to === 'right') {
+//       // Apply animation logic here
+//     }
+//   }
+
+//   function updateDataFromJson(jsonData) {
+//     console.log('Imported JSON Data:', jsonData);
+//     if (Array.isArray(jsonData)) {
+//       const updatedSelectedValues = { ...selectedValues };
+//       const updatedQuantities = { ...quantities };
+
+//       jsonData.forEach((item) => {
+//         // const { key, value, quantity, animation } = item;
+//         const { key, value, quantity } = item;
+//         const originalValue = reverseValueMapping[value];
+//         if (selectedValues[key] !== undefined) {
+//           getSwitchAnimation(originalValue, value);
+//           updatedSelectedValues[key] = originalValue;
+//           // updatedQuantities[value] = quantity;
+//           updatedQuantities[originalValue] = quantity;
+//         }
+//       });
+//       setSelectedValues(updatedSelectedValues);
+//       setQuantities(updatedQuantities);
+//       console.log(selectedValues);
+//       console.log('Quantities:', quantities);
+//     }
+//   }
+
+//   // function handleFileChange(event) {
+//   //   const file = event.target.files[0];
+//   //   if (file) {
+//   //     const reader = new FileReader();
+//   //     reader.onload = function (e) {
+//   //       try {
+//   //         const jsonData = JSON.parse(e.target.result);
+//   //         updateDataFromJson(jsonData);
+//   //       } catch (error) {
+//   //         console.error('Error parsing JSON:', error);
+//   //       }
+//   //     };
+//   //     reader.readAsText(file);
+//   //   }
+//   // }
+
+//   function handleFileChange(event) {
+//     const file = event.target.files[0];
+//     if (file) {
+//       const reader = new FileReader();
+//       reader.onload = function (e) {
+//         try {
+//           const jsonData = JSON.parse(e.target.result);
+//           setImportedData(jsonData);
+//         } catch (error) {
+//           console.error('Error parsing JSON:', error);
+//         }
+//       };
+//       reader.readAsText(file);
+//     }
+//   }
+
+//   useEffect(() => {
+//     if (importedData) {
+//       updateDataFromJson(importedData);
+//     }
+//   }, [importedData]);
+
+//   const fileInputRef = useRef(null);
+
+//   /// //////////////////////////////////////////////////////////////////////////
+
+//   /// /////////////////////////           Export to TabbedElectrodeIPGSelection               /////////////////////////////
+//   const getCartesiaData = () => {
+//     const data = [];
+//     for (const key in selectedValues) {
+//       if (selectedValues.hasOwnProperty(key)) {
+//         data.push({
+//           key,
+//           value: selectedValues[key],
+//           quantity: quantities[selectedValues[key]],
+//         });
+//       }
+//     }
+//     return data;
+//   };
+
+//   useImperativeHandle(ref, () => ({
+//     getCartesiaData,
+//   }));
+
+//   /// //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//   return (
+//     <div className="container">
+//       <div className="container2">
+//         <div className="IPG">
+//           {ipgs.map((ipg) => (
+//             <div className="image-item">
+//               <div className="image-container">
+//                 {React.cloneElement(ipg, {
+//                   key: ipg.key,
+//                   className: `${selectedValues[ipg.key]}-color`,
+//                 })}
+//                 {!isNaN(Number(ipg.key)) && (
+//                   <div className="triple-toggle-ipg">
+//                     <TripleToggle
+//                       key={ipg.key}
+//                       value={selectedValues[ipg.key]}
+//                       quantity={quantities[selectedValues[ipg.key]]} // Pass the quantity prop
+//                       onChange={(value) =>
+//                         handleTripleToggleChange(value, ipg.key)
+//                       }
+//                       onQuantityChange={(value, animation, quantity) =>
+//                         handleQuantityChange(
+//                           value,
+//                           animation,
+//                           quantity,
+//                           ipg.key,
+//                         )
+//                       }
+//                     />
+//                   </div>
+//                 )}
+//               </div>
+//               {/* <p className="image-key">{ipg.key}</p> */}
+//             </div>
+//           ))}
+//         </div>
+//         <div className="left-contacts">
+//           {leftContacts.map((Lcon) => (
+//             <div className="image-item">
+//               <div className="image-container">
+//                 {React.cloneElement(Lcon, {
+//                   key: Lcon.key,
+//                   className: `${selectedValues[Lcon.key]}-color`,
+//                 })}
+//                 {!isNaN(Number(Lcon.key)) && (
+//                   <div className="triple-toggle">
+//                     <TripleToggle
+//                       key={Lcon.key}
+//                       value={selectedValues[Lcon.key]}
+//                       quantity={quantities[selectedValues[Lcon.key]]} // Pass the quantity prop
+//                       onChange={(value) =>
+//                         handleTripleToggleChange(value, Lcon.key)
+//                       }
+//                       onQuantityChange={(value, animation, quantity) =>
+//                         handleQuantityChange(
+//                           value,
+//                           animation,
+//                           quantity,
+//                           Lcon.key,
+//                         )
+//                       }
+//                     />
+//                   </div>
+//                 )}
+//               </div>
+//               {/* <p className="image-key">{Lcon.key}</p> */}
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//       <div className="Elmodel-center">
+//         {svgs.map((svg) => (
+//           <div
+//             className="image-item"
+//             style={{ zIndex: calculateZIndex(svg.key) }}
+//           >
+//             <div className="image-container">
+//               {React.cloneElement(svg, {
+//                 key: svg.key,
+//                 className: `${selectedValues[svg.key]}-color`,
+//               })}
+//               {!isNaN(Number(svg.key)) && (
+//                 <div className="triple-toggle">
+//                   <TripleToggle
+//                     key={svg.key}
+//                     value={selectedValues[svg.key]}
+//                     quantity={quantities[selectedValues[svg.key]]} // Pass the quantity prop
+//                     onChange={(value) =>
+//                       handleTripleToggleChange(value, svg.key)
+//                     }
+//                     onQuantityChange={(value, animation, quantity) =>
+//                       handleQuantityChange(value, animation, quantity, svg.key)
+//                     }
+//                   />
+//                 </div>
+//               )}
+//             </div>
+//             {/* <p className="image-key">{svg.key}</p> */}
+//           </div>
+//         ))}
+//       </div>
+//       <div className="right-contacts">
+//         {rightContacts.map((rCon) => (
+//           <div className="image-item">
+//             <div className="image-container">
+//               {React.cloneElement(rCon, {
+//                 key: rCon.key,
+//                 className: `${selectedValues[rCon.key]}-color`,
+//               })}
+//               {!isNaN(Number(rCon.key)) && (
+//                 <div className="triple-toggle">
+//                   <TripleToggle
+//                     key={rCon.key}
+//                     value={selectedValues[rCon.key]}
+//                     quantity={quantities[selectedValues[rCon.key]]} // Pass the quantity prop
+//                     onChange={(value) =>
+//                       handleTripleToggleChange(value, rCon.key)
+//                     }
+//                     onQuantityChange={(value, animation, quantity) =>
+//                       handleQuantityChange(value, animation, quantity, rCon.key)
+//                     }
+//                   />
+//                 </div>
+//               )}
+//             </div>
+//             {/* <p className="image-key">{rCon.key}</p> */}
+//           </div>
+//         ))}
+//       </div>
+//       <div className="button-container">
+//         <button
+//           className="import-button"
+//           onClick={() => fileInputRef.current.click()}
+//         >
+//           Import from LeadDBS
+//         </button>
+//         <button
+//           className="export-button"
+//           onClick={() => exportToJsonFile(tripleToggleData)}
+//         >
+//           Export to LeadDBS
+//         </button>
+//         <input
+//           ref={fileInputRef}
+//           className="file-input"
+//           type="file"
+//           accept=".json"
+//           onChange={handleFileChange}
+//           style={{ display: 'none' }} // Hide the input element
+//         />
+//         <button
+//           className={calculateQuantity ? 'active-button' : 'inactive-button'}
+//           onClick={handleCalculateQuantitiesButtonClick}
+//         >
+//           {calculateQuantity ? 'On' : 'Off'}
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default forwardRef(BostonCartesia);
+
+// import React, {
+//   useState,
+//   useEffect,
+//   useRef,
+//   forwardRef,
+//   useImperativeHandle,
+// } from 'react';
+// import TripleToggle from '../TripleToggle'; // Make sure to import TripleToggle correctly
+// import calculateQuantities from '../CalculateQuantities'; // Correct the path to quantityUtils
+// import './BostonCartesia.css';
+// import { ReactComponent as IPG } from './images/IPG.svg';
+// import { ReactComponent as Contact } from './images/Contact.svg';
+// import { ReactComponent as Tail } from './images/Tail.svg';
+// import { ReactComponent as RightContact } from './images/RightContact.svg';
+// import { ReactComponent as LeftContact } from './images/LeftContact.svg';
+// import { ReactComponent as HeadTop } from './images/head_top.svg';
+// import { ReactComponent as HeadBottom } from './images/head_bottom.svg';
+// import BostonElectrodeRenderer from './BostonElectrodeRenderer';
+
+// function BostonCartesia(props, ref) {
+//   const svgs = [
+//     <HeadTop key="headTop" />,
+//     <HeadBottom key="headBottom" />,
+//     <Contact key="8" level="4" />,
+//     <Contact key="5" level="3" face="center" />,
+//     <Contact key="2" level="2" face="center" />,
+//     <Tail key="1" level="1" />,
+//   ];
+
+//   const ipgs = [<IPG key="0" />];
+
+//   const rightContacts = [
+//     <Contact key="7" level="3" face="right" />,
+//     <Contact key="4" level="2" face="right" />,
+//   ];
+
+//   const leftContacts = [
+//     <Contact key="6" level="3" face="left" />,
+//     <Contact key="3" level="2" face="left" />,
+//   ];
+
+//   const calculateZIndex = (key) => {
+//     // Define a mapping of key to z-index
+//     const zIndexMap = {
+//       8: 2,
+//       5: 2,
+//       2: 2,
+//       1: 2,
+//       0: 2,
+//       // Add more key-to-z-index mappings as needed
+//     };
+
+//     // Return the calculated z-index or a default value
+//     return zIndexMap[key] || 0;
+//   };
+
+//   const initialQuantities = {
+//     plus: 0,
+//     minus: 0,
+//   };
+
+//   const [selectedValues, setSelectedValues] = useState({
+//     0: 'left',
+//     1: 'left',
+//     2: 'left',
+//     3: 'left',
+//     4: 'left',
+//     5: 'left',
+//     6: 'left',
+//     7: 'left',
+//     8: 'left',
+//     // Initialize other images here
+//   });
+//   const [quantities, setQuantities] = useState({
+//     0: 0,
+//     1: 0,
+//     2: 0,
+//     3: 0,
+//     4: 0,
+//     5: 0,
+//     6: 0,
+//     7: 0,
+//     8: 0,
+//   });
+
+//   // const [userQuantities, setUserQuantities] = useState({}); // Store user input quantities
+
+//   // const handleTripleToggleChange = (value, key) => {
+//   //   setSelectedValues((prevSelectedValues) => ({
+//   //     ...prevSelectedValues,
+//   //     [key]: value,
+//   //   }));
+//   //   console.log('Values:', selectedValues);
+//   // };
+
+//   const handleTripleToggleChange = (value, key) => {
+//     const updatedSelectedValues = { ...selectedValues, [key]: value };
+//     setSelectedValues(updatedSelectedValues);
+//   };
+//   // console.log('Values: ', selectedValues);
+
+//   // Define the handleQuantityChange function to update the quantity for a specific key and value
+//   const handleQuantityChange = (quantity, key) => {
+//     // setQuantities((prevQuantities) => ({
+//     //   ...prevQuantities,
+//     //   [key]: quantity,
+//     // }));
+//     const updatedQuantities = { ...quantities, [key]: quantities };
+//     setQuantities(updatedQuantities);
+//   };
+
+//   const calculateQuantitiesWithDistribution = () => {
+//     // Calculate the quantity increment for 'center' and 'right' values
+//     const centerCount = Object.values(selectedValues).filter(
+//       (value) => value === 'center',
+//     ).length;
+//     const centerQuantityIncrement = centerCount > 0 ? 100 / centerCount : 0;
+//     console.log('CenterCount: ', centerCount);
+
+//     const rightCount = Object.values(selectedValues).filter(
+//       (value) => value === 'right',
+//     ).length;
+//     const rightQuantityIncrement = rightCount > 0 ? 100 / rightCount : 0;
+
+//     const updatedQuantities = { ...quantities }; // Create a copy of the quantities object
+
+//     // Update the quantities based on selected values
+//     Object.keys(selectedValues).forEach((key) => {
+//       const value = selectedValues[key];
+//       if (value === 'left') {
+//         updatedQuantities[key] = 0;
+//       } else if (value === 'center') {
+//         updatedQuantities[key] = centerQuantityIncrement;
+//       } else if (value === 'right') {
+//         updatedQuantities[key] = rightQuantityIncrement;
+//       }
+//     });
+
+//     // console.log(quantities);
+//     setQuantities(updatedQuantities);
+//     // console.log(quantities); // Update the state with the new quantities
+//   };
+
+//   const roundToHundred = () => {
+//     // Initialize sum variables
+//     let totalCenterSum = 0;
+//     let totalRightSum = 0;
+
+//     // Calculate the sums for 'center' and 'right' values
+//     Object.keys(quantities).forEach((key) => {
+//       const value = selectedValues[key];
+//       if (value === 'center') {
+//         totalCenterSum += quantities[key];
+//       } else if (value === 'right') {
+//         totalRightSum += quantities[key];
+//       }
+//     });
+
+//     // Calculate the quantity increments
+//     const centerCount = Object.values(selectedValues).filter(
+//       (value) => value === 'center',
+//     ).length;
+//     const centerQuantityIncrement = (100 - totalCenterSum) / centerCount;
+
+//     const rightCount = Object.values(selectedValues).filter(
+//       (value) => value === 'right',
+//     ).length;
+//     const rightQuantityIncrement = (100 - totalRightSum) / rightCount;
+
+//     const updatedQuantities = { ...quantities }; // Create a copy of the quantities object
+
+//     // Update the quantities based on selected values
+//     Object.keys(selectedValues).forEach((key) => {
+//       const value = selectedValues[key];
+//       if (value === 'left') {
+//         updatedQuantities[key] = 0;
+//       } else if (value === 'center') {
+//         updatedQuantities[key] += centerQuantityIncrement;
+//       } else if (value === 'right') {
+//         updatedQuantities[key] += rightQuantityIncrement;
+//       }
+//     });
+//     setQuantities(updatedQuantities); // Update the state with the new quantities
+//     // console.log(quantities);
+//   };
+
+//   /// ///////////////////////      Exporting Data ////////////////////
+//   function gatherTripleToggleData(selectedValues, quantities) {
+//     const data = [];
+
+//     // Create a mapping object for the values
+//     const valueMapping = {
+//       left: 'OFF',
+//       center: '-',
+//       right: '+',
+//     };
+
+//     // Iterate through the selectedValues object and collect the data for each instance
+//     for (const key in selectedValues) {
+//       if (selectedValues.hasOwnProperty(key)) {
+//         const value = selectedValues[key];
+//         data.push({
+//           key,
+//           value: valueMapping[value] || value, // Use the mapped value or the original value
+//           quantity: quantities[value],
+//         });
+//       }
+//     }
+
+//     return data;
+//   }
+//   const tripleToggleData = gatherTripleToggleData(selectedValues, quantities);
+
+//   function exportToJsonFile(data) {
+//     const json = JSON.stringify(data, null, 2);
+//     const blob = new Blob([json], { type: 'application/json' });
+//     const url = URL.createObjectURL(blob);
+//     const a = document.createElement('a');
+//     a.style.display = 'none';
+//     a.href = url;
+//     a.download = 'tripleToggleData.json';
+//     document.body.appendChild(a);
+//     a.click();
+//     window.URL.revokeObjectURL(url);
+//   }
+//   /// /////////////////////////////////////////////////////////////////////////
+
+//   /// /////////////////////           Importing Data - doesn't really work yet ////////////////////////
+
+//   const [importedData, setImportedData] = useState(null);
+
+//   const reverseValueMapping = {
+//     OFF: 'left',
+//     '-': 'center',
+//     '+': 'right',
+//   };
+
+//   function updateDataFromJson(jsonData) {
+//     console.log('Imported JSON Data:', jsonData);
+//     if (Array.isArray(jsonData)) {
+//       const updatedSelectedValues = { ...selectedValues };
+//       const updatedQuantities = { ...quantities };
+
+//       jsonData.forEach((item) => {
+//         // const { key, value, quantity, animation } = item;
+//         const { key, value, quantity } = item;
+//         const originalValue = reverseValueMapping[value];
+//         if (selectedValues[key] !== undefined) {
+//           getSwitchAnimation(originalValue, value);
+//           updatedSelectedValues[key] = originalValue;
+//           // updatedQuantities[value] = quantity;
+//           updatedQuantities[originalValue] = quantity;
+//         }
+//       });
+//       setSelectedValues(updatedSelectedValues);
+//       setQuantities(updatedQuantities);
+//       console.log(selectedValues);
+//       console.log('Quantities:', quantities);
+//     }
+//   }
+
+//   function handleFileChange(event) {
+//     const file = event.target.files[0];
+//     if (file) {
+//       const reader = new FileReader();
+//       reader.onload = function (e) {
+//         try {
+//           const jsonData = JSON.parse(e.target.result);
+//           setImportedData(jsonData);
+//         } catch (error) {
+//           console.error('Error parsing JSON:', error);
+//         }
+//       };
+//       reader.readAsText(file);
+//     }
+//   }
+
+//   useEffect(() => {
+//     if (importedData) {
+//       updateDataFromJson(importedData);
+//     }
+//   }, [importedData]);
+
+//   const fileInputRef = useRef(null);
+
+//   /// //////////////////////////////////////////////////////////////////////////
+
+//   /// /////////////////////////           Export to TabbedElectrodeIPGSelection               /////////////////////////////
+//   const getCartesiaData = () => {
+//     const data = [];
+//     for (const key in selectedValues) {
+//       if (selectedValues.hasOwnProperty(key)) {
+//         data.push({
+//           key,
+//           value: selectedValues[key],
+//           quantity: quantities[selectedValues[key]],
+//         });
+//       }
+//     }
+//     return data;
+//   };
+
+//   useImperativeHandle(ref, () => ({
+//     getCartesiaData,
+//   }));
+
+//   /// //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//   return (
+//     <div className="container">
+//       <div className="container2">
+//         <div className="IPG">
+//           {ipgs.map((ipg) => (
+//             <div className="image-item">
+//               <div className="image-container">
+//                 {React.cloneElement(ipg, {
+//                   key: ipg.key,
+//                   className: `${selectedValues[ipg.key]}-color`,
+//                 })}
+//                 {!isNaN(Number(ipg.key)) && (
+//                   <div className="triple-toggle-ipg">
+//                     <TripleToggle
+//                       key={ipg.key}
+//                       value={selectedValues[ipg.key]}
+//                       quantity={quantities[selectedValues[ipg.key]]} // Pass the quantity prop
+//                       onChange={(value) =>
+//                         handleTripleToggleChange(value, ipg.key)
+//                       }
+//                       onQuantityChange={(value, animation, quantity) =>
+//                         handleQuantityChange(
+//                           // value,
+//                           // animation,
+//                           quantity,
+//                           ipg.key,
+//                         )
+//                       }
+//                     />
+//                   </div>
+//                 )}
+//               </div>
+//               {/* <p className="image-key">{ipg.key}</p> */}
+//             </div>
+//           ))}
+//         </div>
+//         <div className="left-contacts">
+//           {leftContacts.map((Lcon) => (
+//             <div className="image-item">
+//               <div className="image-container">
+//                 {React.cloneElement(Lcon, {
+//                   key: Lcon.key,
+//                   className: `${selectedValues[Lcon.key]}-color`,
+//                 })}
+//                 {!isNaN(Number(Lcon.key)) && (
+//                   <div className="triple-toggle">
+//                     <TripleToggle
+//                       key={Lcon.key}
+//                       value={selectedValues[Lcon.key]}
+//                       quantity={quantities[selectedValues[Lcon.key]]} // Pass the quantity prop
+//                       onChange={(value) =>
+//                         handleTripleToggleChange(value, Lcon.key)
+//                       }
+//                       onQuantityChange={(value, animation, quantity) =>
+//                         handleQuantityChange(
+//                           value,
+//                           animation,
+//                           quantity,
+//                           Lcon.key,
+//                         )
+//                       }
+//                     />
+//                   </div>
+//                 )}
+//               </div>
+//               {/* <p className="image-key">{Lcon.key}</p> */}
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//       <div className="Elmodel-center">
+//         {svgs.map((svg) => (
+//           <div
+//             className="image-item"
+//             style={{ zIndex: calculateZIndex(svg.key) }}
+//           >
+//             <div className="image-container">
+//               {React.cloneElement(svg, {
+//                 key: svg.key,
+//                 className: `${selectedValues[svg.key]}-color`,
+//               })}
+//               {!isNaN(Number(svg.key)) && (
+//                 <div className="triple-toggle">
+//                   <TripleToggle
+//                     key={svg.key}
+//                     value={selectedValues[svg.key]}
+//                     quantity={quantities[selectedValues[svg.key]]} // Pass the quantity prop
+//                     onChange={(value) =>
+//                       handleTripleToggleChange(value, svg.key)
+//                     }
+//                     onQuantityChange={(value, animation, quantity) =>
+//                       handleQuantityChange(value, animation, quantity, svg.key)
+//                     }
+//                   />
+//                 </div>
+//               )}
+//             </div>
+//             {/* <p className="image-key">{svg.key}</p> */}
+//           </div>
+//         ))}
+//       </div>
+//       <div className="right-contacts">
+//         {rightContacts.map((rCon) => (
+//           <div className="image-item">
+//             <div className="image-container">
+//               {React.cloneElement(rCon, {
+//                 key: rCon.key,
+//                 className: `${selectedValues[rCon.key]}-color`,
+//               })}
+//               {!isNaN(Number(rCon.key)) && (
+//                 <div className="triple-toggle">
+//                   <TripleToggle
+//                     key={rCon.key}
+//                     value={selectedValues[rCon.key]}
+//                     quantity={quantities[selectedValues[rCon.key]]} // Pass the quantity prop
+//                     onChange={(value) =>
+//                       handleTripleToggleChange(value, rCon.key)
+//                     }
+//                     onQuantityChange={(value, animation, quantity) =>
+//                       handleQuantityChange(value, animation, quantity, rCon.key)
+//                     }
+//                   />
+//                 </div>
+//               )}
+//             </div>
+//             {/* <p className="image-key">{rCon.key}</p> */}
+//           </div>
+//         ))}
+//       </div>
+//       <div className="button-container">
+//         <button
+//           className="import-button"
+//           onClick={() => fileInputRef.current.click()}
+//         >
+//           Import from LeadDBS
+//         </button>
+//         <button
+//           className="export-button"
+//           onClick={() => exportToJsonFile(tripleToggleData)}
+//         >
+//           Export to LeadDBS
+//         </button>
+//         <input
+//           ref={fileInputRef}
+//           className="file-input"
+//           type="file"
+//           accept=".json"
+//           onChange={handleFileChange}
+//           style={{ display: 'none' }} // Hide the input element
+//         />
+// <button onClick={calculateQuantitiesWithDistribution}>
+//   Split Even
+// </button>
+// <button onClick={roundToHundred}>Make 100</button>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default forwardRef(BostonCartesia);

@@ -12,6 +12,7 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import * as childProcess from 'child_process';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
@@ -25,11 +26,157 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
+const startServer = () => {
+  // Start the Express server in a child process
+  const serverProcess = childProcess.spawn('node', ['dist/server.js'], {
+    cwd: path.join(__dirname, '../'), // Adjust the path as needed
+    stdio: 'inherit',
+  });
+
+  serverProcess.on('error', (err) => {
+    console.error('Failed to start server:', err);
+  });
+
+  serverProcess.on('exit', (code, signal) => {
+    console.log('Server process exited with code:', code);
+  });
+
+  return serverProcess;
+};
+
+app
+  .whenReady()
+  .then(() => {
+    // Start Express server
+    const serverProcess = startServer();
+
+    // Create window and other initialization code...
+  })
+  .catch(console.error);
+
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
+  const fs = require('fs');
+
+  // const f = fs.readFileSync('/Users/savirmadan/Documents/GitHub/leaddbs/tempData.json');
+  const f = fs.readFileSync(
+    '/Users/savirmadan/Development/lead-dbs-programmer/tempData.json',
+  );
+  console.log(f);
+  // const separatedLine = f.split('\\\\');
+  // console.log(separatedLine);
+  // const k = fs.readFileSync(f);
+  // console.log(k);
+  event.reply('ipc-example', msgTemplate(`pong: ${f}`));
 });
+
+ipcMain.on('open-file', (event, arg) => {
+  // const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
+  // console.log(msgTemplate(arg));
+  const fs = require('fs');
+
+  // const f = fs.readFileSync('/Users/savirmadan/Documents/GitHub/leaddbs/tempData.json');
+  const f = fs.readFileSync(arg);
+  console.log(event);
+  // const separatedLine = f.split('\\\\');
+  // console.log(separatedLine);
+  // const k = fs.readFileSync(f);
+  // console.log(k);
+  event.reply('open-file', `pong: ${f}`);
+});
+
+// ipcMain.on('close-window', () => {
+//   // const currentWindow = BrowserWindow.getFocusedWindow();
+//   // if (currentWindow) {
+//   //   currentWindow.close();
+//   //   event.reply('window-closed', 'Window closed');
+//   // }
+
+//   app.quit();
+// });
+
+ipcMain.on('close-window', (event, arg) => {
+  // setTimeout(() => {
+  //   app.quit();
+  // }, 5000); // 5000 milliseconds = 5 seconds
+
+  app.quit();
+
+  // const currentWindow = BrowserWindow.getFocusedWindow();
+  // if (currentWindow) {
+  //   currentWindow.close();
+  //   event.reply('window-closed', 'Window closed');
+  // }
+});
+
+const { dialog } = require('electron');
+const fs = require('fs');
+
+ipcMain.on('save-file', (event, data) => {
+  // Example of saving data to a file
+  // const filePath = app.getPath('downloads') + '/data.txt';
+  // const currentDirectory = app.getAppPath();
+  // const currentDirectory = '/Users/savirmadan/Development/lead-dbs-programmer';
+  const currentDirectory = app.getAppPath();
+  const directories = currentDirectory.split('/');
+
+  // Initialize a variable to store the result
+  let result = '';
+
+  // Loop through the directories
+  for (const dir of directories) {
+    // Append each directory to the result
+    result += `${dir}/`;
+
+    // If the directory contains "lead-dbs-programmer", stop the loop
+    if (dir === 'lead-dbs-programmer') {
+      break;
+    }
+  }
+  // console.log(currentDirectory + '/lead-dbs-programmer');
+  if (currentDirectory) {
+    // Convert data to string format
+    const dataString = JSON.stringify(data);
+    const fileName = 'data.json';
+    const filePath = path.join(result, fileName);
+    // const filePath = './dist/main/webpack:/leaddbs-stimcontroller/main.js';
+    // Write data to file
+    fs.writeFileSync(filePath, dataString);
+
+    // Send a response back to the renderer process
+    event.reply('file-saved', filePath);
+  }
+});
+
+// ipcMain.on('open-file', (event, filePath) => {
+//   // Read file data
+//   const fs = require('fs');
+//   fs.readFile(filePath, 'utf8', (err: any, data: any) => {
+//     if (err) {
+//       // Handle error
+//       console.error(err);
+//       event.sender.send('file-data', null);
+//       return;
+//     }
+//     // Send data back to renderer process
+//     event.sender.send('file-data', data);
+//   });
+// });
+
+// const { spawn } = require('child_process');
+
+// ipcMain.on('trigger-matlab-action', (event, data) => {
+//   const matlabProcess = spawn('matlab', ['-r', 'disp("hello")']);
+
+//   matlabProcess.stdout.on('data', (data) => {
+//       console.log(`MATLAB stdout: ${data}`);
+//   });
+
+//   matlabProcess.stderr.on('data', (data) => {
+//       console.error(`MATLAB stderr: ${data}`);
+//   });
+// });
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');

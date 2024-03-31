@@ -1,3 +1,8 @@
+// /* eslint-disable no-restricted-globals */
+// /* eslint-disable react/prop-types */
+// /* eslint-disable @typescript-eslint/no-unused-vars */
+// /* eslint-disable react/function-component-definition */
+
 import React, {
   useState,
   useEffect,
@@ -6,11 +11,16 @@ import React, {
   useImperativeHandle,
 } from 'react';
 import Button from 'react-bootstrap/Button';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Modal from 'react-bootstrap/Modal';
+import Form from 'react-bootstrap/Form';
+import ToggleButton from 'react-bootstrap/ToggleButton';
+import Dropdown from 'react-bootstrap/Dropdown';
+import Tooltip from 'react-bootstrap/Tooltip';
 // import Popup from 'reactjs-popup';
 import TripleToggleTest from '../TripleToggleTest'; // Make sure to import TripleToggle correctly
 import calculateQuantities from '../CalculateQuantities'; // Correct the path to quantityUtils
-import './BostonCartesiaTest.css';
+// import './BostonScientificCartesiaHX.css';
 import { ReactComponent as IPG } from './images/IPG.svg';
 import { ReactComponent as Contact } from './images/Contact.svg';
 import { ReactComponent as Tail } from './images/Tail.svg';
@@ -41,6 +51,10 @@ import BostonElectrodeRenderer from './BostonElectrodeRenderer';
 import PercentageAmplitudeToggle from '../PercentageAmplitudeToggle';
 import AssistedToggle from '../AssistedToggle';
 import VoltageAmplitudeToggle from '../VoltageAmplitudeToggle';
+import MAToggleSwitch from '../MAToggleSwitch';
+import { OverlayTrigger } from 'react-bootstrap';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+
 // import { relative } from 'path';
 
 function BostonScientificCartesiaHX(props, ref) {
@@ -48,31 +62,23 @@ function BostonScientificCartesiaHX(props, ref) {
   const svgs = [
     <HeadTop key="headTop" />,
     <HeadBottom key="headBottom" />,
-    <Contact key="16" level="8" face="all" />,
-    <Contact key="15" level="7" face="all" />,
-    <Contact key="14" level="6" face="all" />,
-    <Contact key="13" level="5" face="all" />,
-    // <Contact key="12" level="4" face="center" />,
-    // <Contact key="11" level="4" face="center" />,
+    <Contact key="16" level="8" face="center" />,
+    <Contact key="15" level="7" face="center" />,
+    <Contact key="14" level="6" face="center" />,
+    <Contact key="13" level="5" face="center" />,
     <Contact key="10" level="4" face="center" />,
-    // <Contact key="9" level="3" face="center" />,
-    // <Contact key="8" level="3" face="center" />,
     <Contact key="7" level="3" face="center" />,
-    // <Contact key="6" level="2" face="center" />,
-    // <Contact key="5" level="2" face="center" />,
     <Contact key="4" level="2" face="center" />,
-    // <Contact key="3" level="1" face="center" />,
-    // <Contact key="2" level="1" face="center" />,
     <Contact key="1" level="1" face="center" />,
   ];
 
   const ipgs = [<IPG key="0" />];
 
   const rightContacts = [
-    <Contact key="11" level="3" face="right" />,
-    <Contact key="8" level="2" face="right" />,
-    <Contact key="5" level="3" face="right" />,
-    <Contact key="2" level="2" face="right" />,
+    <Contact key="11" level="4" face="right" />,
+    <Contact key="8" level="3" face="right" />,
+    <Contact key="5" level="2" face="right" />,
+    <Contact key="2" level="1" face="right" />,
   ];
 
   const leftContacts = [
@@ -102,6 +108,13 @@ function BostonScientificCartesiaHX(props, ref) {
     16: 8,
   };
 
+  const levelArray = {
+    1: [1, 2, 3],
+    2: [4, 5, 6],
+    3: [7, 8, 9],
+    4: [10, 11, 12],
+  };
+
   const face = {
     0: '',
     1: 'center',
@@ -126,12 +139,20 @@ function BostonScientificCartesiaHX(props, ref) {
     0: IPG,
     1: 1,
     2: 2,
-    3: 4,
-    4: 3,
+    3: 3,
+    4: 4,
     5: 5,
-    6: 7,
-    7: 6,
+    6: 6,
+    7: 7,
     8: 8,
+    9: 9,
+    10: 10,
+    11: 11,
+    12: 12,
+    13: 13,
+    14: 14,
+    15: 15,
+    16: 16,
   };
 
   const [percAmpToggle, setPercAmpToggle] = useState('left');
@@ -164,7 +185,9 @@ function BostonScientificCartesiaHX(props, ref) {
     minus: 0,
   };
 
-  const [totalAmplitude, setTotalAmplitude] = useState(0);
+  const [totalAmplitude, setTotalAmplitude] = useState(
+    props.totalAmplitude || 0,
+  );
 
   const [selectedValues, setSelectedValues] = useState(
     props.selectedValues || {
@@ -177,6 +200,14 @@ function BostonScientificCartesiaHX(props, ref) {
       6: 'left',
       7: 'left',
       8: 'left',
+      9: 'left',
+      10: 'left',
+      11: 'left',
+      12: 'left',
+      13: 'left',
+      14: 'left',
+      15: 'left',
+      16: 'left',
       // Initialize other images here
     },
   );
@@ -191,6 +222,14 @@ function BostonScientificCartesiaHX(props, ref) {
     6: null,
     7: null,
     8: null,
+    9: null,
+    10: null,
+    11: null,
+    12: null,
+    13: null,
+    14: null,
+    15: null,
+    16: null,
   });
 
   const [quantities, setQuantities] = useState(
@@ -204,9 +243,29 @@ function BostonScientificCartesiaHX(props, ref) {
       6: 0,
       7: 0,
       8: 0,
+      9: 0,
+      10: 0,
+      11: 0,
+      12: 0,
+      13: 0,
+      14: 0,
+      15: 0,
+      16: 0,
     },
   );
   // const [userQuantities, setUserQuantities] = useState({}); // Store user input quantities
+
+  const [parameters, setParameters] = useState(
+    props.parameters || {
+      parameter1: '60',
+      parameter2: '130',
+      parameter3: '0',
+    },
+  );
+
+  const [visModel, setVisModel] = useState(props.visModel || '');
+
+  const [sessionTitle, setSessionTitle] = useState(props.sessionTitle || '');
 
   const totalQuantity = quantities.plus + quantities.minus;
   let isAssisted = false;
@@ -230,9 +289,6 @@ function BostonScientificCartesiaHX(props, ref) {
     });
     return levelTotals;
   };
-
-  // console.log('lastChangedInstance:', lastChangedInstance); // Add this line to log the value
-
   // const calculateQuantitiesWithDistribution = (selectedValues) => {
   //   const quantities = {
   //     left: 0,
@@ -521,6 +577,62 @@ function BostonScientificCartesiaHX(props, ref) {
     console.log(roundUpdatedQuantities);
   };
 
+  const newRoundToHundred = () => {
+    // Initialize sum variables
+    let totalCenterSum = 0;
+    let totalRightSum = 0;
+    const roundUpdatedQuantities = { ...quantities };
+
+    let total = 0;
+    if (percAmpToggle === 'left') {
+      total = 100;
+    } else if (percAmpToggle === 'right') {
+      total = totalAmplitude;
+    }
+
+    // Calculate the sums for 'center' and 'right' values
+    Object.keys(selectedValues).forEach((key) => {
+      const value = selectedValues[key];
+      if (value === 'center') {
+        totalCenterSum += parseFloat(roundUpdatedQuantities[key]);
+        console.log('CenterSum: ', totalCenterSum);
+      } else if (value === 'right') {
+        totalRightSum += parseFloat(roundUpdatedQuantities[key]);
+        console.log('RightSum: ', totalRightSum);
+      }
+    });
+
+    // Calculate the quantity increments
+    const centerCount = Object.values(selectedValues).filter(
+      (value) => value === 'center',
+    ).length;
+    const centerQuantityIncrement = (total - totalCenterSum) / centerCount;
+    console.log('Center increment:', centerQuantityIncrement);
+
+    const rightCount = Object.values(selectedValues).filter(
+      (value) => value === 'right',
+    ).length;
+    const rightQuantityIncrement = (total - totalRightSum) / rightCount;
+
+    // const updatedQuantities = { ...quantities }; // Create a copy of the quantities object
+
+    // Update the quantities based on selected values
+    Object.keys(selectedValues).forEach((key) => {
+      const value = selectedValues[key];
+      if (value === 'left') {
+        roundUpdatedQuantities[key] = 0;
+      } else if (value === 'center') {
+        roundUpdatedQuantities[key] =
+          parseFloat(roundUpdatedQuantities[key]) + centerQuantityIncrement;
+      } else if (value === 'right') {
+        roundUpdatedQuantities[key] =
+          parseFloat(roundUpdatedQuantities[key]) + rightQuantityIncrement;
+      }
+    });
+    return roundUpdatedQuantities;
+    // console.log(roundUpdatedQuantities);
+  };
+
   function checkQuantitiesAndValues(quantity, value) {
     const updatedQuantities = { ...quantity };
     const updatedSelectedValues = { ...value };
@@ -764,6 +876,7 @@ function BostonScientificCartesiaHX(props, ref) {
   // };
 
   const handleUpButton = () => {
+    roundToHundred();
     const updatedQuantities = { ...quantities };
     const updatedSelectedValues = { ...selectedValues };
     Object.keys(selectedValues).forEach((key) => {
@@ -947,6 +1060,7 @@ function BostonScientificCartesiaHX(props, ref) {
 
   const handleDownButton = () => {
     // Create a copy of the current quantities
+    roundToHundred();
     const updatedQuantities = { ...quantities };
     const updatedSelectedValues = { ...selectedValues };
     Object.keys(selectedValues).forEach((key) => {
@@ -979,40 +1093,89 @@ function BostonScientificCartesiaHX(props, ref) {
     setQuantities(updatedQuantities);
   };
 
-  // const handleClockwiseButton = () => {
-  //   const updatedQuantities = { ...quantities };
-  //   console.log(updatedQuantities);
-  //   Object.keys(selectedValues).forEach((key) => {
-  //     const currentLevel = level[key];
-  //     const nextLevel = parseFloat(key) + 1; // These aren't actually the level, but rather the keys of the contacts
-  //     const belowLevel = parseFloat(key) - 2;
-  //     const currentFace = face[key];
-  //     if (selectedValues[key] !== 'left') {
-  //       if (face[key] === 'center' || face[key] === 'left') {
-  //         // console.log('Face: ', face[key]);
-  //         // console.log(selectedValues[key]);
-  //         // console.log(key);
-  //         // console.log(nextLevel);
-  //         // console.log(selectedValues[nextLevel] === selectedValues[key]);
-  //         if (selectedValues[key] === selectedValues[nextLevel]) {
-  //           console.log('UpdatedQuantities: ', updatedQuantities);
-  //           updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
-  //           updatedQuantities[nextLevel] =
-  //             parseFloat(updatedQuantities[nextLevel]) + 10;
-  //           console.log('UpdatedQuantities: ', updatedQuantities);
-  //         }
-  //       } else if (face[key] === 'right') {
-  //         if (selectedValues[key] === selectedValues[belowLevel]) {
-  //           updatedQuantities[key] -= 10;
-  //           updatedQuantities[belowLevel] += 10;
-  //         }
-  //       }
-  //     }
-  //   });
-  //   setQuantities(updatedQuantities);
-  // };
+  function getOnContacts(aLevel) {
+    const onContacts = [];
+    Object.keys(level).forEach((key) => {
+      const numericKey = parseInt(key, 10); // Convert the string key to a number
+      if (level[key] === aLevel && selectedValues[key] !== 'left') {
+        onContacts.push(numericKey);
+      }
+    });
+    return onContacts;
+  }
 
-  const handleClockwiseButton = () => {
+  const newHandleClockwiseButton = () => {
+    const updatedQuantities = { ...quantities };
+    const updatedSelectedValues = { ...selectedValues };
+    const totalLevelArray = {};
+    const numOnContacts = {};
+    const vectorLevelAngle = {};
+    // This code allows us to determine how many contacts are on at each level and what the total sum of the contacts on that level are
+    Object.keys(levelArray).forEach((key) => {
+      totalLevelArray[key] = 0;
+      numOnContacts[key] = 0;
+      for (let i = 0; i < 3; i++) {
+        console.log(levelArray[key][i]);
+        totalLevelArray[key] =
+          parseFloat(totalLevelArray[key]) +
+          parseFloat(updatedQuantities[levelArray[key][i]]);
+        if (updatedQuantities[levelArray[key][i]] > 0) {
+          numOnContacts[key] += 1;
+        }
+      }
+    });
+    let aVec = [0, 0];
+    let bVec = [0, 0];
+    let cVec = [0, 0];
+    const baseZero = [1, 0];
+    const cos60 = Math.cos((60 * Math.PI) / 180);
+    const cos30 = Math.cos((30 * Math.PI) / 180);
+    const sin60 = Math.sin((60 * Math.PI) / 180);
+    const sin30 = Math.sin((30 * Math.PI) / 180);
+    const localCoords = [0, 0];
+    // The next step is to determine the angle of the vector at that level
+    Object.keys(numOnContacts).forEach((key) => {
+      // Now we have the levels that rotation can occur
+      if (numOnContacts[key] > 0 && numOnContacts[key] < 3) {
+        console.log('here');
+        for (let i = 0; i < 3; i++) {
+          console.log(levelArray[key][i]);
+          if (face[levelArray[key][i]] === 'left') {
+            console.log('1');
+            cVec = [
+              parseFloat(-updatedQuantities[levelArray[key][i]]) / 2,
+              parseFloat(-updatedQuantities[levelArray[key][i]]) * cos30,
+            ];
+            console.log('c', cVec);
+          } else if (face[levelArray[key][i]] === 'center') {
+            console.log('center');
+            aVec = [updatedQuantities[levelArray[key][i]], 0];
+            console.log('a', aVec);
+          } else if (face[levelArray[key][i]] === 'right') {
+            bVec = [
+              parseFloat(-updatedQuantities[levelArray[key][i]]) / 2,
+              parseFloat(updatedQuantities[levelArray[key][i]]) * sin60,
+            ];
+            console.log('b', bVec);
+          }
+        }
+      }
+    });
+    for (let i = 0; i < aVec.length; i++) {
+      localCoords[i] = aVec[i] + bVec[i] + cVec[i];
+    }
+    const vecLength = Math.sqrt(
+      localCoords[0] * localCoords[0] + localCoords[1] * localCoords[1],
+    );
+    console.log('local', localCoords);
+    const vecDotProduct = 0;
+    const vecAng = (Math.acos(localCoords[0] / vecLength) * 180) / Math.PI;
+    const vectorAngle =
+      (Math.atan(localCoords[1] / localCoords[0]) * 180) / Math.PI;
+    console.log('vcecof: ', vecAng);
+  };
+
+  const handleCounterClockwiseButton = () => {
     const updatedQuantities = { ...quantities };
     const updatedSelectedValues = { ...selectedValues };
     Object.keys(selectedValues)
@@ -1031,6 +1194,15 @@ function BostonScientificCartesiaHX(props, ref) {
         const currentKeys = Object.keys(level).filter(
           (k) => level[k] === currentLevel,
         );
+        const levelTotals = calculateLevelTotals();
+        console.log(levelTotals);
+        let currentLevelTotal = 0;
+        Object.keys(levelTotals).forEach((levels) => {
+          if (level[key] === parseFloat(levels)) {
+            currentLevelTotal = levelTotals[levels];
+            console.log('leveltot: ', currentLevelTotal);
+          }
+        });
         let currentLeftCount = 0;
         let currentCenterCount = 0;
         let currentRightCount = 0;
@@ -1048,14 +1220,16 @@ function BostonScientificCartesiaHX(props, ref) {
           if (updatedSelectedValues[key] !== 'left') {
             if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
             } else if (updatedSelectedValues[nextKey] === 'left') {
               console.log('HelloHello');
               updatedSelectedValues[nextKey] = updatedSelectedValues[key];
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
             }
           }
         }
@@ -1066,14 +1240,16 @@ function BostonScientificCartesiaHX(props, ref) {
           if (updatedSelectedValues[key] !== 'left') {
             if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
             } else if (updatedSelectedValues[nextKey] === 'left') {
               console.log('HelloHello');
               updatedSelectedValues[nextKey] = updatedSelectedValues[key];
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
             }
           }
         }
@@ -1083,14 +1259,17 @@ function BostonScientificCartesiaHX(props, ref) {
               updatedSelectedValues[key] === updatedSelectedValues[rightNextKey]
             ) {
               updatedQuantities[rightNextKey] =
-                parseFloat(updatedQuantities[rightNextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[rightNextKey]) +
+                currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
             } else if (updatedSelectedValues[rightNextKey] === 'left') {
-              console.log('HelloHello');
               updatedSelectedValues[rightNextKey] = updatedSelectedValues[key];
               updatedQuantities[rightNextKey] =
-                parseFloat(updatedQuantities[rightNextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[rightNextKey]) +
+                currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
             }
           }
         }
@@ -1102,10 +1281,10 @@ function BostonScientificCartesiaHX(props, ref) {
     setQuantities(updatedQuantities);
     // vectorMakeUp();
     // console.log('VecDirection: ', vectorDirection);
-    // checkQuantitiesAndValues(quantities, selectedValues);
+    checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
   };
 
-  const handleClockwiseButtonAmplitude = () => {
+  const handleCounterClockwiseButtonAmplitude = () => {
     const updatedQuantities = { ...quantities };
     const updatedSelectedValues = { ...selectedValues };
     Object.keys(selectedValues)
@@ -1206,7 +1385,7 @@ function BostonScientificCartesiaHX(props, ref) {
     // checkQuantitiesAndValues(quantities, selectedValues);
   };
 
-  const handleCounterClockwiseButton = () => {
+  const handleClockwiseButton = () => {
     const updatedQuantities = { ...quantities };
     const updatedSelectedValues = { ...selectedValues };
     Object.keys(selectedValues)
@@ -1226,6 +1405,14 @@ function BostonScientificCartesiaHX(props, ref) {
         const currentKeys = Object.keys(level).filter(
           (k) => level[k] === currentLevel,
         );
+        const levelTotals = calculateLevelTotals();
+        // console.log(levelTotals);
+        let currentLevelTotal = 0;
+        Object.keys(levelTotals).forEach((levels) => {
+          if (level[key] === parseFloat(levels)) {
+            currentLevelTotal = levelTotals[levels];
+          }
+        });
         let currentLeftCount = 0;
         let currentCenterCount = 0;
         let currentRightCount = 0;
@@ -1242,15 +1429,27 @@ function BostonScientificCartesiaHX(props, ref) {
         if (face[key] === 'left' && updatedQuantities[previousKey] === 0) {
           if (updatedSelectedValues[key] !== 'left') {
             if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
-              updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+              if (updatedQuantities[key] < currentLevelTotal / 10) {
+                updatedQuantities[nextKey] =
+                  parseFloat(updatedQuantities[nextKey]) +
+                  parseFloat(updatedQuantities[key]);
+                updatedQuantities[key] = 0;
+              } else {
+                updatedQuantities[nextKey] =
+                  parseFloat(updatedQuantities[nextKey]) +
+                  currentLevelTotal / 10;
+                updatedQuantities[key] =
+                  parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+              }
+              // updatedQuantities[nextKey] =
+              //   parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              // updatedQuantities[key] = parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
             } else if (updatedSelectedValues[nextKey] === 'left') {
-              console.log('HelloHello');
               updatedSelectedValues[nextKey] = updatedSelectedValues[key];
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
             }
           }
         }
@@ -1260,15 +1459,31 @@ function BostonScientificCartesiaHX(props, ref) {
               updatedSelectedValues[key] ===
               updatedSelectedValues[centerNextKey]
             ) {
-              updatedQuantities[centerNextKey] =
-                parseFloat(updatedQuantities[centerNextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+              // updatedQuantities[centerNextKey] =
+              //   parseFloat(updatedQuantities[centerNextKey]) +
+              //   currentLevelTotal / 10;
+              // updatedQuantities[key] =
+              //   parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+              if (updatedQuantities[key] < currentLevelTotal / 10) {
+                console.log('true');
+                updatedQuantities[centerNextKey] =
+                  parseFloat(updatedQuantities[centerNextKey]) +
+                  parseFloat(updatedQuantities[key]);
+                updatedQuantities[key] = 0;
+              } else {
+                updatedQuantities[centerNextKey] =
+                  parseFloat(updatedQuantities[centerNextKey]) +
+                  currentLevelTotal / 10;
+                updatedQuantities[key] =
+                  parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+              }
             } else if (updatedSelectedValues[centerNextKey] === 'left') {
-              console.log('HelloHello');
               updatedSelectedValues[centerNextKey] = updatedSelectedValues[key];
               updatedQuantities[centerNextKey] =
-                parseFloat(updatedQuantities[centerNextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[centerNextKey]) +
+                currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
             }
           }
         }
@@ -1278,15 +1493,29 @@ function BostonScientificCartesiaHX(props, ref) {
         ) {
           if (updatedSelectedValues[key] !== 'left') {
             if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
-              updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+              if (updatedQuantities[key] < currentLevelTotal / 10) {
+                updatedQuantities[nextKey] =
+                  parseFloat(updatedQuantities[nextKey]) +
+                  parseFloat(updatedQuantities[key]);
+                updatedQuantities[key] = 0;
+              } else {
+                updatedQuantities[nextKey] =
+                  parseFloat(updatedQuantities[nextKey]) +
+                  currentLevelTotal / 10;
+                updatedQuantities[key] =
+                  parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+              }
+              // console.log('true');
+              // updatedQuantities[nextKey] =
+              //   parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              // updatedQuantities[key] =
+              //   parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
             } else if (updatedSelectedValues[nextKey] === 'left') {
-              console.log('HelloHello');
               updatedSelectedValues[nextKey] = updatedSelectedValues[key];
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
             }
           }
         }
@@ -1296,10 +1525,10 @@ function BostonScientificCartesiaHX(props, ref) {
       });
     setSelectedValues(updatedSelectedValues);
     setQuantities(updatedQuantities);
-    // checkQuantitiesAndValues(quantities, selectedValues);
+    checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
   };
 
-  const handleCounterClockwiseButtonAmplitude = () => {
+  const handleClockwiseButtonAmplitude = () => {
     const updatedQuantities = { ...quantities };
     const updatedSelectedValues = { ...selectedValues };
     Object.keys(selectedValues)
@@ -1337,13 +1566,15 @@ function BostonScientificCartesiaHX(props, ref) {
             if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
               updatedQuantities[nextKey] =
                 parseFloat(updatedQuantities[nextKey]) + totalAmplitude / 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
             } else if (updatedSelectedValues[nextKey] === 'left') {
               console.log('HelloHello');
               updatedSelectedValues[nextKey] = updatedSelectedValues[key];
               updatedQuantities[nextKey] =
                 parseFloat(updatedQuantities[nextKey]) + totalAmplitude / 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
             }
           }
         }
@@ -1354,14 +1585,18 @@ function BostonScientificCartesiaHX(props, ref) {
               updatedSelectedValues[centerNextKey]
             ) {
               updatedQuantities[centerNextKey] =
-                parseFloat(updatedQuantities[centerNextKey]) + totalAmplitude / 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
+                parseFloat(updatedQuantities[centerNextKey]) +
+                totalAmplitude / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
             } else if (updatedSelectedValues[centerNextKey] === 'left') {
               console.log('HelloHello');
               updatedSelectedValues[centerNextKey] = updatedSelectedValues[key];
               updatedQuantities[centerNextKey] =
-                parseFloat(updatedQuantities[centerNextKey]) + totalAmplitude / 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
+                parseFloat(updatedQuantities[centerNextKey]) +
+                totalAmplitude / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
             }
           }
         }
@@ -1373,13 +1608,15 @@ function BostonScientificCartesiaHX(props, ref) {
             if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
               updatedQuantities[nextKey] =
                 parseFloat(updatedQuantities[nextKey]) + totalAmplitude / 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
             } else if (updatedSelectedValues[nextKey] === 'left') {
               console.log('HelloHello');
               updatedSelectedValues[nextKey] = updatedSelectedValues[key];
               updatedQuantities[nextKey] =
                 parseFloat(updatedQuantities[nextKey]) + totalAmplitude / 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - totalAmplitude / 10;
             }
           }
         }
@@ -1464,16 +1701,79 @@ function BostonScientificCartesiaHX(props, ref) {
     return false;
   }
 
-  function getOnContacts(aLevel) {
-    const onContacts = [];
-    Object.keys(level).forEach((key) => {
-      const numericKey = parseInt(key, 10); // Convert the string key to a number
-      if (level[key] === aLevel && selectedValues[key] !== 'left') {
-        onContacts.push(numericKey);
+  function roundAlloc(
+    beforeLevel,
+    nextLevel,
+    levelAboveTotal,
+    levelBelowTotal,
+    values,
+    amtOnContacts,
+  ) {
+    // let oldTotal = 0;
+    let newAboveTotal = 0;
+    let newBelowTotal = 0;
+    let belowTotal = levelBelowTotal;
+    let aboveTotal = levelAboveTotal;
+    Object.keys(values).forEach((key) => {
+      if (level[key] === beforeLevel) {
+        values[key] = Math.floor(values[key] + 0.5);
+        newBelowTotal += values[key];
+      } else if (level[key] === nextLevel) {
+        values[key] = Math.floor(values[key] + 0.5);
+        newAboveTotal += values[key];
+      }
+      // values[key] = Math.floor(values[key] + 0.5);
+      // newTotal += values[key];
+    });
+    // console.log('old', oldTotal);
+    // console.log('new', newTotal);
+    belowTotal = Math.floor(belowTotal + 0.5);
+    const belowDiff = belowTotal - newBelowTotal;
+    aboveTotal = Math.floor(aboveTotal + 0.5);
+    const aboveDiff = aboveTotal - newAboveTotal;
+    let doneUpdate = 0;
+    console.log('above', aboveDiff);
+    console.log('below', belowDiff);
+    Object.keys(values).forEach((key) => {
+      if (values[key] !== 0 && doneUpdate === 0 && level[key] === beforeLevel) {
+        values[key] += belowDiff;
+        doneUpdate = 1;
       }
     });
-    return onContacts;
+    doneUpdate = 0;
+    console.log('below level total: ', belowTotal);
+    Object.keys(values).forEach((key) => {
+      if (values[key] !== 0 && doneUpdate === 0 && level[key] === nextLevel) {
+        values[key] += aboveDiff;
+        doneUpdate = 1;
+      }
+      if (amtOnContacts === 3) {
+        if (aboveTotal % 3 === 0) {
+          if (level[key] === nextLevel) {
+            values[key] = aboveTotal / 3;
+          }
+        }
+        if (belowTotal % 3 === 0) {
+          if (level[key] === beforeLevel) {
+            values[key] = belowTotal / 3;
+            console.log('values[key]', values[key]);
+          }
+        }
+      } else if (amtOnContacts === 1) {
+        console.log('made it here');
+        if (belowTotal % 3 === 0) {
+          console.log(beforeLevel);
+          if (level[key] === beforeLevel) {
+            console.log('yes');
+            values[key] = belowTotal / 3;
+            console.log('values[key]', values[key]);
+          }
+        }
+      }
+    });
+    return values;
   }
+
   // For clear button
 
   // const newHandleUpButton = () => {
@@ -1577,8 +1877,13 @@ function BostonScientificCartesiaHX(props, ref) {
   //   checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
   // };
   const newHandleUpButton = () => {
+    // newRoundToHundred();
+    console.log('passed');
+    console.log('quantities: ', quantities);
     vectorMakeUp();
-    const updatedQuantities = { ...quantities };
+    const newQuantities = newRoundToHundred();
+    console.log('newQuantities: ', newQuantities);
+    const updatedQuantities = { ...newQuantities };
     const updatedSelectedValues = { ...selectedValues };
     const levelIncrement = 0.1;
     const previousLevel = Math.floor(vectorLevel);
@@ -1717,6 +2022,15 @@ function BostonScientificCartesiaHX(props, ref) {
     //   }
     // });
     setSelectedValues(updatedSelectedValues);
+    console.log('before level', previousLevel);
+    roundAlloc(
+      previousLevel,
+      levelAbove,
+      levelAboveQuantityTotal,
+      levelBelowQuantityTotal,
+      updatedQuantities,
+      numAboveOnContacts,
+    );
     setQuantities(updatedQuantities);
     checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
   };
@@ -2294,7 +2608,8 @@ function BostonScientificCartesiaHX(props, ref) {
               });
               updatedSelectedValues[key] = updatedSelectedValues[levelAboveKey];
               updatedQuantities[key] =
-                parseFloat(updatedQuantities[key]) + (totalAmplitude * levelIncrement) / 3;
+                parseFloat(updatedQuantities[key]) +
+                (totalAmplitude * levelIncrement) / 3;
             }
           } else if (face[key] === 'all') {
             updatedQuantities[key] = levelBelowQuantityTotal;
@@ -2435,8 +2750,8 @@ function BostonScientificCartesiaHX(props, ref) {
     Object.keys(updatedQuantities).forEach((key) => {
       // keyLevel = getOnContacts[level[key]]
       if (
-        face[key] === 'left' ||
-        (face[key] === 'right' && levelQuantities[level[key]] !== 0)
+        (face[key] === 'left' || face[key] === 'right') &&
+        levelQuantities[level[key]] !== 0
       ) {
         // console.log('length ', getOnContacts(level[key]).length);
         // if (getOnContacts(level[key]).length > 0) {
@@ -2622,11 +2937,11 @@ function BostonScientificCartesiaHX(props, ref) {
       if (updatedSelectedValues[key] === 'center') {
         negativeSum += parseFloat(updatedQuantities[key]);
         centerCount += 1;
-        console.log('negativeSum: ', negativeSum);
+        // console.log('negativeSum: ', negativeSum);
       } else if (updatedSelectedValues[key] === 'right') {
         positiveSum += parseFloat(updatedQuantities[key]);
         rightCount += 1;
-        console.log('positiveSum: ', positiveSum);
+        // console.log('positiveSum: ', positiveSum);
       }
     });
 
@@ -2634,14 +2949,14 @@ function BostonScientificCartesiaHX(props, ref) {
       if (updatedSelectedValues[key] === 'center') {
         if (key === lastChangedKey) {
           negativeModifiedKey = key;
-          console.log('negativeModifiedKey: ', negativeModifiedKey);
+          // console.log('negativeModifiedKey: ', negativeModifiedKey);
           return true; // exit loop
         }
       }
       if (updatedSelectedValues[key] === 'right') {
         if (key === lastChangedKey) {
           positiveModifiedKey = key;
-          console.log('positiveModifiedKey: ', positiveModifiedKey);
+          // console.log('positiveModifiedKey: ', positiveModifiedKey);
           return true; // exit loop
         }
       }
@@ -2662,13 +2977,13 @@ function BostonScientificCartesiaHX(props, ref) {
           key !== negativeModifiedKey &&
           updatedSelectedValues[key] === 'center'
         ) {
-          console.log('passed');
+          // console.log('passed');
           updatedQuantities[key] =
             parseFloat(updatedQuantities[key]) +
             parseFloat(negativeDifference / (centerCount - 1));
         }
       });
-      console.log('negative difference: ', negativeDifference);
+      // console.log('negative difference: ', negativeDifference);
     }
 
     if (positiveSum !== 100) {
@@ -2700,9 +3015,9 @@ function BostonScientificCartesiaHX(props, ref) {
   function assist() {
     isAssisted = !isAssisted;
     if (isAssisted) {
-      console.log('isAssisted: ', isAssisted);
       assistedMode();
     }
+    // console.log('isAssisted: ', isAssisted);
   }
 
   const handleQuantityChange = (quantity, key) => {
@@ -2905,7 +3220,8 @@ function BostonScientificCartesiaHX(props, ref) {
   }
 
   const handlePercAmpChangeUp = () => {
-    console.log('PercAmpButton: ', percAmpToggle);
+    // console.log('PercAmpButton: ', percAmpToggle);
+    roundToHundred();
     if (percAmpToggle === 'left') {
       newHandleUpButton();
     } else if (percAmpToggle === 'right') {
@@ -2971,17 +3287,31 @@ function BostonScientificCartesiaHX(props, ref) {
     return selectedValues;
   };
 
+  const getStateAmplitude = () => {
+    return totalAmplitude;
+  };
+
+  const getStateStimulationParameters = () => {
+    return parameters;
+  };
+
+  const getStateSessionTitle = () => {
+    return sessionTitle;
+  };
+
+  const getStateVisModel = () => {
+    return visModel;
+  };
+
   useImperativeHandle(ref, () => ({
     getCartesiaData,
     getStateQuantities,
     getStateSelectedValues,
+    getStateAmplitude,
+    getStateStimulationParameters,
+    getStateSessionTitle,
+    getStateVisModel,
   }));
-
-  const [parameters, setParameters] = useState({
-    parameter1: '60',
-    parameter2: '130',
-    parameter3: '0',
-  });
 
   const handleParameterChange = (parameter) => (e) => {
     const newValue = e.target.value;
@@ -3045,34 +3375,59 @@ function BostonScientificCartesiaHX(props, ref) {
     } else if (props.IPG === 'Medtronic_Percept') {
       stimController = 3;
     }
-    console.log('stimController: ', stimController);
-    console.log('IPG', props.IPG);
+    // console.log('stimController: ', stimController);
+    // console.log('IPG', props.IPG);
+  };
+
+  const calculatePercentageFromAmplitude = () => {
+    const updatedQuantities = { ...quantities };
+    Object.keys(updatedQuantities).forEach((key) => {
+      updatedQuantities[key] = (updatedQuantities[key] * 100) / totalAmplitude;
+    });
+    setQuantities(updatedQuantities);
+  };
+
+  const calculateAmplitudeFromPercentage = () => {
+    const updatedQuantities = { ...quantities };
+    Object.keys(updatedQuantities).forEach((key) => {
+      updatedQuantities[key] = (updatedQuantities[key] * totalAmplitude) / 100;
+    });
+    setQuantities(updatedQuantities);
   };
 
   // Percentage vs mA toggle switch
   const handlePercAmpToggleChange = (value) => {
     const newValue = value;
     if (newValue === 'left') {
-      setTotalAmplitude(0);
+      // setTotalAmplitude(0);
+      calculatePercentageFromAmplitude();
     } else if (newValue === 'right') {
-      let totalSum = 0;
-      Object.keys(quantities).forEach((key) => {
-        totalSum += parseFloat(quantities[key]);
-      });
-      setTotalAmplitude(totalSum);
+      // let totalSum = 0;
+      // Object.keys(quantities).forEach((key) => {
+      //   totalSum += parseFloat(quantities[key]);
+      // });
+      // setTotalAmplitude(totalSum);
+      calculateAmplitudeFromPercentage();
     }
     setPercAmpToggle(value);
   };
 
+  const [assistedToggle, setAssistedToggle] = useState('left');
+
+  const handleAssistedToggleChange = (value) => {
+    setAssistedToggle(value);
+  };
+
   const [volAmpToggle, setVolAmpToggle] = useState('left');
+  const ampToggle = 'left';
 
   const handleVolAmpToggleChange = (value) => {
     const newValue = value;
-    if (newValue === 'left') {
-      handleActivaVoltage();
-    } else if (newValue === 'right') {
-      handleActivaAmplitude();
-    }
+    // if (newValue === 'left') {
+    //   handleActivaAmplitude();
+    // } else if (newValue === 'right') {
+    //   handleActivaVoltage();
+    // }
     setVolAmpToggle(volAmpToggle);
   };
 
@@ -3107,12 +3462,77 @@ function BostonScientificCartesiaHX(props, ref) {
     console.log('made it');
     handleCheck();
   };
+
+  const [radioValue, setRadioValue] = useState('1');
+
+  const radios = [
+    { name: 'None', value: '1' },
+    { name: 'Assisted', value: '2' },
+  ];
+
+  const handleVisModelChange = (event) => {
+    setVisModel(event.target.value);
+  };
+
+  const handleTitleChange = (event) => {
+    setSessionTitle(event.target.value);
+  };
+
+  const tooltipspliteven = (
+    <Tooltip id="tooltip">
+      <strong>Holy guacamole!</strong> Evenly share current between active contacts.
+    </Tooltip>
+  );
+
+  const tooltiprefactor = (
+    <Tooltip id="tooltip">
+      <strong>Holy guacamole!</strong> Make sure contacts sum to 100.
+    </Tooltip>
+  );
+
+  useEffect(() => {
+    if (props.IPG === 'Abbott') {
+      // const newQuantities = { ...quantities };
+      calculateQuantitiesWithDistribution();
+    }
+    if (radioValue === '2') {
+      assistedMode();
+    }
+    // if (props.IPG === 'Medtronic_Activa') {
+    //   if (volAmpToggle === 'left') {
+    //     handleActivaAmplitude();
+    //   } else if (volAmpToggle === 'right') {
+    //     handleActivaVoltage();
+    //   }
+    // }
+    // assist();
+  });
   /// //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   return (
     <div className="container">
       <div className="button-container">
-        <div></div>
+        <Form.Group className="mb-3">
+          <Form.Control
+            type="email"
+            placeholder="Enter session ID"
+            value={sessionTitle}
+            onChange={handleTitleChange}
+          />
+        </Form.Group>
+        <Form.Select
+          aria-label="Default select example"
+          value={visModel}
+          onChange={handleVisModelChange}
+        >
+          <option>Choose a model</option>
+          <option value="1">Dembek 2017</option>
+          <option value="2">FastField (Baniasadi 2020)</option>
+          <option value="3">SimBio/FieldTrip (see Horn 2017)</option>
+          <option value="4">Kuncel 2008</option>
+          <option value="5">Maedler 2012</option>
+        </Form.Select>
+        <div />
         <div className="PercentageAmplitudeToggle">
           {props.IPG === 'Boston' && (
             <PercentageAmplitudeToggle
@@ -3126,8 +3546,25 @@ function BostonScientificCartesiaHX(props, ref) {
               onChange={(value) => handleVolAmpToggleChange(value)}
             />
           )}
+          {props.IPG === 'Abbott' && (
+            <MAToggleSwitch
+              value={ampToggle}
+              // onChange={(value) => handleVolAmpToggleChange(value)}
+            />
+          )}
         </div>
-        <div></div>
+        <div />
+        <div className="button-container">
+          <label className="label">Total Amplitude</label>
+          <input
+            className="new-quantity-input"
+            type="number"
+            name="quantity"
+            pattern="[0-9]+"
+            value={totalAmplitude}
+            onChange={handleTotalAmplitudeChange}
+          />
+        </div>
         <div className="button-container">
           <label className="label">Pulsewidth (us):</label>
           <input
@@ -3147,23 +3584,25 @@ function BostonScientificCartesiaHX(props, ref) {
             value={parameters.parameter2}
             onChange={handleParameterChange('parameter2')}
           />
-          {/* <PercentageAmplitudeToggle /> */}
         </div>
-        <div className="button-container">
-          <label className="label">Total Amplitude</label>
-          <input
-            className="new-quantity-input"
-            type="number"
-            name="quantity"
-            pattern="[0-9]+"
-            value={totalAmplitude}
-            onChange={handleTotalAmplitudeChange}
-          />
+        <div>
+          <ButtonGroup>
+            {radios.map((radio, idx) => (
+              <ToggleButton
+                key={idx}
+                id={`radio-${idx}`}
+                type="radio"
+                variant={idx % 2 ? 'outline-success' : 'outline-danger'}
+                name="radio"
+                value={radio.value}
+                checked={radioValue === radio.value}
+                onChange={(e) => setRadioValue(e.currentTarget.value)}
+              >
+                {radio.name}
+              </ToggleButton>
+            ))}
+          </ButtonGroup>
         </div>
-        {/* <div></div>
-        <div className="AssistedToggle">
-          <AssistedToggle />
-        </div> */}
       </div>
       <div className="container2">
         <div className="IPG">
@@ -3243,6 +3682,9 @@ function BostonScientificCartesiaHX(props, ref) {
                 )}
               </div>
               {/* <p className="image-key">{Lcon.key}</p> */}
+              <p className="image-name-boston" style={{ color: 'white' }}>
+                {names[Lcon.key]}
+              </p>
             </div>
           ))}
         </div>
@@ -3284,10 +3726,13 @@ function BostonScientificCartesiaHX(props, ref) {
               )}
             </div>
             {/* <p className="image-key">{svg.key}</p> */}
-            <p className="image-name-boston">{names[svg.key]}</p>
+            <p className="image-name-boston" style={{ color: 'white' }}>
+              {names[svg.key]}
+            </p>
           </div>
         ))}
       </div>
+      <div className="spacing"></div>
       <div className="right-contacts">
         {rightContacts.map((rCon) => (
           <div className="image-item">
@@ -3321,6 +3766,9 @@ function BostonScientificCartesiaHX(props, ref) {
               )}
             </div>
             {/* <p className="image-key">{rCon.key}</p> */}
+            <p className="image-name-boston" style={{ color: 'white' }}>
+              {names[rCon.key]}
+            </p>
           </div>
         ))}
       </div>
@@ -3329,9 +3777,9 @@ function BostonScientificCartesiaHX(props, ref) {
           className="import-button"
           onClick={() => fileInputRef.current.click()}
         >
-          Import from LeadDBS
-        </button>
-        <button
+          Import Data
+        </button> */}
+        {/* <button
           className="export-button"
           onClick={() => exportToJsonFile(tripleToggleData)}
         >
@@ -3353,21 +3801,31 @@ function BostonScientificCartesiaHX(props, ref) {
         </button> */}
         <div className="button-container">
           <h2>Contact Share</h2>
-          <button
+          <OverlayTrigger placement="left" overlay={tooltipspliteven}>
+            <button
+              onClick={calculateQuantitiesWithDistribution}
+              className="button"
+            >
+              Split Even
+            </button>
+          </OverlayTrigger>
+          {/* <button
             onClick={calculateQuantitiesWithDistribution}
             className="button"
           >
             Split Even
-          </button>
-          <button onClick={roundToHundred} className="button">
-            Refactor
-          </button>
+          </button> */}
+          <OverlayTrigger placement="left" overlay={tooltiprefactor}>
+            <button onClick={roundToHundred} className="button">
+              Refactor
+            </button>
+          </OverlayTrigger>
           <button onClick={handleClearButton} className="button">
             Clear
           </button>
-          <button onClick={handleCheck} className="button">
+          {/* <button onClick={handleCheck} className="button">
             Check
-          </button>
+          </button> */}
           {/* <StaticExample
             show={show}
             setShow={setShow}
@@ -3396,7 +3854,9 @@ function BostonScientificCartesiaHX(props, ref) {
                 {/* <UpArrow onClick={newHandleUpButton} /> */}
                 <DownArrow onClick={handlePercAmpChangeDown} />
                 <ClockwiseArrow onClick={handlePercAmpChangeClockwise} />
-                <CounterClockwiseArrow onClick={handlePercAmpChangeCounterClockwise} />
+                <CounterClockwiseArrow
+                  onClick={handlePercAmpChangeCounterClockwise}
+                />
               </div>
             )}
             {/* <div className="steering-container">
@@ -3409,11 +3869,14 @@ function BostonScientificCartesiaHX(props, ref) {
           </div>
         )}
         <div className="steering-container">
+          {/* <OverlayTrigger id={tooltipspliteven}>
+            <SplitEvenButton onClick={handleSplitEvenButton} />
+          </OverlayTrigger> */}
           <SplitEvenButton onClick={handleSplitEvenButton} />
           <ForwardButton onClick={handleForwardButton} />
           <BackButton onClick={handleBackButton} />
-          <LeftButton onClick={handleLeftButton} />
-          <RightButton onClick={handleRightButton} />
+          <LeftButton onClick={handleRightButton} />
+          <RightButton onClick={handleLeftButton} />
         </div>
       </div>
     </div>

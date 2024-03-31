@@ -2906,7 +2906,10 @@ import React, {
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Modal from 'react-bootstrap/Modal';
+import Form from 'react-bootstrap/Form';
 import ToggleButton from 'react-bootstrap/ToggleButton';
+import Dropdown from 'react-bootstrap/Dropdown';
+import Tooltip from 'react-bootstrap/Tooltip';
 // import Popup from 'reactjs-popup';
 import TripleToggleTest from '../TripleToggleTest'; // Make sure to import TripleToggle correctly
 import calculateQuantities from '../CalculateQuantities'; // Correct the path to quantityUtils
@@ -2942,6 +2945,14 @@ import PercentageAmplitudeToggle from '../PercentageAmplitudeToggle';
 import AssistedToggle from '../AssistedToggle';
 import VoltageAmplitudeToggle from '../VoltageAmplitudeToggle';
 import MAToggleSwitch from '../MAToggleSwitch';
+import { OverlayTrigger } from 'react-bootstrap';
+import {
+  handleForwardButton,
+  handleBackButton,
+  handleLeftButton,
+  handleRightButton,
+  handleSplitEvenButton,
+} from '../ButtonHandlers';
 // import 'bootstrap/dist/css/bootstrap.min.css';
 
 // import { relative } from 'path';
@@ -2999,11 +3010,11 @@ function BostonCartesiaTest(props, ref) {
     0: IPG,
     1: 1,
     2: 2,
-    3: 4,
-    4: 3,
+    3: 3,
+    4: 4,
     5: 5,
-    6: 7,
-    7: 6,
+    6: 6,
+    7: 7,
     8: 8,
   };
 
@@ -3037,7 +3048,9 @@ function BostonCartesiaTest(props, ref) {
     minus: 0,
   };
 
-  const [totalAmplitude, setTotalAmplitude] = useState(0);
+  const [totalAmplitude, setTotalAmplitude] = useState(
+    props.totalAmplitude || 0,
+  );
 
   const [selectedValues, setSelectedValues] = useState(
     props.selectedValues || {
@@ -3081,6 +3094,18 @@ function BostonCartesiaTest(props, ref) {
   );
   // const [userQuantities, setUserQuantities] = useState({}); // Store user input quantities
 
+  const [parameters, setParameters] = useState(
+    props.parameters || {
+      parameter1: '60',
+      parameter2: '130',
+      parameter3: '0',
+    },
+  );
+
+  const [visModel, setVisModel] = useState(props.visModel || '');
+
+  const [sessionTitle, setSessionTitle] = useState(props.sessionTitle || '');
+
   const totalQuantity = quantities.plus + quantities.minus;
   let isAssisted = false;
 
@@ -3103,9 +3128,6 @@ function BostonCartesiaTest(props, ref) {
     });
     return levelTotals;
   };
-
-  // console.log('lastChangedInstance:', lastChangedInstance); // Add this line to log the value
-
   // const calculateQuantitiesWithDistribution = (selectedValues) => {
   //   const quantities = {
   //     left: 0,
@@ -3944,7 +3966,7 @@ function BostonCartesiaTest(props, ref) {
     let aVec = [0, 0];
     let bVec = [0, 0];
     let cVec = [0, 0];
-    const baseZero = [1,0];
+    const baseZero = [1, 0];
     const cos60 = Math.cos((60 * Math.PI) / 180);
     const cos30 = Math.cos((30 * Math.PI) / 180);
     const sin60 = Math.sin((60 * Math.PI) / 180);
@@ -3986,8 +4008,9 @@ function BostonCartesiaTest(props, ref) {
     );
     console.log('local', localCoords);
     const vecDotProduct = 0;
-    const vecAng = Math.acos(localCoords[0] / vecLength) * 180/Math.PI;
-    const vectorAngle = (Math.atan(localCoords[1] / localCoords[0]) * 180) / Math.PI;
+    const vecAng = (Math.acos(localCoords[0] / vecLength) * 180) / Math.PI;
+    const vectorAngle =
+      (Math.atan(localCoords[1] / localCoords[0]) * 180) / Math.PI;
     console.log('vcecof: ', vecAng);
   };
 
@@ -4010,6 +4033,15 @@ function BostonCartesiaTest(props, ref) {
         const currentKeys = Object.keys(level).filter(
           (k) => level[k] === currentLevel,
         );
+        const levelTotals = calculateLevelTotals();
+        console.log(levelTotals);
+        let currentLevelTotal = 0;
+        Object.keys(levelTotals).forEach((levels) => {
+          if (level[key] === parseFloat(levels)) {
+            currentLevelTotal = levelTotals[levels];
+            console.log('leveltot: ', currentLevelTotal);
+          }
+        });
         let currentLeftCount = 0;
         let currentCenterCount = 0;
         let currentRightCount = 0;
@@ -4027,14 +4059,16 @@ function BostonCartesiaTest(props, ref) {
           if (updatedSelectedValues[key] !== 'left') {
             if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
             } else if (updatedSelectedValues[nextKey] === 'left') {
               console.log('HelloHello');
               updatedSelectedValues[nextKey] = updatedSelectedValues[key];
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
             }
           }
         }
@@ -4045,14 +4079,16 @@ function BostonCartesiaTest(props, ref) {
           if (updatedSelectedValues[key] !== 'left') {
             if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
             } else if (updatedSelectedValues[nextKey] === 'left') {
               console.log('HelloHello');
               updatedSelectedValues[nextKey] = updatedSelectedValues[key];
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
             }
           }
         }
@@ -4062,14 +4098,17 @@ function BostonCartesiaTest(props, ref) {
               updatedSelectedValues[key] === updatedSelectedValues[rightNextKey]
             ) {
               updatedQuantities[rightNextKey] =
-                parseFloat(updatedQuantities[rightNextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[rightNextKey]) +
+                currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
             } else if (updatedSelectedValues[rightNextKey] === 'left') {
-              console.log('HelloHello');
               updatedSelectedValues[rightNextKey] = updatedSelectedValues[key];
               updatedQuantities[rightNextKey] =
-                parseFloat(updatedQuantities[rightNextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[rightNextKey]) +
+                currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
             }
           }
         }
@@ -4081,7 +4120,7 @@ function BostonCartesiaTest(props, ref) {
     setQuantities(updatedQuantities);
     // vectorMakeUp();
     // console.log('VecDirection: ', vectorDirection);
-    // checkQuantitiesAndValues(quantities, selectedValues);
+    checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
   };
 
   const handleCounterClockwiseButtonAmplitude = () => {
@@ -4188,6 +4227,11 @@ function BostonCartesiaTest(props, ref) {
   const handleClockwiseButton = () => {
     const updatedQuantities = { ...quantities };
     const updatedSelectedValues = { ...selectedValues };
+    const levelChanges = {};
+    Object.keys(levelArray).forEach((key) => {
+      levelChanges[key] = 0;
+    });
+    console.log('levelchanges: ', levelChanges);
     Object.keys(selectedValues)
       .reverse()
       .forEach((key) => {
@@ -4205,6 +4249,14 @@ function BostonCartesiaTest(props, ref) {
         const currentKeys = Object.keys(level).filter(
           (k) => level[k] === currentLevel,
         );
+        const levelTotals = calculateLevelTotals();
+        // console.log(levelTotals);
+        let currentLevelTotal = 0;
+        Object.keys(levelTotals).forEach((levels) => {
+          if (level[key] === parseFloat(levels)) {
+            currentLevelTotal = levelTotals[levels];
+          }
+        });
         let currentLeftCount = 0;
         let currentCenterCount = 0;
         let currentRightCount = 0;
@@ -4218,54 +4270,114 @@ function BostonCartesiaTest(props, ref) {
             currentRightCount += 1;
           }
         });
-        if (face[key] === 'left' && updatedQuantities[previousKey] === 0) {
+        if (
+          face[key] === 'left' &&
+          updatedQuantities[previousKey] === 0 &&
+          levelChanges[level[key]] === 0
+        ) {
           if (updatedSelectedValues[key] !== 'left') {
             if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
-              updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+              if (updatedQuantities[key] < currentLevelTotal / 10) {
+                updatedQuantities[nextKey] =
+                  parseFloat(updatedQuantities[nextKey]) +
+                  parseFloat(updatedQuantities[key]);
+                updatedQuantities[key] = 0;
+                levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
+              } else {
+                updatedQuantities[nextKey] =
+                  parseFloat(updatedQuantities[nextKey]) +
+                  currentLevelTotal / 10;
+                updatedQuantities[key] =
+                  parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+                levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
+                }
+              // updatedQuantities[nextKey] =
+              //   parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              // updatedQuantities[key] = parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
             } else if (updatedSelectedValues[nextKey] === 'left') {
-              console.log('HelloHello');
               updatedSelectedValues[nextKey] = updatedSelectedValues[key];
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+              levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
             }
           }
         }
-        if (face[key] === 'center' && updatedQuantities[previousKey] === 0) {
+        if (
+          face[key] === 'center' &&
+          updatedQuantities[previousKey] === 0 &&
+          levelChanges[level[key]] === 0
+        ) {
           if (updatedSelectedValues[key] !== 'left') {
             if (
               updatedSelectedValues[key] ===
               updatedSelectedValues[centerNextKey]
             ) {
-              updatedQuantities[centerNextKey] =
-                parseFloat(updatedQuantities[centerNextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+              // updatedQuantities[centerNextKey] =
+              //   parseFloat(updatedQuantities[centerNextKey]) +
+              //   currentLevelTotal / 10;
+              // updatedQuantities[key] =
+              //   parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+              if (updatedQuantities[key] < currentLevelTotal / 10) {
+                console.log('true');
+                updatedQuantities[centerNextKey] =
+                  parseFloat(updatedQuantities[centerNextKey]) +
+                  parseFloat(updatedQuantities[key]);
+                updatedQuantities[key] = 0;
+                levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
+              } else {
+                updatedQuantities[centerNextKey] =
+                  parseFloat(updatedQuantities[centerNextKey]) +
+                  currentLevelTotal / 10;
+                updatedQuantities[key] =
+                  parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+                levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
+                }
             } else if (updatedSelectedValues[centerNextKey] === 'left') {
-              console.log('HelloHello');
               updatedSelectedValues[centerNextKey] = updatedSelectedValues[key];
               updatedQuantities[centerNextKey] =
-                parseFloat(updatedQuantities[centerNextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[centerNextKey]) +
+                currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+              levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
             }
           }
         }
         if (
           face[key] === 'right' &&
-          updatedQuantities[rightPreviousKey] === 0
+          updatedQuantities[rightPreviousKey] === 0 &&
+          levelChanges[level[key]] === 0
         ) {
           if (updatedSelectedValues[key] !== 'left') {
             if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
-              updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+              if (updatedQuantities[key] < currentLevelTotal / 10) {
+                updatedQuantities[nextKey] =
+                  parseFloat(updatedQuantities[nextKey]) +
+                  parseFloat(updatedQuantities[key]);
+                updatedQuantities[key] = 0;
+                levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
+              } else {
+                updatedQuantities[nextKey] =
+                  parseFloat(updatedQuantities[nextKey]) +
+                  currentLevelTotal / 10;
+                updatedQuantities[key] =
+                  parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+                levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
+                }
+              // console.log('true');
+              // updatedQuantities[nextKey] =
+              //   parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              // updatedQuantities[key] =
+              //   parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
             } else if (updatedSelectedValues[nextKey] === 'left') {
-              console.log('HelloHello');
               updatedSelectedValues[nextKey] = updatedSelectedValues[key];
               updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + 10;
-              updatedQuantities[key] = parseFloat(updatedQuantities[key]) - 10;
+                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+              levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
             }
           }
         }
@@ -4273,9 +4385,10 @@ function BostonCartesiaTest(props, ref) {
           updatedSelectedValues[key] = 'left';
         }
       });
+    console.log('newlevelquantities: ', levelChanges);
     setSelectedValues(updatedSelectedValues);
     setQuantities(updatedQuantities);
-    // checkQuantitiesAndValues(quantities, selectedValues);
+    checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
   };
 
   const handleClockwiseButtonAmplitude = () => {
@@ -4449,6 +4562,156 @@ function BostonCartesiaTest(props, ref) {
       return true;
     }
     return false;
+  }
+
+  // function roundAlloc(
+  //   beforeLevel,
+  //   nextLevel,
+  //   levelAboveTotal,
+  //   levelBelowTotal,
+  //   values,
+  //   amtOnContacts,
+  // ) {
+  //   // let oldTotal = 0;
+  //   let newAboveTotal = 0;
+  //   let newBelowTotal = 0;
+  //   let belowTotal = levelBelowTotal;
+  //   let aboveTotal = levelAboveTotal;
+  //   Object.keys(values).forEach((key) => {
+  //     if (level[key] === beforeLevel) {
+  //       values[key] = Math.floor(values[key] + 0.5);
+  //       newBelowTotal += values[key];
+  //     } else if (level[key] === nextLevel) {
+  //       values[key] = Math.floor(values[key] + 0.5);
+  //       newAboveTotal += values[key];
+  //     }
+  //     // values[key] = Math.floor(values[key] + 0.5);
+  //     // newTotal += values[key];
+  //   });
+  //   // console.log('old', oldTotal);
+  //   // console.log('new', newTotal);
+  //   belowTotal = Math.floor(belowTotal + 0.5);
+  //   const belowDiff = belowTotal - newBelowTotal;
+  //   aboveTotal = Math.floor(aboveTotal + 0.5);
+  //   const aboveDiff = aboveTotal - newAboveTotal;
+  //   let doneUpdate = 0;
+  //   console.log('above', aboveDiff);
+  //   console.log('below', belowDiff);
+  //   Object.keys(values).forEach((key) => {
+  //     if (values[key] !== 0 && doneUpdate === 0 && level[key] === beforeLevel) {
+  //       values[key] += belowDiff;
+  //       doneUpdate = 1;
+  //     }
+  //   });
+  //   doneUpdate = 0;
+  //   console.log('below level total: ', belowTotal);
+  //   Object.keys(values).forEach((key) => {
+  //     if (values[key] !== 0 && doneUpdate === 0 && level[key] === nextLevel) {
+  //       values[key] += aboveDiff;
+  //       doneUpdate = 1;
+  //     }
+  //     if (amtOnContacts === 3) {
+  //       if (aboveTotal % 3 === 0) {
+  //         if (level[key] === nextLevel) {
+  //           values[key] = aboveTotal / 3;
+  //         }
+  //       }
+  //       if (belowTotal % 3 === 0) {
+  //         if (level[key] === beforeLevel) {
+  //           values[key] = belowTotal / 3;
+  //           console.log('values[key]', values[key]);
+  //         }
+  //       }
+  //     } else if (amtOnContacts === 1) {
+  //       console.log('made it here');
+  //       if (belowTotal % 3 === 0) {
+  //         console.log(beforeLevel);
+  //         if (level[key] === beforeLevel) {
+  //           console.log('yes');
+  //           values[key] = belowTotal / 3;
+  //           console.log('values[key]', values[key]);
+  //         }
+  //       }
+  //     }
+  //   });
+  //   return values;
+  // }
+
+  function roundAllocUp(
+    beforeLevel,
+    nextLevel,
+    levelAboveTotal,
+    levelBelowTotal,
+    values,
+    amtOnContacts,
+    amtBelowOnContacts,
+  ) {
+    // let oldTotal = 0;
+    let newAboveTotal = 0;
+    let newBelowTotal = 0;
+    let belowTotal = levelBelowTotal;
+    let aboveTotal = levelAboveTotal;
+    Object.keys(values).forEach((key) => {
+      if (level[key] === beforeLevel) {
+        values[key] = Math.floor(values[key] + 0.5);
+        newBelowTotal += values[key];
+      } else if (level[key] === nextLevel) {
+        values[key] = Math.floor(values[key] + 0.5);
+        newAboveTotal += values[key];
+      }
+      // values[key] = Math.floor(values[key] + 0.5);
+      // newTotal += values[key];
+    });
+    // console.log('old', oldTotal);
+    // console.log('new', newTotal);
+    belowTotal = Math.floor(belowTotal + 0.5);
+    const belowDiff = belowTotal - newBelowTotal;
+    aboveTotal = Math.floor(aboveTotal + 0.5);
+    const aboveDiff = aboveTotal - newAboveTotal;
+    let doneUpdate = 0;
+    console.log('above', aboveDiff);
+    console.log('below', belowDiff);
+    Object.keys(values).forEach((key) => {
+      if (values[key] !== 0 && doneUpdate === 0 && level[key] === beforeLevel) {
+        values[key] += belowDiff;
+        doneUpdate = 1;
+      }
+    });
+    doneUpdate = 0;
+    console.log('below level total: ', belowTotal);
+    Object.keys(values).forEach((key) => {
+      if (values[key] !== 0 && doneUpdate === 0 && level[key] === nextLevel) {
+        values[key] += aboveDiff;
+        doneUpdate = 1;
+      }
+      if (amtOnContacts === 3) {
+        if (aboveTotal % 3 === 0) {
+          if (level[key] === nextLevel) {
+            values[key] = aboveTotal / 3;
+          }
+        }
+        if (belowTotal % 3 === 0) {
+          if (level[key] === beforeLevel && segmentedContact(key)) {
+            console.log('key', key);
+            console.log(segmentedContact(key));
+            values[key] = belowTotal / 3;
+            console.log('values[key]', values[key]);
+          }
+        }
+      } else if (amtOnContacts === 1 && amtBelowOnContacts === 3) {
+        console.log('belowOn: ', amtBelowOnContacts);
+        console.log('made it here');
+        if (belowTotal % 3 === 0) {
+          console.log(beforeLevel);
+          if (level[key] === beforeLevel && segmentedContact(key)) {
+            console.log('yes');
+            values[key] = belowTotal / 3;
+            console.log('values[key]', values[key]);
+          }
+        }
+      }
+    });
+    return values;
   }
 
   // For clear button
@@ -4699,8 +4962,17 @@ function BostonCartesiaTest(props, ref) {
     //   }
     // });
     setSelectedValues(updatedSelectedValues);
+    console.log('before level', previousLevel);
+    roundAllocUp(
+      previousLevel,
+      levelAbove,
+      levelAboveQuantityTotal,
+      levelBelowQuantityTotal,
+      updatedQuantities,
+      numAboveOnContacts,
+      numOnContacts,
+    );
     setQuantities(updatedQuantities);
-    console.log('updatedQUantities', updatedQuantities);
     checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
   };
   // const newHandleUpButton = () => {
@@ -5107,6 +5379,82 @@ function BostonCartesiaTest(props, ref) {
   //   }
   // };
 
+  function roundAllocDown(
+    beforeLevel,
+    nextLevel,
+    levelAboveTotal,
+    levelBelowTotal,
+    values,
+    amtOnContacts,
+    amtBelowOnContacts,
+  ) {
+    // let oldTotal = 0;
+    let newAboveTotal = 0;
+    let newBelowTotal = 0;
+    let belowTotal = levelBelowTotal;
+    let aboveTotal = levelAboveTotal;
+    Object.keys(values).forEach((key) => {
+      if (level[key] === beforeLevel) {
+        values[key] = Math.floor(values[key] + 0.5);
+        newBelowTotal += values[key];
+      } else if (level[key] === nextLevel) {
+        values[key] = Math.floor(values[key] + 0.5);
+        newAboveTotal += values[key];
+      }
+      // values[key] = Math.floor(values[key] + 0.5);
+      // newTotal += values[key];
+    });
+    // console.log('old', oldTotal);
+    // console.log('new', newTotal);
+    belowTotal = Math.floor(belowTotal + 0.5);
+    const belowDiff = belowTotal - newBelowTotal;
+    aboveTotal = Math.floor(aboveTotal + 0.5);
+    const aboveDiff = aboveTotal - newAboveTotal;
+    let doneUpdate = 0;
+    console.log('above', aboveDiff);
+    console.log('below', belowDiff);
+    Object.keys(values).forEach((key) => {
+      if (values[key] !== 0 && doneUpdate === 0 && level[key] === beforeLevel) {
+        values[key] += belowDiff;
+        doneUpdate = 1;
+      }
+    });
+    doneUpdate = 0;
+    console.log('below level total: ', belowTotal);
+    Object.keys(values).forEach((key) => {
+      if (values[key] !== 0 && doneUpdate === 0 && level[key] === nextLevel) {
+        values[key] += aboveDiff;
+        doneUpdate = 1;
+      }
+      if (amtOnContacts === 3) {
+        if (aboveTotal % 3 === 0) {
+          if (level[key] === nextLevel) {
+            values[key] = aboveTotal / 3;
+          }
+        }
+        if (belowTotal % 3 === 0) {
+          if (level[key] === beforeLevel && segmentedContact(key)) {
+            console.log('key', key);
+            console.log(segmentedContact(key));
+            values[key] = belowTotal / 3;
+            console.log('values[key]', values[key]);
+          }
+        }
+      } else if (amtOnContacts === 1 && amtBelowOnContacts === 3) {
+        console.log('belowOn: ', amtBelowOnContacts);
+        console.log('made it here');
+        if (belowTotal % 3 === 0) {
+          console.log(beforeLevel);
+          if (level[key] === beforeLevel && segmentedContact(key)) {
+            console.log('yes');
+            values[key] = belowTotal / 3;
+            console.log('values[key]', values[key]);
+          }
+        }
+      }
+    });
+    return values;
+  }
   const newHandleDownButton = () => {
     vectorMakeUp();
     const updatedQuantities = { ...quantities };
@@ -5198,6 +5546,15 @@ function BostonCartesiaTest(props, ref) {
     //   }
     // });
     setSelectedValues(updatedSelectedValues);
+    roundAllocDown(
+      previousLevel,
+      levelAbove,
+      levelBelowQuantityTotal,
+      levelAboveQuantityTotal,
+      updatedQuantities,
+      numOnContacts,
+      numAboveOnContacts,
+    );
     setQuantities(updatedQuantities);
     checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
   };
@@ -5350,186 +5707,186 @@ function BostonCartesiaTest(props, ref) {
   //   // });
   // };
 
-  const handleForwardButton = () => {
-    const updatedQuantities = { ...quantities };
-    const updatedSelectedValues = { ...selectedValues };
-    // getOnFacesCount();
-    getOnFacesCount();
-    vectorMakeUp();
-    const levelTotalArray = calculateLevelTotals();
-    console.log(facesVec);
-    let counter = 0;
-    // Object.keys(levelTotalArray).forEach((key) => {
-    //   const useLevel = isLevelOnAndSegmented(key);
-    //   console.log('useLevel ', useLevel);
-    //   if (useLevel) {
-    //     counter += 1;
-    //   }
-    // });
-    Object.keys(levelQuantities).forEach((key) => {
-      if (levelQuantities[key] !== 0 && segmentedLevel(key)) {
-        console.log('hello');
-        counter += 1;
-      }
-    });
-    console.log('Counter: ', counter);
-    Object.keys(updatedQuantities).forEach((key) => {
-      // keyLevel = getOnContacts[level[key]]
-      if (face[key] === 'center' && levelQuantities[level[key]] !== 0) {
-        // console.log('length ', getOnContacts(level[key]).length);
-        // if (getOnContacts(level[key]).length > 0) {
-        // console.log('facesVec ', counter);
-        updatedSelectedValues[key] = 'center';
-        updatedQuantities[key] = levelQuantities[level[key]];
-        // }
-      } else {
-        updatedSelectedValues[key] = 'left';
-        updatedQuantities[key] = 0;
-      }
-    });
-    setSelectedValues(updatedSelectedValues);
-    setQuantities(updatedQuantities);
-    // roundToHundred();
-    // calculateQuantitiesWithDistribution();
-  };
+  // const handleForwardButton = () => {
+  //   const updatedQuantities = { ...quantities };
+  //   const updatedSelectedValues = { ...selectedValues };
+  //   // getOnFacesCount();
+  //   getOnFacesCount();
+  //   vectorMakeUp();
+  //   const levelTotalArray = calculateLevelTotals();
+  //   console.log(facesVec);
+  //   let counter = 0;
+  //   // Object.keys(levelTotalArray).forEach((key) => {
+  //   //   const useLevel = isLevelOnAndSegmented(key);
+  //   //   console.log('useLevel ', useLevel);
+  //   //   if (useLevel) {
+  //   //     counter += 1;
+  //   //   }
+  //   // });
+  //   Object.keys(levelQuantities).forEach((key) => {
+  //     if (levelQuantities[key] !== 0 && segmentedLevel(key)) {
+  //       console.log('hello');
+  //       counter += 1;
+  //     }
+  //   });
+  //   console.log('Counter: ', counter);
+  //   Object.keys(updatedQuantities).forEach((key) => {
+  //     // keyLevel = getOnContacts[level[key]]
+  //     if (face[key] === 'center' && levelQuantities[level[key]] !== 0) {
+  //       // console.log('length ', getOnContacts(level[key]).length);
+  //       // if (getOnContacts(level[key]).length > 0) {
+  //       // console.log('facesVec ', counter);
+  //       updatedSelectedValues[key] = 'center';
+  //       updatedQuantities[key] = levelQuantities[level[key]];
+  //       // }
+  //     } else {
+  //       updatedSelectedValues[key] = 'left';
+  //       updatedQuantities[key] = 0;
+  //     }
+  //   });
+  //   setSelectedValues(updatedSelectedValues);
+  //   setQuantities(updatedQuantities);
+  //   // roundToHundred();
+  //   // calculateQuantitiesWithDistribution();
+  // };
 
-  const handleBackButton = () => {
-    const updatedQuantities = { ...quantities };
-    const updatedSelectedValues = { ...selectedValues };
-    // getOnFacesCount();
-    getOnFacesCount();
-    vectorMakeUp();
-    const levelTotalArray = calculateLevelTotals();
-    console.log(facesVec);
-    let counter = 0;
-    // Object.keys(levelTotalArray).forEach((key) => {
-    //   const useLevel = isLevelOnAndSegmented(key);
-    //   console.log('useLevel ', useLevel);
-    //   if (useLevel) {
-    //     counter += 1;
-    //   }
-    // });
-    Object.keys(levelQuantities).forEach((key) => {
-      if (levelQuantities[key] !== 0 && segmentedLevel(key)) {
-        console.log('hello');
-        counter += 1;
-      }
-    });
-    console.log('Counter: ', counter);
-    Object.keys(updatedQuantities).forEach((key) => {
-      // keyLevel = getOnContacts[level[key]]
-      if (
-        (face[key] === 'left' || face[key] === 'right') &&
-        levelQuantities[level[key]] !== 0
-      ) {
-        // console.log('length ', getOnContacts(level[key]).length);
-        // if (getOnContacts(level[key]).length > 0) {
-        // console.log('facesVec ', counter);
-        updatedSelectedValues[key] = 'center';
-        updatedQuantities[key] = levelQuantities[level[key]] / 2;
-        // }
-      } else {
-        updatedSelectedValues[key] = 'left';
-        updatedQuantities[key] = 0;
-      }
-    });
-    setSelectedValues(updatedSelectedValues);
-    setQuantities(updatedQuantities);
-    // roundToHundred();
-    // calculateQuantitiesWithDistribution();
-  };
+  // const handleBackButton = () => {
+  //   const updatedQuantities = { ...quantities };
+  //   const updatedSelectedValues = { ...selectedValues };
+  //   // getOnFacesCount();
+  //   getOnFacesCount();
+  //   vectorMakeUp();
+  //   const levelTotalArray = calculateLevelTotals();
+  //   console.log(facesVec);
+  //   let counter = 0;
+  //   // Object.keys(levelTotalArray).forEach((key) => {
+  //   //   const useLevel = isLevelOnAndSegmented(key);
+  //   //   console.log('useLevel ', useLevel);
+  //   //   if (useLevel) {
+  //   //     counter += 1;
+  //   //   }
+  //   // });
+  //   Object.keys(levelQuantities).forEach((key) => {
+  //     if (levelQuantities[key] !== 0 && segmentedLevel(key)) {
+  //       console.log('hello');
+  //       counter += 1;
+  //     }
+  //   });
+  //   console.log('Counter: ', counter);
+  //   Object.keys(updatedQuantities).forEach((key) => {
+  //     // keyLevel = getOnContacts[level[key]]
+  //     if (
+  //       (face[key] === 'left' || face[key] === 'right') &&
+  //       levelQuantities[level[key]] !== 0
+  //     ) {
+  //       // console.log('length ', getOnContacts(level[key]).length);
+  //       // if (getOnContacts(level[key]).length > 0) {
+  //       // console.log('facesVec ', counter);
+  //       updatedSelectedValues[key] = 'center';
+  //       updatedQuantities[key] = levelQuantities[level[key]] / 2;
+  //       // }
+  //     } else {
+  //       updatedSelectedValues[key] = 'left';
+  //       updatedQuantities[key] = 0;
+  //     }
+  //   });
+  //   setSelectedValues(updatedSelectedValues);
+  //   setQuantities(updatedQuantities);
+  //   // roundToHundred();
+  //   // calculateQuantitiesWithDistribution();
+  // };
 
-  const handleLeftButton = () => {
-    const updatedQuantities = { ...quantities };
-    const updatedSelectedValues = { ...selectedValues };
-    // getOnFacesCount();
-    getOnFacesCount();
-    vectorMakeUp();
-    const levelTotalArray = calculateLevelTotals();
-    console.log(facesVec);
-    let counter = 0;
-    // Object.keys(levelTotalArray).forEach((key) => {
-    //   const useLevel = isLevelOnAndSegmented(key);
-    //   console.log('useLevel ', useLevel);
-    //   if (useLevel) {
-    //     counter += 1;
-    //   }
-    // });
-    Object.keys(levelQuantities).forEach((key) => {
-      if (levelQuantities[key] !== 0 && segmentedLevel(key)) {
-        console.log('hello');
-        counter += 1;
-      }
-    });
-    console.log('Counter: ', counter);
-    Object.keys(updatedQuantities).forEach((key) => {
-      // keyLevel = getOnContacts[level[key]]
-      if (face[key] === 'left' && levelQuantities[level[key]] !== 0) {
-        // console.log('length ', getOnContacts(level[key]).length);
-        // if (getOnContacts(level[key]).length > 0) {
-        // console.log('facesVec ', counter);
-        updatedSelectedValues[key] = 'center';
-        updatedQuantities[key] = (3 * levelQuantities[level[key]]) / 4;
-        // }
-      } else if (face[key] === 'center' && levelQuantities[level[key]] !== 0) {
-        updatedSelectedValues[key] = 'center';
-        updatedQuantities[key] = levelQuantities[level[key]] / 4;
-      } else {
-        updatedSelectedValues[key] = 'left';
-        updatedQuantities[key] = 0;
-      }
-    });
-    setSelectedValues(updatedSelectedValues);
-    setQuantities(updatedQuantities);
-    // roundToHundred();
-    // calculateQuantitiesWithDistribution();
-  };
+  // const handleLeftButton = () => {
+  //   const updatedQuantities = { ...quantities };
+  //   const updatedSelectedValues = { ...selectedValues };
+  //   // getOnFacesCount();
+  //   getOnFacesCount();
+  //   vectorMakeUp();
+  //   const levelTotalArray = calculateLevelTotals();
+  //   console.log(facesVec);
+  //   let counter = 0;
+  //   // Object.keys(levelTotalArray).forEach((key) => {
+  //   //   const useLevel = isLevelOnAndSegmented(key);
+  //   //   console.log('useLevel ', useLevel);
+  //   //   if (useLevel) {
+  //   //     counter += 1;
+  //   //   }
+  //   // });
+  //   Object.keys(levelQuantities).forEach((key) => {
+  //     if (levelQuantities[key] !== 0 && segmentedLevel(key)) {
+  //       console.log('hello');
+  //       counter += 1;
+  //     }
+  //   });
+  //   console.log('Counter: ', counter);
+  //   Object.keys(updatedQuantities).forEach((key) => {
+  //     // keyLevel = getOnContacts[level[key]]
+  //     if (face[key] === 'left' && levelQuantities[level[key]] !== 0) {
+  //       // console.log('length ', getOnContacts(level[key]).length);
+  //       // if (getOnContacts(level[key]).length > 0) {
+  //       // console.log('facesVec ', counter);
+  //       updatedSelectedValues[key] = 'center';
+  //       updatedQuantities[key] = (3 * levelQuantities[level[key]]) / 4;
+  //       // }
+  //     } else if (face[key] === 'center' && levelQuantities[level[key]] !== 0) {
+  //       updatedSelectedValues[key] = 'center';
+  //       updatedQuantities[key] = levelQuantities[level[key]] / 4;
+  //     } else {
+  //       updatedSelectedValues[key] = 'left';
+  //       updatedQuantities[key] = 0;
+  //     }
+  //   });
+  //   setSelectedValues(updatedSelectedValues);
+  //   setQuantities(updatedQuantities);
+  //   // roundToHundred();
+  //   // calculateQuantitiesWithDistribution();
+  // };
 
-  const handleRightButton = () => {
-    const updatedQuantities = { ...quantities };
-    const updatedSelectedValues = { ...selectedValues };
-    // getOnFacesCount();
-    getOnFacesCount();
-    vectorMakeUp();
-    const levelTotalArray = calculateLevelTotals();
-    console.log(facesVec);
-    let counter = 0;
-    // Object.keys(levelTotalArray).forEach((key) => {
-    //   const useLevel = isLevelOnAndSegmented(key);
-    //   console.log('useLevel ', useLevel);
-    //   if (useLevel) {
-    //     counter += 1;
-    //   }
-    // });
-    Object.keys(levelQuantities).forEach((key) => {
-      if (levelQuantities[key] !== 0 && segmentedLevel(key)) {
-        console.log('hello');
-        counter += 1;
-      }
-    });
-    console.log('Counter: ', counter);
-    Object.keys(updatedQuantities).forEach((key) => {
-      // keyLevel = getOnContacts[level[key]]
-      if (face[key] === 'right' && levelQuantities[level[key]] !== 0) {
-        // console.log('length ', getOnContacts(level[key]).length);
-        // if (getOnContacts(level[key]).length > 0) {
-        // console.log('facesVec ', counter);
-        updatedSelectedValues[key] = 'center';
-        updatedQuantities[key] = (3 * levelQuantities[level[key]]) / 4;
-        // }
-      } else if (face[key] === 'center' && levelQuantities[level[key]] !== 0) {
-        updatedSelectedValues[key] = 'center';
-        updatedQuantities[key] = levelQuantities[level[key]] / 4;
-      } else {
-        updatedSelectedValues[key] = 'left';
-        updatedQuantities[key] = 0;
-      }
-    });
-    setSelectedValues(updatedSelectedValues);
-    setQuantities(updatedQuantities);
-    // roundToHundred();
-    // calculateQuantitiesWithDistribution();
-  };
+  // const handleRightButton = () => {
+  //   const updatedQuantities = { ...quantities };
+  //   const updatedSelectedValues = { ...selectedValues };
+  //   // getOnFacesCount();
+  //   getOnFacesCount();
+  //   vectorMakeUp();
+  //   const levelTotalArray = calculateLevelTotals();
+  //   console.log(facesVec);
+  //   let counter = 0;
+  //   // Object.keys(levelTotalArray).forEach((key) => {
+  //   //   const useLevel = isLevelOnAndSegmented(key);
+  //   //   console.log('useLevel ', useLevel);
+  //   //   if (useLevel) {
+  //   //     counter += 1;
+  //   //   }
+  //   // });
+  //   Object.keys(levelQuantities).forEach((key) => {
+  //     if (levelQuantities[key] !== 0 && segmentedLevel(key)) {
+  //       console.log('hello');
+  //       counter += 1;
+  //     }
+  //   });
+  //   console.log('Counter: ', counter);
+  //   Object.keys(updatedQuantities).forEach((key) => {
+  //     // keyLevel = getOnContacts[level[key]]
+  //     if (face[key] === 'right' && levelQuantities[level[key]] !== 0) {
+  //       // console.log('length ', getOnContacts(level[key]).length);
+  //       // if (getOnContacts(level[key]).length > 0) {
+  //       // console.log('facesVec ', counter);
+  //       updatedSelectedValues[key] = 'center';
+  //       updatedQuantities[key] = (3 * levelQuantities[level[key]]) / 4;
+  //       // }
+  //     } else if (face[key] === 'center' && levelQuantities[level[key]] !== 0) {
+  //       updatedSelectedValues[key] = 'center';
+  //       updatedQuantities[key] = levelQuantities[level[key]] / 4;
+  //     } else {
+  //       updatedSelectedValues[key] = 'left';
+  //       updatedQuantities[key] = 0;
+  //     }
+  //   });
+  //   setSelectedValues(updatedSelectedValues);
+  //   setQuantities(updatedQuantities);
+  //   // roundToHundred();
+  //   // calculateQuantitiesWithDistribution();
+  // };
 
   const handleSplitEvenButton = () => {
     const updatedQuantities = { ...quantities };
@@ -5589,6 +5946,259 @@ function BostonCartesiaTest(props, ref) {
     // roundToHundred();
     // calculateQuantitiesWithDistribution();
   };
+
+  // const handleForwardButton = () => {
+  //   const updatedQuantities = { ...quantities };
+  //   const updatedSelectedValues = { ...selectedValues };
+  //   // getOnFacesCount();
+  //   getOnFacesCount();
+  //   vectorMakeUp();
+  //   const levelTotalArray = calculateLevelTotals();
+  //   console.log(facesVec);
+  //   let counter = 0;
+  //   // Object.keys(levelTotalArray).forEach((key) => {
+  //   //   const useLevel = isLevelOnAndSegmented(key);
+  //   //   console.log('useLevel ', useLevel);
+  //   //   if (useLevel) {
+  //   //     counter += 1;
+  //   //   }
+  //   // });
+  //   Object.keys(levelQuantities).forEach((key) => {
+  //     if (levelQuantities[key] !== 0 && segmentedLevel(key)) {
+  //       console.log('hello');
+  //       counter += 1;
+  //     }
+  //   });
+  //   console.log('Counter: ', counter);
+  //   Object.keys(updatedQuantities).forEach((key) => {
+  //     // keyLevel = getOnContacts[level[key]]
+  //     const levelOnContacts = getOnContacts(level[key]);
+  //     if (face[key] === 'center' && levelQuantities[level[key]] !== 0) {
+  //       // console.log('length ', getOnContacts(level[key]).length);
+  //       // if (getOnContacts(level[key]).length > 0) {
+  //       // console.log('facesVec ', counter);
+  //       // updatedSelectedValues[key] = 'center';
+  //       updatedSelectedValues[key] = selectedValues[levelOnContacts[0]]; // Need to fix this
+  //       updatedQuantities[key] = levelQuantities[level[key]];
+  //       // }
+  //     } else {
+  //       updatedSelectedValues[key] = 'left';
+  //       updatedQuantities[key] = 0;
+  //     }
+  //   });
+  //   setSelectedValues(updatedSelectedValues);
+  //   setQuantities(updatedQuantities);
+  //   // roundToHundred();
+  //   // calculateQuantitiesWithDistribution();
+  // };
+
+  // const handleBackButton = () => {
+  //   const updatedQuantities = { ...quantities };
+  //   const updatedSelectedValues = { ...selectedValues };
+  //   // getOnFacesCount();
+  //   getOnFacesCount();
+  //   vectorMakeUp();
+  //   const levelTotalArray = calculateLevelTotals();
+  //   console.log(facesVec);
+  //   let counter = 0;
+  //   // Object.keys(levelTotalArray).forEach((key) => {
+  //   //   const useLevel = isLevelOnAndSegmented(key);
+  //   //   console.log('useLevel ', useLevel);
+  //   //   if (useLevel) {
+  //   //     counter += 1;
+  //   //   }
+  //   // });
+  //   Object.keys(levelQuantities).forEach((key) => {
+  //     if (levelQuantities[key] !== 0 && segmentedLevel(key)) {
+  //       console.log('hello');
+  //       counter += 1;
+  //     }
+  //   });
+  //   console.log('Counter: ', counter);
+  //   Object.keys(updatedQuantities).forEach((key) => {
+  //     // keyLevel = getOnContacts[level[key]]
+  //     const levelOnContacts = getOnContacts(level[key]);
+  //     if (
+  //       (face[key] === 'left' || face[key] === 'right') &&
+  //       levelQuantities[level[key]] !== 0
+  //     ) {
+  //       // console.log('length ', getOnContacts(level[key]).length);
+  //       // if (getOnContacts(level[key]).length > 0) {
+  //       // console.log('facesVec ', counter);
+  //       // updatedSelectedValues[key] = 'center';
+  //       updatedSelectedValues[key] = selectedValues[levelOnContacts[0]]; // Need to fix this
+  //       updatedQuantities[key] = levelQuantities[level[key]] / 2;
+  //       // }
+  //     } else {
+  //       updatedSelectedValues[key] = 'left';
+  //       updatedQuantities[key] = 0;
+  //     }
+  //   });
+  //   setSelectedValues(updatedSelectedValues);
+  //   setQuantities(updatedQuantities);
+  //   // roundToHundred();
+  //   // calculateQuantitiesWithDistribution();
+  // };
+
+  // const handleLeftButton = () => {
+  //   const updatedQuantities = { ...quantities };
+  //   const updatedSelectedValues = { ...selectedValues };
+  //   // getOnFacesCount();
+  //   getOnFacesCount();
+  //   vectorMakeUp();
+  //   const levelTotalArray = calculateLevelTotals();
+  //   console.log(facesVec);
+  //   let counter = 0;
+  //   // Object.keys(levelTotalArray).forEach((key) => {
+  //   //   const useLevel = isLevelOnAndSegmented(key);
+  //   //   console.log('useLevel ', useLevel);
+  //   //   if (useLevel) {
+  //   //     counter += 1;
+  //   //   }
+  //   // });
+  //   Object.keys(levelQuantities).forEach((key) => {
+  //     if (levelQuantities[key] !== 0 && segmentedLevel(key)) {
+  //       console.log('hello');
+  //       counter += 1;
+  //     }
+  //   });
+  //   console.log('Counter: ', counter);
+  //   Object.keys(updatedQuantities).forEach((key) => {
+  //     // keyLevel = getOnContacts[level[key]]
+  //     const levelOnContacts = getOnContacts(level[key]);
+  //     if (face[key] === 'left' && levelQuantities[level[key]] !== 0) {
+  //       // console.log('length ', getOnContacts(level[key]).length);
+  //       // if (getOnContacts(level[key]).length > 0) {
+  //       // console.log('facesVec ', counter);
+  //       updatedSelectedValues[key] = selectedValues[levelOnContacts[0]]; // Need to fix this
+  //       // updatedSelectedValues[key] = 'center';
+  //       updatedQuantities[key] = (3 * levelQuantities[level[key]]) / 4;
+  //       // }
+  //     } else if (face[key] === 'center' && levelQuantities[level[key]] !== 0) {
+  //       updatedSelectedValues[key] = selectedValues[levelOnContacts[0]]; // Need to fix this
+  //       // updatedSelectedValues[key] = 'center';
+  //       updatedQuantities[key] = levelQuantities[level[key]] / 4;
+  //     } else {
+  //       updatedSelectedValues[key] = 'left';
+  //       updatedQuantities[key] = 0;
+  //     }
+  //   });
+  //   setSelectedValues(updatedSelectedValues);
+  //   setQuantities(updatedQuantities);
+  //   // roundToHundred();
+  //   // calculateQuantitiesWithDistribution();
+  // };
+
+  // const handleRightButton = () => {
+  //   const updatedQuantities = { ...quantities };
+  //   const updatedSelectedValues = { ...selectedValues };
+  //   // getOnFacesCount();
+  //   getOnFacesCount();
+  //   vectorMakeUp();
+  //   const levelTotalArray = calculateLevelTotals();
+  //   console.log(facesVec);
+  //   let counter = 0;
+  //   // Object.keys(levelTotalArray).forEach((key) => {
+  //   //   const useLevel = isLevelOnAndSegmented(key);
+  //   //   console.log('useLevel ', useLevel);
+  //   //   if (useLevel) {
+  //   //     counter += 1;
+  //   //   }
+  //   // });
+  //   Object.keys(levelQuantities).forEach((key) => {
+  //     if (levelQuantities[key] !== 0 && segmentedLevel(key)) {
+  //       console.log('hello');
+  //       counter += 1;
+  //     }
+  //   });
+  //   console.log('Counter: ', counter);
+  //   Object.keys(updatedQuantities).forEach((key) => {
+  //     // keyLevel = getOnContacts[level[key]]
+  //     const levelOnContacts = getOnContacts(level[key]);
+  //     if (face[key] === 'right' && levelQuantities[level[key]] !== 0) {
+  //       // console.log('length ', getOnContacts(level[key]).length);
+  //       // if (getOnContacts(level[key]).length > 0) {
+  //       // console.log('facesVec ', counter);
+  //       updatedSelectedValues[key] = selectedValues[levelOnContacts[0]]; // Need to fix this
+  //       // updatedSelectedValues[key] = 'center';
+  //       updatedQuantities[key] = (3 * levelQuantities[level[key]]) / 4;
+  //       // }
+  //     } else if (face[key] === 'center' && levelQuantities[level[key]] !== 0) {
+  //       updatedSelectedValues[key] = selectedValues[levelOnContacts[0]]; // Need to fix this
+  //       // updatedSelectedValues[key] = 'center';
+  //       updatedQuantities[key] = levelQuantities[level[key]] / 4;
+  //     } else {
+  //       updatedSelectedValues[key] = 'left';
+  //       updatedQuantities[key] = 0;
+  //     }
+  //   });
+  //   setSelectedValues(updatedSelectedValues);
+  //   setQuantities(updatedQuantities);
+  //   // roundToHundred();
+  //   // calculateQuantitiesWithDistribution();
+  // };
+
+  // const handleSplitEvenButton = () => {
+  //   const updatedQuantities = { ...quantities };
+  //   const updatedSelectedValues = { ...selectedValues };
+  //   // getOnFacesCount();
+  //   getOnFacesCount();
+  //   vectorMakeUp();
+  //   const levelTotalArray = calculateLevelTotals();
+  //   console.log(facesVec);
+  //   let counter = 0;
+  //   // Object.keys(levelTotalArray).forEach((key) => {
+  //   //   const useLevel = isLevelOnAndSegmented(key);
+  //   //   console.log('useLevel ', useLevel);
+  //   //   if (useLevel) {
+  //   //     counter += 1;
+  //   //   }
+  //   // });
+  //   Object.keys(levelQuantities).forEach((key) => {
+  //     if (levelQuantities[key] !== 0 && segmentedLevel(key)) {
+  //       console.log('hello:');
+  //       counter += 1;
+  //     }
+  //   });
+  //   console.log('Counter: ', counter);
+  //   Object.keys(updatedQuantities).forEach((key) => {
+  //     // keyLevel = getOnContacts[level[key]]
+  //     // if (face[key] !== 'all' || face[key] !== '' && levelQuantities[level[key]] !== 0) {
+  //     //   // console.log('length ', getOnContacts(level[key]).length);
+  //     //   // if (getOnContacts(level[key]).length > 0) {
+  //     //   // console.log('facesVec ', counter);
+  //     //   updatedSelectedValues[key] = 'center'; // Need to fix this
+  //     //   updatedQuantities[key] = levelQuantities[level[key]] / 3;
+  //     //   // }
+  //     // }
+  //     if (levelQuantities[level[key]] !== 0 && level[key] !== 0) {
+  //       const levelOnContacts = getOnContacts(level[key]);
+  //       console.log('levelQuantities', levelQuantities);
+  //       // console.log('length ', getOnContacts(level[key]).length);
+  //       // if (getOnContacts(level[key]).length > 0) {
+  //       // console.log('facesVec ', counter);
+  //       if (face[key] !== 'all' && key !== 0) {
+  //         updatedSelectedValues[key] = selectedValues[levelOnContacts[0]]; // Need to fix this
+  //         updatedQuantities[key] = levelQuantities[level[key]] / 3;
+  //       }
+  //       // }
+  //     }
+  //     // else if (face[key] === 'center' && levelQuantities[level[key]] !== 0) {
+  //     //   updatedSelectedValues[key] = 'center';
+  //     //   updatedQuantities[key] = levelQuantities[level[key]] / 4;
+  //     // }
+  //     // else {
+  //     //   updatedSelectedValues[key] = 'left';
+  //     //   updatedQuantities[key] = 0;
+  //     // }
+  //   });
+
+  //   setSelectedValues(updatedSelectedValues);
+  //   setQuantities(updatedQuantities);
+  //   // checkQuantitiesAndValues();
+  //   // roundToHundred();
+  //   // calculateQuantitiesWithDistribution();
+  // };
 
   const [assistedModeEnabled, setAssistedModeEnabled] = useState(false);
 
@@ -5900,7 +6510,7 @@ function BostonCartesiaTest(props, ref) {
 
   const handlePercAmpChangeClockwise = () => {
     if (percAmpToggle === 'left') {
-      newHandleClockwiseButton();
+      handleClockwiseButton();
     } else if (percAmpToggle === 'right') {
       handleClockwiseButtonAmplitude();
     }
@@ -5956,17 +6566,31 @@ function BostonCartesiaTest(props, ref) {
     return selectedValues;
   };
 
+  const getStateAmplitude = () => {
+    return totalAmplitude;
+  };
+
+  const getStateStimulationParameters = () => {
+    return parameters;
+  };
+
+  const getStateSessionTitle = () => {
+    return sessionTitle;
+  };
+
+  const getStateVisModel = () => {
+    return visModel;
+  };
+
   useImperativeHandle(ref, () => ({
     getCartesiaData,
     getStateQuantities,
     getStateSelectedValues,
+    getStateAmplitude,
+    getStateStimulationParameters,
+    getStateSessionTitle,
+    getStateVisModel,
   }));
-
-  const [parameters, setParameters] = useState({
-    parameter1: '60',
-    parameter2: '130',
-    parameter3: '0',
-  });
 
   const handleParameterChange = (parameter) => (e) => {
     const newValue = e.target.value;
@@ -6125,6 +6749,27 @@ function BostonCartesiaTest(props, ref) {
     { name: 'Assisted', value: '2' },
   ];
 
+  const handleVisModelChange = (event) => {
+    setVisModel(event.target.value);
+  };
+
+  const handleTitleChange = (event) => {
+    setSessionTitle(event.target.value);
+  };
+
+  const tooltipspliteven = (
+    <Tooltip id="tooltip">
+      <strong>Holy guacamole!</strong> Evenly share current between active
+      contacts.
+    </Tooltip>
+  );
+
+  const tooltiprefactor = (
+    <Tooltip id="tooltip">
+      <strong>Holy guacamole!</strong> Make sure contacts sum to 100.
+    </Tooltip>
+  );
+
   useEffect(() => {
     if (props.IPG === 'Abbott') {
       // const newQuantities = { ...quantities };
@@ -6147,6 +6792,27 @@ function BostonCartesiaTest(props, ref) {
   return (
     <div className="container">
       <div className="button-container">
+        <Form.Group className="mb-3">
+          <Form.Control
+            type="email"
+            placeholder="Enter session ID"
+            value={sessionTitle}
+            onChange={handleTitleChange}
+          />
+        </Form.Group>
+        <Form.Select
+          aria-label="Default select example"
+          value={visModel}
+          onChange={handleVisModelChange}
+        >
+          <option>Choose a model</option>
+          <option value="1">Dembek 2017</option>
+          <option value="2">FastField (Baniasadi 2020)</option>
+          <option value="3">SimBio/FieldTrip (see Horn 2017)</option>
+          <option value="4">Kuncel 2008</option>
+          <option value="5">Maedler 2012</option>
+          <option value="6">OSS-DBS (Butenko 2020)</option>
+        </Form.Select>
         <div />
         <div className="PercentageAmplitudeToggle">
           {props.IPG === 'Boston' && (
@@ -6170,28 +6836,7 @@ function BostonCartesiaTest(props, ref) {
         </div>
         <div />
         <div className="button-container">
-          <label className="label">Pulsewidth (us):</label>
-          <input
-            className="new-quantity-input"
-            type="number"
-            name="quantity"
-            pattern="[0-9]+"
-            value={parameters.parameter1}
-            onChange={handleParameterChange('parameter1')}
-          />
-          <label className="label">Frequency (Hz):</label>
-          <input
-            className="new-quantity-input"
-            type="number"
-            name="quantity"
-            pattern="[0-9]+"
-            value={parameters.parameter2}
-            onChange={handleParameterChange('parameter2')}
-          />
-          {/* <PercentageAmplitudeToggle /> */}
-        </div>
-        <div className="button-container">
-          <label className="label">Total Amplitude</label>
+          <label className="puls-label">Total Amplitude</label>
           <input
             className="new-quantity-input"
             type="number"
@@ -6201,17 +6846,27 @@ function BostonCartesiaTest(props, ref) {
             onChange={handleTotalAmplitudeChange}
           />
         </div>
-        <div />
+        <div className="button-container">
+          <label className="puls-label">Pulsewidth (us):</label>
+          <input
+            className="new-quantity-input"
+            type="number"
+            name="quantity"
+            pattern="[0-9]+"
+            value={parameters.parameter1}
+            onChange={handleParameterChange('parameter1')}
+          />
+          <label className="puls-label">Frequency (Hz):</label>
+          <input
+            className="new-quantity-input"
+            type="number"
+            name="quantity"
+            pattern="[0-9]+"
+            value={parameters.parameter2}
+            onChange={handleParameterChange('parameter2')}
+          />
+        </div>
         <div>
-          {/* <AssistedToggle
-            value={assistedToggle}
-            onChange={(value) => handleAssistedToggleChange(value)}
-          /> */}
-          {/* <ButtonGroup aria-label="Basic example" className="mb-2">
-            <Button variant="secondary">Left</Button>
-            <Button variant="secondary">Middle</Button>
-            <Button variant="secondary">Right</Button>
-          </ButtonGroup> */}
           <ButtonGroup>
             {radios.map((radio, idx) => (
               <ToggleButton
@@ -6424,35 +7079,6 @@ function BostonCartesiaTest(props, ref) {
         >
           {calculateQuantities ? 'On' : 'Off'}
         </button> */}
-        <div className="button-container">
-          <h2>Contact Share</h2>
-          <button
-            onClick={calculateQuantitiesWithDistribution}
-            className="button"
-          >
-            Split Even
-          </button>
-          <button onClick={roundToHundred} className="button">
-            Refactor
-          </button>
-          <button onClick={handleClearButton} className="button">
-            Clear
-          </button>
-          <button onClick={handleCheck} className="button">
-            Check
-          </button>
-          {/* <StaticExample
-            show={show}
-            setShow={setShow}
-            handleClose={handleClose}
-          /> */}
-          {/* <button
-            onClick={assist}
-            className={isAssisted ? 'isAssistedButton' : 'button'}
-          >
-            Assisted
-          </button> */}
-        </div>
         {handleIPG()}
         {(stimController === 0 || stimController === 3) && (
           <div className="button-container">
@@ -6484,11 +7110,93 @@ function BostonCartesiaTest(props, ref) {
           </div>
         )}
         <div className="steering-container">
-          <SplitEvenButton onClick={handleSplitEvenButton} />
-          <ForwardButton onClick={handleForwardButton} />
+          {/* <OverlayTrigger id={tooltipspliteven}>
+            <SplitEvenButton onClick={handleSplitEvenButton} />
+          </OverlayTrigger> */}
+          <SplitEvenButton
+            onClick={() =>
+              handleSplitEvenButton(
+                level,
+                levelQuantities,
+                vectorLevel,
+                vecCoords,
+                face,
+                vectorDirection,
+                quantities,
+                selectedValues,
+                facesVec,
+                // segmentedLevel,
+                // level,
+                // levelQuantities,
+                // face,
+                getOnContacts,
+                setSelectedValues,
+                setQuantities,
+              )
+            }
+          />
+          <ForwardButton
+            onClick={() =>
+              handleForwardButton(
+                level,
+                levelQuantities,
+                vectorLevel,
+                vecCoords,
+                face,
+                vectorDirection,
+                quantities,
+                selectedValues,
+                facesVec,
+                // segmentedLevel,
+                // level,
+                // levelQuantities,
+                // face,
+                getOnContacts,
+                setSelectedValues,
+                setQuantities,
+              )
+            }
+          />
           <BackButton onClick={handleBackButton} />
-          <LeftButton onClick={handleLeftButton} />
-          <RightButton onClick={handleRightButton} />
+          <LeftButton onClick={handleRightButton} />
+          <RightButton onClick={handleLeftButton} />
+        </div>
+        <div className="button-container-2">
+          {/* <h2>Contact Share</h2> */}
+          {/* <OverlayTrigger placement="left" overlay={tooltipspliteven}>
+            <button
+              onClick={calculateQuantitiesWithDistribution}
+              className="button"
+            >
+              Split Even
+            </button>
+          </OverlayTrigger>
+
+          <OverlayTrigger placement="left" overlay={tooltiprefactor}>
+            <button onClick={roundToHundred} className="button">
+              Refactor
+            </button>
+          </OverlayTrigger>
+          <button onClick={handleClearButton} className="button">
+            Clear
+          </button> */}
+          <OverlayTrigger placement="left" overlay={tooltipspliteven}>
+            <button
+              onClick={calculateQuantitiesWithDistribution}
+              className="button"
+            >
+              Split Even
+            </button>
+          </OverlayTrigger>
+
+          <OverlayTrigger placement="left" overlay={tooltiprefactor}>
+            <button onClick={roundToHundred} className="button">
+              Refactor
+            </button>
+          </OverlayTrigger>
+          <button onClick={handleClearButton} className="button">
+            Clear
+          </button>
         </div>
       </div>
     </div>

@@ -104,6 +104,13 @@ select {
   gap: 10px;
 }
 
+.export-button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
 .export-button {
   background-color: #007BFF;
   color: #fff;
@@ -116,4 +123,9 @@ select {
 
 .export-button:hover {
   background-color: #0056b3;
+}
+
+.tabs-container {
+  /* display: flex; */
+  justify-content: center;
 }
