@@ -71,6 +71,34 @@ ipcMain.on('ipc-example', async (event, arg) => {
   event.reply('ipc-example', msgTemplate(`pong: ${f}`));
 });
 
+ipcMain.on('import-file', async (event, arg) => {
+  const msgTemplate = (pingPong: string) => `${pingPong}`;
+  const fs = require('fs');
+  const currentDirectory = app.getAppPath();
+  const directories = currentDirectory.split('/');
+
+  // Initialize a variable to store the result
+  let result = '';
+
+  // Loop through the directories
+  for (const dir of directories) {
+    // Append each directory to the result
+    result += `${dir}/`;
+
+    // If the directory contains "lead-dbs-programmer", stop the loop
+    if (dir === 'lead-dbs-programmer') {
+      break;
+    }
+  }
+
+  const fileName = 'inputData.json';
+  const filePath = path.join(result, fileName);
+  console.log(filePath);
+  const f = fs.readFileSync(filePath);
+  const jsonData = JSON.parse(f);
+  event.reply('import-file', jsonData);
+});
+
 ipcMain.on('open-file', (event, arg) => {
   // const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   // console.log(msgTemplate(arg));

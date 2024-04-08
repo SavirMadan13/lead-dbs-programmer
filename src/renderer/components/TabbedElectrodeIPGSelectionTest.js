@@ -459,7 +459,7 @@ function TabbedElectrodeIPGSelection({
         data.S[dynamicKey2].frequency = parseFloat(
           allStimulationParameters[j].parameter2,
         );
-        data.S[dynamicKey2].pulsewidth = parseFloat(
+        data.S[dynamicKey2].pulseWidth = parseFloat(
           allStimulationParameters[j].parameter1,
         );
         data.S[dynamicKey2].va = 2;
@@ -484,7 +484,7 @@ function TabbedElectrodeIPGSelection({
         };
         data.S[dynamicKey2].amp = 0;
         data.S[dynamicKey2].frequency = 0;
-        data.S[dynamicKey2].pulsewidth = 0;
+        data.S[dynamicKey2].pulseWidth = 0;
         data.S[dynamicKey2].va = 2;
       }
     }
@@ -519,7 +519,7 @@ function TabbedElectrodeIPGSelection({
         data.S[dynamicKey2].frequency = parseFloat(
           allStimulationParameters[j + 4].parameter2,
         );
-        data.S[dynamicKey2].pulsewidth = parseFloat(
+        data.S[dynamicKey2].pulseWidth = parseFloat(
           allStimulationParameters[j + 4].parameter1,
         );
         data.S[dynamicKey2].va = 2;
@@ -543,7 +543,7 @@ function TabbedElectrodeIPGSelection({
         };
         data.S[dynamicKey2].amp = 0;
         data.S[dynamicKey2].frequency = 0;
-        data.S[dynamicKey2].pulsewidth = 0;
+        data.S[dynamicKey2].pulseWidth = 0;
         data.S[dynamicKey2].va = 2;
       }
     }
@@ -876,7 +876,7 @@ function TabbedElectrodeIPGSelection({
         data.S[dynamicKey2].frequency = parseFloat(
           allStimulationParameters[j].parameter2,
         );
-        data.S[dynamicKey2].pulsewidth = parseFloat(
+        data.S[dynamicKey2].pulseWidth = parseFloat(
           allStimulationParameters[j].parameter1,
         );
         data.S[dynamicKey2].va = 2;
@@ -901,7 +901,7 @@ function TabbedElectrodeIPGSelection({
         };
         data.S[dynamicKey2].amp = 0;
         data.S[dynamicKey2].frequency = 0;
-        data.S[dynamicKey2].pulsewidth = 0;
+        data.S[dynamicKey2].pulseWidth = 0;
         data.S[dynamicKey2].va = 2;
       }
     }
@@ -936,7 +936,7 @@ function TabbedElectrodeIPGSelection({
         data.S[dynamicKey2].frequency = parseFloat(
           allStimulationParameters[j + 4].parameter2,
         );
-        data.S[dynamicKey2].pulsewidth = parseFloat(
+        data.S[dynamicKey2].pulseWidth = parseFloat(
           allStimulationParameters[j + 4].parameter1,
         );
         data.S[dynamicKey2].va = 2;
@@ -960,7 +960,7 @@ function TabbedElectrodeIPGSelection({
         };
         data.S[dynamicKey2].amp = 0;
         data.S[dynamicKey2].frequency = 0;
-        data.S[dynamicKey2].pulsewidth = 0;
+        data.S[dynamicKey2].pulseWidth = 0;
         data.S[dynamicKey2].va = 2;
       }
     }
@@ -993,6 +993,20 @@ function TabbedElectrodeIPGSelection({
     data.S.sources = sourcesArray;
     data.S.active = [leftLength, rightLength];
     // data.S.activecontacts = activeContacts(allSelectedValues[1]);
+
+    for (let i = 1; i < 9; i++) {
+      const zerosArr = [];
+      for (let j = 1; j < loopSize; j++) {
+        zerosArr.push(0);
+      }
+      if (data.S.activecontacts[i]) {
+        if (data.S.activecontacts[i] === null) {
+          data.S.activecontacts[i] = zerosArr;
+        }
+      } else {
+        data.S.activecontacts[i] = zerosArr;
+      }
+    }
 
     let exportVisModel = '';
     console.log(visModel[1]);

@@ -1,5 +1,6 @@
 // import { useState } from 'react';
 import React, { useState, useRef, useEffect } from 'react';
+import BostonCartesiaTest from './electrode_models/BostonCartesiaTest';
 
 function StimulationSettings({
   rightElectrode,
@@ -20,6 +21,16 @@ function StimulationSettings({
   // const [rightElectrode, setRightElectrode] = useState('');
   let importData = [];
 
+  const handleImportedElectrode = (importedElectrode) => {
+    if (importedElectrode === 'Boston Scientific Vercise Directed') {
+      setLeftElectrode('BostonCartesiaTest');
+      setRightElectrode('BostonCartesiaTest');
+      setIPG('Boston');
+    }
+  };
+
+  // window.electron.ipcRenderer.sendMessage('import-file', ['ping']);
+
   window.electron.ipcRenderer.once('ipc-example', (arg) => {
     // eslint-disable-next-line no-console
     importData = arg;
@@ -31,6 +42,14 @@ function StimulationSettings({
   window.electron.ipcRenderer.on('open-file', (event, data) => {
     // Handle received data
     console.log(data);
+  });
+  window.electron.ipcRenderer.once('import-file', (arg) => {
+    importData = arg;
+    console.log(importData);
+    const numElectrodes = 'numElectrodes';
+    console.log(importData['numElectrodes']);
+    const selectedElectrode = importData.electrodeModel;
+    handleImportedElectrode(selectedElectrode);
   });
 
   const handleLeftElectrodeChange = (e) => {
