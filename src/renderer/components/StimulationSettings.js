@@ -55,11 +55,11 @@ function StimulationSettings({
   const handleLeftElectrodeChange = (e) => {
     const selectedLeftElectrode = e.target.value;
     if (rightElectrode === '') {
-      if (selectedLeftElectrode.includes('Boston')) {
+      if (selectedLeftElectrode.includes('Boston') || selectedLeftElectrode.includes('boston')) {
         setIPG('Boston');
-      } else if (selectedLeftElectrode.includes('Medtronic')) {
+      } else if (selectedLeftElectrode.includes('Medtronic') || selectedLeftElectrode.includes('medtronic')) {
         setIPG('Medtronic_Percept');
-      } else if (selectedLeftElectrode.includes('Abbott')) {
+      } else if (selectedLeftElectrode.includes('Abbott') || selectedLeftElectrode.includes('abbott')) {
         setIPG('Abbott');
       }
     }
@@ -126,6 +126,12 @@ function StimulationSettings({
     setRightElectrode(jsonData.S.elmodel[1]);
     const elecIPG = jsonData.S.ipg;
     setIPG(elecIPG);
+    const amplitudeArray = [];
+    amplitudeArray.push(jsonData.S.amplitude.leftElectrode);
+    amplitudeArray.push(jsonData.S.amplitude.rightElectrode);
+    setAllTotalAmplitudes(amplitudeArray);
+    console.log('AmpllitudueArray: ', amplitudeArray);
+    console.log(allTotalAmplitudes);
 
     for (let j = 1; j < 5; j++) {
       let dynamicKey2 = `Ls${j}`;
@@ -243,6 +249,112 @@ function StimulationSettings({
   return (
     <div className="StimulationParameters">
       {/* <button onClick={handleMatlabConnectivity}>Matlab Test</button> */}
+      {/* <button
+        className="import-button"
+        onClick={() => fileInputRef.current.click()}
+        // onClick={gatherImportedData(importData)}
+
+      >
+        Import Data
+      </button>
+      <input
+        ref={fileInputRef}
+        className="file-input"
+        type="file"
+        accept=".json"
+        onChange={handleFileChange}
+        style={{ display: 'none' }} // Hide the input element
+      /> */}
+      <div></div>
+      <h2>Choose Left Electrode</h2>
+      <select
+        value={leftElectrode}
+        onChange={(e) => handleLeftElectrodeChange(e)}
+      >
+        <option value="">None</option>
+        {/* <option value="BostonCartesia">Boston Scientific Cartesia</option> */}
+        {/* <option value="Medtronic3389">Medtronic 3389</option>
+        <option value="Medtronic3387">Medtronic 3387</option>
+        <option value="Medtronic3391">Medtronic 3391</option>
+        <option value="MedtronicB33005">Medtronic B33005</option>
+        <option value="BostonScientificVercise">
+          Boston Scientific Vercise
+        </option>
+        <option value="BostonCartesiaTest">
+          Boston Scientific Vercise Directed
+        </option>
+        <option value="NewBostonCartesiaTest">
+          Boston Scientific Vercise Directed - Alternate
+        </option>
+        <option value="BostonScientificCartesiaHX">Boston Scientific Vercise Cartesia HX</option>
+        <option value="BostonScientificCartesiaX">Boston Scientific Vercise Cartesia X</option>
+        <option value="AbbottActiveTip2">Abbott ActiveTip (2mm)</option>
+        <option value="AbbottActiveTip3">Abbott ActiveTip (3mm)</option>
+        <option value="AbbottDirected6172">Abbott Directed 6172</option>
+        <option value="AbbottDirected6173">Abbott Directed 6173</option> */}
+        <option value="abbott_activetip_2mm">Abbott ActiveTip (2mm)</option>
+        <option value="abbott_activetip_3mm">Abbott ActiveTip (3mm)</option>
+        <option value="abbott_directed_6172">Abbott Directed 6172</option>
+        <option value="abbott_directed_6173">Abbott Directed 6173</option>
+        <option value="boston_vercise">Boston Scientific Vercise</option>
+        <option value="boston_vercise_directed">Boston Scientific Vercise Directed</option>
+        <option value="medtronic_3387">Medtronic 3387</option>
+        <option value="medtronic_3389">Medtronic 3389</option>
+        <option value="medtronic_3391">Medtronic 3391</option>
+        <option value="medtronic_b33005">Medtronic B33005</option>
+        <option value="medtronic_b33015">Medtronic B33015</option>
+        {/* <option value="AbbottDirectedTest">Abbott Directed</option> */}
+      </select>
+      <div></div>
+      <h2>Choose Right Electrode</h2>
+      <select
+        value={rightElectrode}
+        onChange={(e) => handleRightElectrodeChange(e)}
+      >
+        <option value="">None</option>
+        {/* <option value="Medtronic3389">Medtronic 3389</option>
+        <option value="Medtronic3387">Medtronic 3387</option>
+        <option value="Medtronic3391">Medtronic 3391</option>
+        <option value="MedtronicB33005">Medtronic B33005</option>
+        <option value="BostonScientificVercise">
+          Boston Scientific Vercise
+        </option>
+        <option value="BostonCartesiaTest">
+          Boston Scientific Vercise Directed
+        </option>
+        <option value="NewBostonCartesiaTest">
+          Boston Scientific Vercise Directed - Alternate
+        </option>
+        <option value="BostonScientificCartesiaHX">Boston Scientific Vercise Cartesia HX</option>
+        <option value="BostonScientificCartesiaX">Boston Scientific Vercise Cartesia X</option>
+        <option value="AbbottActiveTip2">Abbott ActiveTip (2mm)</option>
+        <option value="AbbottActiveTip3">Abbott ActiveTip (3mm)</option>
+        <option value="AbbottDirected6172">Abbott Directed 6172</option>
+        <option value="AbbottDirected6173">Abbott Directed 6173</option> */}
+        <option value="abbott_activetip_2mm">Abbott ActiveTip (2mm)</option>
+        <option value="abbott_activetip_3mm">Abbott ActiveTip (3mm)</option>
+        <option value="abbott_directed_6172">Abbott Directed 6172</option>
+        <option value="abbott_directed_6173">Abbott Directed 6173</option>
+        <option value="boston_vercise">Boston Scientific Vercise</option>
+        <option value="boston_vercise_directed">Boston Scientific Vercise Directed</option>
+        <option value="medtronic_3387">Medtronic 3387</option>
+        <option value="medtronic_3389">Medtronic 3389</option>
+        <option value="medtronic_3391">Medtronic 3391</option>
+        <option value="medtronic_b33005">Medtronic B33005</option>
+        <option value="medtronic_b33015">Medtronic B33015</option>
+      </select>
+      <div></div>
+      <h2>Choose IPG</h2>
+      <select value={IPG} onChange={(e) => handleIPGChange(e)}>
+        <option value="">None</option>
+        <option value="Abbott">Abbott (Infinity, Brio, Libra)</option>
+        <option value="Boston">
+          Boston Scientific (Vercise, Genus, Gevia)
+        </option>
+        <option value="Medtronic_Activa">Medtronic Activa</option>
+        <option value="Medtronic_Percept">Medtronic Percept</option>
+      </select>
+      <div></div>
       <button
         className="import-button"
         onClick={() => fileInputRef.current.click()}
@@ -259,75 +371,6 @@ function StimulationSettings({
         onChange={handleFileChange}
         style={{ display: 'none' }} // Hide the input element
       />
-      <div></div>
-      <h2>Choose Left Electrode</h2>
-      <select
-        value={leftElectrode}
-        onChange={(e) => handleLeftElectrodeChange(e)}
-      >
-        <option value="">None</option>
-        {/* <option value="BostonCartesia">Boston Scientific Cartesia</option> */}
-        <option value="Medtronic3389">Medtronic 3389</option>
-        <option value="Medtronic3387">Medtronic 3387</option>
-        <option value="Medtronic3391">Medtronic 3391</option>
-        <option value="MedtronicB33005">Medtronic B33005</option>
-        <option value="BostonScientificVercise">
-          Boston Scientific Vercise
-        </option>
-        <option value="BostonCartesiaTest">
-          Boston Scientific Vercise Directed
-        </option>
-        <option value="NewBostonCartesiaTest">
-          Boston Scientific Vercise Directed - Alternate
-        </option>
-        <option value="BostonScientificCartesiaHX">Boston Scientific Vercise Cartesia HX</option>
-        <option value="BostonScientificCartesiaX">Boston Scientific Vercise Cartesia X</option>
-        {/* <option value="Boston ScientificCartesiaX">Boston Scientific Vercise Cartesia X</option> */}
-        <option value="AbbottActiveTip2">Abbott ActiveTip (2mm)</option>
-        <option value="AbbottActiveTip3">Abbott ActiveTip (3mm)</option>
-        <option value="AbbottDirected6172">Abbott Directed 6172</option>
-        <option value="AbbottDirected6173">Abbott Directed 6173</option>
-        {/* <option value="AbbottDirectedTest">Abbott Directed</option> */}
-      </select>
-      <div></div>
-      <h2>Choose Right Electrode</h2>
-      <select
-        value={rightElectrode}
-        onChange={(e) => handleRightElectrodeChange(e)}
-      >
-        <option value="">None</option>
-        <option value="Medtronic3389">Medtronic 3389</option>
-        <option value="Medtronic3387">Medtronic 3387</option>
-        <option value="Medtronic3391">Medtronic 3391</option>
-        <option value="MedtronicB33005">Medtronic B33005</option>
-        <option value="BostonScientificVercise">
-          Boston Scientific Vercise
-        </option>
-        <option value="BostonCartesiaTest">
-          Boston Scientific Vercise Directed
-        </option>
-        <option value="NewBostonCartesiaTest">
-          Boston Scientific Vercise Directed - Alternate
-        </option>
-        <option value="BostonScientificCartesiaHX">Boston Scientific Vercise Cartesia HX</option>
-        <option value="BostonScientificCartesiaX">Boston Scientific Vercise Cartesia X</option>
-        {/* <option value="Boston ScientificCartesiaX">Boston Scientific Vercise Cartesia X</option> */}
-        <option value="AbbottActiveTip2">Abbott ActiveTip (2mm)</option>
-        <option value="AbbottActiveTip3">Abbott ActiveTip (3mm)</option>
-        <option value="AbbottDirected6172">Abbott Directed 6172</option>
-        <option value="AbbottDirected6173">Abbott Directed 6173</option>
-      </select>
-      <div></div>
-      <h2>Choose IPG</h2>
-      <select value={IPG} onChange={(e) => handleIPGChange(e)}>
-        <option value="">None</option>
-        <option value="Abbott">Abbott (Infinity, Brio, Libra)</option>
-        <option value="Boston">
-          Boston Scientific (Vercise, Genus, Gevia)
-        </option>
-        <option value="Medtronic_Activa">Medtronic Activa</option>
-        <option value="Medtronic_Percept">Medtronic Percept</option>
-      </select>
     </div>
   );
 }

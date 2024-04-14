@@ -67,7 +67,7 @@ export default function App() {
   const [allSelectedValues, setAllSelectedValues] = useState({});
   const [allTotalAmplitudes, setAllTotalAmplitudes] = useState({});
   const [allStimulationParameters, setAllStimulationParameters] = useState({});
-  const [visModel, setVisModel] = useState('');
+  const [visModel, setVisModel] = useState('6');
   const [sessionTitle, setSessionTitle] = useState('');
 
   return (

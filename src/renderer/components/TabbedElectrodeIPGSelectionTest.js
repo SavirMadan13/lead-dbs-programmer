@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-pascal-case */
+/* eslint-disable camelcase */
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
@@ -14,6 +16,17 @@ import MedtronicB33005 from './electrode_models/MedtronicB33005';
 import BostonScientificVercise from './electrode_models/BostonScientificVercise';
 import BostonScientificCartesiaHX from './electrode_models/BostonScientificCartesiaHX';
 import BostonScientificCartesiaX from './electrode_models/BostonScientificCartesiaX';
+import Boston_vercise_directed from './electrode_models/currentModels/Boston_vercise_directed';
+import Boston_vercise from './electrode_models/currentModels/Boston_vercise';
+import Medtronic_3389 from './electrode_models/currentModels/Medtronic_3389';
+import Medtronic_3387 from './electrode_models/currentModels/Medtronic_3387';
+import Medtronic_3391 from './electrode_models/currentModels/Medtronic_3391';
+import Medtronic_B33005 from './electrode_models/currentModels/Medtronic_B33005';
+import Medtronic_B33015 from './electrode_models/currentModels/Medtronic_B33015';
+import Abbott_activetip_2mm from './electrode_models/currentModels/Abbott_activetip_2mm';
+import Abbott_activetip_3mm from './electrode_models/currentModels/Abbott_activetip_3mm';
+import Abbott_directed_6172 from './electrode_models/currentModels/Abbott_directed_6172';
+import Abbott_directed_6173 from './electrode_models/currentModels/Abbott_directed_6173';
 
 function TabbedElectrodeIPGSelection({
   IPG,
@@ -289,6 +302,160 @@ function TabbedElectrodeIPGSelection({
         name={key}
         quantities={allQuantities[key]}
         selectedValues={allSelectedValues[key]}
+      />
+    ),
+    boston_vercise_directed: (
+      <Boston_vercise_directed
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel[1]}
+        sessionTitle={sessionTitle[1]}
+      />
+    ),
+    boston_vercise: (
+      <Boston_vercise
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel[1]}
+        sessionTitle={sessionTitle[1]}
+      />
+    ),
+    medtronic_3389: (
+      <Medtronic_3389
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel[1]}
+        sessionTitle={sessionTitle[1]}
+      />
+    ),
+    medtronic_3387: (
+      <Medtronic_3387
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel[1]}
+        sessionTitle={sessionTitle[1]}
+      />
+    ),
+    medtronic_3391: (
+      <Medtronic_3391
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel[1]}
+        sessionTitle={sessionTitle[1]}
+      />
+    ),
+    medtronic_b33005: (
+      <Medtronic_B33005
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel[1]}
+        sessionTitle={sessionTitle[1]}
+      />
+    ),
+    medtronic_b33015: (
+      <Medtronic_B33015
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel[1]}
+        sessionTitle={sessionTitle[1]}
+      />
+    ),
+    abbott_activetip_2mm: (
+      <Abbott_activetip_2mm
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel[1]}
+        sessionTitle={sessionTitle[1]}
+      />
+    ),
+    abbott_activetip_3mm: (
+      <Abbott_activetip_3mm
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel[1]}
+        sessionTitle={sessionTitle[1]}
+      />
+    ),
+    abbott_directed_6172: (
+      <Abbott_directed_6172
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel[1]}
+        sessionTitle={sessionTitle[1]}
+      />
+    ),
+    abbott_directed_6173: (
+      <Abbott_directed_6173
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel[1]}
+        sessionTitle={sessionTitle[1]}
       />
     ),
   };
@@ -1221,12 +1388,12 @@ function TabbedElectrodeIPGSelection({
           onChange={handleFileChange}
           style={{ display: 'none' }} // Hide the input element
         />
-        <button className="export-button" onClick={gatherExportedData2}>
+        {/* <button className="export-button" onClick={gatherExportedData2}>
           Visualize
         </button>
         <button className="export-button" onClick={handleClick}>
           Visualize Webserver
-        </button>
+        </button> */}
         <button className="export-button" onClick={sendDataToMain}>
           Visualize File
         </button>

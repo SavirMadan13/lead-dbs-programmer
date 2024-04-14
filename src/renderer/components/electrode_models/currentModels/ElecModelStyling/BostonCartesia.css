@@ -1,0 +1,165 @@
+/* BostonCartesia.css */
+.IPG {
+  flex: 1;
+}
+
+.Elmodel-center {
+  flex: 1;
+  margin-left: -85px;
+  margin-right: -100px;
+}
+
+.right-contacts {
+  flex: 1;
+  margin-top: 275px;
+}
+
+.left-contacts {
+  flex: 1;
+  margin-top: 140px;
+}
+
+.container {
+  display: flex;
+  /* justify-content: space-between; */
+  width: 100%; /* Set the desired width */
+  height: 100%; /* Set the desired height */
+}
+
+.container2 {
+  width: 33%; /* Set the desired width */
+  height: 100%; /* Set the desired height */
+  margin-right: 0px;
+}
+.image-item {
+  display: inline-block;
+  position: relative;
+  margin-top: -35px; /*This is setting the distance between the contacts
+  /* top: -100px; */
+
+}
+
+.image {
+  width: 500px; /* Adjust the width and height as needed */
+  height: 500px;
+}
+
+.Elmodel-center .image-item .triple-toggle {
+  position: absolute;
+  top: 0px;
+  left: -5px;
+  z-index: 1;
+}
+
+.triple-toggle-ipg {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  z-index: 1;
+}
+.triple-toggle {
+
+  position: absolute;
+  top: 0px;
+  left: -5px;
+  z-index: 1;
+}
+
+.left-color {
+  /* background-color: transparent; */
+  fill: transparent;
+}
+.center-color {
+  /* background-color: green; */
+  fill: rgba(229, 40, 40, 0.41);
+  /* Change the background color for the 'center' position */
+}
+
+.right-color {
+  /* background-color: blue; */
+  fill: rgba(50, 50, 244, 0.411);
+  /* Change the background color for the 'right' position */
+}
+
+.image-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: -100px;
+  height: 200px;
+  width: 200px;
+  /* margin: -10px; */
+  row-gap: 100px;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* gap: 10px; */
+}
+
+.export-button {
+  background-color: #007BFF;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.import-button {
+  background-color: #007BFF;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.export-button:hover {
+  background-color: #0056b3;
+}
+
+.file-input {
+  display: none;
+}
+
+/* Style for the file input label */
+.file-input + label {
+  background-color: #007BFF;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.file-input + label:hover {
+  background-color: #0056b3;
+}
+
+.active-button {
+  background-color: green; /* Set your desired active color */
+  color: white;
+}
+
+.inactive-button {
+  background-color: red; /* Set your desired inactive color */
+  color: white;
+}
+
+
+/* .image-key {
+  position: relative;
+  z-index: 1;
+  top: 100px;
+
+} */
+
+/* .image-item {
+  height: 200px;
+  width: 200px;
+} */

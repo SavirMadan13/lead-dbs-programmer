@@ -2916,7 +2916,7 @@ import calculateQuantities from '../CalculateQuantities'; // Correct the path to
 import './BostonCartesiaTest.css';
 import { ReactComponent as IPG } from './images/IPG.svg';
 import { ReactComponent as Contact } from './images/Contact.svg';
-import { ReactComponent as Tail } from './images/Tail.svg';
+import { ReactComponent as Tail } from './images/ElectrodeTailContact.svg';
 import { ReactComponent as RightContact } from './images/RightContact.svg';
 import { ReactComponent as LeftContact } from './images/LeftContact.svg';
 import { ReactComponent as HeadTop } from './images/head_top.svg';
@@ -3483,6 +3483,9 @@ function BostonCartesiaTest(props, ref) {
       if (updatedSelectedValues[key] === 'left') {
         updatedQuantities[key] = 0;
       }
+      if (updatedQuantities[key] > 100) {
+        updatedQuantities[key] = 100;
+      }
     });
     setQuantities(updatedQuantities);
     setSelectedValues(updatedSelectedValues);
@@ -4015,114 +4018,116 @@ function BostonCartesiaTest(props, ref) {
     console.log('vcecof: ', vecAng);
   };
 
-  const handleCounterClockwiseButton = () => {
-    const updatedQuantities = { ...quantities };
-    const updatedSelectedValues = { ...selectedValues };
-    Object.keys(selectedValues)
-      .reverse()
-      .forEach((key) => {
-        const currentLevel = level[key];
-        const nextKey = parseFloat(key) + 1;
-        const previousKey = parseFloat(key) - 1;
-        const rightNextKey = parseFloat(key) - 2;
-        const centerpreviousKey = parseFloat(key) + 2;
-        const currentFace = face[key];
 
-        if (updatedQuantities[key] === 0) {
-          updatedSelectedValues[key] = 'left';
-        }
-        const currentKeys = Object.keys(level).filter(
-          (k) => level[k] === currentLevel,
-        );
-        const levelTotals = calculateLevelTotals();
-        console.log(levelTotals);
-        let currentLevelTotal = 0;
-        Object.keys(levelTotals).forEach((levels) => {
-          if (level[key] === parseFloat(levels)) {
-            currentLevelTotal = levelTotals[levels];
-            console.log('leveltot: ', currentLevelTotal);
-          }
-        });
-        let currentLeftCount = 0;
-        let currentCenterCount = 0;
-        let currentRightCount = 0;
-        currentKeys.forEach((currentKey) => {
-          const value = updatedSelectedValues[currentKey];
-          if (value === 'left') {
-            currentLeftCount += 1;
-          } else if (value === 'center') {
-            currentCenterCount += 1;
-          } else if (value === 'right') {
-            currentRightCount += 1;
-          }
-        });
-        if (face[key] === 'left' && updatedQuantities[previousKey] === 0) {
-          if (updatedSelectedValues[key] !== 'left') {
-            if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
-              updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
-              updatedQuantities[key] =
-                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
-            } else if (updatedSelectedValues[nextKey] === 'left') {
-              console.log('HelloHello');
-              updatedSelectedValues[nextKey] = updatedSelectedValues[key];
-              updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
-              updatedQuantities[key] =
-                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
-            }
-          }
-        }
-        if (
-          face[key] === 'center' &&
-          updatedQuantities[centerpreviousKey] === 0
-        ) {
-          if (updatedSelectedValues[key] !== 'left') {
-            if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
-              updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
-              updatedQuantities[key] =
-                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
-            } else if (updatedSelectedValues[nextKey] === 'left') {
-              console.log('HelloHello');
-              updatedSelectedValues[nextKey] = updatedSelectedValues[key];
-              updatedQuantities[nextKey] =
-                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
-              updatedQuantities[key] =
-                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
-            }
-          }
-        }
-        if (face[key] === 'right' && updatedQuantities[previousKey] === 0) {
-          if (updatedSelectedValues[key] !== 'left') {
-            if (
-              updatedSelectedValues[key] === updatedSelectedValues[rightNextKey]
-            ) {
-              updatedQuantities[rightNextKey] =
-                parseFloat(updatedQuantities[rightNextKey]) +
-                currentLevelTotal / 10;
-              updatedQuantities[key] =
-                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
-            } else if (updatedSelectedValues[rightNextKey] === 'left') {
-              updatedSelectedValues[rightNextKey] = updatedSelectedValues[key];
-              updatedQuantities[rightNextKey] =
-                parseFloat(updatedQuantities[rightNextKey]) +
-                currentLevelTotal / 10;
-              updatedQuantities[key] =
-                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
-            }
-          }
-        }
-        if (updatedQuantities[key] === 0) {
-          updatedSelectedValues[key] = 'left';
-        }
-      });
-    setSelectedValues(updatedSelectedValues);
-    setQuantities(updatedQuantities);
-    // vectorMakeUp();
-    // console.log('VecDirection: ', vectorDirection);
-    checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
-  };
+  // Real one
+  // const handleCounterClockwiseButton = () => {
+  //   const updatedQuantities = { ...quantities };
+  //   const updatedSelectedValues = { ...selectedValues };
+  //   Object.keys(selectedValues)
+  //     .reverse()
+  //     .forEach((key) => {
+  //       const currentLevel = level[key];
+  //       const nextKey = parseFloat(key) + 1;
+  //       const previousKey = parseFloat(key) - 1;
+  //       const rightNextKey = parseFloat(key) - 2;
+  //       const centerpreviousKey = parseFloat(key) + 2;
+  //       const currentFace = face[key];
+
+  //       if (updatedQuantities[key] === 0) {
+  //         updatedSelectedValues[key] = 'left';
+  //       }
+  //       const currentKeys = Object.keys(level).filter(
+  //         (k) => level[k] === currentLevel,
+  //       );
+  //       const levelTotals = calculateLevelTotals();
+  //       console.log(levelTotals);
+  //       let currentLevelTotal = 0;
+  //       Object.keys(levelTotals).forEach((levels) => {
+  //         if (level[key] === parseFloat(levels)) {
+  //           currentLevelTotal = levelTotals[levels];
+  //           console.log('leveltot: ', currentLevelTotal);
+  //         }
+  //       });
+  //       let currentLeftCount = 0;
+  //       let currentCenterCount = 0;
+  //       let currentRightCount = 0;
+  //       currentKeys.forEach((currentKey) => {
+  //         const value = updatedSelectedValues[currentKey];
+  //         if (value === 'left') {
+  //           currentLeftCount += 1;
+  //         } else if (value === 'center') {
+  //           currentCenterCount += 1;
+  //         } else if (value === 'right') {
+  //           currentRightCount += 1;
+  //         }
+  //       });
+  //       if (face[key] === 'left' && updatedQuantities[previousKey] === 0) {
+  //         if (updatedSelectedValues[key] !== 'left') {
+  //           if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
+  //             updatedQuantities[nextKey] =
+  //               parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+  //             updatedQuantities[key] =
+  //               parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+  //           } else if (updatedSelectedValues[nextKey] === 'left') {
+  //             console.log('HelloHello');
+  //             updatedSelectedValues[nextKey] = updatedSelectedValues[key];
+  //             updatedQuantities[nextKey] =
+  //               parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+  //             updatedQuantities[key] =
+  //               parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+  //           }
+  //         }
+  //       }
+  //       if (
+  //         face[key] === 'center' &&
+  //         updatedQuantities[centerpreviousKey] === 0
+  //       ) {
+  //         if (updatedSelectedValues[key] !== 'left') {
+  //           if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
+  //             updatedQuantities[nextKey] =
+  //               parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+  //             updatedQuantities[key] =
+  //               parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+  //           } else if (updatedSelectedValues[nextKey] === 'left') {
+  //             console.log('HelloHello');
+  //             updatedSelectedValues[nextKey] = updatedSelectedValues[key];
+  //             updatedQuantities[nextKey] =
+  //               parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+  //             updatedQuantities[key] =
+  //               parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+  //           }
+  //         }
+  //       }
+  //       if (face[key] === 'right' && updatedQuantities[previousKey] === 0) {
+  //         if (updatedSelectedValues[key] !== 'left') {
+  //           if (
+  //             updatedSelectedValues[key] === updatedSelectedValues[rightNextKey]
+  //           ) {
+  //             updatedQuantities[rightNextKey] =
+  //               parseFloat(updatedQuantities[rightNextKey]) +
+  //               currentLevelTotal / 10;
+  //             updatedQuantities[key] =
+  //               parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+  //           } else if (updatedSelectedValues[rightNextKey] === 'left') {
+  //             updatedSelectedValues[rightNextKey] = updatedSelectedValues[key];
+  //             updatedQuantities[rightNextKey] =
+  //               parseFloat(updatedQuantities[rightNextKey]) +
+  //               currentLevelTotal / 10;
+  //             updatedQuantities[key] =
+  //               parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+  //           }
+  //         }
+  //       }
+  //       if (updatedQuantities[key] === 0) {
+  //         updatedSelectedValues[key] = 'left';
+  //       }
+  //     });
+  //   setSelectedValues(updatedSelectedValues);
+  //   setQuantities(updatedQuantities);
+  //   // vectorMakeUp();
+  //   // console.log('VecDirection: ', vectorDirection);
+  //   checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+  // };
 
   const handleCounterClockwiseButtonAmplitude = () => {
     const updatedQuantities = { ...quantities };
@@ -4227,171 +4232,172 @@ function BostonCartesiaTest(props, ref) {
 
   //Testing counter clockwise
 
-  // const handleCounterClockwiseButton = () => {
-  //   const updatedQuantities = { ...quantities };
-  //   const updatedSelectedValues = { ...selectedValues };
-  //   const levelChanges = {};
-  //   Object.keys(levelArray).forEach((key) => {
-  //     levelChanges[key] = 0;
-  //   });
-  //   console.log('levelchanges: ', levelChanges);
-  //   Object.keys(selectedValues)
-  //     .reverse()
-  //     .forEach((key) => {
-  //       const currentLevel = level[key];
-  //       const nextKey = parseFloat(key) + 1;
-  //       const previousKey = parseFloat(key) - 1;
-  //       const rightNextKey = parseFloat(key) - 2;
-  //       const centerpreviousKey = parseFloat(key) + 2;
-  //       const currentFace = face[key];
+  const handleCounterClockwiseButton = () => {
+    const updatedQuantities = { ...quantities };
+    const updatedSelectedValues = { ...selectedValues };
+    const levelChanges = {};
+    Object.keys(levelArray).forEach((key) => {
+      levelChanges[key] = 0;
+    });
+    console.log('levelchanges: ', levelChanges);
+    Object.keys(selectedValues)
+      .reverse()
+      .forEach((key) => {
+        const currentLevel = level[key];
+        const nextKey = parseFloat(key) + 1;
+        const previousKey = parseFloat(key) - 1;
+        const leftNextKey = parseFloat(key) - 2;
+        const centerpreviousKey = parseFloat(key) + 2;
+        const currentFace = face[key];
 
-  //       if (updatedQuantities[key] === 0) {
-  //         updatedSelectedValues[key] = 'left';
-  //       }
-  //       const currentKeys = Object.keys(level).filter(
-  //         (k) => level[k] === currentLevel,
-  //       );
-  //       const levelTotals = calculateLevelTotals();
-  //       // console.log(levelTotals);
-  //       let currentLevelTotal = 0;
-  //       Object.keys(levelTotals).forEach((levels) => {
-  //         if (level[key] === parseFloat(levels)) {
-  //           currentLevelTotal = levelTotals[levels];
-  //         }
-  //       });
-  //       let currentLeftCount = 0;
-  //       let currentCenterCount = 0;
-  //       let currentRightCount = 0;
-  //       currentKeys.forEach((currentKey) => {
-  //         const value = updatedSelectedValues[currentKey];
-  //         if (value === 'left') {
-  //           currentLeftCount += 1;
-  //         } else if (value === 'center') {
-  //           currentCenterCount += 1;
-  //         } else if (value === 'right') {
-  //           currentRightCount += 1;
-  //         }
-  //       });
-  //       if (
-  //         face[key] === 'left' &&
-  //         updatedQuantities[previousKey] === 0 &&
-  //         levelChanges[level[key]] === 0
-  //       ) {
-  //         if (updatedSelectedValues[key] !== 'left') {
-  //           if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
-  //             if (updatedQuantities[key] < currentLevelTotal / 10) {
-  //               updatedQuantities[nextKey] =
-  //                 parseFloat(updatedQuantities[nextKey]) +
-  //                 parseFloat(updatedQuantities[key]);
-  //               updatedQuantities[key] = 0;
-  //               levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
-  //             } else {
-  //               updatedQuantities[nextKey] =
-  //                 parseFloat(updatedQuantities[nextKey]) +
-  //                 currentLevelTotal / 10;
-  //               updatedQuantities[key] =
-  //                 parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
-  //               levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
-  //               }
-  //             // updatedQuantities[nextKey] =
-  //             //   parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
-  //             // updatedQuantities[key] = parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
-  //           } else if (updatedSelectedValues[nextKey] === 'left') {
-  //             updatedSelectedValues[nextKey] = updatedSelectedValues[key];
-  //             updatedQuantities[nextKey] =
-  //               parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
-  //             updatedQuantities[key] =
-  //               parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
-  //             levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
-  //           }
-  //         }
-  //       }
-  //       if (
-  //         face[key] === 'center' &&
-  //         updatedQuantities[centerpreviousKey] === 0 &&
-  //         levelChanges[level[key]] === 0
-  //       ) {
-  //         if (updatedSelectedValues[key] !== 'left') {
-  //           if (
-  //             updatedSelectedValues[key] ===
-  //             updatedSelectedValues[centerNextKey]
-  //           ) {
-  //             // updatedQuantities[centerNextKey] =
-  //             //   parseFloat(updatedQuantities[centerNextKey]) +
-  //             //   currentLevelTotal / 10;
-  //             // updatedQuantities[key] =
-  //             //   parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
-  //             if (updatedQuantities[key] < currentLevelTotal / 10) {
-  //               console.log('true');
-  //               updatedQuantities[centerNextKey] =
-  //                 parseFloat(updatedQuantities[centerNextKey]) +
-  //                 parseFloat(updatedQuantities[key]);
-  //               updatedQuantities[key] = 0;
-  //               levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
-  //             } else {
-  //               updatedQuantities[centerNextKey] =
-  //                 parseFloat(updatedQuantities[centerNextKey]) +
-  //                 currentLevelTotal / 10;
-  //               updatedQuantities[key] =
-  //                 parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
-  //               levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
-  //               }
-  //           } else if (updatedSelectedValues[centerNextKey] === 'left') {
-  //             updatedSelectedValues[centerNextKey] = updatedSelectedValues[key];
-  //             updatedQuantities[centerNextKey] =
-  //               parseFloat(updatedQuantities[centerNextKey]) +
-  //               currentLevelTotal / 10;
-  //             updatedQuantities[key] =
-  //               parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
-  //             levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
-  //           }
-  //         }
-  //       }
-  //       if (
-  //         face[key] === 'right' &&
-  //         updatedQuantities[rightNextKey] === 0 &&
-  //         levelChanges[level[key]] === 0
-  //       ) {
-  //         if (updatedSelectedValues[key] !== 'left') {
-  //           if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
-  //             if (updatedQuantities[key] < currentLevelTotal / 10) {
-  //               updatedQuantities[nextKey] =
-  //                 parseFloat(updatedQuantities[nextKey]) +
-  //                 parseFloat(updatedQuantities[key]);
-  //               updatedQuantities[key] = 0;
-  //               levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
-  //             } else {
-  //               updatedQuantities[nextKey] =
-  //                 parseFloat(updatedQuantities[nextKey]) +
-  //                 currentLevelTotal / 10;
-  //               updatedQuantities[key] =
-  //                 parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
-  //               levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
-  //               }
-  //             // console.log('true');
-  //             // updatedQuantities[nextKey] =
-  //             //   parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
-  //             // updatedQuantities[key] =
-  //             //   parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
-  //           } else if (updatedSelectedValues[nextKey] === 'left') {
-  //             updatedSelectedValues[nextKey] = updatedSelectedValues[key];
-  //             updatedQuantities[nextKey] =
-  //               parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
-  //             updatedQuantities[key] =
-  //               parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
-  //             levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
-  //           }
-  //         }
-  //       }
-  //       if (updatedQuantities[key] === 0) {
-  //         updatedSelectedValues[key] = 'left';
-  //       }
-  //     });
-  //   console.log('newlevelquantities: ', levelChanges);
-  //   setSelectedValues(updatedSelectedValues);
-  //   setQuantities(updatedQuantities);
-  //   checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
-  // };
+        if (updatedQuantities[key] === 0) {
+          updatedSelectedValues[key] = 'left';
+        }
+        const currentKeys = Object.keys(level).filter(
+          (k) => level[k] === currentLevel,
+        );
+        const levelTotals = calculateLevelTotals();
+        // console.log(levelTotals);
+        let currentLevelTotal = 0;
+        Object.keys(levelTotals).forEach((levels) => {
+          if (level[key] === parseFloat(levels)) {
+            currentLevelTotal = levelTotals[levels];
+          }
+        });
+        let currentLeftCount = 0;
+        let currentCenterCount = 0;
+        let currentRightCount = 0;
+        currentKeys.forEach((currentKey) => {
+          const value = updatedSelectedValues[currentKey];
+          if (value === 'left') {
+            currentLeftCount += 1;
+          } else if (value === 'center') {
+            currentCenterCount += 1;
+          } else if (value === 'right') {
+            currentRightCount += 1;
+          }
+        });
+        if (
+          face[key] === 'left' &&
+          updatedQuantities[previousKey] === 0 &&
+          levelChanges[level[key]] === 0
+        ) {
+          if (updatedSelectedValues[key] !== 'left') {
+            console.log('FACE LEFT');
+            if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
+              if (updatedQuantities[key] < currentLevelTotal / 10) {
+                updatedQuantities[nextKey] =
+                  parseFloat(updatedQuantities[nextKey]) +
+                  parseFloat(updatedQuantities[key]);
+                updatedQuantities[key] = 0;
+                levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
+              } else {
+                updatedQuantities[nextKey] =
+                  parseFloat(updatedQuantities[nextKey]) +
+                  currentLevelTotal / 10;
+                updatedQuantities[key] =
+                  parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+                levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
+                }
+              // updatedQuantities[nextKey] =
+              //   parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              // updatedQuantities[key] = parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+            } else if (updatedSelectedValues[nextKey] === 'left') {
+              updatedSelectedValues[nextKey] = updatedSelectedValues[key];
+              updatedQuantities[nextKey] =
+                parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+              levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
+            }
+          }
+        }
+        if (
+          face[key] === 'center' &&
+          updatedQuantities[centerpreviousKey] === 0 &&
+          levelChanges[level[key]] === 0
+        ) {
+          if (updatedSelectedValues[key] !== 'left') {
+            if (
+              updatedSelectedValues[key] ===
+              updatedSelectedValues[nextKey]
+            ) {
+              // updatedQuantities[centerNextKey] =
+              //   parseFloat(updatedQuantities[centerNextKey]) +
+              //   currentLevelTotal / 10;
+              // updatedQuantities[key] =
+              //   parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+              if (updatedQuantities[key] < currentLevelTotal / 10) {
+                console.log('true');
+                updatedQuantities[nextKey] =
+                  parseFloat(updatedQuantities[nextKey]) +
+                  parseFloat(updatedQuantities[key]);
+                updatedQuantities[key] = 0;
+                levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
+              } else {
+                updatedQuantities[nextKey] =
+                  parseFloat(updatedQuantities[nextKey]) +
+                  currentLevelTotal / 10;
+                updatedQuantities[key] =
+                  parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+                levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
+                }
+            } else if (updatedSelectedValues[nextKey] === 'left') {
+              updatedSelectedValues[nextKey] = updatedSelectedValues[key];
+              updatedQuantities[nextKey] =
+                parseFloat(updatedQuantities[nextKey]) +
+                currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+              levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
+            }
+          }
+        }
+        if (
+          face[key] === 'right' &&
+          updatedQuantities[previousKey] === 0 &&
+          levelChanges[level[key]] === 0
+        ) {
+          if (updatedSelectedValues[key] !== 'left') {
+            if (updatedSelectedValues[key] === updatedSelectedValues[leftNextKey]) {
+              if (updatedQuantities[key] < currentLevelTotal / 10) {
+                updatedQuantities[leftNextKey] =
+                  parseFloat(updatedQuantities[leftNextKey]) +
+                  parseFloat(updatedQuantities[key]);
+                updatedQuantities[key] = 0;
+                levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
+              } else {
+                updatedQuantities[leftNextKey] =
+                  parseFloat(updatedQuantities[leftNextKey]) +
+                  currentLevelTotal / 10;
+                updatedQuantities[key] =
+                  parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+                levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
+                }
+              // console.log('true');
+              // updatedQuantities[nextKey] =
+              //   parseFloat(updatedQuantities[nextKey]) + currentLevelTotal / 10;
+              // updatedQuantities[key] =
+              //   parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+            } else if (updatedSelectedValues[leftNextKey] === 'left') {
+              updatedSelectedValues[leftNextKey] = updatedSelectedValues[key];
+              updatedQuantities[leftNextKey] =
+                parseFloat(updatedQuantities[leftNextKey]) + currentLevelTotal / 10;
+              updatedQuantities[key] =
+                parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
+              levelChanges[parseFloat(level[key])] = levelChanges[parseFloat(level[key])] + 1;
+            }
+          }
+        }
+        if (updatedQuantities[key] === 0) {
+          updatedSelectedValues[key] = 'left';
+        }
+      });
+    console.log('newlevelquantities: ', levelChanges);
+    setSelectedValues(updatedSelectedValues);
+    setQuantities(updatedQuantities);
+    checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+  };
 
   const handleClockwiseButton = () => {
     const updatedQuantities = { ...quantities };
@@ -4446,7 +4452,7 @@ function BostonCartesiaTest(props, ref) {
         ) {
           if (updatedSelectedValues[key] !== 'left') {
             if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
-              if (updatedQuantities[key] < currentLevelTotal / 10) {
+              if (updatedQuantities[key] <= currentLevelTotal / 10) {
                 updatedQuantities[nextKey] =
                   parseFloat(updatedQuantities[nextKey]) +
                   parseFloat(updatedQuantities[key]);
@@ -4491,7 +4497,7 @@ function BostonCartesiaTest(props, ref) {
               //   currentLevelTotal / 10;
               // updatedQuantities[key] =
               //   parseFloat(updatedQuantities[key]) - currentLevelTotal / 10;
-              if (updatedQuantities[key] < currentLevelTotal / 10) {
+              if (updatedQuantities[key] <= currentLevelTotal / 10) {
                 console.log('true');
                 updatedQuantities[centerNextKey] =
                   parseFloat(updatedQuantities[centerNextKey]) +
@@ -4527,7 +4533,7 @@ function BostonCartesiaTest(props, ref) {
         ) {
           if (updatedSelectedValues[key] !== 'left') {
             if (updatedSelectedValues[key] === updatedSelectedValues[nextKey]) {
-              if (updatedQuantities[key] < currentLevelTotal / 10) {
+              if (updatedQuantities[key] <= currentLevelTotal / 10) {
                 updatedQuantities[nextKey] =
                   parseFloat(updatedQuantities[nextKey]) +
                   parseFloat(updatedQuantities[key]);
@@ -6730,7 +6736,7 @@ function BostonCartesiaTest(props, ref) {
     if (percAmpToggle === 'left') {
       handleCounterClockwiseButton();
     } else if (percAmpToggle === 'right') {
-      handleCounterClockwiseButtonAmplitude();
+      handleCounterClockwiseButton();
     }
   };
 
