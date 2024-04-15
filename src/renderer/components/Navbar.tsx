@@ -25,14 +25,14 @@ export default function Navbar() {
 
   const menuItems = (
     <>
-      <NavLink
+      {/* <NavLink
         to="/testing"
         style={{ textDecoration: 'none', color: 'inherit' }}
       >
         <IconButton>
           <Typography>Component Testing</Typography>
         </IconButton>
-      </NavLink>
+      </NavLink> */}
       <NavLink
         to="/stimulation-settings"
         style={{ textDecoration: 'none', color: 'inherit' }}
@@ -49,14 +49,14 @@ export default function Navbar() {
           <Typography>Electrode Model</Typography>
         </IconButton>
       </NavLink>
-      <NavLink
+      {/* <NavLink
         to="/end-session"
         style={{ textDecoration: 'none', color: 'inherit' }}
       >
         <IconButton>
           <Typography>Finish Session</Typography>
         </IconButton>
-      </NavLink>
+      </NavLink> */}
       {/* {isDarkMode ? (
         <Button onClick={toggleTheme}>
           <FaSun style={{ color: 'yellow' }} />
