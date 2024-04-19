@@ -53,7 +53,8 @@ function Boston_vercise(props, ref) {
     <Contact key="4" level="3" face="center" />,
     <Contact key="3" level="2" face="center" />,
     <Contact key="2" level="2" face="center" />,
-    <Tail key="1" level="1" />,
+    <Contact key="1" level="2" face="center" />,
+    <Tail key="tail" fill="transparent" />,
   ];
 
   const ipgs = [<IPG key="0" />];

@@ -75,10 +75,10 @@ function Medtronic_3391(props, ref) {
 
   const names = {
     0: IPG,
-    1: 1,
-    2: 2,
-    3: 3,
-    4: 4,
+    1: 0,
+    2: 1,
+    3: 2,
+    4: 3,
   };
 
   const [percAmpToggle, setPercAmpToggle] = useState('left');

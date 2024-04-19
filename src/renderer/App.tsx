@@ -69,6 +69,8 @@ export default function App() {
   const [allStimulationParameters, setAllStimulationParameters] = useState({});
   const [visModel, setVisModel] = useState('6');
   const [sessionTitle, setSessionTitle] = useState('');
+  const [allTogglePositions, setAllTogglePositions] = useState({});
+  const [allPercAmpToggles, setAllPercAmpToggles] = useState({});
 
   return (
     <Router>
@@ -112,6 +114,10 @@ export default function App() {
                 setAllSelectedValues={setAllSelectedValues}
                 allTotalAmplitudes={allTotalAmplitudes}
                 setAllTotalAmplitudes={setAllTotalAmplitudes}
+                allTogglePositions={allTogglePositions}
+                setAllTogglePositions={setAllTogglePositions}
+                allPercAmpToggles={allPercAmpToggles}
+                setAllPercAmpToggles={setAllPercAmpToggles}
               />
               <Link to="/tabbed-selection">
                 <button className="button">Next</button>
@@ -140,6 +146,10 @@ export default function App() {
               setVisModel={setVisModel}
               sessionTitle={sessionTitle}
               setSessionTitle={setSessionTitle}
+              allTogglePositions={allTogglePositions}
+              setAllTogglePositions={setAllTogglePositions}
+              allPercAmpToggles={allPercAmpToggles}
+              setAllPercAmpToggles={setAllPercAmpToggles}
             />
           }
         />

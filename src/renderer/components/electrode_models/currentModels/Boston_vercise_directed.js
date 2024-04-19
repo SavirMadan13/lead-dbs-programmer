@@ -102,7 +102,12 @@ function Boston_vercise_directed(props, ref) {
     8: 8,
   };
 
-  const [percAmpToggle, setPercAmpToggle] = useState('left');
+  const [percAmpToggle, setPercAmpToggle] = useState(
+    props.percAmpToggle || 'left',
+  );
+  const [volAmpToggle, setVolAmpToggle] = useState('left');
+
+  // const [IPGforOutput, setIPGforOutput] = useState(props.outputIPG);
 
   const [calculateQuantities, setCalculateQuantities] = useState(false);
 
@@ -271,6 +276,8 @@ function Boston_vercise_directed(props, ref) {
     } else if (percAmpToggle === 'right') {
       total = totalAmplitude;
     }
+
+    // total = totalAmplitude;
     console.log('total: ', total);
     const centerCount = Object.values(selectedValues).filter(
       (value) => value === 'center',
@@ -311,6 +318,7 @@ function Boston_vercise_directed(props, ref) {
 
   const handleIPGLogic = () => {
     if (props.IPG === 'Abbott') {
+      setPercAmpToggle('right');
       calculateQuantitiesWithDistribution();
     }
   };
@@ -2294,6 +2302,34 @@ function Boston_vercise_directed(props, ref) {
     return visModel;
   };
 
+  const getStatePercAmpToggle = () => {
+    return percAmpToggle;
+  };
+
+  let outputTogglePosition = 'mA';
+  const getStateTogglePosition = () => {
+    if (props.IPG === 'Boston') {
+      if (percAmpToggle === 'left') {
+        outputTogglePosition = '%';
+      }
+    } else if (props.IPG === 'Medtronic_Activa') {
+      console.log('volAmpToggle: ', volAmpToggle);
+      if (volAmpToggle === 'right') {
+        outputTogglePosition = 'V';
+      }
+    }
+    return outputTogglePosition;
+  };
+
+  // const getOutputIPG = () => {
+  //   // if (props.IPG = 'Boston') {
+  //   //   if (percAmpToggle === 'right') {
+  //   //     handlePercAmpToggleChange('left');
+  //   //   }
+  //   // } else if ()
+  //   return IPGforOutput;
+  // };
+
   useImperativeHandle(ref, () => ({
     getCartesiaData,
     getStateQuantities,
@@ -2302,6 +2338,8 @@ function Boston_vercise_directed(props, ref) {
     getStateStimulationParameters,
     getStateSessionTitle,
     getStateVisModel,
+    getStateTogglePosition,
+    getStatePercAmpToggle,
   }));
 
   const handleParameterChange = (parameter) => (e) => {
@@ -2363,15 +2401,30 @@ function Boston_vercise_directed(props, ref) {
       stimController = 1;
       if (percAmpToggle !== 'right') {
         setPercAmpToggle('right');
+        // setIPGforOutput('')
       }
+      // if (volAmpToggle === 'left') {
+      //   setIPGforOutput('mA');
+      // } else {
+      //   setIPGforOutput('V');
+      // }
     } else if (props.IPG === 'Abbott') {
       stimController = 2;
+      // setIPGforOutput('mA');
     } else if (props.IPG === 'Medtronic_Percept') {
       stimController = 3;
       if (percAmpToggle !== 'right') {
         setPercAmpToggle('right');
       }
+      // setIPGforOutput('mA');
     }
+    // else if (props.IPG === 'Boston') {
+    //   if (percAmpToggle === 'left') {
+    //     setIPGforOutput('%');
+    //   } else {
+    //     setIPGforOutput('mA');
+    //   }
+    // }
     // console.log('stimController: ', stimController);
     // console.log('IPG', props.IPG);
   };
@@ -2392,13 +2445,18 @@ function Boston_vercise_directed(props, ref) {
     setQuantities(updatedQuantities);
   };
 
+  const [percAmpAnimation, setPercAmpAnimation] = useState(null);
   // Percentage vs mA toggle switch
-  const handlePercAmpToggleChange = (value) => {
+  const handlePercAmpToggleChange = (value, animate) => {
+    console.log('value', value);
     const newValue = value;
+    setPercAmpAnimation(animate);
     if (newValue === 'left') {
       // setTotalAmplitude(0);
       calculatePercentageFromAmplitude();
+      outputTogglePosition = '%';
     } else if (newValue === 'right') {
+      outputTogglePosition = 'mA';
       // let totalSum = 0;
       // Object.keys(quantities).forEach((key) => {
       //   totalSum += parseFloat(quantities[key]);
@@ -2406,6 +2464,7 @@ function Boston_vercise_directed(props, ref) {
       // setTotalAmplitude(totalSum);
       calculateAmplitudeFromPercentage();
     }
+    console.log(value);
     setPercAmpToggle(value);
   };
 
@@ -2415,17 +2474,16 @@ function Boston_vercise_directed(props, ref) {
     setAssistedToggle(value);
   };
 
-  const [volAmpToggle, setVolAmpToggle] = useState('left');
   const ampToggle = 'left';
 
   const handleVolAmpToggleChange = (value) => {
     const newValue = value;
-    // if (newValue === 'left') {
-    //   handleActivaAmplitude();
-    // } else if (newValue === 'right') {
-    //   handleActivaVoltage();
-    // }
-    setVolAmpToggle(volAmpToggle);
+    if (newValue === 'left') {
+      outputTogglePosition = 'mA';
+    } else if (newValue === 'right') {
+      outputTogglePosition = 'V';
+    }
+    setVolAmpToggle(value);
   };
 
   const [show, setShow] = useState(false);
@@ -2485,6 +2543,16 @@ function Boston_vercise_directed(props, ref) {
     <Tooltip id="tooltip">Make sure contacts sum to 100.</Tooltip>
   );
 
+  const getSwitchAnimationPercAmp = (value, switchPosition) => {
+    if (value === 'right' && switchPosition === 'left') {
+      setPercAmpAnimation('leftRight');
+    } else if (value === 'left' && switchPosition === 'right') {
+      setPercAmpAnimation('rightLeft');
+    }
+    // this.props.onChange(value, animation);
+    // this.setState({ switchPosition: value, animation });
+  };
+
   useEffect(() => {
     if (props.IPG === 'Abbott') {
       // const newQuantities = { ...quantities };
@@ -2533,7 +2601,10 @@ function Boston_vercise_directed(props, ref) {
           {props.IPG === 'Boston' && (
             <PercentageAmplitudeToggle
               value={percAmpToggle}
-              onChange={(value) => handlePercAmpToggleChange(value)}
+              // switchPosition={percAmpToggle}
+              // animation={percAmpAnimation}
+              onChange={(value, anime) => handlePercAmpToggleChange(value, anime)}
+              // getSwitchAnimation={(value, switchPosition) => getSwitchAnimationPercAmp(value, switchPosition)}
             />
           )}
           {props.IPG === 'Medtronic_Activa' && (

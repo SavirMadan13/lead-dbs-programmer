@@ -246,9 +246,9 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1200,
-    height: 1200,
-    maxWidth: 1200, // Maximum width of the window
+    width: 1100,
+    height: 1100,
+    maxWidth: 1100, // Maximum width of the window
     // maxHeight: 1200, // Maximum height of the window
     minWidth: 1000, // Minimum width of the window
     // minHeight: 1200, // Minimum height of the window

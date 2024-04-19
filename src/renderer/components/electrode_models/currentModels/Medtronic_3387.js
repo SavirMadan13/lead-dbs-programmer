@@ -75,10 +75,10 @@ function Medtronic_3387(props, ref) {
 
   const names = {
     0: IPG,
-    1: 1,
-    2: 2,
-    3: 3,
-    4: 4,
+    1: 0,
+    2: 1,
+    3: 2,
+    4: 3,
   };
 
   const [percAmpToggle, setPercAmpToggle] = useState('left');
@@ -122,10 +122,6 @@ function Medtronic_3387(props, ref) {
       2: 'left',
       3: 'left',
       4: 'left',
-      5: 'left',
-      6: 'left',
-      7: 'left',
-      8: 'left',
       // Initialize other images here
     },
   );
@@ -149,10 +145,6 @@ function Medtronic_3387(props, ref) {
       2: 0,
       3: 0,
       4: 0,
-      5: 0,
-      6: 0,
-      7: 0,
-      8: 0,
     },
   );
 

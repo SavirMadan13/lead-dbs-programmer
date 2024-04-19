@@ -25,8 +25,9 @@
   /* margin-top: 475px; */
   /* margin-bottom: -450px; */
   /* padding-top: 350px; */
-  margin-right: -50px;
+  margin-right: -125px;
   padding-left: 10px;;
+  padding-top: 15px;
 }
 
 .left-contacts {
@@ -34,6 +35,32 @@
   margin-top: 140px;
   /* margin-right: 10px; */
   /* margin-right: -0px; */
+}
+
+.left-hx-contacts {
+  flex: 1;
+  margin-top: 450px;
+}
+
+.right-hx-contacts {
+  flex: 1;
+  margin-right: -125px;
+  padding-left: 10px;
+  padding-top: 590px;
+
+}
+
+.left-x-contacts {
+  flex: 1;
+  margin-top: 150px;
+}
+
+.right-x-contacts {
+  flex: 1;
+  margin-right: -125px;
+  padding-left: 10px;
+  padding-top: 290px;
+
 }
 
 .container {

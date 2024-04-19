@@ -27,6 +27,8 @@ import Abbott_activetip_2mm from './electrode_models/currentModels/Abbott_active
 import Abbott_activetip_3mm from './electrode_models/currentModels/Abbott_activetip_3mm';
 import Abbott_directed_6172 from './electrode_models/currentModels/Abbott_directed_6172';
 import Abbott_directed_6173 from './electrode_models/currentModels/Abbott_directed_6173';
+import Boston_vercise_cartesia_HX from './electrode_models/currentModels/Boston_vercise_cartesia_HX';
+import Boston_vercise_cartesia_X from './electrode_models/currentModels/Boston_vercise_cartesia_X';
 
 function TabbedElectrodeIPGSelection({
   IPG,
@@ -46,6 +48,10 @@ function TabbedElectrodeIPGSelection({
   setVisModel,
   sessionTitle,
   setSessionTitle,
+  allTogglePositions,
+  setAllTogglePositions,
+  allPercAmpToggles,
+  setAllPercAmpToggles,
 }) {
   const testElectrodeRef = React.createRef();
   // const [selectedElectrode, setSelectedElectrode] = useState('');
@@ -127,6 +133,21 @@ function TabbedElectrodeIPGSelection({
       [key]: testElectrodeRef.current.getStateSessionTitle(),
     };
     setSessionTitle(updatedSessionTitle);
+
+    const updatedAllTogglePositions = {
+      ...allTogglePositions,
+      [key]: testElectrodeRef.current.getStateTogglePosition(),
+    };
+    setAllTogglePositions(updatedAllTogglePositions);
+    console.log('Alltogglepositions', allTogglePositions);
+
+    const updatedAllPercAmpTogglePositions = {
+      ...allPercAmpToggles,
+      [key]: testElectrodeRef.current.getStatePercAmpToggle(),
+    };
+    setAllPercAmpToggles(updatedAllPercAmpTogglePositions);
+    // const updatedIPGforOutput = testElectrodeRef.current.getOutputIPG();
+    // setOutputIPG(updatedIPGforOutput);
     // console.log(sessionTitle[1]);
 
     // setAllQuantities[key] = testElectrodeRef.current.getStateData();
@@ -180,6 +201,7 @@ function TabbedElectrodeIPGSelection({
     }
 
     sessionTitle[key] = testElectrodeRef.current.getStateSessionTitle();
+    allTogglePositions[key] = testElectrodeRef.current.getStateTogglePosition();
     // }
   };
 
@@ -306,6 +328,37 @@ function TabbedElectrodeIPGSelection({
     ),
     boston_vercise_directed: (
       <Boston_vercise_directed
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel[1]}
+        sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        // outputIPG={outputIPG}
+      />
+    ),
+    boston_vercise_cartesia_hx: (
+      <Boston_vercise_cartesia_HX
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel[1]}
+        sessionTitle={sessionTitle[1]}
+      />
+    ),
+    boston_vercise_cartesia_x: (
+      <Boston_vercise_cartesia_X
         ref={testElectrodeRef}
         key={key}
         name={key}
@@ -471,6 +524,65 @@ function TabbedElectrodeIPGSelection({
     return exportAmplitudeList;
   }
 
+  const calculatePercentageFromAmplitude = (quantities, totalAmplitude) => {
+    const updatedQuantities = { ...quantities };
+    Object.keys(updatedQuantities).forEach((element) => {
+      updatedQuantities[element] = (updatedQuantities[element] * 100) / totalAmplitude;
+    });
+    return updatedQuantities;
+  };
+
+  const calculateVoltageFromAmplitude = (quantities) => {
+    const updatedQuantities = { ...quantities };
+    Object.keys(updatedQuantities).forEach((element) => {
+      if (quantities[element] !== 0) {
+        updatedQuantities[element] = 100;
+      }
+    });
+    return updatedQuantities;
+  };
+
+  const handleTogglePositions = () => {
+    let outputQuantities = {};
+    console.log(allQuantities);
+    console.log(allTotalAmplitudes);
+    Object.keys(allQuantities).forEach((quantity) => {
+      if (allTogglePositions[quantity] === 'mA') {
+        console.log('quantity: ', quantity);
+        outputQuantities = calculatePercentageFromAmplitude(
+          allQuantities[quantity],
+          parseFloat(allTotalAmplitudes[quantity]),
+        );
+        const updatedQuantities = {
+          ...allQuantities,
+          [key]: outputQuantities,
+        };
+        // console.log('updaredQuantities: ', updatedQuantities);
+        outputQuantities = updatedQuantities;
+      } else if (allTogglePositions[quantity] === 'V') {
+        outputQuantities = calculateVoltageFromAmplitude(
+          allQuantities[quantity],
+        );
+        const updatedQuantities = {
+          ...allQuantities,
+          [key]: outputQuantities,
+        };
+        outputQuantities = updatedQuantities;
+      } else {
+        outputQuantities[quantity] = allQuantities[quantity];
+      }
+      // return '';
+    });
+    // console.log(updatedQuantities);
+    return outputQuantities;
+  };
+
+  // const handleIPGForOutput = () => {
+  //   if (IPG = 'Boston') {
+  //     if (handlePercAmp)
+  //   }
+  // }
+
   function handleFileChange(event) {
     const file = event.target.files[0];
     if (file) {
@@ -514,6 +626,10 @@ function TabbedElectrodeIPGSelection({
     a.download = 'exportedData.json';
     a.click();
     window.URL.revokeObjectURL(url);
+  };
+
+  const handleIPGForOutput = () => {
+    console.log(percAmpToggl);
   };
 
   const translatePolarity = (sideValue) => {
@@ -896,7 +1012,7 @@ function TabbedElectrodeIPGSelection({
         data.S.activecontacts[j] = activeContacts(allSelectedValues[j]);
       } else {
         for (let i = 1; i < 9; i++) {
-          console.log('j: ', dynamicKey2);
+          // console.log('j: ', dynamicKey2);
           let dynamicKey = `k${i + 7}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: 0,
@@ -978,9 +1094,12 @@ function TabbedElectrodeIPGSelection({
   const gatherExportedData4 = () => {
     // handleFileChange('1');
     saveQuantitiesandValues();
+    let updatedOutputQuantity = {};
+    updatedOutputQuantity = handleTogglePositions();
+    console.log('Updated output quantity: ', updatedOutputQuantity);
     // parseAllVariables();
     const exportAmplitudeData = handleExportAmplitude(allTotalAmplitudes);
-    console.log(exportAmplitudeData);
+    // console.log(exportAmplitudeData);
     const leftHemiArr = [];
     const rightHemiArr = [];
     const data = {
@@ -1007,10 +1126,10 @@ function TabbedElectrodeIPGSelection({
     };
 
     data.S.elmodel = [selectedElectrodeLeft, selectedElectrodeRight];
-    console.log('length', Object.keys(allQuantities[1]));
+    // console.log('length', Object.keys(allQuantities[1]));
 
     const loopSize = Object.keys(allQuantities[1]).length;
-    console.log('loopSize: ', loopSize);
+    // console.log('loopSize: ', loopSize);
     // data.S.label = 'Num1';
     const activeArray = [];
     const leftAmpArray = [];
@@ -1176,7 +1295,7 @@ function TabbedElectrodeIPGSelection({
     }
 
     let exportVisModel = '';
-    console.log(visModel[1]);
+    // console.log(visModel[1]);
     if (visModel[1] === '1') {
       console.log('here');
       exportVisModel = 'Dembek 2017';
@@ -1191,7 +1310,238 @@ function TabbedElectrodeIPGSelection({
     } else if (visModel[1] === '6') {
       exportVisModel = 'OSS-DBS (Butenko 2020)';
     }
-    console.log('export vis model', exportVisModel);
+    // console.log('export vis model', exportVisModel);
+    data.S.model = exportVisModel;
+
+    return data;
+  };
+
+  const gatherExportedData5 = () => {
+    // handleFileChange('1');
+    saveQuantitiesandValues();
+    let updatedOutputQuantity = {};
+    updatedOutputQuantity = handleTogglePositions();
+    console.log('Updated output quantity: ', updatedOutputQuantity);
+    // parseAllVariables();
+    const exportAmplitudeData = handleExportAmplitude(allTotalAmplitudes);
+    // console.log(exportAmplitudeData);
+    const leftHemiArr = [];
+    const rightHemiArr = [];
+    const data = {
+      S: {
+        label: sessionTitle[1],
+        Rs1: {},
+        Rs2: {},
+        Rs3: {},
+        Rs4: {},
+        Ls1: {},
+        Ls2: {},
+        Ls3: {},
+        Ls4: {},
+        active: {},
+        model: '',
+        monopolarmodel: 0,
+        amplitude: {},
+        activecontacts: [],
+        template: 'warp',
+        sources: {},
+        elmodel: {},
+        ipg: IPG,
+      },
+    };
+
+    data.S.elmodel = [selectedElectrodeLeft, selectedElectrodeRight];
+    // console.log('length', Object.keys(allQuantities[1]));
+
+    const loopSize = Object.keys(allQuantities[1]).length;
+    // console.log('loopSize: ', loopSize);
+    // data.S.label = 'Num1';
+    const activeArray = [];
+    const leftAmpArray = [];
+
+    for (let j = 1; j < 5; j++) {
+      let dynamicKey2 = `Ls${j}`;
+      if (allSelectedValues[j] && updatedOutputQuantity[j]) {
+        // Need to change the i = 9 to number of electrodes to accomodate for 16 contact electrodes
+        for (let i = 1; i < loopSize; i++) {
+          let polarity = 0;
+          if (allSelectedValues[j][i] === 'left') {
+            polarity = 0;
+          } else if (allSelectedValues[j][i] === 'center') {
+            polarity = 1;
+          } else if (allSelectedValues[j][i] === 'right') {
+            polarity = 2;
+          }
+          let dynamicKey = `k${i + loopSize - 2}`;
+          data.S[dynamicKey2][dynamicKey] = {
+            perc: parseFloat(updatedOutputQuantity[j][i]),
+            pol: polarity,
+            imp: 1,
+          };
+        }
+        data.S[dynamicKey2].case = {
+          perc: parseFloat(updatedOutputQuantity[j][0]),
+          pol: translatePolarity(allSelectedValues[j][0]),
+        };
+        data.S[dynamicKey2].amp = parseFloat(allTotalAmplitudes[j]);
+        data.S[dynamicKey2].frequency = parseFloat(
+          allStimulationParameters[j].parameter2,
+        );
+        data.S[dynamicKey2].pulseWidth = parseFloat(
+          allStimulationParameters[j].parameter1,
+        );
+        data.S[dynamicKey2].va = 2;
+        if (allPercAmpToggles[j] === 'V') {
+          data.S[dynamicKey2].va = 1;
+        }
+        activeArray.push(j);
+        leftAmpArray[j] = parseFloat(allTotalAmplitudes[j]);
+        // console.log(activeContacts(allSelectedValues[j]));
+        leftHemiArr[j - 1] = activeContacts(allSelectedValues[j]);
+        data.S.activecontacts[j - 1] = activeContacts(allSelectedValues[j]);
+        // console.log(data.S.activecontacts);
+      } else {
+        for (let i = 1; i < loopSize; i++) {
+          let dynamicKey = `k${i + loopSize - 2}`;
+          data.S[dynamicKey2][dynamicKey] = {
+            perc: 0,
+            pol: 0,
+            imp: 1,
+          };
+        }
+        data.S[dynamicKey2].case = {
+          perc: 0,
+          pol: 0,
+        };
+        data.S[dynamicKey2].amp = 0;
+        data.S[dynamicKey2].frequency = 0;
+        data.S[dynamicKey2].pulseWidth = 0;
+        data.S[dynamicKey2].va = 0;
+      }
+    }
+    const leftLength = activeArray.length;
+    const newActiveArray = [];
+    const rightAmpArray = [];
+
+    for (let j = 1; j < 5; j++) {
+      let dynamicKey2 = `Rs${j}`;
+      if (allSelectedValues[j + 4] && updatedOutputQuantity[j + 4]) {
+        for (let i = 1; i < loopSize; i++) {
+          let polarity = 0;
+          if (allSelectedValues[j + 4][i] === 'left') {
+            polarity = 0;
+          } else if (allSelectedValues[j + 4][i] === 'center') {
+            polarity = 1;
+          } else if (allSelectedValues[j + 4][i] === 'right') {
+            polarity = 2;
+          }
+          let dynamicKey = `k${i - 1}`;
+          data.S[dynamicKey2][dynamicKey] = {
+            perc: parseFloat(updatedOutputQuantity[j + 4][i]),
+            pol: polarity,
+            imp: 1,
+          };
+        }
+        data.S[dynamicKey2].case = {
+          perc: parseFloat(updatedOutputQuantity[j + 4][0]),
+          pol: translatePolarity(allSelectedValues[j + 4][0]),
+        };
+        data.S[dynamicKey2].amp = parseFloat(allTotalAmplitudes[j + 4]);
+        data.S[dynamicKey2].frequency = parseFloat(
+          allStimulationParameters[j + 4].parameter2,
+        );
+        data.S[dynamicKey2].pulseWidth = parseFloat(
+          allStimulationParameters[j + 4].parameter1,
+        );
+        data.S[dynamicKey2].va = 2;
+        if (allPercAmpToggles[j + 4] === 'V') {
+          data.S[dynamicKey2].va = 1;
+        }
+        activeArray.push(j + 4);
+        newActiveArray.push(j);
+        rightHemiArr[j - 1] = activeContacts(allSelectedValues[j]);
+        data.S.activecontacts[j + 3] = activeContacts(allSelectedValues[j + 4]);
+        rightAmpArray[j + 4] = parseFloat(allTotalAmplitudes[j + 4]);
+      } else {
+        for (let i = 1; i < loopSize; i++) {
+          let dynamicKey = `k${i - 1}`;
+          data.S[dynamicKey2][dynamicKey] = {
+            perc: 0,
+            pol: 0,
+            imp: 1,
+          };
+        }
+        data.S[dynamicKey2].case = {
+          perc: 0,
+          pol: 0,
+        };
+        data.S[dynamicKey2].amp = 0;
+        data.S[dynamicKey2].frequency = 0;
+        data.S[dynamicKey2].pulseWidth = 0;
+        data.S[dynamicKey2].va = 0;
+      }
+    }
+    // data.S.activecontacts.push(rightHemiArr);
+    // data.S.activecontacts.push(leftHemiArr);
+    const totalAmpArray = leftAmpArray.push(rightAmpArray);
+    // data.S.amplitude{1} = leftAmpArray;
+    // data.S.amplitude{2} = rightAmpArray;
+    const leftAmplitude = [];
+    const rightAmplitude = [];
+    for (let i = 1; i < 5; i++) {
+      if (allTotalAmplitudes[i]) {
+        leftAmplitude.push(parseFloat(allTotalAmplitudes[i]));
+      } else {
+        leftAmplitude.push(0);
+      }
+    }
+    for (let i = 5; i < 9; i++) {
+      if (allTotalAmplitudes[i]) {
+        rightAmplitude.push(parseFloat(allTotalAmplitudes[i]));
+      } else {
+        rightAmplitude.push(0);
+      }
+    }
+    data.S.amplitude = { rightAmplitude, leftAmplitude };
+    // data.S.amplitude = exportAmplitudeData;
+    // console.log(exportAmplitudeData);
+    const sourcesArray = activeArray;
+    const rightLength = newActiveArray.length;
+    data.S.sources = sourcesArray;
+    data.S.active = [leftLength, rightLength];
+    // data.S.activecontacts = activeContacts(allSelectedValues[1]);
+
+    for (let i = 1; i < 9; i++) {
+      const zerosArr = [];
+      for (let j = 1; j < loopSize; j++) {
+        zerosArr.push(0);
+      }
+      if (data.S.activecontacts[i]) {
+        if (data.S.activecontacts[i] === null) {
+          data.S.activecontacts[i] = zerosArr;
+        }
+      } else {
+        data.S.activecontacts[i] = zerosArr;
+      }
+    }
+
+    let exportVisModel = '';
+    // console.log(visModel[1]);
+    if (visModel[1] === '1') {
+      console.log('here');
+      exportVisModel = 'Dembek 2017';
+    } else if (visModel[1] === '2') {
+      exportVisModel = 'Fastfield (Baniasadi 2020)';
+    } else if (visModel[1] === '3') {
+      exportVisModel = 'SimBio/FieldTrip (see Horn 2017)';
+    } else if (visModel[1] === '4') {
+      exportVisModel = 'Kuncel 2008';
+    } else if (visModel[1] === '5') {
+      exportVisModel = 'Maedler 2012';
+    } else if (visModel[1] === '6') {
+      exportVisModel = 'OSS-DBS (Butenko 2020)';
+    }
+    // console.log('export vis model', exportVisModel);
     data.S.model = exportVisModel;
 
     return data;
@@ -1218,10 +1568,10 @@ function TabbedElectrodeIPGSelection({
   };
 
   const sendDataToMain = () => {
-    const outputData = gatherExportedData4();
+    const outputData = gatherExportedData5();
     window.electron.ipcRenderer.sendMessage('save-file', outputData);
-    window.electron.ipcRenderer.sendMessage('close-window');
     // window.electron.ipcRenderer.sendMessage('close-window');
+    window.electron.ipcRenderer.sendMessage('close-window');
 
     // Listen for a response from the main process
     window.electron.ipcRenderer.on('window-closed', (event, arg) => {
@@ -1394,6 +1744,7 @@ function TabbedElectrodeIPGSelection({
         <button className="export-button" onClick={handleClick}>
           Visualize Webserver
         </button> */}
+        {/* <button onClick={handleIPGForOutput}>IPG Output</button> */}
         <button className="export-button" onClick={sendDataToMain}>
           Visualize File
         </button>

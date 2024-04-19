@@ -15,6 +15,10 @@ function StimulationSettings({
   setAllSelectedValues,
   allTotalAmplitudes,
   setAllTotalAmplitudes,
+  allTogglePositions,
+  setAllTogglePositions,
+  allPercAmpToggles,
+  setAllPercAmpToggles,
 }) {
   // const [IPG, setIPG] = useState('');
   // const [leftElectrode, setLeftElectrode] = useState('');
@@ -91,6 +95,8 @@ function StimulationSettings({
     setIPG(selectedIPG);
     setAllQuantities({});
     setAllSelectedValues({});
+    setAllTogglePositions({});
+    setAllPercAmpToggles({});
     console.log('selectedIPG: ', selectedIPG);
   };
 
@@ -298,6 +304,8 @@ function StimulationSettings({
         <option value="abbott_directed_6173">Abbott Directed 6173</option>
         <option value="boston_vercise">Boston Scientific Vercise</option>
         <option value="boston_vercise_directed">Boston Scientific Vercise Directed</option>
+        <option value="boston_vercise_cartesia_x">Boston Scientific Vercise Cartesia X</option>
+        <option value="boston_vercise_cartesia_hx">Boston Scientific Vercise Cartesia HX</option>
         <option value="medtronic_3387">Medtronic 3387</option>
         <option value="medtronic_3389">Medtronic 3389</option>
         <option value="medtronic_3391">Medtronic 3391</option>
@@ -337,6 +345,8 @@ function StimulationSettings({
         <option value="abbott_directed_6173">Abbott Directed 6173</option>
         <option value="boston_vercise">Boston Scientific Vercise</option>
         <option value="boston_vercise_directed">Boston Scientific Vercise Directed</option>
+        <option value="boston_vercise_cartesia_x">Boston Scientific Vercise Cartesia X</option>
+        <option value="boston_vercise_cartesia_hx">Boston Scientific Vercise Cartesia HX</option>
         <option value="medtronic_3387">Medtronic 3387</option>
         <option value="medtronic_3389">Medtronic 3389</option>
         <option value="medtronic_3391">Medtronic 3391</option>
