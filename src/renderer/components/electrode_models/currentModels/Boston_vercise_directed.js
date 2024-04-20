@@ -105,7 +105,9 @@ function Boston_vercise_directed(props, ref) {
   const [percAmpToggle, setPercAmpToggle] = useState(
     props.percAmpToggle || 'left',
   );
-  const [volAmpToggle, setVolAmpToggle] = useState('left');
+  const [volAmpToggle, setVolAmpToggle] = useState(
+    props.volAmpToggle || 'left',
+  );
 
   // const [IPGforOutput, setIPGforOutput] = useState(props.outputIPG);
 
@@ -168,19 +170,49 @@ function Boston_vercise_directed(props, ref) {
     8: null,
   });
 
+  const newInitialQuantities =
+    props.IPG === 'Boston'
+      ? {
+          0: 100,
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+          6: 0,
+          7: 0,
+          8: 0,
+        }
+      : {
+          0: 0,
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+          6: 0,
+          7: 0,
+          8: 0,
+        };
+
   const [quantities, setQuantities] = useState(
-    props.quantities || {
-      0: 100,
-      1: 0,
-      2: 0,
-      3: 0,
-      4: 0,
-      5: 0,
-      6: 0,
-      7: 0,
-      8: 0,
-    },
+    props.quantities || newInitialQuantities,
   );
+
+  // const [quantities, setQuantities] = useState(
+  //   props.quantities ||
+  //   {
+  //     0: 100,
+  //     1: 0,
+  //     2: 0,
+  //     3: 0,
+  //     4: 0,
+  //     5: 0,
+  //     6: 0,
+  //     7: 0,
+  //     8: 0,
+  //   },
+  // );
 
   const [parameters, setParameters] = useState(
     props.parameters || {
@@ -276,6 +308,56 @@ function Boston_vercise_directed(props, ref) {
     } else if (percAmpToggle === 'right') {
       total = totalAmplitude;
     }
+
+    // total = totalAmplitude;
+    console.log('total: ', total);
+    const centerCount = Object.values(selectedValues).filter(
+      (value) => value === 'center',
+    ).length;
+    const centerQuantityIncrement = centerCount > 0 ? total / centerCount : 0;
+    // console.log('CenterCount: ', centerCount);
+
+    const rightCount = Object.values(selectedValues).filter(
+      (value) => value === 'right',
+    ).length;
+    const rightQuantityIncrement = rightCount > 0 ? total / rightCount : 0;
+
+    const updatedQuantities = { ...quantities }; // Create a copy of the quantities object
+
+    // Update the quantities based on selected values
+    Object.keys(selectedValues).forEach((key) => {
+      const value = selectedValues[key];
+      // console.log("key="+key + ", value=" + value);
+      if (value === 'left') {
+        updatedQuantities[key] = 0;
+      } else if (value === 'center') {
+        console.log('CENTER: ', centerQuantityIncrement);
+        updatedQuantities[key] = centerQuantityIncrement;
+        console.log('updated: ', updatedQuantities);
+      } else if (value === 'right') {
+        updatedQuantities[key] = rightQuantityIncrement;
+      }
+      // updatedQuantities[key] = 20;
+    });
+
+    // console.log(quantities);
+    setQuantities(updatedQuantities);
+    // setSelectedValues(selectedValue);
+
+    console.log(quantities);
+    // Update the state with the new quantities
+  };
+
+  const calculateQuantitiesWithDistributionAbbott = () => {
+    // Calculate the quantity increment for 'center' and 'right' values
+    let total = 0;
+    if (percAmpToggle === 'left') {
+      total = 100;
+    } else if (percAmpToggle === 'right') {
+      total = totalAmplitude;
+    }
+
+    total = totalAmplitude;
 
     // total = totalAmplitude;
     console.log('total: ', total);
@@ -2306,6 +2388,10 @@ function Boston_vercise_directed(props, ref) {
     return percAmpToggle;
   };
 
+  const getStateVolAmpToggle = () => {
+    return volAmpToggle;
+  };
+
   let outputTogglePosition = 'mA';
   const getStateTogglePosition = () => {
     if (props.IPG === 'Boston') {
@@ -2340,6 +2426,7 @@ function Boston_vercise_directed(props, ref) {
     getStateVisModel,
     getStateTogglePosition,
     getStatePercAmpToggle,
+    getStateVolAmpToggle,
   }));
 
   const handleParameterChange = (parameter) => (e) => {
@@ -2447,10 +2534,30 @@ function Boston_vercise_directed(props, ref) {
 
   const [percAmpAnimation, setPercAmpAnimation] = useState(null);
   // Percentage vs mA toggle switch
-  const handlePercAmpToggleChange = (value, animate) => {
+  // const handlePercAmpToggleChange = (value, animate) => {
+  //   console.log('value', value);
+  //   const newValue = value;
+  //   setPercAmpAnimation(animate);
+  //   if (newValue === 'left') {
+  //     // setTotalAmplitude(0);
+  //     calculatePercentageFromAmplitude();
+  //     outputTogglePosition = '%';
+  //   } else if (newValue === 'right') {
+  //     outputTogglePosition = 'mA';
+  //     // let totalSum = 0;
+  //     // Object.keys(quantities).forEach((key) => {
+  //     //   totalSum += parseFloat(quantities[key]);
+  //     // });
+  //     // setTotalAmplitude(totalSum);
+  //     calculateAmplitudeFromPercentage();
+  //   }
+  //   console.log(value);
+  //   setPercAmpToggle(value);
+  // };
+
+  const handlePercAmpToggleChange = (value) => {
     console.log('value', value);
     const newValue = value;
-    setPercAmpAnimation(animate);
     if (newValue === 'left') {
       // setTotalAmplitude(0);
       calculatePercentageFromAmplitude();
@@ -2525,12 +2632,35 @@ function Boston_vercise_directed(props, ref) {
     { name: 'Assisted', value: '2' },
   ];
 
+  const percAmpDef = [
+    { name: '%', value: 'left' },
+    { name: 'mA', value: 'right' },
+  ];
+
+  const volAmpDef = [
+    { name: 'mA', value: 'left' },
+    { name: 'V', value: 'right' },
+  ];
+
+  const ampDef = [{ name: 'mA', value: 'left' }];
+
   const handleVisModelChange = (event) => {
     setVisModel(event.target.value);
   };
 
   const handleTitleChange = (event) => {
     setSessionTitle(event.target.value);
+  };
+
+  const getVariant = (value) => {
+    // if (value === 'left') {
+    //     return 'outline-success';  // Green outline for 'left'
+    // } else if (value === 'right') {
+    //     return 'outline-danger';  // Red outline for 'right'
+    // } else {
+    //     return 'outline-secondary';  // Default secondary outline
+    // }
+    return 'outline-secondary';
   };
 
   const tooltipspliteven = (
@@ -2556,7 +2686,7 @@ function Boston_vercise_directed(props, ref) {
   useEffect(() => {
     if (props.IPG === 'Abbott') {
       // const newQuantities = { ...quantities };
-      calculateQuantitiesWithDistribution();
+      calculateQuantitiesWithDistributionAbbott();
     }
     if (radioValue === '2') {
       assistedMode();
@@ -2598,7 +2728,7 @@ function Boston_vercise_directed(props, ref) {
         </Form.Select>
         <div />
         <div className="PercentageAmplitudeToggle">
-          {props.IPG === 'Boston' && (
+          {/* {props.IPG === 'Boston' && (
             <PercentageAmplitudeToggle
               value={percAmpToggle}
               // switchPosition={percAmpToggle}
@@ -2606,22 +2736,76 @@ function Boston_vercise_directed(props, ref) {
               onChange={(value, anime) => handlePercAmpToggleChange(value, anime)}
               // getSwitchAnimation={(value, switchPosition) => getSwitchAnimationPercAmp(value, switchPosition)}
             />
+          )} */}
+          {props.IPG === 'Boston' && (
+            <ButtonGroup className="button-group">
+              {percAmpDef.map((percAmp, idx) => (
+                <ToggleButton
+                  key={idx}
+                  id={`percAmp-${idx}`}
+                  type="radio"
+                  variant={getVariant(percAmp.value)}
+                  name="percAmp"
+                  value={percAmp.value}
+                  checked={percAmpToggle === percAmp.value}
+                  onChange={(e) =>
+                    handlePercAmpToggleChange(e.currentTarget.value)
+                  }
+                >
+                  {percAmp.name}
+                </ToggleButton>
+              ))}
+            </ButtonGroup>
           )}
-          {props.IPG === 'Medtronic_Activa' && (
+          {/* {props.IPG === 'Medtronic_Activa' && (
             <VolumeAmplitudeToggle
               value={volAmpToggle}
               onChange={(value) => handleVolAmpToggleChange(value)}
             />
+          )} */}
+          {props.IPG === 'Medtronic_Activa' && (
+            <ButtonGroup className="button-group">
+              {volAmpDef.map((volAmp, idx) => (
+                <ToggleButton
+                  key={idx}
+                  id={`volAmp-${idx}`}
+                  type="radio"
+                  variant={getVariant(volAmp.value)}
+                  name="volAmp"
+                  value={volAmp.value}
+                  checked={volAmpToggle === volAmp.value}
+                  onChange={(e) =>
+                    handleVolAmpToggleChange(e.currentTarget.value)
+                  }
+                >
+                  {volAmp.name}
+                </ToggleButton>
+              ))}
+            </ButtonGroup>
           )}
-          {props.IPG === 'Medtronic_Percept' && (
-            <MAToggleSwitch value={ampToggle} />
+          {(props.IPG === 'Medtronic_Percept' || props.IPG === 'Abbott') && (
+            <ButtonGroup className="button-group">
+              {ampDef.map((amp, idx) => (
+                <ToggleButton
+                  key={idx}
+                  id={`amp-${idx}`}
+                  type="radio"
+                  variant={getVariant(amp.value)}
+                  name="amp"
+                  value={amp.value}
+                  checked={ampToggle === amp.value}
+                >
+                  {amp.name}
+                </ToggleButton>
+              ))}
+            </ButtonGroup>
           )}
-          {props.IPG === 'Abbott' && (
+          {/* {props.IPG === 'Abbott' && (
             <MAToggleSwitch
               value={ampToggle}
               // onChange={(value) => handleVolAmpToggleChange(value)}
             />
-          )}
+          )} */}
         </div>
         <div />
         <div className="button-container">

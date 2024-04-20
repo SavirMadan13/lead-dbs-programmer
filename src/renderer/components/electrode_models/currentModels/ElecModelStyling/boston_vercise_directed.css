@@ -376,10 +376,20 @@ h2 {
   color: #fff; /* Light text color */
 }
 
+.button-group {
+  width: 150px; /* Set the desired width for the ButtonGroup */
+  height: 40px; /* Optional: Set the height of the ButtonGroup */
+  display: flex; /* Ensure the ButtonGroup behaves as a flex container */
+  justify-content: center; /* Center the buttons within the group */
+  margin: auto; /* Center the ButtonGroup within its parent container */
+}
+
 .PercentageAmplitudeToggle {
   position: relative;
-  top: -30px;
-  right: 90px;
+  top: 0px;
+  left: 0px;
+  /* display: flex;
+  justify-content: center; */
 }
 
 .AssistedToggle {

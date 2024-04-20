@@ -19,6 +19,8 @@ function StimulationSettings({
   setAllTogglePositions,
   allPercAmpToggles,
   setAllPercAmpToggles,
+  allVolAmpToggles,
+  setAllVolAmpToggles,
 }) {
   // const [IPG, setIPG] = useState('');
   // const [leftElectrode, setLeftElectrode] = useState('');
@@ -97,6 +99,7 @@ function StimulationSettings({
     setAllSelectedValues({});
     setAllTogglePositions({});
     setAllPercAmpToggles({});
+    setAllVolAmpToggles({});
     console.log('selectedIPG: ', selectedIPG);
   };
 

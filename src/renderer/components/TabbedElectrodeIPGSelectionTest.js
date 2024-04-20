@@ -52,6 +52,8 @@ function TabbedElectrodeIPGSelection({
   setAllTogglePositions,
   allPercAmpToggles,
   setAllPercAmpToggles,
+  allVolAmpToggles,
+  setAllVolAmpToggles,
 }) {
   const testElectrodeRef = React.createRef();
   // const [selectedElectrode, setSelectedElectrode] = useState('');
@@ -146,6 +148,12 @@ function TabbedElectrodeIPGSelection({
       [key]: testElectrodeRef.current.getStatePercAmpToggle(),
     };
     setAllPercAmpToggles(updatedAllPercAmpTogglePositions);
+
+    const updatedAllVolAmpTogglePositions = {
+      ...allVolAmpToggles,
+      [key]: testElectrodeRef.current.getStateVolAmpToggle(),
+    };
+    setAllVolAmpToggles(updatedAllVolAmpTogglePositions);
     // const updatedIPGforOutput = testElectrodeRef.current.getOutputIPG();
     // setOutputIPG(updatedIPGforOutput);
     // console.log(sessionTitle[1]);
@@ -340,6 +348,7 @@ function TabbedElectrodeIPGSelection({
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
         // outputIPG={outputIPG}
       />
     ),

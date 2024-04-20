@@ -71,6 +71,7 @@ export default function App() {
   const [sessionTitle, setSessionTitle] = useState('');
   const [allTogglePositions, setAllTogglePositions] = useState({});
   const [allPercAmpToggles, setAllPercAmpToggles] = useState({});
+  const [allVolAmpToggles, setAllVolAmpToggles] = useState({});
 
   return (
     <Router>
@@ -118,6 +119,8 @@ export default function App() {
                 setAllTogglePositions={setAllTogglePositions}
                 allPercAmpToggles={allPercAmpToggles}
                 setAllPercAmpToggles={setAllPercAmpToggles}
+                allVolAmpToggles={allVolAmpToggles}
+                setAllVolAmpToggles={setAllVolAmpToggles}
               />
               <Link to="/tabbed-selection">
                 <button className="button">Next</button>
@@ -150,6 +153,8 @@ export default function App() {
               setAllTogglePositions={setAllTogglePositions}
               allPercAmpToggles={allPercAmpToggles}
               setAllPercAmpToggles={setAllPercAmpToggles}
+              allVolAmpToggles={allVolAmpToggles}
+              setAllVolAmpToggles={setAllVolAmpToggles}
             />
           }
         />
