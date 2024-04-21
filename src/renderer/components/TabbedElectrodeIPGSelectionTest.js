@@ -364,6 +364,9 @@ function TabbedElectrodeIPGSelection({
         parameters={allStimulationParameters[key]}
         visModel={visModel[1]}
         sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
       />
     ),
     boston_vercise_cartesia_x: (
@@ -378,6 +381,9 @@ function TabbedElectrodeIPGSelection({
         parameters={allStimulationParameters[key]}
         visModel={visModel[1]}
         sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
       />
     ),
     boston_vercise: (
@@ -392,6 +398,9 @@ function TabbedElectrodeIPGSelection({
         parameters={allStimulationParameters[key]}
         visModel={visModel[1]}
         sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
       />
     ),
     medtronic_3389: (
@@ -406,6 +415,9 @@ function TabbedElectrodeIPGSelection({
         parameters={allStimulationParameters[key]}
         visModel={visModel[1]}
         sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
       />
     ),
     medtronic_3387: (
@@ -420,6 +432,9 @@ function TabbedElectrodeIPGSelection({
         parameters={allStimulationParameters[key]}
         visModel={visModel[1]}
         sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
       />
     ),
     medtronic_3391: (
@@ -434,6 +449,9 @@ function TabbedElectrodeIPGSelection({
         parameters={allStimulationParameters[key]}
         visModel={visModel[1]}
         sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
       />
     ),
     medtronic_b33005: (
@@ -448,6 +466,9 @@ function TabbedElectrodeIPGSelection({
         parameters={allStimulationParameters[key]}
         visModel={visModel[1]}
         sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
       />
     ),
     medtronic_b33015: (
@@ -462,6 +483,9 @@ function TabbedElectrodeIPGSelection({
         parameters={allStimulationParameters[key]}
         visModel={visModel[1]}
         sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
       />
     ),
     abbott_activetip_2mm: (
@@ -476,6 +500,9 @@ function TabbedElectrodeIPGSelection({
         parameters={allStimulationParameters[key]}
         visModel={visModel[1]}
         sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
       />
     ),
     abbott_activetip_3mm: (
@@ -490,6 +517,9 @@ function TabbedElectrodeIPGSelection({
         parameters={allStimulationParameters[key]}
         visModel={visModel[1]}
         sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
       />
     ),
     abbott_directed_6172: (
@@ -504,6 +534,9 @@ function TabbedElectrodeIPGSelection({
         parameters={allStimulationParameters[key]}
         visModel={visModel[1]}
         sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
       />
     ),
     abbott_directed_6173: (
@@ -518,6 +551,9 @@ function TabbedElectrodeIPGSelection({
         parameters={allStimulationParameters[key]}
         visModel={visModel[1]}
         sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
       />
     ),
   };

@@ -73,6 +73,7 @@ function StimulationSettings({
     setLeftElectrode(selectedLeftElectrode);
     setAllQuantities({});
     setAllSelectedValues({});
+    setAllTotalAmplitudes({});
     console.log('IPGselection: ', IPG);
   };
 
@@ -100,6 +101,7 @@ function StimulationSettings({
     setAllTogglePositions({});
     setAllPercAmpToggles({});
     setAllVolAmpToggles({});
+    setAllTotalAmplitudes({});
     console.log('selectedIPG: ', selectedIPG);
   };
 
