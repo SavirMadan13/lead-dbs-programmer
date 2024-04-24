@@ -33,6 +33,9 @@
     "postinstall": "ts-node .erb/scripts/check-native-dep.js && electron-builder install-app-deps && npm run build:dll",
     "lint": "cross-env NODE_ENV=development eslint . --ext .js,.jsx,.ts,.tsx",
     "package": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never && npm run build:dll",
+    "package:win": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --win --publish never && npm run build:dll",
+    "package:linux": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --linux --publish never && npm run build:dll",
+    "package:tar": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --linux --publish never && npm run build:dll && cd ./release/build && tar -zcvf ../LeadDbsProgrammer.tar.gz . && cd ../..",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir release/app",
     "start": "concurrently \"npm run start-server\" \"npm run start:renderer\"",
     "start-server": "ts-node server.ts",
@@ -221,7 +224,7 @@
     },
     "linux": {
       "target": [
-        "AppImage"
+        "dir"
       ],
       "category": "Development"
     },

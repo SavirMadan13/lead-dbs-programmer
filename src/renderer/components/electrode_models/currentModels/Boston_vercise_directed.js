@@ -432,6 +432,7 @@ function Boston_vercise_directed(props, ref) {
       console.log('2');
     }
     setQuantities(updatedQuantities);
+    setLastChangedKey(key);
     // console.log('quani: ', quantities);
     // // handleIPGLogic();
   };
@@ -2097,10 +2098,12 @@ function Boston_vercise_directed(props, ref) {
     let rightCount = 0;
 
     Object.keys(updatedQuantities).forEach((key) => {
+      // gets the sum of negative polarity
       if (updatedSelectedValues[key] === 'center') {
         negativeSum += parseFloat(updatedQuantities[key]);
         centerCount += 1;
         // console.log('negativeSum: ', negativeSum);
+        // gets the sum of positive polarity
       } else if (updatedSelectedValues[key] === 'right') {
         positiveSum += parseFloat(updatedQuantities[key]);
         rightCount += 1;
@@ -2109,6 +2112,7 @@ function Boston_vercise_directed(props, ref) {
     });
 
     Object.keys(updatedQuantities).find((key) => {
+      // Negative polarity
       if (updatedSelectedValues[key] === 'center') {
         if (key === lastChangedKey) {
           negativeModifiedKey = key;
@@ -2116,6 +2120,7 @@ function Boston_vercise_directed(props, ref) {
           return true; // exit loop
         }
       }
+      // Positive polarity
       if (updatedSelectedValues[key] === 'right') {
         if (key === lastChangedKey) {
           positiveModifiedKey = key;
@@ -2125,6 +2130,14 @@ function Boston_vercise_directed(props, ref) {
       }
       return false; // continue looping
     });
+
+    if (negativeSum === 100) {
+      Object.keys(updatedQuantities).forEach((key) => {
+        if (key === negativeModifiedKey && updatedQuantities[key] === 0) {
+          updatedQuantities[key] = 10;
+        }
+      });
+    }
 
     if (negativeSum !== 100) {
       const negativeDifference = 100 - parseFloat(negativeSum);
@@ -2169,10 +2182,17 @@ function Boston_vercise_directed(props, ref) {
         }
       });
     }
+    // if (negativeSum === 100) {
+    //   Object.keys(updatedQuantities).forEach((key) => {
+    //     if ()
+    //   })
+    // }
+    // roundAllocUp();
     setQuantities(updatedQuantities);
     setSelectedValues(updatedSelectedValues);
     checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
-    return quantities; // Return the modified quantities
+    // return quantities;
+    // Return the modified quantities
   }
 
   function assist() {
@@ -2625,7 +2645,7 @@ function Boston_vercise_directed(props, ref) {
     handleCheck();
   };
 
-  const [radioValue, setRadioValue] = useState('1');
+  const [radioValue, setRadioValue] = useState('2');
 
   const radios = [
     { name: 'None', value: '1' },
@@ -2688,8 +2708,16 @@ function Boston_vercise_directed(props, ref) {
       // const newQuantities = { ...quantities };
       calculateQuantitiesWithDistributionAbbott();
     }
-    if (radioValue === '2') {
-      assistedMode();
+    console.log('outputTogglePosition: ', outputTogglePosition);
+
+    if (radioValue === '2' && props.IPG === 'Boston' && percAmpToggle === 'left') {
+      // assistedMode();
+      calculateQuantitiesWithDistribution();
+    } else if (
+      radioValue === '2' &&
+      (outputTogglePosition === 'mA' || outputTogglePosition === 'V')
+    ) {
+      calculateQuantitiesWithDistributionAbbott();
     }
     // if (props.IPG === 'Medtronic_Activa') {
     //   if (volAmpToggle === 'left') {

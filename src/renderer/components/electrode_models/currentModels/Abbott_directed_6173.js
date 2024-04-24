@@ -2626,7 +2626,7 @@ function Abbott_directed_6173(props, ref) {
     handleCheck();
   };
 
-  const [radioValue, setRadioValue] = useState('1');
+  const [radioValue, setRadioValue] = useState('2');
 
   const radios = [
     { name: 'None', value: '1' },
@@ -2689,8 +2689,14 @@ function Abbott_directed_6173(props, ref) {
       // const newQuantities = { ...quantities };
       calculateQuantitiesWithDistributionAbbott();
     }
-    if (radioValue === '2') {
-      assistedMode();
+    if (radioValue === '2' && props.IPG === 'Boston' && percAmpToggle === 'left') {
+      // assistedMode();
+      calculateQuantitiesWithDistribution();
+    } else if (
+      radioValue === '2' &&
+      (outputTogglePosition === 'mA' || outputTogglePosition === 'V')
+    ) {
+      calculateQuantitiesWithDistributionAbbott();
     }
     // if (props.IPG === 'Medtronic_Activa') {
     //   if (volAmpToggle === 'left') {
