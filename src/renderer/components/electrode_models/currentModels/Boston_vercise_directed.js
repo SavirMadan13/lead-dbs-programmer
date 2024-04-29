@@ -2000,7 +2000,7 @@ function Boston_vercise_directed(props, ref) {
     Object.keys(updatedQuantities).forEach((key) => {
       // keyLevel = getOnContacts[level[key]]
       const levelOnContacts = getOnContacts(level[key]);
-      if (face[key] === 'right' && levelQuantities[level[key]] !== 0) {
+      if (face[key] === 'right' && levelQuantities[level[key]] !== 0 && key !== 0) {
         // console.log('length ', getOnContacts(level[key]).length);
         // if (getOnContacts(level[key]).length > 0) {
         // console.log('facesVec ', counter);
@@ -2008,11 +2008,11 @@ function Boston_vercise_directed(props, ref) {
         // updatedSelectedValues[key] = 'center';
         updatedQuantities[key] = (3 * levelQuantities[level[key]]) / 4;
         // }
-      } else if (face[key] === 'center' && levelQuantities[level[key]] !== 0) {
+      } else if (face[key] === 'center' && levelQuantities[level[key]] !== 0 && key !== 0) {
         updatedSelectedValues[key] = selectedValues[levelOnContacts[0]]; // Need to fix this
         // updatedSelectedValues[key] = 'center';
         updatedQuantities[key] = levelQuantities[level[key]] / 4;
-      } else {
+      } else if (key !== 0) {
         updatedSelectedValues[key] = 'left';
         updatedQuantities[key] = 0;
       }

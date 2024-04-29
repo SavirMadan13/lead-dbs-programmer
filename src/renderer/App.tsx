@@ -72,6 +72,10 @@ export default function App() {
   const [allTogglePositions, setAllTogglePositions] = useState({});
   const [allPercAmpToggles, setAllPercAmpToggles] = useState({});
   const [allVolAmpToggles, setAllVolAmpToggles] = useState({});
+  const [importCount, setImportCount] = useState(0);
+  const [importData, setImportData] = useState('');
+  const [masterImportData, setMasterImportData] = useState('');
+  const [matImportFile, setMatImportFile] = useState(null);
 
   return (
     <Router>
@@ -85,7 +89,7 @@ export default function App() {
           path="/"
           element={<Navigate to ="/new-route" />}
         /> */}
-        <Route
+        {/* <Route
           path="/"
           element={
             <div>
@@ -96,10 +100,10 @@ export default function App() {
               </Link>
             </div>
           }
-        />
+        /> */}
         <Route path="/testing" element={<AssistedButtons />} />
         <Route
-          path="/stimulation-settings"
+          path="/"
           element={
             <div>
               <StimulationSettings
@@ -121,6 +125,14 @@ export default function App() {
                 setAllPercAmpToggles={setAllPercAmpToggles}
                 allVolAmpToggles={allVolAmpToggles}
                 setAllVolAmpToggles={setAllVolAmpToggles}
+                importCount={importCount}
+                setImportCount={setImportCount}
+                importDataTest={importData}
+                setImportDataTest={setImportData}
+                masterImportData={masterImportData}
+                setMasterImportData={setMasterImportData}
+                matImportFile={matImportFile}
+                setMatImportFile={setMatImportFile}
               />
               <Link to="/tabbed-selection">
                 <button className="button">Next</button>

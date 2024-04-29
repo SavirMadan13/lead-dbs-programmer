@@ -1791,7 +1791,7 @@ function TabbedElectrodeIPGSelection({
         </button> */}
         {/* <button onClick={handleIPGForOutput}>IPG Output</button> */}
         <button className="export-button" onClick={sendDataToMain}>
-          Visualize File
+          Stimulate
         </button>
       </div>
     </div>

@@ -34,7 +34,7 @@ export default function Navbar() {
         </IconButton>
       </NavLink> */}
       <NavLink
-        to="/stimulation-settings"
+        to="/"
         style={{ textDecoration: 'none', color: 'inherit' }}
       >
         <IconButton>

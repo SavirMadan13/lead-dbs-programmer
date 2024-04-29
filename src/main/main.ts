@@ -94,9 +94,34 @@ ipcMain.on('import-file', async (event, arg) => {
   const fileName = 'inputData.json';
   const filePath = path.join(result, fileName);
   console.log(filePath);
+  // const testFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/lead-dbs-programmer/inputData.json';
   const f = fs.readFileSync(filePath);
   const jsonData = JSON.parse(f);
   event.reply('import-file', jsonData);
+});
+
+ipcMain.on('import-previous-files', (event, fileID, importData) => {
+  // console.log(fileID);
+  const masterImportData = importData.priorStims;
+  console.log('MasterimportData: ', masterImportData);
+  let fileKey = '';
+  Object.keys(masterImportData).forEach((key) => {
+    if (masterImportData[key].name === fileID) {
+      fileKey = key;
+    }
+  });
+  const priorStimFolder = masterImportData[fileKey].folder;
+  console.log('priorStimFolder: ', priorStimFolder);
+  const fileName = importData.patientname + '_desc-stimparameters.json';
+  const filePath = path.join(priorStimFolder, fileID, fileName);
+  // const matData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+
+  // Convert the data to JSON format
+  const f = fs.readFileSync(filePath);
+  const jsonData = JSON.parse(f);
+
+  // console.log(key);
+  event.reply('import-previous-files-reply', jsonData);
 });
 
 ipcMain.on('open-file', (event, arg) => {
