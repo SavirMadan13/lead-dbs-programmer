@@ -103,7 +103,7 @@ ipcMain.on('import-file', async (event, arg) => {
 ipcMain.on('import-previous-files', (event, fileID, importData) => {
   // console.log(fileID);
   const masterImportData = importData.priorStims;
-  console.log('MasterimportData: ', masterImportData);
+  // console.log('MasterimportData: ', masterImportData);
   let fileKey = '';
   Object.keys(masterImportData).forEach((key) => {
     if (masterImportData[key].name === fileID) {
@@ -111,7 +111,7 @@ ipcMain.on('import-previous-files', (event, fileID, importData) => {
     }
   });
   const priorStimFolder = masterImportData[fileKey].folder;
-  console.log('priorStimFolder: ', priorStimFolder);
+  // console.log('priorStimFolder: ', priorStimFolder);
   const fileName = importData.patientname + '_desc-stimparameters.json';
   const filePath = path.join(priorStimFolder, fileID, fileName);
   // const matData = JSON.parse(fs.readFileSync(filePath, 'utf8'));

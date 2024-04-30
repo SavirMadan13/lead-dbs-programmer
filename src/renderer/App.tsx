@@ -1,6 +1,6 @@
 /* eslint-disable react/self-closing-comp */
 import { MemoryRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 
 import ImageDisplay from './components/ImageDisplay';
@@ -17,6 +17,7 @@ import JSONDataExtractor from './components/JSONDataExtractor';
 import NewBostonCartesiaTest from './components/NewBostonCartesiaTest';
 import TripleToggleTest from './components/TripleToggleTest';
 import Navbar from './components/Navbar';
+// import Navbar from 'react-bootstrap/Navbar'
 import StimulationSettings from './components/StimulationSettings';
 import PercentageAmplitudeToggle from './components/PercentageAmplitudeToggle';
 import AssistedToggle from './components/AssistedToggle';
@@ -25,7 +26,9 @@ import MAToggleSwitch from './components/MAToggleSwitch';
 import ExportData from './components/ExportData';
 import React from 'react';
 import AssistedButtons from './components/AssistedButtons';
+import Dropdown from 'react-bootstrap/dropdown';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Container } from 'react-bootstrap';
 
 function Hello() {
   return (
@@ -76,6 +79,16 @@ export default function App() {
   const [importData, setImportData] = useState('');
   const [masterImportData, setMasterImportData] = useState('');
   const [matImportFile, setMatImportFile] = useState(null);
+  const [newImportFiles, setNewImportFiles] = useState(null);
+  const [showDropdown, setShowDropdown] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowDropdown(false);
+    }, 1); // Adjust the time to your preference (in milliseconds)
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <Router>
@@ -83,6 +96,102 @@ export default function App() {
         <Navbar />
         {/* <img src="./logo512Padding-300x212.png" alt="leadDBS" /> */}
       </div>
+      {showDropdown && (
+        <StimulationSettings
+          IPG={IPG}
+          setIPG={setIPG}
+          leftElectrode={leftElectrode}
+          setLeftElectrode={setLeftElectrode}
+          rightElectrode={rightElectrode}
+          setRightElectrode={setRightElectrode}
+          allQuantities={allQuantities}
+          setAllQuantities={setAllQuantities}
+          allSelectedValues={allSelectedValues}
+          setAllSelectedValues={setAllSelectedValues}
+          allTotalAmplitudes={allTotalAmplitudes}
+          setAllTotalAmplitudes={setAllTotalAmplitudes}
+          allTogglePositions={allTogglePositions}
+          setAllTogglePositions={setAllTogglePositions}
+          allPercAmpToggles={allPercAmpToggles}
+          setAllPercAmpToggles={setAllPercAmpToggles}
+          allVolAmpToggles={allVolAmpToggles}
+          setAllVolAmpToggles={setAllVolAmpToggles}
+          importCount={importCount}
+          setImportCount={setImportCount}
+          importDataTest={importData}
+          setImportDataTest={setImportData}
+          masterImportData={masterImportData}
+          setMasterImportData={setMasterImportData}
+          matImportFile={matImportFile}
+          setMatImportFile={setMatImportFile}
+          newImportFiles={newImportFiles}
+          setNewImportFiles={setNewImportFiles}
+        />
+      )}
+      <Dropdown style={{marginLeft: 100}}>
+        <Dropdown.Toggle variant="success" id="dropdown-button-dark-example1">
+          Stimulation Settings
+        </Dropdown.Toggle>
+        <Dropdown.Menu>
+          <StimulationSettings
+            IPG={IPG}
+            setIPG={setIPG}
+            leftElectrode={leftElectrode}
+            setLeftElectrode={setLeftElectrode}
+            rightElectrode={rightElectrode}
+            setRightElectrode={setRightElectrode}
+            allQuantities={allQuantities}
+            setAllQuantities={setAllQuantities}
+            allSelectedValues={allSelectedValues}
+            setAllSelectedValues={setAllSelectedValues}
+            allTotalAmplitudes={allTotalAmplitudes}
+            setAllTotalAmplitudes={setAllTotalAmplitudes}
+            allTogglePositions={allTogglePositions}
+            setAllTogglePositions={setAllTogglePositions}
+            allPercAmpToggles={allPercAmpToggles}
+            setAllPercAmpToggles={setAllPercAmpToggles}
+            allVolAmpToggles={allVolAmpToggles}
+            setAllVolAmpToggles={setAllVolAmpToggles}
+            importCount={importCount}
+            setImportCount={setImportCount}
+            importDataTest={importData}
+            setImportDataTest={setImportData}
+            masterImportData={masterImportData}
+            setMasterImportData={setMasterImportData}
+            matImportFile={matImportFile}
+            setMatImportFile={setMatImportFile}
+            newImportFiles={newImportFiles}
+            setNewImportFiles={setNewImportFiles}
+          />
+        </Dropdown.Menu>
+      </Dropdown>
+      {leftElectrode && (
+        <TabbedElectrodeIPGSelectionTest
+          selectedElectrodeLeft={leftElectrode}
+          selectedElectrodeRight={rightElectrode}
+          IPG={IPG}
+          // key={key}
+          // setKey={setKey}
+          allQuantities={allQuantities}
+          setAllQuantities={setAllQuantities}
+          allSelectedValues={allSelectedValues}
+          setAllSelectedValues={setAllSelectedValues}
+          allTotalAmplitudes={allTotalAmplitudes}
+          setAllTotalAmplitudes={setAllTotalAmplitudes}
+          allStimulationParameters={allStimulationParameters}
+          setAllStimulationParameters={setAllStimulationParameters}
+          visModel={visModel}
+          setVisModel={setVisModel}
+          sessionTitle={sessionTitle}
+          setSessionTitle={setSessionTitle}
+          allTogglePositions={allTogglePositions}
+          setAllTogglePositions={setAllTogglePositions}
+          allPercAmpToggles={allPercAmpToggles}
+          setAllPercAmpToggles={setAllPercAmpToggles}
+          allVolAmpToggles={allVolAmpToggles}
+          setAllVolAmpToggles={setAllVolAmpToggles}
+        />
+      )}
       <Routes>
         {/* <Route path="/" element={<Hello />} /> */}
         {/* <Route
@@ -102,8 +211,8 @@ export default function App() {
           }
         /> */}
         <Route path="/testing" element={<AssistedButtons />} />
-        <Route
-          path="/"
+        {/* <Route
+          path="/test"
           element={
             <div>
               <StimulationSettings
@@ -139,9 +248,9 @@ export default function App() {
               </Link>
             </div>
           }
-        />
+        /> */}
         <Route
-          path="tabbed-selection"
+          path="/tab"
           element={
             <TabbedElectrodeIPGSelectionTest
               selectedElectrodeLeft={leftElectrode}

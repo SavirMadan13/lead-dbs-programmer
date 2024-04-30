@@ -99,7 +99,7 @@ function TabbedElectrodeIPGSelection({
     // console.log("new key=" + k + ", old key="+key + ", old data="+ JSON.stringify(testElectrodeRef.current.getStateQuantities()));
     // localStorage.setItem(key, testElectrodeRef.current.getStateData());
     // setAllQuantities({key: testElectrodeRef.current.getStateData()});
-
+    console.log('testElectrodeRef: ', testElectrodeRef.current);
     const updatedAllQuantities = {
       ...allQuantities,
       [key]: testElectrodeRef.current.getStateQuantities(),
@@ -1781,7 +1781,8 @@ function TabbedElectrodeIPGSelection({
           type="file"
           accept=".json"
           onChange={handleFileChange}
-          style={{ display: 'none' }} // Hide the input element
+          style={{ display: 'none' }}
+       // Hide the input element
         />
         {/* <button className="export-button" onClick={gatherExportedData2}>
           Visualize

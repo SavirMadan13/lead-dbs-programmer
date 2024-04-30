@@ -1,6 +1,9 @@
 // import { useState } from 'react';
 import React, { useState, useRef, useEffect } from 'react';
 import BostonCartesiaTest from './electrode_models/BostonCartesiaTest';
+import InputGroup from 'react-bootstrap/InputGroup';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
 
 function StimulationSettings({
   rightElectrode,
@@ -29,6 +32,8 @@ function StimulationSettings({
   setMasterImportData,
   matImportFile,
   setMatImportFile,
+  newImportFiles,
+  setNewImportFiles,
 }) {
   // const [IPG, setIPG] = useState('');
   // const [leftElectrode, setLeftElectrode] = useState('');
@@ -56,10 +61,10 @@ function StimulationSettings({
     window.electron.ipcRenderer.sendMessage('open-file', newImportData[2]);
   });
   window.electron.ipcRenderer.sendMessage('ipc-example', ['ping']);
-  window.electron.ipcRenderer.on('open-file', (event, data) => {
-    // Handle received data
-    console.log(data);
-  });
+  // window.electron.ipcRenderer.on('open-file', (event, data) => {
+  //   // Handle received data
+  //   console.log(data);
+  // });
 
   window.electron.ipcRenderer.once('import-file', (arg) => {
     importData = arg;
@@ -78,8 +83,8 @@ function StimulationSettings({
     });
     setTestData(stimDatasetList);
     setImportDataTest(stimDatasetList);
-    console.log('Stimdatasetlabel: ', stimDatasetList);
-    console.log('masterData: ', arg);
+    // console.log('Stimdatasetlabel: ', stimDatasetList);
+    // console.log('masterData: ', arg);
     handleImportedElectrode(selectedElectrode);
   });
 
@@ -90,7 +95,7 @@ function StimulationSettings({
     Object.keys(stimDatasets).forEach((key) => {
       stimDatasetList[key] = stimDatasets[key].name;
     });
-    console.log(stimDatasetList);
+    // console.log(stimDatasetList);
   };
 
   const handleLeftElectrodeChange = (e) => {
@@ -118,7 +123,7 @@ function StimulationSettings({
     setAllQuantities({});
     setAllSelectedValues({});
     setAllTotalAmplitudes({});
-    console.log('IPGselection: ', IPG);
+    // console.log('IPGselection: ', IPG);
   };
 
   const handleRightElectrodeChange = (e) => {
@@ -146,7 +151,7 @@ function StimulationSettings({
     setAllPercAmpToggles({});
     setAllVolAmpToggles({});
     setAllTotalAmplitudes({});
-    console.log('selectedIPG: ', selectedIPG);
+    // console.log('selectedIPG: ', selectedIPG);
   };
 
   const [importedData, setImportedData] = useState(null);
@@ -177,7 +182,7 @@ function StimulationSettings({
     // console.log(allQuantities[1][0]);
 
     setLeftElectrode(jsonData.S.elmodel[0]);
-    console.log(jsonData.S.elmodel[1]);
+    // console.log(jsonData.S.elmodel[1]);
     setRightElectrode(jsonData.S.elmodel[1]);
     const elecIPG = jsonData.S.ipg;
     setIPG(elecIPG);
@@ -185,8 +190,8 @@ function StimulationSettings({
     amplitudeArray.push(jsonData.S.amplitude.leftElectrode);
     amplitudeArray.push(jsonData.S.amplitude.rightElectrode);
     setAllTotalAmplitudes(amplitudeArray);
-    console.log('AmpllitudueArray: ', amplitudeArray);
-    console.log(allTotalAmplitudes);
+    // console.log('AmpllitudueArray: ', amplitudeArray);
+    // console.log(allTotalAmplitudes);
 
     for (let j = 1; j < 5; j++) {
       let dynamicKey2 = `Ls${j}`;
@@ -271,8 +276,8 @@ function StimulationSettings({
 
     // console.log('filtered', filteredQuantities);
     // console.log(jsonData.S['Ls1'].case['pol']);
-    console.log('newQuantities: ', newQuantities);
-    console.log('newvalues: ', newSelectedValues);
+    // console.log('newQuantities: ', newQuantities);
+    // console.log('newvalues: ', newSelectedValues);
     setAllSelectedValues(filteredValues);
     setAllQuantities(filteredQuantities);
   };
@@ -311,8 +316,8 @@ function StimulationSettings({
     amplitudeArray.push(jsonData.S.amplitude.leftElectrode);
     amplitudeArray.push(jsonData.S.amplitude.rightElectrode);
     setAllTotalAmplitudes(amplitudeArray);
-    console.log('AmpllitudueArray: ', amplitudeArray);
-    console.log(allTotalAmplitudes);
+    // console.log('AmpllitudueArray: ', amplitudeArray);
+    // console.log(allTotalAmplitudes);
 
     for (let j = 1; j < 5; j++) {
       let dynamicKey2 = `Ls${j}`;
@@ -397,8 +402,8 @@ function StimulationSettings({
 
     // console.log('filtered', filteredQuantities);
     // console.log(jsonData.S['Ls1'].case['pol']);
-    console.log('newQuantities: ', newQuantities);
-    console.log('newvalues: ', newSelectedValues);
+    // console.log('newQuantities: ', newQuantities);
+    // console.log('newvalues: ', newSelectedValues);
     setAllSelectedValues(filteredValues);
     setAllQuantities(filteredQuantities);
   };
@@ -420,10 +425,11 @@ function StimulationSettings({
   }
 
   const fileInputRef = useRef(null);
-
+  const [newStims, setNewStims] = useState([]);
   const handleImportFileChange = (e) => {
-    console.log('E: ', masterImportData);
-    if (e.target.value !== 'new') {
+    // console.log('E: ', masterImportData);
+    console.log('NewStims ', newStims.includes(e.target.value));
+    if (!newStims.includes(e.target.value)) {
       window.electron.ipcRenderer.sendMessage(
         'import-previous-files',
         e.target.value,
@@ -435,10 +441,54 @@ function StimulationSettings({
   };
 
   window.electron.ipcRenderer.on('import-previous-files-reply', (arg) => {
-    console.log('hello');
-    console.log(arg);
+    // console.log('hello');
+    // console.log(arg);
     gatherImportedDataNew(arg);
   });
+
+  const [newStim, setNewStim] = useState('');
+  const handleOnAddButtonClick = () => {
+    // console.log
+    // newStims.push(newStim);
+    setNewStims([...newStims, newStim]);
+    let lastKey = 0;
+    Object.keys(importDataTest).forEach((key) => {
+      lastKey = parseFloat(key) + 1;
+    });
+    const updatedImportDataTest = { ...importDataTest };
+    updatedImportDataTest[lastKey] = newStim;
+    setImportDataTest(updatedImportDataTest);
+    const updatedNewImportFiles = { ...newImportFiles };
+    updatedNewImportFiles[lastKey] = newStim;
+    // setNewImportFiles(updatedNewImportFiles);
+    console.log(updatedImportDataTest);
+    console.log(newStim);
+    setMatImportFile(newStim);
+    setNewStim('');
+  };
+
+  const handleNewStimText = (event) => {
+    setNewStim(event.target.value);
+  };
+
+  function generateUniqueID() {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // Adding 1 because months are zero-based
+    const day = currentDate.getDate().toString().padStart(2, '0');
+    const randomNums = Math.floor(Math.random() * 1000000); // Generate random 4-digit number
+    return `${year}${month}${day}${randomNums}`;
+  }
+
+  const handleTabKeyPress = (event) => {
+    if (event.key === 'Tab') {
+      event.preventDefault(); // Prevent the default tab behavior
+      const uniqueID = generateUniqueID();
+      setNewStim(uniqueID);
+      // setNewStim(Date.now().toString());
+      // Set the input field value to the placeholder text
+    }
+  };
 
   // useEffect(() => {
   //   if (importedData) {
@@ -466,17 +516,41 @@ function StimulationSettings({
         style={{ display: 'none' }} // Hide the input element
       /> */}
       <div></div>
-      <button onClick={handleDebugButton}>debug</button>
-      <h2>Load Stimulation Settings</h2>
+      {/* <button onClick={handleDebugButton}>debug</button> */}
+      <h2 style={{fontSize: 16}}>Stimulation ID</h2>
       <select value={matImportFile} onChange={(e) => handleImportFileChange(e)}>
         {Object.keys(importDataTest).map((key) => (
           <option key={key} value={importDataTest[key]}>
             {importDataTest[key]}
           </option>
         ))}
+        {/* {Object.keys(newImportFiles).map((key) => (
+          <option key={key} value={newImportFiles[key]}>
+            {newImportFiles[key]}
+          </option>
+        ))} */}
       </select>
+      <InputGroup className="mb-3">
+        <Form.Control
+          placeholder='Tab for auto ID'
+          // aria-label="Recipient's username"
+          aria-describedby="basic-addon2"
+          value={newStim}
+          onChange={handleNewStimText}
+          onKeyDown={handleTabKeyPress}
+        />
+        <Button variant="outline-secondary" id="button-addon2" onClick={handleOnAddButtonClick}>
+          Add
+        </Button>
+      </InputGroup>
+      {/* <input
+        type="text"
+        // value={newItem}
+        // onChange={(e) => handleNewItemChange(e)}
+        placeholder={Date.now()}
+      /> */}
       <div></div>
-      <h2>Choose Left Electrode</h2>
+      <h2 style={{fontSize: 16}}>Left Electrode</h2>
       <select
         value={leftElectrode}
         onChange={(e) => handleLeftElectrodeChange(e)}
@@ -524,7 +598,7 @@ function StimulationSettings({
         {/* <option value="AbbottDirectedTest">Abbott Directed</option> */}
       </select>
       <div></div>
-      <h2>Choose Right Electrode</h2>
+      <h2 style={{fontSize: 16}}>Right Electrode</h2>
       <select
         value={rightElectrode}
         onChange={(e) => handleRightElectrodeChange(e)}
@@ -570,7 +644,7 @@ function StimulationSettings({
         <option value="medtronic_b33015">Medtronic B33015</option>
       </select>
       <div></div>
-      <h2>Choose IPG</h2>
+      <h2 style={{fontSize: 16}}>IPG</h2>
       <select value={IPG} onChange={(e) => handleIPGChange(e)}>
         <option value="">None</option>
         <option value="Abbott">Abbott (Infinity, Brio, Libra)</option>
@@ -581,13 +655,13 @@ function StimulationSettings({
         <option value="Medtronic_Percept">Medtronic Percept</option>
       </select>
       <div></div>
-      <button
+      {/* <button
         className="import-button"
         onClick={() => fileInputRef.current.click()}
         // onClick={gatherImportedData(importData)}
       >
         Import Data
-      </button>
+      </button> */}
       <input
         ref={fileInputRef}
         className="file-input"

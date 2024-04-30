@@ -9,6 +9,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
+import AssistedToggle from './AssistedToggle';
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 // import { FaHamburger, FaSun, FaMoon } from 'react-icons/fa';
@@ -33,7 +34,7 @@ export default function Navbar() {
           <Typography>Component Testing</Typography>
         </IconButton>
       </NavLink> */}
-      <NavLink
+      {/* <NavLink
         to="/"
         style={{ textDecoration: 'none', color: 'inherit' }}
       >
@@ -48,7 +49,7 @@ export default function Navbar() {
         <IconButton>
           <Typography>Electrode Model</Typography>
         </IconButton>
-      </NavLink>
+      </NavLink> */}
       {/* <NavLink
         to="/end-session"
         style={{ textDecoration: 'none', color: 'inherit' }}
@@ -73,8 +74,9 @@ export default function Navbar() {
     <AppBar position="fixed">
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Lead DBS Programmer
+          Lead-DBS Programmer
         </Typography>
+        {/* <AssistedToggle /> */}
         {isMobile ? (
           <>
             <IconButton color="inherit" onClick={() => toggleDrawer(true)}>
