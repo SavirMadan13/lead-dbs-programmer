@@ -2645,7 +2645,7 @@ function Boston_vercise_directed(props, ref) {
     handleCheck();
   };
 
-  const [radioValue, setRadioValue] = useState('2');
+  const [radioValue, setRadioValue] = useState('1');
 
   const radios = [
     { name: 'None', value: '1' },

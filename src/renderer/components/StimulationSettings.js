@@ -406,6 +406,10 @@ function StimulationSettings({
     // console.log('newvalues: ', newSelectedValues);
     setAllSelectedValues(filteredValues);
     setAllQuantities(filteredQuantities);
+    // setAllQuantities(filteredQuantities => {
+    //   const newAllQuantities = { ...filteredQuantities };
+    //   return filteredQuantities;
+    // });
   };
 
   function handleFileChange(event) {
@@ -429,21 +433,30 @@ function StimulationSettings({
   const handleImportFileChange = (e) => {
     // console.log('E: ', masterImportData);
     console.log('NewStims ', newStims.includes(e.target.value));
-    if (!newStims.includes(e.target.value)) {
+    // if (!newStims.includes(e.target.value)) {
       window.electron.ipcRenderer.sendMessage(
         'import-previous-files',
         e.target.value,
         // key,
         masterImportData,
       );
-    }
+    // }
     setMatImportFile(e.target.value);
   };
 
   window.electron.ipcRenderer.on('import-previous-files-reply', (arg) => {
     // console.log('hello');
-    // console.log(arg);
-    gatherImportedDataNew(arg);
+    console.log(arg);
+    if (arg !== 'Empty') {
+      gatherImportedDataNew(arg);
+    }
+  });
+
+  let filePath = '';
+  window.electron.ipcRenderer.on('get-output-filePath', (arg) => {
+    // console.log('hello');
+    console.log(arg);
+    filePath = arg;
   });
 
   const [newStim, setNewStim] = useState('');

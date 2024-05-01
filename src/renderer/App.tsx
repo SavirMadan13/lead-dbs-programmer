@@ -129,7 +129,7 @@ export default function App() {
         />
       )}
       <Dropdown style={{marginLeft: 100}}>
-        <Dropdown.Toggle variant="success" id="dropdown-button-dark-example1">
+        <Dropdown.Toggle variant="secondary" id="dropdown-button-dark-example1">
           Stimulation Settings
         </Dropdown.Toggle>
         <Dropdown.Menu>
