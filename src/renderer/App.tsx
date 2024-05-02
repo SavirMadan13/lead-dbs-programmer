@@ -81,6 +81,7 @@ export default function App() {
   const [matImportFile, setMatImportFile] = useState(null);
   const [newImportFiles, setNewImportFiles] = useState(null);
   const [showDropdown, setShowDropdown] = useState(true);
+  const [filePath, setFilePath] = useState('');
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -126,6 +127,8 @@ export default function App() {
           setMatImportFile={setMatImportFile}
           newImportFiles={newImportFiles}
           setNewImportFiles={setNewImportFiles}
+          filePath={filePath}
+          setFilePath={setFilePath}
         />
       )}
       <Dropdown style={{marginLeft: 100}}>
@@ -162,6 +165,8 @@ export default function App() {
             setMatImportFile={setMatImportFile}
             newImportFiles={newImportFiles}
             setNewImportFiles={setNewImportFiles}
+            filePath={filePath}
+            setFilePath={setFilePath}
           />
         </Dropdown.Menu>
       </Dropdown>
@@ -190,6 +195,8 @@ export default function App() {
           setAllPercAmpToggles={setAllPercAmpToggles}
           allVolAmpToggles={allVolAmpToggles}
           setAllVolAmpToggles={setAllVolAmpToggles}
+          filePath={filePath}
+          setFilePath={setFilePath}
         />
       )}
       <Routes>

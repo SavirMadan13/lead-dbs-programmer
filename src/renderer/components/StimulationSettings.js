@@ -34,6 +34,8 @@ function StimulationSettings({
   setMatImportFile,
   newImportFiles,
   setNewImportFiles,
+  filePath,
+  setFilePath,
 }) {
   // const [IPG, setIPG] = useState('');
   // const [leftElectrode, setLeftElectrode] = useState('');
@@ -77,7 +79,7 @@ function StimulationSettings({
     const stimDatasets = importData.priorStims;
     const stimDatasetList = {};
     Object.keys(stimDatasets).forEach((key) => {
-      if (key > 3) {
+      if (key > 2) {
         stimDatasetList[key] = stimDatasets[key].name;
       }
     });
@@ -444,19 +446,14 @@ function StimulationSettings({
     setMatImportFile(e.target.value);
   };
 
-  window.electron.ipcRenderer.on('import-previous-files-reply', (arg) => {
+  window.electron.ipcRenderer.on('import-previous-files-reply', (arg, arg1) => {
     // console.log('hello');
     console.log(arg);
+    setFilePath(arg);
+    console.log('arg1: ', arg1);
     if (arg !== 'Empty') {
-      gatherImportedDataNew(arg);
+      gatherImportedDataNew(arg1);
     }
-  });
-
-  let filePath = '';
-  window.electron.ipcRenderer.on('get-output-filePath', (arg) => {
-    // console.log('hello');
-    console.log(arg);
-    filePath = arg;
   });
 
   const [newStim, setNewStim] = useState('');

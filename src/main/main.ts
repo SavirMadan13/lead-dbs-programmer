@@ -168,11 +168,12 @@ ipcMain.on('import-previous-files', (event, fileID, importData) => {
     console.log('File does not exist. Created a new file.');
     // const jsonData = 'Empty';
   }
+  console.log('FILEPATH; ', filePath);
 
   console.log('JSONDATA: ', jsonData);
   // console.log(key);
-  event.reply('import-previous-files-reply', jsonData);
-  event.reply('get-output-filePath', filePath);
+  event.reply('import-previous-files-reply', filePath, jsonData);
+  // event.reply('get-output-filePath', filePath);
 });
 
 ipcMain.on('open-file', (event, arg) => {
@@ -217,11 +218,12 @@ ipcMain.on('close-window', (event, arg) => {
 const { dialog } = require('electron');
 const fs = require('fs');
 
-ipcMain.on('save-file', (event, data) => {
+ipcMain.on('save-file', (event, file, data) => {
   // Example of saving data to a file
   // const filePath = app.getPath('downloads') + '/data.txt';
   // const currentDirectory = app.getAppPath();
   // const currentDirectory = '/Users/savirmadan/Development/lead-dbs-programmer';
+  console.log('FILE: ', file);
   const currentDirectory = app.getAppPath();
   const directories = currentDirectory.split('/');
 
@@ -246,7 +248,8 @@ ipcMain.on('save-file', (event, data) => {
     const filePath = path.join(result, fileName);
     // const filePath = './dist/main/webpack:/leaddbs-stimcontroller/main.js';
     // Write data to file
-    fs.writeFileSync(filePath, dataString);
+    // fs.writeFileSync(filePath, dataString);
+    fs.writeFileSync(file, dataString);
 
     // Send a response back to the renderer process
     event.reply('file-saved', filePath);

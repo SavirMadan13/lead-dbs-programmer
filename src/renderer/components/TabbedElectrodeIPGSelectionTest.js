@@ -54,6 +54,8 @@ function TabbedElectrodeIPGSelection({
   setAllPercAmpToggles,
   allVolAmpToggles,
   setAllVolAmpToggles,
+  filePath,
+  setFilePath,
 }) {
   const testElectrodeRef = React.createRef();
   // const [selectedElectrode, setSelectedElectrode] = useState('');
@@ -1429,12 +1431,12 @@ function TabbedElectrodeIPGSelection({
           pol: translatePolarity(allSelectedValues[j][0]),
         };
         data.S[dynamicKey2].amp = parseFloat(allTotalAmplitudes[j]);
-        data.S[dynamicKey2].frequency = parseFloat(
-          allStimulationParameters[j].parameter2,
-        );
-        data.S[dynamicKey2].pulseWidth = parseFloat(
-          allStimulationParameters[j].parameter1,
-        );
+        // data.S[dynamicKey2].frequency = parseFloat(
+        //   allStimulationParameters[j].parameter2,
+        // );
+        // data.S[dynamicKey2].pulseWidth = parseFloat(
+        //   allStimulationParameters[j].parameter1,
+        // );
         data.S[dynamicKey2].va = 2;
         if (allPercAmpToggles[j] === 'V') {
           data.S[dynamicKey2].va = 1;
@@ -1492,12 +1494,12 @@ function TabbedElectrodeIPGSelection({
           pol: translatePolarity(allSelectedValues[j + 4][0]),
         };
         data.S[dynamicKey2].amp = parseFloat(allTotalAmplitudes[j + 4]);
-        data.S[dynamicKey2].frequency = parseFloat(
-          allStimulationParameters[j + 4].parameter2,
-        );
-        data.S[dynamicKey2].pulseWidth = parseFloat(
-          allStimulationParameters[j + 4].parameter1,
-        );
+        // data.S[dynamicKey2].frequency = parseFloat(
+        //   allStimulationParameters[j + 4].parameter2,
+        // );
+        // data.S[dynamicKey2].pulseWidth = parseFloat(
+        //   allStimulationParameters[j + 4].parameter1,
+        // );
         data.S[dynamicKey2].va = 2;
         if (allPercAmpToggles[j + 4] === 'V') {
           data.S[dynamicKey2].va = 1;
@@ -1614,7 +1616,7 @@ function TabbedElectrodeIPGSelection({
 
   const sendDataToMain = () => {
     const outputData = gatherExportedData5();
-    window.electron.ipcRenderer.sendMessage('save-file', outputData);
+    window.electron.ipcRenderer.sendMessage('save-file', filePath, outputData);
     // window.electron.ipcRenderer.sendMessage('close-window');
     window.electron.ipcRenderer.sendMessage('close-window');
 
