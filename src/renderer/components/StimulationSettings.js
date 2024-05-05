@@ -36,6 +36,8 @@ function StimulationSettings({
   setNewImportFiles,
   filePath,
   setFilePath,
+  stimChanged,
+  setStimChanged,
 }) {
   // const [IPG, setIPG] = useState('');
   // const [leftElectrode, setLeftElectrode] = useState('');
@@ -85,6 +87,7 @@ function StimulationSettings({
     });
     setTestData(stimDatasetList);
     setImportDataTest(stimDatasetList);
+    // setMatImportFile(stimDatasetList[3]);
     // console.log('Stimdatasetlabel: ', stimDatasetList);
     // console.log('masterData: ', arg);
     handleImportedElectrode(selectedElectrode);
@@ -402,12 +405,13 @@ function StimulationSettings({
         return obj;
       }, {});
 
-    // console.log('filtered', filteredQuantities);
+    console.log('filtered', filteredQuantities);
     // console.log(jsonData.S['Ls1'].case['pol']);
     // console.log('newQuantities: ', newQuantities);
     // console.log('newvalues: ', newSelectedValues);
     setAllSelectedValues(filteredValues);
     setAllQuantities(filteredQuantities);
+    console.log('STIMCHANGED: ', stimChanged);
     // setAllQuantities(filteredQuantities => {
     //   const newAllQuantities = { ...filteredQuantities };
     //   return filteredQuantities;
@@ -444,6 +448,7 @@ function StimulationSettings({
       );
     // }
     setMatImportFile(e.target.value);
+    setStimChanged(true);
   };
 
   window.electron.ipcRenderer.on('import-previous-files-reply', (arg, arg1) => {
@@ -454,6 +459,8 @@ function StimulationSettings({
     if (arg !== 'Empty') {
       gatherImportedDataNew(arg1);
     }
+    console.log('MATIMPORTDATA: ', matImportFile);
+    console.log('STIMCHANGED: ', stimChanged);
   });
 
   const [newStim, setNewStim] = useState('');
@@ -500,6 +507,10 @@ function StimulationSettings({
     }
   };
 
+  const handleDebugButton2 = () => {
+    console.log('ALLQUANTITIES: ', allQuantities);
+  };
+
   // useEffect(() => {
   //   if (importedData) {
   //     gatherImportedData(importedData);
@@ -529,6 +540,7 @@ function StimulationSettings({
       {/* <button onClick={handleDebugButton}>debug</button> */}
       <h2 style={{fontSize: 16}}>Stimulation ID</h2>
       <select value={matImportFile} onChange={(e) => handleImportFileChange(e)}>
+        <option>None</option>
         {Object.keys(importDataTest).map((key) => (
           <option key={key} value={importDataTest[key]}>
             {importDataTest[key]}
@@ -553,6 +565,7 @@ function StimulationSettings({
           Add
         </Button>
       </InputGroup>
+      <button onClick={handleDebugButton2}>Debug</button>
       {/* <input
         type="text"
         // value={newItem}

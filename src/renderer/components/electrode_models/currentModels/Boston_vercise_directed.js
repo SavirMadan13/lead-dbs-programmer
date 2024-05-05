@@ -2719,6 +2719,10 @@ function Boston_vercise_directed(props, ref) {
     ) {
       calculateQuantitiesWithDistributionAbbott();
     }
+    // if (props.stimChanged) {
+    //   setQuantities(props.allQuantities(props.key));
+    //   props.setStimChanged(false);
+    // }
     // if (props.IPG === 'Medtronic_Activa') {
     //   if (volAmpToggle === 'left') {
     //     handleActivaAmplitude();

@@ -82,6 +82,7 @@ export default function App() {
   const [newImportFiles, setNewImportFiles] = useState(null);
   const [showDropdown, setShowDropdown] = useState(true);
   const [filePath, setFilePath] = useState('');
+  const [stimChanged, setStimChanged] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -129,9 +130,11 @@ export default function App() {
           setNewImportFiles={setNewImportFiles}
           filePath={filePath}
           setFilePath={setFilePath}
+          stimChanged={stimChanged}
+          setStimChanged={setStimChanged}
         />
       )}
-      <Dropdown style={{marginLeft: 100}}>
+      <Dropdown style={{ marginLeft: 100 }}>
         <Dropdown.Toggle variant="secondary" id="dropdown-button-dark-example1">
           Stimulation Settings
         </Dropdown.Toggle>
@@ -167,6 +170,8 @@ export default function App() {
             setNewImportFiles={setNewImportFiles}
             filePath={filePath}
             setFilePath={setFilePath}
+            stimChanged={stimChanged}
+            setStimChanged={setStimChanged}
           />
         </Dropdown.Menu>
       </Dropdown>
@@ -197,8 +202,41 @@ export default function App() {
           setAllVolAmpToggles={setAllVolAmpToggles}
           filePath={filePath}
           setFilePath={setFilePath}
+          matImportFile={matImportFile}
+          stimChanged={stimChanged}
+          setStimChanged={setStimChanged}
         />
       )}
+      {/* <TabbedElectrodeIPGSelectionTest
+        selectedElectrodeLeft={leftElectrode}
+        selectedElectrodeRight={rightElectrode}
+        IPG={IPG}
+        // key={key}
+        // setKey={setKey}
+        allQuantities={allQuantities}
+        setAllQuantities={setAllQuantities}
+        allSelectedValues={allSelectedValues}
+        setAllSelectedValues={setAllSelectedValues}
+        allTotalAmplitudes={allTotalAmplitudes}
+        setAllTotalAmplitudes={setAllTotalAmplitudes}
+        allStimulationParameters={allStimulationParameters}
+        setAllStimulationParameters={setAllStimulationParameters}
+        visModel={visModel}
+        setVisModel={setVisModel}
+        sessionTitle={sessionTitle}
+        setSessionTitle={setSessionTitle}
+        allTogglePositions={allTogglePositions}
+        setAllTogglePositions={setAllTogglePositions}
+        allPercAmpToggles={allPercAmpToggles}
+        setAllPercAmpToggles={setAllPercAmpToggles}
+        allVolAmpToggles={allVolAmpToggles}
+        setAllVolAmpToggles={setAllVolAmpToggles}
+        filePath={filePath}
+        setFilePath={setFilePath}
+        matImportFile={matImportFile}
+        stimChanged={stimChanged}
+        setStimChanged={setStimChanged}
+      /> */}
       <Routes>
         {/* <Route path="/" element={<Hello />} /> */}
         {/* <Route

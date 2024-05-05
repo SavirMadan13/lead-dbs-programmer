@@ -248,7 +248,7 @@ ipcMain.on('save-file', (event, file, data) => {
     const filePath = path.join(result, fileName);
     // const filePath = './dist/main/webpack:/leaddbs-stimcontroller/main.js';
     // Write data to file
-    // fs.writeFileSync(filePath, dataString);
+    fs.writeFileSync(filePath, dataString);
     fs.writeFileSync(file, dataString);
 
     // Send a response back to the renderer process

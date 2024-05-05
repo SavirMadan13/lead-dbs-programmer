@@ -56,6 +56,9 @@ function TabbedElectrodeIPGSelection({
   setAllVolAmpToggles,
   filePath,
   setFilePath,
+  matImportFile,
+  stimChanged,
+  setStimChanged,
 }) {
   const testElectrodeRef = React.createRef();
   // const [selectedElectrode, setSelectedElectrode] = useState('');
@@ -107,6 +110,7 @@ function TabbedElectrodeIPGSelection({
       [key]: testElectrodeRef.current.getStateQuantities(),
     };
     setAllQuantities(updatedAllQuantities);
+    console.log('updatedquantities: ', updatedAllQuantities);
 
     const updatedAllSelectedValues = {
       ...allSelectedValues,
@@ -341,6 +345,7 @@ function TabbedElectrodeIPGSelection({
         ref={testElectrodeRef}
         key={key}
         name={key}
+        allQuantities={allQuantities}
         quantities={allQuantities[key]}
         selectedValues={allSelectedValues[key]}
         IPG={IPG}
@@ -351,6 +356,8 @@ function TabbedElectrodeIPGSelection({
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
+        // stimChanged={stimChanged}
+        // setStimChanged={setStimChanged}
         // outputIPG={outputIPG}
       />
     ),
@@ -1376,7 +1383,7 @@ function TabbedElectrodeIPGSelection({
     const rightHemiArr = [];
     const data = {
       S: {
-        label: sessionTitle[1],
+        label: matImportFile,
         Rs1: {},
         Rs2: {},
         Rs3: {},
@@ -1669,8 +1676,22 @@ function TabbedElectrodeIPGSelection({
       gatherImportedData(importedData);
     }
     handleTabChange('1');
+    console.log('Tabbed all quantities: ', allQuantities);
+    if (stimChanged) {
+      handleTabChange(key);
+      setStimChanged(false);
+    }
   }, [importedData]);
 
+  useEffect(() => {
+    if (stimChanged) {
+      console.log('STIMCHANGED: ', stimChanged);
+      console.log('Tabbed all quantities: ', allQuantities);
+      handleTabChange(key);
+      // setAllQuantities(allQuantities);
+      setStimChanged(false);
+    }
+  });
   // const data = 'hello';
   // function handleMatlabConnectivity() {
   //   window.electron.ipcRenderer.send('trigger-matlab-action', data);
