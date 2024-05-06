@@ -42,25 +42,38 @@ import AssistedToggle from '../../AssistedToggle';
 import VolumeAmplitudeToggle from '../../VoltageAmplitudeToggle';
 import MAToggleSwitch from '../../MAToggleSwitch';
 
-function Abbott_activetip_3mm(props, ref) {
+function Boston_vercise_directed_new(props, ref) {
   const svgs = [
     <HeadTop key="headTop" />,
     <HeadBottom key="headBottom" />,
-    <Contact key="4" level="4" />,
-    <Contact key="3" level="3" face="center" />,
+    <Contact key="8" level="4" />,
+    <Contact key="5" level="3" face="center" />,
     <Contact key="2" level="2" face="center" />,
-    <Contact key="1" level="2" face="center" />,
-    <Tail key="tail" fill="transparent" />,
+    <Tail key="1" level="1" />,
   ];
 
   const ipgs = [<IPG key="0" />];
+
+  const leftContacts = [
+    <Contact key="7" level="3" face="right" />,
+    <Contact key="4" level="2" face="right" />,
+  ];
+
+  const rightContacts = [
+    <Contact key="6" level="3" face="left" />,
+    <Contact key="3" level="2" face="left" />,
+  ];
 
   const level = {
     0: 0,
     1: 1,
     2: 2,
-    3: 3,
-    4: 4,
+    3: 2,
+    4: 2,
+    5: 3,
+    6: 3,
+    7: 3,
+    8: 4,
   };
 
   const levelArray = { 2: [2, 3, 4], 3: [5, 6, 7] };
@@ -68,9 +81,13 @@ function Abbott_activetip_3mm(props, ref) {
   const face = {
     0: '',
     1: 'all',
-    2: 'all',
-    3: 'all',
-    4: 'all',
+    2: 'center',
+    3: 'left',
+    4: 'right',
+    5: 'center',
+    6: 'left',
+    7: 'right',
+    8: 'all',
   };
 
   const names = {
@@ -79,6 +96,10 @@ function Abbott_activetip_3mm(props, ref) {
     2: 2,
     3: 3,
     4: 4,
+    5: 5,
+    6: 6,
+    7: 7,
+    8: 8,
   };
 
   const [percAmpToggle, setPercAmpToggle] = useState(
@@ -129,6 +150,10 @@ function Abbott_activetip_3mm(props, ref) {
       2: 'left',
       3: 'left',
       4: 'left',
+      5: 'left',
+      6: 'left',
+      7: 'left',
+      8: 'left',
       // Initialize other images here
     },
   );
@@ -139,6 +164,10 @@ function Abbott_activetip_3mm(props, ref) {
     2: null,
     3: null,
     4: null,
+    5: null,
+    6: null,
+    7: null,
+    8: null,
   });
 
   const newInitialQuantities =
@@ -149,6 +178,10 @@ function Abbott_activetip_3mm(props, ref) {
           2: 0,
           3: 0,
           4: 0,
+          5: 0,
+          6: 0,
+          7: 0,
+          8: 0,
         }
       : {
           0: 0,
@@ -156,6 +189,10 @@ function Abbott_activetip_3mm(props, ref) {
           2: 0,
           3: 0,
           4: 0,
+          5: 0,
+          6: 0,
+          7: 0,
+          8: 0,
         };
 
   const [quantities, setQuantities] = useState(
@@ -395,6 +432,7 @@ function Abbott_activetip_3mm(props, ref) {
       console.log('2');
     }
     setQuantities(updatedQuantities);
+    setLastChangedKey(key);
     // console.log('quani: ', quantities);
     // // handleIPGLogic();
   };
@@ -1825,6 +1863,7 @@ function Abbott_activetip_3mm(props, ref) {
     });
     console.log('Counter: ', counter);
     Object.keys(updatedQuantities).forEach((key) => {
+      if (key === 0) return; // skip to next iteration
       // keyLevel = getOnContacts[level[key]]
       const levelOnContacts = getOnContacts(level[key]);
       if (face[key] === 'center' && levelQuantities[level[key]] !== 0) {
@@ -1962,7 +2001,7 @@ function Abbott_activetip_3mm(props, ref) {
     Object.keys(updatedQuantities).forEach((key) => {
       // keyLevel = getOnContacts[level[key]]
       const levelOnContacts = getOnContacts(level[key]);
-      if (face[key] === 'right' && levelQuantities[level[key]] !== 0) {
+      if (face[key] === 'right' && levelQuantities[level[key]] !== 0 && key !== 0) {
         // console.log('length ', getOnContacts(level[key]).length);
         // if (getOnContacts(level[key]).length > 0) {
         // console.log('facesVec ', counter);
@@ -1970,11 +2009,11 @@ function Abbott_activetip_3mm(props, ref) {
         // updatedSelectedValues[key] = 'center';
         updatedQuantities[key] = (3 * levelQuantities[level[key]]) / 4;
         // }
-      } else if (face[key] === 'center' && levelQuantities[level[key]] !== 0) {
+      } else if (face[key] === 'center' && levelQuantities[level[key]] !== 0 && key !== 0) {
         updatedSelectedValues[key] = selectedValues[levelOnContacts[0]]; // Need to fix this
         // updatedSelectedValues[key] = 'center';
         updatedQuantities[key] = levelQuantities[level[key]] / 4;
-      } else {
+      } else if (key !== 0) {
         updatedSelectedValues[key] = 'left';
         updatedQuantities[key] = 0;
       }
@@ -2060,10 +2099,12 @@ function Abbott_activetip_3mm(props, ref) {
     let rightCount = 0;
 
     Object.keys(updatedQuantities).forEach((key) => {
+      // gets the sum of negative polarity
       if (updatedSelectedValues[key] === 'center') {
         negativeSum += parseFloat(updatedQuantities[key]);
         centerCount += 1;
         // console.log('negativeSum: ', negativeSum);
+        // gets the sum of positive polarity
       } else if (updatedSelectedValues[key] === 'right') {
         positiveSum += parseFloat(updatedQuantities[key]);
         rightCount += 1;
@@ -2072,6 +2113,7 @@ function Abbott_activetip_3mm(props, ref) {
     });
 
     Object.keys(updatedQuantities).find((key) => {
+      // Negative polarity
       if (updatedSelectedValues[key] === 'center') {
         if (key === lastChangedKey) {
           negativeModifiedKey = key;
@@ -2079,6 +2121,7 @@ function Abbott_activetip_3mm(props, ref) {
           return true; // exit loop
         }
       }
+      // Positive polarity
       if (updatedSelectedValues[key] === 'right') {
         if (key === lastChangedKey) {
           positiveModifiedKey = key;
@@ -2088,6 +2131,14 @@ function Abbott_activetip_3mm(props, ref) {
       }
       return false; // continue looping
     });
+
+    if (negativeSum === 100) {
+      Object.keys(updatedQuantities).forEach((key) => {
+        if (key === negativeModifiedKey && updatedQuantities[key] === 0) {
+          updatedQuantities[key] = 10;
+        }
+      });
+    }
 
     if (negativeSum !== 100) {
       const negativeDifference = 100 - parseFloat(negativeSum);
@@ -2132,11 +2183,41 @@ function Abbott_activetip_3mm(props, ref) {
         }
       });
     }
+    // if (negativeSum === 100) {
+    //   Object.keys(updatedQuantities).forEach((key) => {
+    //     if ()
+    //   })
+    // }
+    // roundAllocUp();
     setQuantities(updatedQuantities);
     setSelectedValues(updatedSelectedValues);
     checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
-    return quantities; // Return the modified quantities
+    // return quantities;
+    // Return the modified quantities
   }
+
+  const semiAssist = () => {
+    const updatedQuantities = { ...quantities };
+    let total = totalAmplitude;
+    if (props.IPG === 'Boston') {
+      if (percAmpToggle === 'left') {
+        total = 100;
+      }
+    }
+    // const updatedSelectedValues = { ...selectedValues };
+    let count = 0;
+    const lastKey = [];
+    Object.keys(updatedQuantities).forEach((key) => {
+      if (key !== 0 && selectedValues[key] === 'center') {
+        count += 1;
+        lastKey.push(key);
+      }
+    });
+    if (count === 1) {
+      updatedQuantities[lastKey[0]] = total;
+    }
+    setQuantities(updatedQuantities);
+  };
 
   function assist() {
     isAssisted = !isAssisted;
@@ -2622,28 +2703,6 @@ function Abbott_activetip_3mm(props, ref) {
       });
     }
   };
-  const semiAssist = () => {
-    const updatedQuantities = { ...quantities };
-    let total = totalAmplitude;
-    if (props.IPG === 'Boston') {
-      if (percAmpToggle === 'left') {
-        total = 100;
-      }
-    }
-    // const updatedSelectedValues = { ...selectedValues };
-    let count = 0;
-    const lastKey = [];
-    Object.keys(updatedQuantities).forEach((key) => {
-      if (key !== 0 && selectedValues[key] === 'center') {
-        count += 1;
-        lastKey.push(key);
-      }
-    });
-    if (count === 1) {
-      updatedQuantities[lastKey[0]] = total;
-    }
-    setQuantities(updatedQuantities);
-  };
 
   const radios = [
     { name: 'None', value: '1' },
@@ -2706,6 +2765,11 @@ function Abbott_activetip_3mm(props, ref) {
       // const newQuantities = { ...quantities };
       calculateQuantitiesWithDistributionAbbott();
     }
+    console.log('outputTogglePosition: ', outputTogglePosition);
+    if (radioValue === '1') {
+      semiAssist();
+    }
+
     // if (radioValue === '2' && props.IPG === 'Boston' && percAmpToggle === 'left') {
     //   // assistedMode();
     //   calculateQuantitiesWithDistribution();
@@ -2715,9 +2779,10 @@ function Abbott_activetip_3mm(props, ref) {
     // ) {
     //   calculateQuantitiesWithDistributionAbbott();
     // }
-    if (radioValue === '1') {
-      semiAssist();
-    }
+    // if (props.stimChanged) {
+    //   setQuantities(props.allQuantities(props.key));
+    //   props.setStimChanged(false);
+    // }
     // if (props.IPG === 'Medtronic_Activa') {
     //   if (volAmpToggle === 'left') {
     //     handleActivaAmplitude();
@@ -2880,6 +2945,7 @@ function Abbott_activetip_3mm(props, ref) {
                 onChange={(e) =>
                   handleSteeringModeChange(e.currentTarget.value)
                 }
+                // onChange={(e) => setRadioValue(e.currentTarget.value)}
               >
                 {radio.name}
               </ToggleButton>
@@ -2927,6 +2993,42 @@ function Abbott_activetip_3mm(props, ref) {
             </div>
           ))}
         </div>
+        <div className="left-contacts">
+          {leftContacts.map((Lcon) => (
+            <div className="image-item">
+              <div className="image-container">
+                {React.cloneElement(Lcon, {
+                  key: Lcon.key,
+                  className: `${selectedValues[Lcon.key]}-color`,
+                })}
+                {!isNaN(Number(Lcon.key)) && (
+                  <div className="triple-toggle-boston-test">
+                    <TripleToggleTest
+                      key={Lcon.key}
+                      value={selectedValues[Lcon.key]}
+                      switchPosition={selectedValues[Lcon.key]}
+                      animation={animation[Lcon.key]}
+                      // quantity={quantities[selectedValues[Lcon.key]]} // Pass the quantity prop
+                      quantity={quantities[Lcon.key]} // Pass the quantity prop
+                      onChange={(value, anime) =>
+                        handleTripleToggleChange(value, anime, Lcon.key)
+                      }
+                      onQuantityChange={(value, anime, quantity) =>
+                        handleQuantityChange(quantity, Lcon.key)
+                      }
+                      level={Lcon.level}
+                      face={Lcon.face}
+                    />
+                  </div>
+                )}
+              </div>
+              {/* <p className="image-key">{Lcon.key}</p> */}
+              <p className="image-name-boston" style={{ color: 'white' }}>
+                {names[Lcon.key]}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
       <div className="Elmodel-center">
         {svgs.map((svg) => (
@@ -2971,6 +3073,45 @@ function Abbott_activetip_3mm(props, ref) {
           </div>
         ))}
       </div>
+      <div className="right-contacts">
+        {rightContacts.map((rCon) => (
+          <div className="image-item">
+            <div className="image-container">
+              {React.cloneElement(rCon, {
+                key: rCon.key,
+                className: `${selectedValues[rCon.key]}-color`,
+              })}
+              {!isNaN(Number(rCon.key)) && (
+                <div className="triple-toggle-boston-test">
+                  <TripleToggleTest
+                    key={rCon.key}
+                    value={selectedValues[rCon.key]}
+                    switchPosition={selectedValues[rCon.key]}
+                    animation={animation[rCon.key]}
+                    // quantity={quantities[selectedValues[rCon.key]]} // Pass the quantity prop
+                    quantity={quantities[rCon.key]}
+                    onChange={(value, anime) =>
+                      handleTripleToggleChange(value, anime, rCon.key)
+                    }
+                    onQuantityChange={(value, anime, quantity) =>
+                      handleQuantityChange(quantity, rCon.key)
+                    }
+                    level={rCon.level}
+                    face={rCon.face}
+                    // onQuantityChange={(value, animation, quantity) =>
+                    //   handleQuantityChange(value, animation, quantity, rCon.key)
+                    // }
+                  />
+                </div>
+              )}
+            </div>
+            {/* <p className="image-key">{rCon.key}</p> */}
+            <p className="image-name-boston" style={{ color: 'white' }}>
+              {names[rCon.key]}
+            </p>
+          </div>
+        ))}
+      </div>
       <div className="button-container">
         {handleIPG()}
         {(stimController === 0 || stimController === 3) && (
@@ -2981,21 +3122,21 @@ function Abbott_activetip_3mm(props, ref) {
                 <UpArrow onClick={handlePercAmpChangeUp} />
                 {/* <UpArrow onClick={newHandleUpButton} /> */}
                 <DownArrow onClick={handlePercAmpChangeDown} />
-                {/* <ClockwiseArrow onClick={handlePercAmpChangeClockwise} />
+                <ClockwiseArrow onClick={handlePercAmpChangeClockwise} />
                 <CounterClockwiseArrow
                   onClick={handlePercAmpChangeCounterClockwise}
-                /> */}
+                />
               </div>
             )}
           </div>
         )}
-        {/* <div className="steering-container-special-buttons">
+        <div className="steering-container-special-buttons">
           <SplitEvenButton onClick={handleSplitEvenButton} />
           <ForwardButton onClick={handleForwardButton} />
           <BackButton onClick={handleBackButton} />
           <LeftButton onClick={handleRightButton} />
           <RightButton onClick={handleLeftButton} />
-        </div> */}
+        </div>
         <div className="button-container-2">
           {/* <OverlayTrigger placement="left" overlay={tooltipspliteven}>
             <button
@@ -3029,4 +3170,4 @@ function Abbott_activetip_3mm(props, ref) {
   );
 }
 
-export default forwardRef(Abbott_activetip_3mm);
+export default forwardRef(Boston_vercise_directed_new);

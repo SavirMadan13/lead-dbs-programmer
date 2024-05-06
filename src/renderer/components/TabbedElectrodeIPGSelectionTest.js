@@ -29,6 +29,7 @@ import Abbott_directed_6172 from './electrode_models/currentModels/Abbott_direct
 import Abbott_directed_6173 from './electrode_models/currentModels/Abbott_directed_6173';
 import Boston_vercise_cartesia_HX from './electrode_models/currentModels/Boston_vercise_cartesia_HX';
 import Boston_vercise_cartesia_X from './electrode_models/currentModels/Boston_vercise_cartesia_X';
+import Boston_vercise_directed_new from './electrode_models/currentModels/Boston_vercise_directed_new';
 
 function TabbedElectrodeIPGSelection({
   IPG,
@@ -340,8 +341,29 @@ function TabbedElectrodeIPGSelection({
         selectedValues={allSelectedValues[key]}
       />
     ),
+    // boston_vercise_directed: (
+    //   <Boston_vercise_directed
+    //     ref={testElectrodeRef}
+    //     key={key}
+    //     name={key}
+    //     allQuantities={allQuantities}
+    //     quantities={allQuantities[key]}
+    //     selectedValues={allSelectedValues[key]}
+    //     IPG={IPG}
+    //     totalAmplitude={allTotalAmplitudes[key]}
+    //     parameters={allStimulationParameters[key]}
+    //     visModel={visModel[1]}
+    //     sessionTitle={sessionTitle[1]}
+    //     togglePosition={allTogglePositions[key]}
+    //     percAmpToggle={allPercAmpToggles[key]}
+    //     volAmpToggle={allVolAmpToggles[key]}
+    //     // stimChanged={stimChanged}
+    //     // setStimChanged={setStimChanged}
+    //     // outputIPG={outputIPG}
+    //   />
+    // ),
     boston_vercise_directed: (
-      <Boston_vercise_directed
+      <Boston_vercise_directed_new
         ref={testElectrodeRef}
         key={key}
         name={key}
@@ -581,8 +603,9 @@ function TabbedElectrodeIPGSelection({
   const calculatePercentageFromAmplitude = (quantities, totalAmplitude) => {
     const updatedQuantities = { ...quantities };
     Object.keys(updatedQuantities).forEach((element) => {
-      updatedQuantities[element] = (updatedQuantities[element] * 100) / totalAmplitude;
+      updatedQuantities[element] = (parseFloat(updatedQuantities[element]) * 100) / totalAmplitude;
     });
+    console.log(updatedQuantities);
     return updatedQuantities;
   };
 
@@ -596,34 +619,75 @@ function TabbedElectrodeIPGSelection({
     return updatedQuantities;
   };
 
+  // const handleTogglePositions = () => {
+  //   let outputQuantities = {};
+  //   console.log(allQuantities);
+  //   console.log(allTotalAmplitudes);
+  //   Object.keys(allQuantities).forEach((quantity) => {
+  //     if (allTogglePositions[quantity] === 'mA') {
+  //       console.log('quantity: ', allTogglePositions);
+  //       outputQuantities = calculatePercentageFromAmplitude(
+  //         allQuantities[quantity],
+  //         parseFloat(allTotalAmplitudes[quantity]),
+  //       );
+  //       const updatedQuantities = {
+  //         ...allQuantities,
+  //         [key]: outputQuantities,
+  //       };
+  //       // console.log('updaredQuantities: ', updatedQuantities);
+  //       outputQuantities = updatedQuantities;
+  //     } else if (allTogglePositions[quantity] === 'V') {
+  //       outputQuantities = calculateVoltageFromAmplitude(
+  //         allQuantities[quantity],
+  //       );
+  //       const updatedQuantities = {
+  //         ...allQuantities,
+  //         [key]: outputQuantities,
+  //       };
+  //       outputQuantities = updatedQuantities;
+  //     } else {
+  //       outputQuantities[quantity] = allQuantities[quantity];
+  //     }
+  //     // return '';
+  //   });
+  //   // console.log(updatedQuantities);
+  //   return outputQuantities;
+  // };
+
   const handleTogglePositions = () => {
     let outputQuantities = {};
     console.log(allQuantities);
     console.log(allTotalAmplitudes);
-    Object.keys(allQuantities).forEach((quantity) => {
-      if (allTogglePositions[quantity] === 'mA') {
-        console.log('quantity: ', quantity);
+    const updatedQuantities = { ...allQuantities };
+    Object.keys(allTogglePositions).forEach((position) => {
+      if (allTogglePositions[position] === 'mA') {
+        console.log('position', position);
+        console.log('quantity: ', allTogglePositions);
+        console.log(allTotalAmplitudes[position]);
+        console.log(allQuantities[position]);
         outputQuantities = calculatePercentageFromAmplitude(
-          allQuantities[quantity],
-          parseFloat(allTotalAmplitudes[quantity]),
+          allQuantities[position],
+          parseFloat(allTotalAmplitudes[position]),
         );
-        const updatedQuantities = {
-          ...allQuantities,
-          [key]: outputQuantities,
-        };
-        // console.log('updaredQuantities: ', updatedQuantities);
+        // const updatedQuantities = {
+        //   ...allQuantities,
+        //   [position]: outputQuantities,
+        // };
+        updatedQuantities[position] = outputQuantities;
+        console.log('updaredQuantities: ', updatedQuantities);
         outputQuantities = updatedQuantities;
-      } else if (allTogglePositions[quantity] === 'V') {
+      } else if (allTogglePositions[position] === 'V') {
         outputQuantities = calculateVoltageFromAmplitude(
-          allQuantities[quantity],
+          allQuantities[position],
         );
-        const updatedQuantities = {
-          ...allQuantities,
-          [key]: outputQuantities,
-        };
+        // const updatedQuantities = {
+        //   ...allQuantities,
+        //   [position]: outputQuantities,
+        // };
+        updatedQuantities[position] = outputQuantities;
         outputQuantities = updatedQuantities;
       } else {
-        outputQuantities[quantity] = allQuantities[quantity];
+        outputQuantities[position] = allQuantities[position];
       }
       // return '';
     });
@@ -1623,6 +1687,7 @@ function TabbedElectrodeIPGSelection({
 
   const sendDataToMain = () => {
     const outputData = gatherExportedData5();
+    console.log('OUTPUTDATA: ', outputData);
     window.electron.ipcRenderer.sendMessage('save-file', filePath, outputData);
     // window.electron.ipcRenderer.sendMessage('close-window');
     window.electron.ipcRenderer.sendMessage('close-window');

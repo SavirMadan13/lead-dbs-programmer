@@ -2588,7 +2588,62 @@ function Abbott_activetip_2mm(props, ref) {
     handleCheck();
   };
 
-  const [radioValue, setRadioValue] = useState('2');
+  const [radioValue, setRadioValue] = useState('1');
+  const handleSteeringModeChange = (value) => {
+    let total = totalAmplitude;
+    if (props.IPG === 'Boston') {
+      if (percAmpToggle === 'left') {
+        total = 100;
+      }
+    }
+    setRadioValue(value);
+    if (value === '2') {
+      setQuantities({
+        0: total,
+        1: total,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+        6: 0,
+        7: 0,
+        8: 0,
+      });
+      setSelectedValues({
+        0: 'right',
+        1: 'center',
+        2: 'left',
+        3: 'left',
+        4: 'left',
+        5: 'left',
+        6: 'left',
+        7: 'left',
+        8: 'left',
+      });
+    }
+  };
+  const semiAssist = () => {
+    const updatedQuantities = { ...quantities };
+    let total = totalAmplitude;
+    if (props.IPG === 'Boston') {
+      if (percAmpToggle === 'left') {
+        total = 100;
+      }
+    }
+    // const updatedSelectedValues = { ...selectedValues };
+    let count = 0;
+    const lastKey = [];
+    Object.keys(updatedQuantities).forEach((key) => {
+      if (key !== 0 && selectedValues[key] === 'center') {
+        count += 1;
+        lastKey.push(key);
+      }
+    });
+    if (count === 1) {
+      updatedQuantities[lastKey[0]] = total;
+    }
+    setQuantities(updatedQuantities);
+  };
 
   const radios = [
     { name: 'None', value: '1' },
@@ -2651,14 +2706,17 @@ function Abbott_activetip_2mm(props, ref) {
       // const newQuantities = { ...quantities };
       calculateQuantitiesWithDistributionAbbott();
     }
-    if (radioValue === '2' && props.IPG === 'Boston' && percAmpToggle === 'left') {
-      // assistedMode();
-      calculateQuantitiesWithDistribution();
-    } else if (
-      radioValue === '2' &&
-      (outputTogglePosition === 'mA' || outputTogglePosition === 'V')
-    ) {
-      calculateQuantitiesWithDistributionAbbott();
+    // if (radioValue === '2' && props.IPG === 'Boston' && percAmpToggle === 'left') {
+    //   // assistedMode();
+    //   calculateQuantitiesWithDistribution();
+    // } else if (
+    //   radioValue === '2' &&
+    //   (outputTogglePosition === 'mA' || outputTogglePosition === 'V')
+    // ) {
+    //   calculateQuantitiesWithDistributionAbbott();
+    // }
+    if (radioValue === '1') {
+      semiAssist();
     }
     // if (props.IPG === 'Medtronic_Activa') {
     //   if (volAmpToggle === 'left') {
@@ -2819,7 +2877,9 @@ function Abbott_activetip_2mm(props, ref) {
                 name="radio"
                 value={radio.value}
                 checked={radioValue === radio.value}
-                onChange={(e) => setRadioValue(e.currentTarget.value)}
+                onChange={(e) =>
+                  handleSteeringModeChange(e.currentTarget.value)
+                }
               >
                 {radio.name}
               </ToggleButton>
