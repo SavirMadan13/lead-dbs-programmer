@@ -185,7 +185,7 @@ function Abbott_activetip_2mm(props, ref) {
     },
   );
 
-  const [visModel, setVisModel] = useState(props.visModel || '');
+  const [visModel, setVisModel] = useState(props.visModel || '6');
 
   const [sessionTitle, setSessionTitle] = useState(props.sessionTitle || '');
 
@@ -2978,9 +2978,9 @@ function Abbott_activetip_2mm(props, ref) {
             <h2>Steering</h2>
             {(stimController === 0 || stimController === 3) && (
               <div className="steering-container">
-                <UpArrow onClick={handlePercAmpChangeUp} />
+                <UpArrow className="svgButtons" onClick={handlePercAmpChangeUp} />
                 {/* <UpArrow onClick={newHandleUpButton} /> */}
-                <DownArrow onClick={handlePercAmpChangeDown} />
+                <DownArrow className="svgButtons" onClick={handlePercAmpChangeDown} />
                 {/* <ClockwiseArrow onClick={handlePercAmpChangeClockwise} />
                 <CounterClockwiseArrow
                   onClick={handlePercAmpChangeCounterClockwise}

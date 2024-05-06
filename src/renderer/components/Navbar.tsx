@@ -34,10 +34,7 @@ export default function Navbar() {
           <Typography>Component Testing</Typography>
         </IconButton>
       </NavLink> */}
-      {/* <NavLink
-        to="/"
-        style={{ textDecoration: 'none', color: 'inherit' }}
-      >
+      <NavLink to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
         <IconButton>
           <Typography>Setup</Typography>
         </IconButton>
@@ -49,7 +46,7 @@ export default function Navbar() {
         <IconButton>
           <Typography>Electrode Model</Typography>
         </IconButton>
-      </NavLink> */}
+      </NavLink>
       {/* <NavLink
         to="/end-session"
         style={{ textDecoration: 'none', color: 'inherit' }}

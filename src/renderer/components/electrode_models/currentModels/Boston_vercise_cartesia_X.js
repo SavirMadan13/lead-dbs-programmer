@@ -293,7 +293,7 @@ function Boston_vercise_cartesia_X(props, ref) {
     },
   );
 
-  const [visModel, setVisModel] = useState(props.visModel || '');
+  const [visModel, setVisModel] = useState(props.visModel || '6');
 
   const [sessionTitle, setSessionTitle] = useState(props.sessionTitle || '');
 
@@ -3161,11 +3161,11 @@ function Boston_vercise_cartesia_X(props, ref) {
             <h2>Steering</h2>
             {(stimController === 0 || stimController === 3) && (
               <div className="steering-container">
-                <UpArrow onClick={handlePercAmpChangeUp} />
+                <UpArrow className="svgButtons" onClick={handlePercAmpChangeUp} />
                 {/* <UpArrow onClick={newHandleUpButton} /> */}
-                <DownArrow onClick={handlePercAmpChangeDown} />
-                <ClockwiseArrow onClick={handlePercAmpChangeClockwise} />
-                <CounterClockwiseArrow
+                <DownArrow className="svgButtons" onClick={handlePercAmpChangeDown} />
+                <ClockwiseArrow className="svgButtons" onClick={handlePercAmpChangeClockwise} />
+                <CounterClockwiseArrow className="svgButtons"
                   onClick={handlePercAmpChangeCounterClockwise}
                 />
               </div>
@@ -3173,11 +3173,11 @@ function Boston_vercise_cartesia_X(props, ref) {
           </div>
         )}
         <div className="steering-container-special-buttons">
-          <SplitEvenButton onClick={handleSplitEvenButton} />
-          <ForwardButton onClick={handleForwardButton} />
-          <BackButton onClick={handleBackButton} />
-          <LeftButton onClick={handleRightButton} />
-          <RightButton onClick={handleLeftButton} />
+          <SplitEvenButton className="svgButtons" onClick={handleSplitEvenButton} />
+          <ForwardButton className="svgButtons" onClick={handleForwardButton} />
+          <BackButton className="svgButtons" onClick={handleBackButton} />
+          <LeftButton className="svgButtons" onClick={handleRightButton} />
+          <RightButton className="svgButtons" onClick={handleLeftButton} />
         </div>
         <div className="button-container-2">
           {/* <OverlayTrigger placement="left" overlay={tooltipspliteven}>

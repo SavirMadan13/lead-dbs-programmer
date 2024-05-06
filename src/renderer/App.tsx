@@ -84,13 +84,13 @@ export default function App() {
   const [filePath, setFilePath] = useState('');
   const [stimChanged, setStimChanged] = useState(true);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowDropdown(false);
-    }, 1); // Adjust the time to your preference (in milliseconds)
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setShowDropdown(false);
+  //   }, 1); // Adjust the time to your preference (in milliseconds)
 
-    return () => clearTimeout(timer);
-  }, []);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
   return (
     <Router>
@@ -98,7 +98,7 @@ export default function App() {
         <Navbar />
         {/* <img src="./logo512Padding-300x212.png" alt="leadDBS" /> */}
       </div>
-      {showDropdown && (
+      {/* {showDropdown && (
         <StimulationSettings
           IPG={IPG}
           setIPG={setIPG}
@@ -206,7 +206,7 @@ export default function App() {
           stimChanged={stimChanged}
           setStimChanged={setStimChanged}
         />
-      )}
+      )} */}
       {/* <TabbedElectrodeIPGSelectionTest
         selectedElectrodeLeft={leftElectrode}
         selectedElectrodeRight={rightElectrode}
@@ -256,8 +256,8 @@ export default function App() {
           }
         /> */}
         <Route path="/testing" element={<AssistedButtons />} />
-        {/* <Route
-          path="/test"
+        <Route
+          path="/"
           element={
             <div>
               <StimulationSettings
@@ -287,15 +287,21 @@ export default function App() {
                 setMasterImportData={setMasterImportData}
                 matImportFile={matImportFile}
                 setMatImportFile={setMatImportFile}
+                newImportFiles={newImportFiles}
+                setNewImportFiles={setNewImportFiles}
+                filePath={filePath}
+                setFilePath={setFilePath}
+                stimChanged={stimChanged}
+                setStimChanged={setStimChanged}
               />
               <Link to="/tabbed-selection">
                 <button className="button">Next</button>
               </Link>
             </div>
           }
-        /> */}
+        />
         <Route
-          path="/tab"
+          path="/tabbed-selection"
           element={
             <TabbedElectrodeIPGSelectionTest
               selectedElectrodeLeft={leftElectrode}
@@ -321,6 +327,11 @@ export default function App() {
               setAllPercAmpToggles={setAllPercAmpToggles}
               allVolAmpToggles={allVolAmpToggles}
               setAllVolAmpToggles={setAllVolAmpToggles}
+              filePath={filePath}
+              setFilePath={setFilePath}
+              matImportFile={matImportFile}
+              stimChanged={stimChanged}
+              setStimChanged={setStimChanged}
             />
           }
         />

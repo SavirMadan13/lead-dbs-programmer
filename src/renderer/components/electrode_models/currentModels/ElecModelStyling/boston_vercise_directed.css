@@ -566,6 +566,38 @@ h2 {
   color: white;
 }
 
+/* .svgButtons {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.svgButtons:hover {
+  transform: scale(1.1);
+}
+
+.svgButtons:active {
+  transform: scale(0.9);
+}
+ */
+ .svgButtons {
+  cursor: pointer;
+  transition: transform 0.2s, fill 0.2s; /* Add transition for fill change */
+}
+
+.svgButtons:hover {
+  transform: scale(1.1);
+  fill: #007bff; /* Change fill color on hover */
+}
+
+.svgButtons:active {
+  transform: scale(0.9);
+}
+
+.svgButtons:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5); /* Add focus outline */
+}
+
 
 /* .image-key {
   position: relative;

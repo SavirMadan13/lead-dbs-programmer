@@ -488,12 +488,12 @@ function StimulationSettings({
     // console.log('E: ', masterImportData);
     console.log('NewStims ', newStims.includes(e.target.value));
     // if (!newStims.includes(e.target.value)) {
-      window.electron.ipcRenderer.sendMessage(
-        'import-previous-files',
-        e.target.value,
-        // key,
-        masterImportData,
-      );
+    window.electron.ipcRenderer.sendMessage(
+      'import-previous-files',
+      e.target.value,
+      // key,
+      masterImportData,
+    );
     // }
     setMatImportFile(e.target.value);
     setStimChanged(true);
@@ -585,8 +585,7 @@ function StimulationSettings({
         style={{ display: 'none' }} // Hide the input element
       /> */}
       <div></div>
-      {/* <button onClick={handleDebugButton}>debug</button> */}
-      <h2 style={{fontSize: 16}}>Stimulation ID</h2>
+      <h2 style={{ fontSize: 16 }}>Stimulation ID</h2>
       <select value={matImportFile} onChange={(e) => handleImportFileChange(e)}>
         <option>None</option>
         {Object.keys(importDataTest).map((key) => (
@@ -602,18 +601,22 @@ function StimulationSettings({
       </select>
       <InputGroup className="mb-3">
         <Form.Control
-          placeholder='Tab for auto ID'
+          placeholder="Tab for auto ID"
           // aria-label="Recipient's username"
           aria-describedby="basic-addon2"
           value={newStim}
           onChange={handleNewStimText}
           onKeyDown={handleTabKeyPress}
         />
-        <Button variant="outline-secondary" id="button-addon2" onClick={handleOnAddButtonClick}>
+        <Button
+          variant="outline-secondary"
+          id="button-addon2"
+          onClick={handleOnAddButtonClick}
+        >
           Add
         </Button>
       </InputGroup>
-      <button onClick={handleDebugButton2}>Debug</button>
+      {/* <button onClick={handleDebugButton2}>Debug</button> */}
       {/* <input
         type="text"
         // value={newItem}
@@ -621,7 +624,7 @@ function StimulationSettings({
         placeholder={Date.now()}
       /> */}
       <div></div>
-      <h2 style={{fontSize: 16}}>Left Electrode</h2>
+      <h2 style={{ fontSize: 16 }}>Left Electrode</h2>
       <select
         value={leftElectrode}
         onChange={(e) => handleLeftElectrodeChange(e)}
@@ -669,7 +672,7 @@ function StimulationSettings({
         {/* <option value="AbbottDirectedTest">Abbott Directed</option> */}
       </select>
       <div></div>
-      <h2 style={{fontSize: 16}}>Right Electrode</h2>
+      <h2 style={{ fontSize: 16 }}>Right Electrode</h2>
       <select
         value={rightElectrode}
         onChange={(e) => handleRightElectrodeChange(e)}
@@ -715,7 +718,7 @@ function StimulationSettings({
         <option value="medtronic_b33015">Medtronic B33015</option>
       </select>
       <div></div>
-      <h2 style={{fontSize: 16}}>IPG</h2>
+      <h2 style={{ fontSize: 16 }}>IPG</h2>
       <select value={IPG} onChange={(e) => handleIPGChange(e)}>
         <option value="">None</option>
         <option value="Abbott">Abbott (Infinity, Brio, Libra)</option>
