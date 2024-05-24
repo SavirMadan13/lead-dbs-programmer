@@ -19,6 +19,8 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import Tooltip from 'react-bootstrap/Tooltip';
 // import Popup from 'reactjs-popup';
 import { OverlayTrigger } from 'react-bootstrap';
+import { Unstable_NumberInput as NumberInput } from '@mui/base/Unstable_NumberInput';
+import QuantityInput2 from '../../QuantityInput2';
 import TripleToggleTest from '../../TripleToggleTest';
 import './ElecModelStyling/boston_vercise_directed.css';
 import { ReactComponent as IPG } from '../images/IPG.svg';
@@ -2001,7 +2003,11 @@ function Boston_vercise_directed_new(props, ref) {
     Object.keys(updatedQuantities).forEach((key) => {
       // keyLevel = getOnContacts[level[key]]
       const levelOnContacts = getOnContacts(level[key]);
-      if (face[key] === 'right' && levelQuantities[level[key]] !== 0 && key !== 0) {
+      if (
+        face[key] === 'right' &&
+        levelQuantities[level[key]] !== 0 &&
+        key !== 0
+      ) {
         // console.log('length ', getOnContacts(level[key]).length);
         // if (getOnContacts(level[key]).length > 0) {
         // console.log('facesVec ', counter);
@@ -2009,7 +2015,11 @@ function Boston_vercise_directed_new(props, ref) {
         // updatedSelectedValues[key] = 'center';
         updatedQuantities[key] = (3 * levelQuantities[level[key]]) / 4;
         // }
-      } else if (face[key] === 'center' && levelQuantities[level[key]] !== 0 && key !== 0) {
+      } else if (
+        face[key] === 'center' &&
+        levelQuantities[level[key]] !== 0 &&
+        key !== 0
+      ) {
         updatedSelectedValues[key] = selectedValues[levelOnContacts[0]]; // Need to fix this
         // updatedSelectedValues[key] = 'center';
         updatedQuantities[key] = levelQuantities[level[key]] / 4;
@@ -2796,7 +2806,7 @@ function Boston_vercise_directed_new(props, ref) {
 
   return (
     <div className="container">
-      <div className="button-container">
+      <div className="">
         {/* <Form.Group className="mb-3">
           <Form.Control
             type="email"
@@ -2805,22 +2815,23 @@ function Boston_vercise_directed_new(props, ref) {
             onChange={handleTitleChange}
           />
         </Form.Group> */}
-        <Form.Select
-          aria-label="Default select example"
-          value={visModel}
-          onChange={handleVisModelChange}
-        >
-          <option>Choose a model</option>
-          <option value="1">Dembek 2017</option>
-          <option value="2">FastField (Baniasadi 2020)</option>
-          <option value="3">SimBio/FieldTrip (see Horn 2017)</option>
-          <option value="4">Kuncel 2008</option>
-          <option value="5">Maedler 2012</option>
-          <option value="6">OSS-DBS (Butenko 2020)</option>
-        </Form.Select>
-        <div />
-        <div className="PercentageAmplitudeToggle">
-          {/* {props.IPG === 'Boston' && (
+        <div className="button-container">
+          <Form.Select
+            aria-label="Default select example"
+            value={visModel}
+            onChange={handleVisModelChange}
+          >
+            <option>Choose a model</option>
+            <option value="1">Dembek 2017</option>
+            <option value="2">FastField (Baniasadi 2020)</option>
+            <option value="3">SimBio/FieldTrip (see Horn 2017)</option>
+            <option value="4">Kuncel 2008</option>
+            <option value="5">Maedler 2012</option>
+            <option value="6">OSS-DBS (Butenko 2020)</option>
+          </Form.Select>
+          <div />
+          <div className="PercentageAmplitudeToggle">
+            {/* {props.IPG === 'Boston' && (
             <PercentageAmplitudeToggle
               value={percAmpToggle}
               // switchPosition={percAmpToggle}
@@ -2829,78 +2840,92 @@ function Boston_vercise_directed_new(props, ref) {
               // getSwitchAnimation={(value, switchPosition) => getSwitchAnimationPercAmp(value, switchPosition)}
             />
           )} */}
-          {props.IPG === 'Boston' && (
-            <ButtonGroup className="button-group">
-              {percAmpDef.map((percAmp, idx) => (
-                <ToggleButton
-                  key={idx}
-                  id={`percAmp-${idx}`}
-                  type="radio"
-                  variant={getVariant(percAmp.value)}
-                  name="percAmp"
-                  value={percAmp.value}
-                  checked={percAmpToggle === percAmp.value}
-                  onChange={(e) =>
-                    handlePercAmpToggleChange(e.currentTarget.value)
-                  }
-                >
-                  {percAmp.name}
-                </ToggleButton>
-              ))}
-            </ButtonGroup>
-          )}
-          {/* {props.IPG === 'Medtronic_Activa' && (
+            {props.IPG === 'Boston' && (
+              <ButtonGroup className="button-group">
+                {percAmpDef.map((percAmp, idx) => (
+                  <ToggleButton
+                    key={idx}
+                    id={`percAmp-${idx}`}
+                    type="radio"
+                    variant={getVariant(percAmp.value)}
+                    name="percAmp"
+                    value={percAmp.value}
+                    checked={percAmpToggle === percAmp.value}
+                    onChange={(e) =>
+                      handlePercAmpToggleChange(e.currentTarget.value)
+                    }
+                  >
+                    {percAmp.name}
+                  </ToggleButton>
+                ))}
+              </ButtonGroup>
+            )}
+            {/* {props.IPG === 'Medtronic_Activa' && (
             <VolumeAmplitudeToggle
               value={volAmpToggle}
               onChange={(value) => handleVolAmpToggleChange(value)}
             />
           )} */}
-          {props.IPG === 'Medtronic_Activa' && (
-            <ButtonGroup className="button-group">
-              {volAmpDef.map((volAmp, idx) => (
-                <ToggleButton
-                  key={idx}
-                  id={`volAmp-${idx}`}
-                  type="radio"
-                  variant={getVariant(volAmp.value)}
-                  name="volAmp"
-                  value={volAmp.value}
-                  checked={volAmpToggle === volAmp.value}
-                  onChange={(e) =>
-                    handleVolAmpToggleChange(e.currentTarget.value)
-                  }
-                >
-                  {volAmp.name}
-                </ToggleButton>
-              ))}
-            </ButtonGroup>
-          )}
-          {(props.IPG === 'Medtronic_Percept' || props.IPG === 'Abbott') && (
-            <ButtonGroup className="button-group">
-              {ampDef.map((amp, idx) => (
-                <ToggleButton
-                  key={idx}
-                  id={`amp-${idx}`}
-                  type="radio"
-                  variant={getVariant(amp.value)}
-                  name="amp"
-                  value={amp.value}
-                  checked={ampToggle === amp.value}
-                >
-                  {amp.name}
-                </ToggleButton>
-              ))}
-            </ButtonGroup>
-          )}
-          {/* {props.IPG === 'Abbott' && (
+            {props.IPG === 'Medtronic_Activa' && (
+              <ButtonGroup className="button-group">
+                {volAmpDef.map((volAmp, idx) => (
+                  <ToggleButton
+                    key={idx}
+                    id={`volAmp-${idx}`}
+                    type="radio"
+                    variant={getVariant(volAmp.value)}
+                    name="volAmp"
+                    value={volAmp.value}
+                    checked={volAmpToggle === volAmp.value}
+                    onChange={(e) =>
+                      handleVolAmpToggleChange(e.currentTarget.value)
+                    }
+                  >
+                    {volAmp.name}
+                  </ToggleButton>
+                ))}
+              </ButtonGroup>
+            )}
+            {(props.IPG === 'Medtronic_Percept' || props.IPG === 'Abbott') && (
+              <ButtonGroup className="button-group">
+                {ampDef.map((amp, idx) => (
+                  <ToggleButton
+                    key={idx}
+                    id={`amp-${idx}`}
+                    type="radio"
+                    variant={getVariant(amp.value)}
+                    name="amp"
+                    value={amp.value}
+                    checked={ampToggle === amp.value}
+                  >
+                    {amp.name}
+                  </ToggleButton>
+                ))}
+              </ButtonGroup>
+            )}
+            {/* {props.IPG === 'Abbott' && (
             <MAToggleSwitch
               value={ampToggle}
               // onChange={(value) => handleVolAmpToggleChange(value)}
             />
           )} */}
+          </div>
+          {/* <div /> */}
+          {/* <NumberInput
+          // value={totalAmplitude}
+          // onChange={handleTotalAmplitudeChange}
+          aria-label="Quantity Input"
+          min={1}
+          max={99}
+        /> */}
+          <QuantityInput2
+            value={totalAmplitude}
+            onChange={handleTotalAmplitudeChange}
+            min={0}
+            label="mA"
+          />
         </div>
-        <div />
-        <div className="button-container">
+        {/* <div className="button-container">
           <label className="puls-label">Total Amplitude</label>
           <input
             className="new-quantity-input"
@@ -2910,9 +2935,9 @@ function Boston_vercise_directed_new(props, ref) {
             value={totalAmplitude}
             onChange={handleTotalAmplitudeChange}
           />
-        </div>
+        </div> */}
         <div className="button-container">
-          <label className="puls-label">Pulsewidth (us):</label>
+          {/* <label className="puls-label">Pulsewidth (us):</label>
           <input
             className="new-quantity-input"
             type="number"
@@ -2929,9 +2954,21 @@ function Boston_vercise_directed_new(props, ref) {
             pattern="[0-9]+"
             value={parameters.parameter2}
             onChange={handleParameterChange('parameter2')}
+          /> */}
+          <QuantityInput2
+            value={parameters.parameter1}
+            onChange={handleParameterChange('parameter1')}
+            min={0}
+            label="us"
+          />
+          <QuantityInput2
+            value={parameters.parameter2}
+            onChange={handleParameterChange('parameter2')}
+            min={0}
+            label="hz"
           />
         </div>
-        <div>
+        <div className="button-container">
           <ButtonGroup>
             {radios.map((radio, idx) => (
               <ToggleButton
@@ -3112,18 +3149,27 @@ function Boston_vercise_directed_new(props, ref) {
           </div>
         ))}
       </div>
-      <div className="button-container">
+      <div>
         {handleIPG()}
         {(stimController === 0 || stimController === 3) && (
           <div className="button-container">
             <h2>Steering</h2>
             {(stimController === 0 || stimController === 3) && (
               <div className="steering-container">
-                <UpArrow className="svgButtons" onClick={handlePercAmpChangeUp} />
-                {/* <UpArrow onClick={newHandleUpButton} /> */}
-                <DownArrow className="svgButtons" onClick={handlePercAmpChangeDown} />
-                <ClockwiseArrow className="svgButtons" onClick={handlePercAmpChangeClockwise} />
-                <CounterClockwiseArrow className="svgButtons"
+                <UpArrow
+                  className="svgButtons"
+                  onClick={handlePercAmpChangeUp}
+                />
+                <DownArrow
+                  className="svgButtons"
+                  onClick={handlePercAmpChangeDown}
+                />
+                <ClockwiseArrow
+                  className="svgButtons"
+                  onClick={handlePercAmpChangeClockwise}
+                />
+                <CounterClockwiseArrow
+                  className="svgButtons"
                   onClick={handlePercAmpChangeCounterClockwise}
                 />
               </div>
@@ -3131,39 +3177,28 @@ function Boston_vercise_directed_new(props, ref) {
           </div>
         )}
         <div className="steering-container-special-buttons">
-          <SplitEvenButton className="svgButtons" onClick={handleSplitEvenButton} />
+          <SplitEvenButton
+            className="svgButtons"
+            onClick={handleSplitEvenButton}
+          />
           <ForwardButton className="svgButtons" onClick={handleForwardButton} />
           <BackButton className="svgButtons" onClick={handleBackButton} />
           <LeftButton className="svgButtons" onClick={handleRightButton} />
           <RightButton className="svgButtons" onClick={handleLeftButton} />
         </div>
-        <div className="button-container-2">
-          {/* <OverlayTrigger placement="left" overlay={tooltipspliteven}>
-            <button
+        <div className="button-container">
+          <button
               onClick={calculateQuantitiesWithDistribution}
               className="button"
             >
               Split Even
             </button>
-          </OverlayTrigger>
-
-          <OverlayTrigger placement="left" overlay={tooltiprefactor}>
             <button onClick={roundToHundred} className="button">
               Refactor
             </button>
-          </OverlayTrigger> */}
-          <button
-            onClick={calculateQuantitiesWithDistribution}
-            className="button"
-          >
-            Split Even
-          </button>
-          <button onClick={roundToHundred} className="button">
-            Refactor
-          </button>
-          <button onClick={handleClearButton} className="button">
-            Clear
-          </button>
+            <button onClick={handleClearButton} className="button">
+              Clear
+            </button>
         </div>
       </div>
     </div>

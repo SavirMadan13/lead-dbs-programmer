@@ -149,11 +149,14 @@
 
 .left-color {
   /* background-color: transparent; */
-  fill: rgba(48, 46, 46, 0.768);
+  /* fill: rgba(48, 46, 46, 0.768); */
+  fill: rgba(128, 128, 128, 0.804);
+
 }
 .center-color {
   /* background-color: green; */
-  fill: rgba(229, 40, 40, 0.41);
+  /* fill: rgba(229, 40, 40, 0.41); */
+  fill: rgb(229, 40, 40);
   /* Change the background color for the 'center' position */
 }
 
@@ -290,7 +293,7 @@
   display: inline-block;
   padding: 10px 20px;
   background-color: #72a9f2; /* Change to your desired button color */
-  color: #ffffff; /* Text color for the buttons */
+  color: #ffffff; /* Text color for the busteering-container-special-buttonsttons */
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -305,12 +308,14 @@
 
 /* Style for the div containers */
 .button-container {
-  /* border: 2px solid #0c0c0c; */
+  border: 2px solid #abbdd67e;
   /* Border color for the divs */
   /* padding: 20px; */
   /* margin: 10px; */
   /* border-radius: 5px; */
-  background-color: #222121; /* Background color for the divs */
+  /* background-color: #222121; */
+  background-color: #abbdd67e;
+  /* Background color for the divs */
   /* box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); */
   /* Add a subtle shadow */
 }
@@ -337,6 +342,8 @@ h2 {
   align-items: center;
   text-align: center;
   position: relative;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 /* .ClockwiseArrow {
@@ -486,13 +493,14 @@ h2 {
 
 .center-color {
   /* background-color: green; */
-  fill: rgba(229, 40, 40, 0.41);
+  fill: rgba(232, 57, 57, 0.804);
   /* Change the background color for the 'center' position */
 }
 
 .right-color {
   /* background-color: blue; */
-  fill: rgba(50, 50, 244, 0.411);
+  /* fill: rgba(50, 50, 244, 0.411); */
+  fill: rgba(23, 86, 222, 0.804);
   /* Change the background color for the 'right' position */
 }
 

@@ -19,6 +19,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import Tooltip from 'react-bootstrap/Tooltip';
 // import Popup from 'reactjs-popup';
 import { OverlayTrigger } from 'react-bootstrap';
+import { Unstable_NumberInput as NumberInput } from '@mui/base/Unstable_NumberInput';
 import TripleToggleTest from '../../TripleToggleTest';
 import './ElecModelStyling/boston_vercise_directed.css';
 import { ReactComponent as IPG } from '../images/IPG.svg';
@@ -2898,6 +2899,7 @@ function Boston_vercise_directed(props, ref) {
           )} */}
         </div>
         <div />
+        <NumberInput />
         <div className="button-container">
           <label className="puls-label">Total Amplitude</label>
           <input
