@@ -488,12 +488,15 @@ function StimulationSettings({
     // console.log('E: ', masterImportData);
     console.log('NewStims ', newStims.includes(e.target.value));
     // if (!newStims.includes(e.target.value)) {
-    window.electron.ipcRenderer.sendMessage(
-      'import-previous-files',
-      e.target.value,
-      // key,
-      masterImportData,
-    );
+    try {
+      window.electron.ipcRenderer.sendMessage(
+        'import-previous-files',
+        e.target.value,
+        masterImportData,
+      );
+    } catch {
+      console.log('error');
+    }
     // }
     setMatImportFile(e.target.value);
     setStimChanged(true);

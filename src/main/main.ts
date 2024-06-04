@@ -164,8 +164,11 @@ ipcMain.on('import-previous-files', (event, fileID, importData) => {
     }
   } else {
     // If the file doesn't exist, create the file and pass back a message
-    fs.writeFileSync(filePath, JSON.stringify({}), 'utf8');
-    console.log('File does not exist. Created a new file.');
+    try {
+      fs.writeFileSync(filePath, JSON.stringify({}), 'utf8');
+    } catch {
+      console.log('File does not exist.');
+    }
     // const jsonData = 'Empty';
   }
   console.log('FILEPATH; ', filePath);
@@ -250,11 +253,15 @@ ipcMain.on('save-file', (event, file, data) => {
     // Write data to file
     try {
       fs.writeFileSync(filePath, dataString);
-    } catch (error) {
+    } catch {
       // Handle the error here
-      console.error('Error writing to file:', error);
+      console.log('Error writing to file:');
     }
-    fs.writeFileSync(file, dataString);
+    try {
+      fs.writeFileSync(file, dataString);
+    } catch {
+      console.log('Error');
+    }
 
     // Send a response back to the renderer process
     event.reply('file-saved', filePath);
