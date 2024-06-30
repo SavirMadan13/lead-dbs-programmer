@@ -1,9 +1,13 @@
+/* eslint-disable react/prop-types */
 // import { useState } from 'react';
 import React, { useState, useRef, useEffect } from 'react';
-import BostonCartesiaTest from './electrode_models/BostonCartesiaTest';
+import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import { Dropdown } from 'react-bootstrap';
+import TabbedElectrodeIPGSelectionTest from './TabbedElectrodeIPGSelectionTest';
+import BostonCartesiaTest from './electrode_models/BostonCartesiaTest';
 
 function StimulationSettings({
   rightElectrode,
@@ -38,6 +42,12 @@ function StimulationSettings({
   setFilePath,
   stimChanged,
   setStimChanged,
+  allStimulationParameters,
+  setAllStimulationParameters,
+  visModel,
+  setVisModel,
+  sessionTitle,
+  setSessionTitle,
 }) {
   // const [IPG, setIPG] = useState('');
   // const [leftElectrode, setLeftElectrode] = useState('');
@@ -118,21 +128,46 @@ function StimulationSettings({
   //   console.log(data);
   // });
 
+  const [newStim, setNewStim] = useState('');
+
+  function generateUniqueID() {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // Adding 1 because months are zero-based
+    const day = currentDate.getDate().toString().padStart(2, '0');
+    const randomNums = Math.floor(Math.random() * 1000000); // Generate random 4-digit number
+    return `${year}${month}${day}${randomNums}`;
+  }
+
+  const handleTabKeyPress = (event) => {
+    if (event.key === 'Tab') {
+      event.preventDefault(); // Prevent the default tab behavior
+      const uniqueID = generateUniqueID();
+      setNewStim(uniqueID);
+      // setNewStim(Date.now().toString());
+      // Set the input field value to the placeholder text
+    }
+  };
+
   window.electron.ipcRenderer.once('import-file', (arg) => {
     importData = arg;
     // setTestData(importData);
     console.log('Import Data', importData);
     setMasterImportData(arg);
     const numElectrodes = 'numElectrodes';
-    console.log(importData['numElectrodes']);
     const selectedElectrode = importData.electrodeModel;
     const stimDatasets = importData.priorStims;
     const stimDatasetList = {};
     Object.keys(stimDatasets).forEach((key) => {
-      if (key > 2) {
+      if (key >= 2) {
         stimDatasetList[key] = stimDatasets[key].name;
       }
     });
+    if (Object.keys(stimDatasetList).length === 0) {
+      const uniqueID = generateUniqueID();
+      stimDatasetList[3] = uniqueID;
+      // setNewStim(uniqueID);
+    }
     setTestData(stimDatasetList);
     setImportDataTest(stimDatasetList);
     // setMatImportFile(stimDatasetList[3]);
@@ -247,11 +282,11 @@ function StimulationSettings({
     // console.log(allTotalAmplitudes);
 
     for (let j = 1; j < 5; j++) {
-      let dynamicKey2 = `Ls${j}`;
-      let dynamicKey3 = `Rs${j}`;
+      const dynamicKey2 = `Ls${j}`;
+      const dynamicKey3 = `Rs${j}`;
       for (let i = 0; i < 9; i++) {
-        let dynamicKey = `k${i + 7}`;
-        let dynamicKey1 = `k${i}`;
+        const dynamicKey = `k${i + 7}`;
+        const dynamicKey1 = `k${i}`;
         // let nestedData = jsonData.S[dynamicKey2][dynamicKey];
         // let nestedData = jsonData.S[dynamicKey2][dynamicKey];
         // console.log('nestred data: ', nestedData);
@@ -259,9 +294,7 @@ function StimulationSettings({
           newQuantities[j][i] = parseFloat(
             jsonData.S[dynamicKey2][dynamicKey].perc,
           );
-          newQuantities[j][0] = parseFloat(
-            jsonData.S[dynamicKey2].case['perc'],
-          );
+          newQuantities[j][0] = parseFloat(jsonData.S[dynamicKey2].case.perc);
           if (jsonData.S[dynamicKey2][dynamicKey].pol === 0) {
             newSelectedValues[j][i] = 'left';
           } else if (jsonData.S[dynamicKey2][dynamicKey].pol === 1) {
@@ -269,11 +302,11 @@ function StimulationSettings({
           } else if (jsonData.S[dynamicKey2][dynamicKey].pol === 2) {
             newSelectedValues[j][i] = 'right';
           }
-          if (jsonData.S[dynamicKey2].case['pol'] === 0) {
+          if (jsonData.S[dynamicKey2].case.pol === 0) {
             newSelectedValues[j][0] = 'left';
-          } else if (jsonData.S[dynamicKey2].case['pol'] === 1) {
+          } else if (jsonData.S[dynamicKey2].case.pol === 1) {
             newSelectedValues[j][0] = 'center';
-          } else if (jsonData.S[dynamicKey2].case['pol'] === 2) {
+          } else if (jsonData.S[dynamicKey2].case.pol === 2) {
             newSelectedValues[j][0] = 'right';
           }
         }
@@ -282,7 +315,7 @@ function StimulationSettings({
             jsonData.S[dynamicKey3][dynamicKey1].perc,
           );
           newQuantities[j + 4][0] = parseFloat(
-            jsonData.S[dynamicKey3].case['perc'],
+            jsonData.S[dynamicKey3].case.perc,
           );
           if (jsonData.S[dynamicKey3][dynamicKey1].pol === 0) {
             newSelectedValues[j + 4][i + 1] = 'left';
@@ -291,11 +324,11 @@ function StimulationSettings({
           } else if (jsonData.S[dynamicKey3][dynamicKey1].pol === 2) {
             newSelectedValues[j + 4][i + 1] = 'right';
           }
-          if (jsonData.S[dynamicKey2].case['pol'] === 0) {
+          if (jsonData.S[dynamicKey2].case.pol === 0) {
             newSelectedValues[j + 4][0] = 'left';
-          } else if (jsonData.S[dynamicKey2].case['pol'] === 1) {
+          } else if (jsonData.S[dynamicKey2].case.pol === 1) {
             newSelectedValues[j + 4][0] = 'center';
-          } else if (jsonData.S[dynamicKey2].case['pol'] === 2) {
+          } else if (jsonData.S[dynamicKey2].case.pol === 2) {
             newSelectedValues[j + 4][0] = 'right';
           }
         }
@@ -336,6 +369,7 @@ function StimulationSettings({
   };
 
   const gatherImportedDataNew = (jsonData) => {
+    console.log(jsonData);
     const newQuantities = {
       1: {},
       2: {},
@@ -356,6 +390,16 @@ function StimulationSettings({
       7: {},
       8: {},
     };
+    const newTotalAmplitude = {
+      1: {},
+      2: {},
+      3: {},
+      4: {},
+      5: {},
+      6: {},
+      7: {},
+      8: {},
+    };
     const newAllQuantities = {};
     // let newSelectedValues = {};
     // console.log(allQuantities[1][0]);
@@ -365,19 +409,24 @@ function StimulationSettings({
     // setRightElectrode(jsonData.S.elmodel[1]);
     // const elecIPG = jsonData.S.ipg;
     // setIPG(elecIPG);
-    const amplitudeArray = [];
-    amplitudeArray.push(jsonData.S.amplitude.leftElectrode);
-    amplitudeArray.push(jsonData.S.amplitude.rightElectrode);
-    setAllTotalAmplitudes(amplitudeArray);
+    // for (let a = 1)
+    // const amplitudeArray = [];
+    // amplitudeArray.push(jsonData.S.amplitude[0]);
+    // console.log(jsonData.S.amplitude['leftAmplitude']);
+    // amplitudeArray.push(jsonData.S.amplitude[0]);
+    // console.log(amplitudeArray);
+    // setAllTotalAmplitudes(amplitudeArray);
     // console.log('AmpllitudueArray: ', amplitudeArray);
     // console.log(allTotalAmplitudes);
 
     for (let j = 1; j < 5; j++) {
-      let dynamicKey2 = `Ls${j}`;
-      let dynamicKey3 = `Rs${j}`;
+      newTotalAmplitude[j] = jsonData.S.amplitude.leftAmplitude[j - 1];
+      newTotalAmplitude[j + 4] = jsonData.S.amplitude.rightAmplitude[j - 1];
+      const dynamicKey2 = `Ls${j}`;
+      const dynamicKey3 = `Rs${j}`;
       for (let i = 0; i < 9; i++) {
-        let dynamicKey = `k${i + 7}`;
-        let dynamicKey1 = `k${i}`;
+        const dynamicKey = `k${i + 7}`;
+        const dynamicKey1 = `k${i}`;
         // let nestedData = jsonData.S[dynamicKey2][dynamicKey];
         // let nestedData = jsonData.S[dynamicKey2][dynamicKey];
         // console.log('nestred data: ', nestedData);
@@ -385,9 +434,7 @@ function StimulationSettings({
           newQuantities[j][i] = parseFloat(
             jsonData.S[dynamicKey2][dynamicKey].perc,
           );
-          newQuantities[j][0] = parseFloat(
-            jsonData.S[dynamicKey2].case['perc'],
-          );
+          newQuantities[j][0] = parseFloat(jsonData.S[dynamicKey2].case.perc);
           if (jsonData.S[dynamicKey2][dynamicKey].pol === 0) {
             newSelectedValues[j][i] = 'left';
           } else if (jsonData.S[dynamicKey2][dynamicKey].pol === 1) {
@@ -395,11 +442,11 @@ function StimulationSettings({
           } else if (jsonData.S[dynamicKey2][dynamicKey].pol === 2) {
             newSelectedValues[j][i] = 'right';
           }
-          if (jsonData.S[dynamicKey2].case['pol'] === 0) {
+          if (jsonData.S[dynamicKey2].case.pol === 0) {
             newSelectedValues[j][0] = 'left';
-          } else if (jsonData.S[dynamicKey2].case['pol'] === 1) {
+          } else if (jsonData.S[dynamicKey2].case.pol === 1) {
             newSelectedValues[j][0] = 'center';
-          } else if (jsonData.S[dynamicKey2].case['pol'] === 2) {
+          } else if (jsonData.S[dynamicKey2].case.pol === 2) {
             newSelectedValues[j][0] = 'right';
           }
         }
@@ -408,7 +455,7 @@ function StimulationSettings({
             jsonData.S[dynamicKey3][dynamicKey1].perc,
           );
           newQuantities[j + 4][0] = parseFloat(
-            jsonData.S[dynamicKey3].case['perc'],
+            jsonData.S[dynamicKey3].case.perc,
           );
           if (jsonData.S[dynamicKey3][dynamicKey1].pol === 0) {
             newSelectedValues[j + 4][i + 1] = 'left';
@@ -417,11 +464,11 @@ function StimulationSettings({
           } else if (jsonData.S[dynamicKey3][dynamicKey1].pol === 2) {
             newSelectedValues[j + 4][i + 1] = 'right';
           }
-          if (jsonData.S[dynamicKey2].case['pol'] === 0) {
+          if (jsonData.S[dynamicKey2].case.pol === 0) {
             newSelectedValues[j + 4][0] = 'left';
-          } else if (jsonData.S[dynamicKey2].case['pol'] === 1) {
+          } else if (jsonData.S[dynamicKey2].case.pol === 1) {
             newSelectedValues[j + 4][0] = 'center';
-          } else if (jsonData.S[dynamicKey2].case['pol'] === 2) {
+          } else if (jsonData.S[dynamicKey2].case.pol === 2) {
             newSelectedValues[j + 4][0] = 'right';
           }
         }
@@ -439,6 +486,7 @@ function StimulationSettings({
     //   }
     // });
     // console.
+    console.log(newTotalAmplitude);
     const filteredValues = Object.keys(newSelectedValues)
       .filter((key) => Object.keys(newSelectedValues[key]).length > 0) // Filter non-empty values
       .reduce((obj, key) => {
@@ -459,6 +507,7 @@ function StimulationSettings({
     // console.log('newvalues: ', newSelectedValues);
     setAllSelectedValues(filteredValues);
     setAllQuantities(filteredQuantities);
+    setAllTotalAmplitudes(newTotalAmplitude);
     console.log('STIMCHANGED: ', stimChanged);
     // setAllQuantities(filteredQuantities => {
     //   const newAllQuantities = { ...filteredQuantities };
@@ -501,17 +550,21 @@ function StimulationSettings({
 
   window.electron.ipcRenderer.on('import-previous-files-reply', (arg, arg1) => {
     // console.log('hello');
-    console.log(arg);
+    console.log('ARG: ', arg);
     setFilePath(arg);
     console.log('arg1: ', arg1);
     if (arg !== 'Empty') {
       gatherImportedDataNew(arg1);
+    } else if (arg === 'Empty') {
+      const uniqueID = generateUniqueID();
+      setNewStim(uniqueID);
     }
+    // Here is where I can write an if statement for if arg1 is empty, and then I can write a statement to create
+    // a new one and then select that one as the stimulation setting
     console.log('MATIMPORTDATA: ', matImportFile);
     console.log('STIMCHANGED: ', stimChanged);
   });
 
-  const [newStim, setNewStim] = useState('');
   const handleOnAddButtonClick = () => {
     // console.log
     // newStims.push(newStim);
@@ -536,25 +589,6 @@ function StimulationSettings({
     setNewStim(event.target.value);
   };
 
-  function generateUniqueID() {
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // Adding 1 because months are zero-based
-    const day = currentDate.getDate().toString().padStart(2, '0');
-    const randomNums = Math.floor(Math.random() * 1000000); // Generate random 4-digit number
-    return `${year}${month}${day}${randomNums}`;
-  }
-
-  const handleTabKeyPress = (event) => {
-    if (event.key === 'Tab') {
-      event.preventDefault(); // Prevent the default tab behavior
-      const uniqueID = generateUniqueID();
-      setNewStim(uniqueID);
-      // setNewStim(Date.now().toString());
-      // Set the input field value to the placeholder text
-    }
-  };
-
   const handleDebugButton2 = () => {
     console.log('ALLQUANTITIES: ', allQuantities);
   };
@@ -566,184 +600,328 @@ function StimulationSettings({
   // }, [importedData]);
 
   return (
-    <div className="StimulationParameters">
-      {/* <button onClick={handleMatlabConnectivity}>Matlab Test</button> */}
-      {/* <button
-        className="import-button"
-        onClick={() => fileInputRef.current.click()}
-        // onClick={gatherImportedData(importData)}
-
-      >
-        Import Data
-      </button>
-      <input
-        ref={fileInputRef}
-        className="file-input"
-        type="file"
-        accept=".json"
-        onChange={handleFileChange}
-        style={{ display: 'none' }} // Hide the input element
-      /> */}
-      <div></div>
-      <h2 style={{ fontSize: 16 }}>Stimulation ID</h2>
-      <select value={matImportFile} onChange={(e) => handleImportFileChange(e)}>
-        <option>None</option>
-        {Object.keys(importDataTest).map((key) => (
-          <option key={key} value={importDataTest[key]}>
-            {importDataTest[key]}
-          </option>
-        ))}
-        {/* {Object.keys(newImportFiles).map((key) => (
-          <option key={key} value={newImportFiles[key]}>
-            {newImportFiles[key]}
-          </option>
-        ))} */}
-      </select>
-      <InputGroup className="mb-3">
-        <Form.Control
-          placeholder="Tab for auto ID"
-          // aria-label="Recipient's username"
-          aria-describedby="basic-addon2"
-          value={newStim}
-          onChange={handleNewStimText}
-          onKeyDown={handleTabKeyPress}
-        />
-        <Button
-          variant="outline-secondary"
-          id="button-addon2"
-          onClick={handleOnAddButtonClick}
-        >
-          Add
-        </Button>
-      </InputGroup>
-      {/* <button onClick={handleDebugButton2}>Debug</button> */}
-      {/* <input
-        type="text"
-        // value={newItem}
-        // onChange={(e) => handleNewItemChange(e)}
-        placeholder={Date.now()}
-      /> */}
-      <div></div>
-      <h2 style={{ fontSize: 16 }}>Left Electrode</h2>
-      <select
-        value={leftElectrode}
-        onChange={(e) => handleLeftElectrodeChange(e)}
-      >
-        <option value="">None</option>
-        {/* <option value="BostonCartesia">Boston Scientific Cartesia</option> */}
-        {/* <option value="Medtronic3389">Medtronic 3389</option>
-        <option value="Medtronic3387">Medtronic 3387</option>
-        <option value="Medtronic3391">Medtronic 3391</option>
-        <option value="MedtronicB33005">Medtronic B33005</option>
-        <option value="BostonScientificVercise">
-          Boston Scientific Vercise
-        </option>
-        <option value="BostonCartesiaTest">
-          Boston Scientific Vercise Directed
-        </option>
-        <option value="NewBostonCartesiaTest">
-          Boston Scientific Vercise Directed - Alternate
-        </option>
-        <option value="BostonScientificCartesiaHX">Boston Scientific Vercise Cartesia HX</option>
-        <option value="BostonScientificCartesiaX">Boston Scientific Vercise Cartesia X</option>
-        <option value="AbbottActiveTip2">Abbott ActiveTip (2mm)</option>
-        <option value="AbbottActiveTip3">Abbott ActiveTip (3mm)</option>
-        <option value="AbbottDirected6172">Abbott Directed 6172</option>
-        <option value="AbbottDirected6173">Abbott Directed 6173</option> */}
-        <option value="abbott_activetip_2mm">Abbott ActiveTip (2mm)</option>
-        <option value="abbott_activetip_3mm">Abbott ActiveTip (3mm)</option>
-        <option value="abbott_directed_6172">Abbott Directed 6172</option>
-        <option value="abbott_directed_6173">Abbott Directed 6173</option>
-        <option value="boston_vercise">Boston Scientific Vercise</option>
-        <option value="boston_vercise_directed">
-          Boston Scientific Vercise Directed
-        </option>
-        <option value="boston_vercise_cartesia_x">
-          Boston Scientific Vercise Cartesia X
-        </option>
-        <option value="boston_vercise_cartesia_hx">
-          Boston Scientific Vercise Cartesia HX
-        </option>
-        <option value="medtronic_3387">Medtronic 3387</option>
-        <option value="medtronic_3389">Medtronic 3389</option>
-        <option value="medtronic_3391">Medtronic 3391</option>
-        <option value="medtronic_b33005">Medtronic B33005</option>
-        <option value="medtronic_b33015">Medtronic B33015</option>
-        {/* <option value="AbbottDirectedTest">Abbott Directed</option> */}
-      </select>
-      <div></div>
-      <h2 style={{ fontSize: 16 }}>Right Electrode</h2>
-      <select
-        value={rightElectrode}
-        onChange={(e) => handleRightElectrodeChange(e)}
-      >
-        <option value="">None</option>
-        {/* <option value="Medtronic3389">Medtronic 3389</option>
-        <option value="Medtronic3387">Medtronic 3387</option>
-        <option value="Medtronic3391">Medtronic 3391</option>
-        <option value="MedtronicB33005">Medtronic B33005</option>
-        <option value="BostonScientificVercise">
-          Boston Scientific Vercise
-        </option>
-        <option value="BostonCartesiaTest">
-          Boston Scientific Vercise Directed
-        </option>
-        <option value="NewBostonCartesiaTest">
-          Boston Scientific Vercise Directed - Alternate
-        </option>
-        <option value="BostonScientificCartesiaHX">Boston Scientific Vercise Cartesia HX</option>
-        <option value="BostonScientificCartesiaX">Boston Scientific Vercise Cartesia X</option>
-        <option value="AbbottActiveTip2">Abbott ActiveTip (2mm)</option>
-        <option value="AbbottActiveTip3">Abbott ActiveTip (3mm)</option>
-        <option value="AbbottDirected6172">Abbott Directed 6172</option>
-        <option value="AbbottDirected6173">Abbott Directed 6173</option> */}
-        <option value="abbott_activetip_2mm">Abbott ActiveTip (2mm)</option>
-        <option value="abbott_activetip_3mm">Abbott ActiveTip (3mm)</option>
-        <option value="abbott_directed_6172">Abbott Directed 6172</option>
-        <option value="abbott_directed_6173">Abbott Directed 6173</option>
-        <option value="boston_vercise">Boston Scientific Vercise</option>
-        <option value="boston_vercise_directed">
-          Boston Scientific Vercise Directed
-        </option>
-        <option value="boston_vercise_cartesia_x">
-          Boston Scientific Vercise Cartesia X
-        </option>
-        <option value="boston_vercise_cartesia_hx">
-          Boston Scientific Vercise Cartesia HX
-        </option>
-        <option value="medtronic_3387">Medtronic 3387</option>
-        <option value="medtronic_3389">Medtronic 3389</option>
-        <option value="medtronic_3391">Medtronic 3391</option>
-        <option value="medtronic_b33005">Medtronic B33005</option>
-        <option value="medtronic_b33015">Medtronic B33015</option>
-      </select>
-      <div></div>
-      <h2 style={{ fontSize: 16 }}>IPG</h2>
-      <select value={IPG} onChange={(e) => handleIPGChange(e)}>
-        <option value="">None</option>
-        <option value="Abbott">Abbott (Infinity, Brio, Libra)</option>
-        <option value="Boston">
-          Boston Scientific (Vercise, Genus, Gevia)
-        </option>
-        <option value="Medtronic_Activa">Medtronic Activa</option>
-        <option value="Medtronic_Percept">Medtronic Percept</option>
-      </select>
-      <div></div>
-      {/* <button
-        className="import-button"
-        onClick={() => fileInputRef.current.click()}
-        // onClick={gatherImportedData(importData)}
-      >
-        Import Data
-      </button> */}
-      <input
-        ref={fileInputRef}
-        className="file-input"
-        type="file"
-        accept=".json"
-        onChange={handleFileChange}
-        style={{ display: 'none' }} // Hide the input element
-      />
+    // <div style={{ justifyContent: 'horizontal', width: '300px' }}>
+    // <div className="stimulationSettingsContainer">
+    //   <div />
+    //   <h2 style={{ fontSize: 16 }}>Stimulation ID</h2>
+    //   <select value={matImportFile} onChange={(e) => handleImportFileChange(e)}>
+    //     {Object.keys(importDataTest).map((key) => (
+    //       <option key={key} value={importDataTest[key]}>
+    //         {importDataTest[key]}
+    //       </option>
+    //     ))}
+    //   </select>
+    //   <InputGroup className="mb-3">
+    //     <Form.Control
+    //       placeholder="Tab for auto ID"
+    //       // aria-label="Recipient's username"
+    //       aria-describedby="basic-addon2"
+    //       value={newStim}
+    //       onChange={handleNewStimText}
+    //       onKeyDown={handleTabKeyPress}
+    //     />
+    //     <Button
+    //       variant="outline-secondary"
+    //       id="button-addon2"
+    //       onClick={handleOnAddButtonClick}
+    //     >
+    //       Add
+    //     </Button>
+    //   </InputGroup>
+    //   <div />
+    //   <Dropdown>
+    //     <Dropdown.Toggle>
+    //       Electrode Model
+    //     </Dropdown.Toggle>
+    //     <Dropdown.Menu style={{ width: '350px', paddingLeft: '10px' }}>
+    //       <h2 style={{ fontSize: 16 }}>Left Electrode</h2>
+    //       <select
+    //         value={leftElectrode}
+    //         onChange={(e) => handleLeftElectrodeChange(e)}
+    //       >
+    //         <option value="">None</option>
+    //         <option value="abbott_activetip_2mm">Abbott ActiveTip (2mm)</option>
+    //         <option value="abbott_activetip_3mm">Abbott ActiveTip (3mm)</option>
+    //         <option value="abbott_directed_6172">Abbott Directed 6172</option>
+    //         <option value="abbott_directed_6173">Abbott Directed 6173</option>
+    //         <option value="boston_vercise">Boston Scientific Vercise</option>
+    //         <option value="boston_vercise_directed">
+    //           Boston Scientific Vercise Directed
+    //         </option>
+    //         <option value="boston_vercise_cartesia_x">
+    //           Boston Scientific Vercise Cartesia X
+    //         </option>
+    //         <option value="boston_vercise_cartesia_hx">
+    //           Boston Scientific Vercise Cartesia HX
+    //         </option>
+    //         <option value="medtronic_3387">Medtronic 3387</option>
+    //         <option value="medtronic_3389">Medtronic 3389</option>
+    //         <option value="medtronic_3391">Medtronic 3391</option>
+    //         <option value="medtronic_b33005">Medtronic B33005</option>
+    //         <option value="medtronic_b33015">Medtronic B33015</option>
+    //       </select>
+    //       <div />
+    //       <h2 style={{ fontSize: 16 }}>Right Electrode</h2>
+    //       <select
+    //         value={rightElectrode}
+    //         onChange={(e) => handleRightElectrodeChange(e)}
+    //       >
+    //         <option value="">None</option>
+    //         <option value="abbott_activetip_2mm">Abbott ActiveTip (2mm)</option>
+    //         <option value="abbott_activetip_3mm">Abbott ActiveTip (3mm)</option>
+    //         <option value="abbott_directed_6172">Abbott Directed 6172</option>
+    //         <option value="abbott_directed_6173">Abbott Directed 6173</option>
+    //         <option value="boston_vercise">Boston Scientific Vercise</option>
+    //         <option value="boston_vercise_directed">
+    //           Boston Scientific Vercise Directed
+    //         </option>
+    //         <option value="boston_vercise_cartesia_x">
+    //           Boston Scientific Vercise Cartesia X
+    //         </option>
+    //         <option value="boston_vercise_cartesia_hx">
+    //           Boston Scientific Vercise Cartesia HX
+    //         </option>
+    //         <option value="medtronic_3387">Medtronic 3387</option>
+    //         <option value="medtronic_3389">Medtronic 3389</option>
+    //         <option value="medtronic_3391">Medtronic 3391</option>
+    //         <option value="medtronic_b33005">Medtronic B33005</option>
+    //         <option value="medtronic_b33015">Medtronic B33015</option>
+    //       </select>
+    //       <div />
+    //       <h2 style={{ fontSize: 16 }}>IPG</h2>
+    //       <select value={IPG} onChange={(e) => handleIPGChange(e)}>
+    //         <option value="">None</option>
+    //         <option value="Abbott">Abbott (Infinity, Brio, Libra)</option>
+    //         <option value="Boston">
+    //           Boston Scientific (Vercise, Genus, Gevia)
+    //         </option>
+    //         <option value="Medtronic_Activa">Medtronic Activa</option>
+    //         <option value="Medtronic_Percept">Medtronic Percept</option>
+    //         <option value="Research">Master</option>
+    //       </select>
+    //     </Dropdown.Menu>
+    //   </Dropdown>
+    //   {/* <h2 style={{ fontSize: 16 }}>Left Electrode</h2>
+    //   <select
+    //     value={leftElectrode}
+    //     onChange={(e) => handleLeftElectrodeChange(e)}
+    //   >
+    //     <option value="">None</option>
+    //     <option value="abbott_activetip_2mm">Abbott ActiveTip (2mm)</option>
+    //     <option value="abbott_activetip_3mm">Abbott ActiveTip (3mm)</option>
+    //     <option value="abbott_directed_6172">Abbott Directed 6172</option>
+    //     <option value="abbott_directed_6173">Abbott Directed 6173</option>
+    //     <option value="boston_vercise">Boston Scientific Vercise</option>
+    //     <option value="boston_vercise_directed">
+    //       Boston Scientific Vercise Directed
+    //     </option>
+    //     <option value="boston_vercise_cartesia_x">
+    //       Boston Scientific Vercise Cartesia X
+    //     </option>
+    //     <option value="boston_vercise_cartesia_hx">
+    //       Boston Scientific Vercise Cartesia HX
+    //     </option>
+    //     <option value="medtronic_3387">Medtronic 3387</option>
+    //     <option value="medtronic_3389">Medtronic 3389</option>
+    //     <option value="medtronic_3391">Medtronic 3391</option>
+    //     <option value="medtronic_b33005">Medtronic B33005</option>
+    //     <option value="medtronic_b33015">Medtronic B33015</option>
+    //   </select>
+    //   <div />
+    //   <h2 style={{ fontSize: 16 }}>Right Electrode</h2>
+    //   <select
+    //     value={rightElectrode}
+    //     onChange={(e) => handleRightElectrodeChange(e)}
+    //   >
+    //     <option value="">None</option>
+    //     <option value="abbott_activetip_2mm">Abbott ActiveTip (2mm)</option>
+    //     <option value="abbott_activetip_3mm">Abbott ActiveTip (3mm)</option>
+    //     <option value="abbott_directed_6172">Abbott Directed 6172</option>
+    //     <option value="abbott_directed_6173">Abbott Directed 6173</option>
+    //     <option value="boston_vercise">Boston Scientific Vercise</option>
+    //     <option value="boston_vercise_directed">
+    //       Boston Scientific Vercise Directed
+    //     </option>
+    //     <option value="boston_vercise_cartesia_x">
+    //       Boston Scientific Vercise Cartesia X
+    //     </option>
+    //     <option value="boston_vercise_cartesia_hx">
+    //       Boston Scientific Vercise Cartesia HX
+    //     </option>
+    //     <option value="medtronic_3387">Medtronic 3387</option>
+    //     <option value="medtronic_3389">Medtronic 3389</option>
+    //     <option value="medtronic_3391">Medtronic 3391</option>
+    //     <option value="medtronic_b33005">Medtronic B33005</option>
+    //     <option value="medtronic_b33015">Medtronic B33015</option>
+    //   </select>
+    //   <div />
+    //   <h2 style={{ fontSize: 16 }}>IPG</h2>
+    //   <select value={IPG} onChange={(e) => handleIPGChange(e)}>
+    //     <option value="">None</option>
+    //     <option value="Abbott">Abbott (Infinity, Brio, Libra)</option>
+    //     <option value="Boston">
+    //       Boston Scientific (Vercise, Genus, Gevia)
+    //     </option>
+    //     <option value="Medtronic_Activa">Medtronic Activa</option>
+    //     <option value="Medtronic_Percept">Medtronic Percept</option>
+    //     <option value="Research">Master</option>
+    //   </select>
+    //   <div />
+    //   <input
+    //     ref={fileInputRef}
+    //     className="file-input"
+    //     type="file"
+    //     accept=".json"
+    //     onChange={handleFileChange}
+    //     style={{ display: 'none' }} // Hide the input element
+    //   /> */}
+    // </div>
+    <div>
+      <div className="stimulationSettingsContainer">
+        <div />
+        <div className="stim-id-group">
+          <h2 style={{ fontSize: 16 }}>Stimulation ID</h2>
+          <select
+            value={matImportFile}
+            onChange={(e) => handleImportFileChange(e)}
+          >
+            {Object.keys(importDataTest).map((key) => (
+              <option key={key} value={importDataTest[key]}>
+                {importDataTest[key]}
+              </option>
+            ))}
+          </select>
+          <InputGroup className="mb-3">
+            <Form.Control
+              placeholder="Tab for auto ID"
+              aria-describedby="basic-addon2"
+              value={newStim}
+              onChange={handleNewStimText}
+              onKeyDown={handleTabKeyPress}
+            />
+            <Button
+              variant="outline-secondary"
+              id="button-addon2"
+              onClick={handleOnAddButtonClick}
+            >
+              Add
+            </Button>
+          </InputGroup>
+        </div>
+        <div />
+        <Dropdown>
+          <Dropdown.Toggle>Electrode Model</Dropdown.Toggle>
+          <Dropdown.Menu style={{ width: '350px', paddingLeft: '10px' }}>
+            <h2 style={{ fontSize: 16 }}>Left Electrode</h2>
+            <select
+              value={leftElectrode}
+              onChange={(e) => handleLeftElectrodeChange(e)}
+            >
+              <option value="">None</option>
+              <option value="abbott_activetip_2mm">
+                Abbott ActiveTip (2mm)
+              </option>
+              <option value="abbott_activetip_3mm">
+                Abbott ActiveTip (3mm)
+              </option>
+              <option value="abbott_directed_6172">Abbott Directed 6172</option>
+              <option value="abbott_directed_6173">Abbott Directed 6173</option>
+              <option value="boston_vercise">Boston Scientific Vercise</option>
+              <option value="boston_vercise_directed">
+                Boston Scientific Vercise Directed
+              </option>
+              <option value="boston_vercise_cartesia_x">
+                Boston Scientific Vercise Cartesia X
+              </option>
+              <option value="boston_vercise_cartesia_hx">
+                Boston Scientific Vercise Cartesia HX
+              </option>
+              <option value="medtronic_3387">Medtronic 3387</option>
+              <option value="medtronic_3389">Medtronic 3389</option>
+              <option value="medtronic_3391">Medtronic 3391</option>
+              <option value="medtronic_b33005">Medtronic B33005</option>
+              <option value="medtronic_b33015">Medtronic B33015</option>
+            </select>
+            <div />
+            <h2 style={{ fontSize: 16 }}>Right Electrode</h2>
+            <select
+              value={rightElectrode}
+              onChange={(e) => handleRightElectrodeChange(e)}
+            >
+              <option value="">None</option>
+              <option value="abbott_activetip_2mm">
+                Abbott ActiveTip (2mm)
+              </option>
+              <option value="abbott_activetip_3mm">
+                Abbott ActiveTip (3mm)
+              </option>
+              <option value="abbott_directed_6172">Abbott Directed 6172</option>
+              <option value="abbott_directed_6173">Abbott Directed 6173</option>
+              <option value="boston_vercise">Boston Scientific Vercise</option>
+              <option value="boston_vercise_directed">
+                Boston Scientific Vercise Directed
+              </option>
+              <option value="boston_vercise_cartesia_x">
+                Boston Scientific Vercise Cartesia X
+              </option>
+              <option value="boston_vercise_cartesia_hx">
+                Boston Scientific Vercise Cartesia HX
+              </option>
+              <option value="medtronic_3387">Medtronic 3387</option>
+              <option value="medtronic_3389">Medtronic 3389</option>
+              <option value="medtronic_3391">Medtronic 3391</option>
+              <option value="medtronic_b33005">Medtronic B33005</option>
+              <option value="medtronic_b33015">Medtronic B33015</option>
+            </select>
+            <div />
+            <h2 style={{ fontSize: 16 }}>IPG</h2>
+            <select value={IPG} onChange={(e) => handleIPGChange(e)}>
+              <option value="">None</option>
+              <option value="Abbott">Abbott (Infinity, Brio, Libra)</option>
+              <option value="Boston">
+                Boston Scientific (Vercise, Genus, Gevia)
+              </option>
+              <option value="Medtronic_Activa">Medtronic Activa</option>
+              <option value="Medtronic_Percept">Medtronic Percept</option>
+              <option value="Research">Master</option>
+            </select>
+          </Dropdown.Menu>
+        </Dropdown>
+      </div>
+      <div>
+        {leftElectrode && (
+          <TabbedElectrodeIPGSelectionTest
+            selectedElectrodeLeft={leftElectrode}
+            selectedElectrodeRight={rightElectrode}
+            IPG={IPG}
+            // key={key}
+            // setKey={setKey}
+            allQuantities={allQuantities}
+            setAllQuantities={setAllQuantities}
+            allSelectedValues={allSelectedValues}
+            setAllSelectedValues={setAllSelectedValues}
+            allTotalAmplitudes={allTotalAmplitudes}
+            setAllTotalAmplitudes={setAllTotalAmplitudes}
+            allStimulationParameters={allStimulationParameters}
+            setAllStimulationParameters={setAllStimulationParameters}
+            visModel={visModel}
+            setVisModel={setVisModel}
+            sessionTitle={sessionTitle}
+            setSessionTitle={setSessionTitle}
+            allTogglePositions={allTogglePositions}
+            setAllTogglePositions={setAllTogglePositions}
+            allPercAmpToggles={allPercAmpToggles}
+            setAllPercAmpToggles={setAllPercAmpToggles}
+            allVolAmpToggles={allVolAmpToggles}
+            setAllVolAmpToggles={setAllVolAmpToggles}
+            filePath={filePath}
+            setFilePath={setFilePath}
+            matImportFile={matImportFile}
+            stimChanged={stimChanged}
+            setStimChanged={setStimChanged}
+          />
+        )}
+      </div>
     </div>
   );
 }

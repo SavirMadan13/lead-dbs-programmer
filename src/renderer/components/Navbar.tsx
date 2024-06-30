@@ -9,6 +9,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
+import StimulationSettings from './StimulationSettings';
 import AssistedToggle from './AssistedToggle';
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
@@ -73,8 +74,7 @@ export default function Navbar() {
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           Lead-DBS Programmer
         </Typography>
-        {/* <AssistedToggle /> */}
-        {isMobile ? (
+        {/* {isMobile ? (
           <>
             <IconButton color="inherit" onClick={() => toggleDrawer(true)}>
               Button
@@ -91,8 +91,9 @@ export default function Navbar() {
           </>
         ) : (
           menuItems
-        )}
+        )} */}
       </Toolbar>
+      {/* <StimulationSettings /> */}
     </AppBar>
   );
 }

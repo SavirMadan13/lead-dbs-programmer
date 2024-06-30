@@ -1690,12 +1690,17 @@ function TabbedElectrodeIPGSelection({
     console.log('OUTPUTDATA: ', outputData);
     window.electron.ipcRenderer.sendMessage('save-file', filePath, outputData);
     // window.electron.ipcRenderer.sendMessage('close-window');
-    window.electron.ipcRenderer.sendMessage('close-window');
+    // window.electron.ipcRenderer.sendMessage('close-window');
 
     // Listen for a response from the main process
     window.electron.ipcRenderer.on('window-closed', (event, arg) => {
       console.log(arg); // Prints "Window closed" if received from the main process
     });
+  };
+
+  const quitApp = () => {
+    window.electron.ipcRenderer.sendMessage('set-status');
+    window.electron.ipcRenderer.sendMessage('close-window');
   };
 
   const gatherImportedData = (jsonData) => {
@@ -1764,6 +1769,14 @@ function TabbedElectrodeIPGSelection({
 
   return (
     <div>
+      <div className="stimCloseContainer">
+        <button className="export-button" onClick={sendDataToMain}>
+            Stimulate
+          </button>
+          <button className="export-button" onClick={quitApp}>
+            Close
+          </button>
+      </div>
       <Tabs className="tabs-container">
         <TabList className="tabs-container">
           <Tab onClick={() => handleTabChange('1')}>Left Hemisphere</Tab>
@@ -1879,9 +1892,12 @@ function TabbedElectrodeIPGSelection({
           Visualize Webserver
         </button> */}
         {/* <button onClick={handleIPGForOutput}>IPG Output</button> */}
-        <button className="export-button" onClick={sendDataToMain}>
+        {/* <button className="export-button" onClick={sendDataToMain}>
           Stimulate
         </button>
+        <button className="export-button" onClick={quitApp}>
+          Close
+        </button> */}
       </div>
     </div>
   );

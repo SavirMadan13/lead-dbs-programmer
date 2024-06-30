@@ -4,6 +4,34 @@
 
 /* @import '~bootstrap/dist/css/bootstrap.min.css'; */
 
+.container {
+  display: flex;
+}
+
+.stimulationSettingsContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: -50px;
+  /* Adjust gap as needed */
+}
+
+.stim-id-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px; /* Adjust gap as needed */
+}
+
+.input-group {
+  display: flex;
+  gap: 5px; /* Adjust gap as needed */
+}
+
+.Navbar {
+  margin-bottom: 10px;
+}
+
 .IPG {
   /* margin-top: 350px; */
   flex: 1;
@@ -16,15 +44,13 @@
 
 .Elmodel-center {
   flex: 1;
+  margin: 0% 2%;
   /* margin-left: -100px; */
   /* margin-right: -1050px; */
 }
 
 .right-contacts {
   flex: 1;
-  /* margin-top: 475px; */
-  /* margin-bottom: -450px; */
-  /* padding-top: 350px; */
   margin-right: -125px;
   padding-left: 10px;;
   padding-top: 15px;
@@ -33,8 +59,6 @@
 .left-contacts {
   flex: 1;
   margin-top: 140px;
-  /* margin-right: 10px; */
-  /* margin-right: -0px; */
 }
 
 .left-hx-contacts {
@@ -63,22 +87,7 @@
 
 }
 
-.container {
-  display: flex;
 
-  /* margin-top: 30px; */
-  /* margin-bottom: -10px; */
-  /* justify-content: space-between; */
-  /* width: 100%;  */
-  /* Set the desired width */
-  /* height: 100%;  */
-  /* Set the desired height */
-  /* overflow-y: auto; */
-  /* flex-wrap: nowrap;s */
-  /* margin-top: 100px;; */
-  /* overflow-x: auto; */
-  /* margin-left: -100px; */
-}
 
 .container2 {
   /* width: 33%; */
@@ -91,8 +100,10 @@
 .image-item {
   /* display: inline-block; */
   position: relative;
-  margin-left: -80px;
-  margin-right: 80px;
+  /* margin: 0% -22%;  */
+  /* Adjust horizontal margins */
+  /* margin-left: -80px;
+  margin-right: 80px; */
   /* margin-top: -55px; */
   /*This is setting the distance between the contacts
   /* top: -100px; */
@@ -150,7 +161,7 @@
 .left-color {
   /* background-color: transparent; */
   /* fill: rgba(48, 46, 46, 0.768); */
-  fill: rgba(128, 128, 128, 0.804);
+  fill: rgba(122, 125, 131, 0.804);
 
 }
 .center-color {
@@ -162,7 +173,8 @@
 
 .right-color {
   /* background-color: blue; */
-  fill: rgba(50, 50, 244, 0.411);
+  /* fill: rgba(50, 50, 244, 0.411); */
+  fill: rgba(28, 73, 144, 0.411);
   /* Change the background color for the 'right' position */
 }
 
@@ -279,7 +291,9 @@
 .button {
   display: inline-block;
   padding: 10px 20px;
-  background-color: #355c8f; /* Change to your desired button color */
+  background-color: #0056b3;
+  /* background-color: #355c8f;  */
+  /* Change to your desired button color */
   color: #ffffff; /* Text color for the buttons */
   border: none;
   border-radius: 4px;
@@ -308,13 +322,15 @@
 
 /* Style for the div containers */
 .button-container {
-  border: 2px solid #abbdd67e;
+  /* border: 2px solid #abbdd67e; */
+  border: 2px solid #80808050;
   /* Border color for the divs */
   /* padding: 20px; */
   /* margin: 10px; */
   /* border-radius: 5px; */
   /* background-color: #222121; */
-  background-color: #abbdd67e;
+  /* background-color: #abbdd67e; */
+  background-color: #80808050;
   /* Background color for the divs */
   /* box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); */
   /* Add a subtle shadow */
@@ -327,13 +343,9 @@ h2 {
 
 .steering-container {
   display: flex;
-  flex-direction: horizontal;
-  align-items: center;
-  text-align: center;
+  flex-direction: vertical;
   position: relative;
   /* margin: 1px; */
-  width: 100px; /* Adjust width as per your requirement */
-  height: 50px; /* Adjust height as per your requirement */
 }
 
 .steering-container-special-buttons {
@@ -372,6 +384,35 @@ h2 {
   font-weight: lighter;
 }
 
+.input-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.input-wrapper input {
+  padding-left: 20px; /* Adjust based on adornment width */
+}
+
+.input-wrapper .input-adornment {
+  position: absolute;
+  top: 50%;
+  right: 35px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  /* color: #888; */
+  color: black;
+}
+
+
+.param-input {
+  font-size: 14px;
+  height: 3rem;
+  width: 8rem;
+  border-radius: 0.5rem;
+  border: transparent;
+  padding: 0 1rem;
+}
+
 .new-quantity-input:hover {
   background: #b1b0b0;
   box-shadow: 0 10px 65px -10px rgba(0, 0, 0, 0.35); /* Change the box-shadow on hover */
@@ -386,6 +427,12 @@ h2 {
 .button-group {
   width: 150px; /* Set the desired width for the ButtonGroup */
   height: 40px; /* Optional: Set the height of the ButtonGroup */
+  display: flex; /* Ensure the ButtonGroup behaves as a flex container */
+  justify-content: center; /* Center the buttons within the group */
+  margin: auto; /* Center the ButtonGroup within its parent container */
+}
+
+.button-group-2 {
   display: flex; /* Ensure the ButtonGroup behaves as a flex container */
   justify-content: center; /* Center the buttons within the group */
   margin: auto; /* Center the ButtonGroup within its parent container */
@@ -445,13 +492,6 @@ h2 {
   margin-top: 140px;
 }
 
-.container {
-  display: flex;
-  /* justify-content: space-between; */
-  width: 100%; /* Set the desired width */
-  height: 100%; /* Set the desired height */
-}
-
 .container2 {
   width: 33%; /* Set the desired width */
   height: 100%; /* Set the desired height */
@@ -492,16 +532,11 @@ h2 {
 }
 
 .center-color {
-  /* background-color: green; */
-  fill: rgba(232, 57, 57, 0.804);
-  /* Change the background color for the 'center' position */
+  fill: rgba(230, 35, 0, 0.709);
 }
 
 .right-color {
-  /* background-color: blue; */
-  /* fill: rgba(50, 50, 244, 0.411); */
-  fill: rgba(23, 86, 222, 0.804);
-  /* Change the background color for the 'right' position */
+  fill: #2259dabb;
 }
 
 .image-container {
@@ -574,19 +609,6 @@ h2 {
   color: white;
 }
 
-/* .svgButtons {
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.svgButtons:hover {
-  transform: scale(1.1);
-}
-
-.svgButtons:active {
-  transform: scale(0.9);
-}
- */
  .svgButtons {
   cursor: pointer;
   transition: transform 0.2s, fill 0.2s; /* Add transition for fill change */
@@ -605,16 +627,3 @@ h2 {
   outline: none;
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5); /* Add focus outline */
 }
-
-
-/* .image-key {
-  position: relative;
-  z-index: 1;
-  top: 100px;
-
-} */
-
-/* .image-item {
-  height: 200px;
-  width: 200px;
-} */

@@ -6,6 +6,7 @@
 import React, {
   useState,
   useEffect,
+  useCallback,
   useRef,
   forwardRef,
   useImperativeHandle,
@@ -19,6 +20,8 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import Tooltip from 'react-bootstrap/Tooltip';
 // import Popup from 'reactjs-popup';
 import { OverlayTrigger } from 'react-bootstrap';
+import { Unstable_NumberInput as NumberInput } from '@mui/base/Unstable_NumberInput';
+import QuantityInput2 from '../../QuantityInput2';
 import TripleToggleTest from '../../TripleToggleTest';
 import './ElecModelStyling/boston_vercise_directed.css';
 import { ReactComponent as IPG } from '../images/IPG.svg';
@@ -101,7 +104,11 @@ function Boston_vercise(props, ref) {
     props.percAmpToggle || 'left',
   );
   const [volAmpToggle, setVolAmpToggle] = useState(
-    props.volAmpToggle || 'left',
+    props.volAmpToggle || 'center',
+  );
+
+  const [researchToggle, setResearchToggle] = useState(
+    props.researchToggle || 'left',
   );
 
   // const [IPGforOutput, setIPGforOutput] = useState(props.outputIPG);
@@ -231,6 +238,8 @@ function Boston_vercise(props, ref) {
     animation: null,
   });
 
+  let outputTogglePosition = 'mA';
+
   const calculateLevelTotals = () => {
     const levelTotals = {};
     Object.keys(level).forEach((key) => {
@@ -250,7 +259,7 @@ function Boston_vercise(props, ref) {
     let total = 0;
     if (percAmpToggle === 'left') {
       total = 100;
-    } else if (percAmpToggle === 'right') {
+    } else if (percAmpToggle === 'center') {
       total = totalAmplitude;
     }
     const centerCount = Object.values(selectedValues).filter(
@@ -300,11 +309,13 @@ function Boston_vercise(props, ref) {
     let total = 0;
     if (percAmpToggle === 'left') {
       total = 100;
-    } else if (percAmpToggle === 'right') {
+    } else if (percAmpToggle === 'center') {
       total = totalAmplitude;
+      // console.log('Total: ', totalAmplitude);
     }
 
     // total = totalAmplitude;
+    console.log('percAmpToggle: ', percAmpToggle);
     console.log('total: ', total);
     const centerCount = Object.values(selectedValues).filter(
       (value) => value === 'center',
@@ -348,7 +359,7 @@ function Boston_vercise(props, ref) {
     let total = 0;
     if (percAmpToggle === 'left') {
       total = 100;
-    } else if (percAmpToggle === 'right') {
+    } else if (percAmpToggle === 'center') {
       total = totalAmplitude;
     }
 
@@ -427,6 +438,7 @@ function Boston_vercise(props, ref) {
       console.log('2');
     }
     setQuantities(updatedQuantities);
+    setLastChangedKey(key);
     // console.log('quani: ', quantities);
     // // handleIPGLogic();
   };
@@ -440,7 +452,7 @@ function Boston_vercise(props, ref) {
     let total = 0;
     if (percAmpToggle === 'left') {
       total = 100;
-    } else if (percAmpToggle === 'right') {
+    } else if (percAmpToggle === 'center') {
       total = totalAmplitude;
     }
 
@@ -493,11 +505,9 @@ function Boston_vercise(props, ref) {
     let totalRightSum = 0;
     const roundUpdatedQuantities = { ...quantities };
 
-    let total = 0;
+    let total = totalAmplitude;
     if (percAmpToggle === 'left') {
       total = 100;
-    } else if (percAmpToggle === 'right') {
-      total = totalAmplitude;
     }
 
     // Calculate the sums for 'center' and 'right' values
@@ -546,6 +556,12 @@ function Boston_vercise(props, ref) {
   function checkQuantitiesAndValues(quantity, value) {
     const updatedQuantities = { ...quantity };
     const updatedSelectedValues = { ...value };
+    let total = totalAmplitude;
+    console.log('TOTALAMPLITUDE: ', totalAmplitude);
+    console.log('PERCAMPTOGGLE: ', percAmpToggle);
+    if (percAmpToggle === 'left') {
+      total = 100;
+    }
     Object.keys(updatedQuantities).forEach((key) => {
       if (updatedQuantities[key] <= 0) {
         updatedSelectedValues[key] = 'left';
@@ -553,8 +569,8 @@ function Boston_vercise(props, ref) {
       if (updatedSelectedValues[key] === 'left') {
         updatedQuantities[key] = 0;
       }
-      if (updatedQuantities[key] > 100) {
-        updatedQuantities[key] = 100;
+      if (updatedQuantities[key] > total) {
+        updatedQuantities[key] = total;
       }
     });
     setQuantities(updatedQuantities);
@@ -907,7 +923,7 @@ function Boston_vercise(props, ref) {
     Object.keys(levelArray).forEach((key) => {
       levelChanges[key] = 0;
     });
-    console.log('levelchanges: ', levelChanges);
+    // console.log('levelchanges: ', levelChanges);
     Object.keys(selectedValues)
       .reverse()
       .forEach((key) => {
@@ -1070,9 +1086,10 @@ function Boston_vercise(props, ref) {
           updatedSelectedValues[key] = 'left';
         }
       });
-    console.log('newlevelquantities: ', levelChanges);
+    // console.log('newlevelquantities: ', levelTotals);
     setSelectedValues(updatedSelectedValues);
     setQuantities(updatedQuantities);
+    // easyRoundUp(updatedQuantities);
     checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
   };
 
@@ -1264,11 +1281,45 @@ function Boston_vercise(props, ref) {
     return values;
   }
 
+  // function easyRoundUp(values) {
+  //   Object.keys(values).forEach((key) => {
+  //     const decimalPart = values[key] % 1;
+  //     if (decimalPart >= 0.99) {
+  //       values[key] = Math.ceil(values[key]);
+  //     }
+  //   });
+  //   return values;
+  // }
+
   function easyRoundUp(values) {
     Object.keys(values).forEach((key) => {
       const decimalPart = values[key] % 1;
+
       if (decimalPart >= 0.99) {
         values[key] = Math.ceil(values[key]);
+      } else if (decimalPart >= 0.199 && decimalPart < 0.2) {
+        values[key] = Math.floor(values[key]) + 0.2;
+      } else if (decimalPart >= 0.299 && decimalPart < 0.3) {
+        values[key] = Math.floor(values[key]) + 0.3;
+      } else if (decimalPart >= 0.399 && decimalPart < 0.4) {
+        values[key] = Math.floor(values[key]) + 0.4;
+      } else if (decimalPart >= 0.499 && decimalPart < 0.5) {
+        values[key] = Math.floor(values[key]) + 0.5;
+      } else if (decimalPart >= 0.599 && decimalPart < 0.6) {
+        values[key] = Math.floor(values[key]) + 0.6;
+      } else if (decimalPart >= 0.699 && decimalPart < 0.7) {
+        values[key] = Math.floor(values[key]) + 0.7;
+      } else if (decimalPart >= 0.799 && decimalPart < 0.8) {
+        values[key] = Math.floor(values[key]) + 0.8;
+      } else if (decimalPart >= 0.899 && decimalPart < 0.9) {
+        values[key] = Math.floor(values[key]) + 0.9;
+      } else if (decimalPart > 0 && decimalPart < 0.0001) {
+        values[key] = Math.floor(values[key]);
+      }
+
+      // Remove trailing .00 if the value is a whole number
+      if (values[key] % 1 === 0) {
+        values[key] = Math.floor(values[key]);
       }
     });
     return values;
@@ -1378,41 +1429,39 @@ function Boston_vercise(props, ref) {
   };
 
   const newHandleUpButtonAmplitude = () => {
+    // newRoundToHundred();
+    // console.log('passed');
+    // console.log('quantities: ', quantities);
     vectorMakeUpAmplitude();
-    const updatedQuantities = { ...quantities };
+    const newQuantities = newRoundToHundred();
+    // console.log('newQuantities: ', newQuantities);
+    const updatedQuantities = { ...newQuantities };
+    // const updatedQuantities = { ...quantities };
     const updatedSelectedValues = { ...selectedValues };
     const levelIncrement = 0.1;
     const previousLevel = Math.floor(vectorLevel);
     vectorLevel += levelIncrement;
     const currentLevel = Math.floor(vectorLevel);
-    console.log('currentLevel: ', currentLevel);
-    console.log('previousLevel: ', previousLevel);
+    // console.log('currentLevel: ', currentLevel);
+    // console.log('previousLevel: ', previousLevel);
     const levelBelow =
       currentLevel !== previousLevel ? previousLevel : Math.floor(vectorLevel);
     // const levelBelow = Math.floor(vectorLevel);
     // const levelAbove = Math.ceil(vectorLevel);
     const levelAbove = levelBelow + 1;
-    console.log('Level Below', levelBelow);
-    console.log('level Above', levelAbove);
+    // console.log('Level Below', levelBelow);
+    // console.log('level Above', levelAbove);
     const percDiff = vectorLevel - levelBelow;
     const levelBelowQuantityTotal = totalAmplitude * (1 - percDiff);
+    console.log('HELEOELEO: ', percDiff);
     const levelAboveQuantityTotal = totalAmplitude - levelBelowQuantityTotal;
     // Want to figure out how many contacts are "on" at a level
-    // const levelBelowCount = 0;
-    // const levelAboveCount = 0;
-    // Object.keys(selectedValues).forEach((key) => {
-    //   if ((level[key] === levelBelow) && (selectedValues[key] !== 'left')) {
-    //     levelBelowCount += 1;
-    //   }
-    //   if ((level[key] === levelAbove) && (selectedValues[key] !== )) {
 
-    //   }
-    // });
     const onContacts = getOnContacts(levelBelow);
     const numOnContacts = getOnContacts(levelBelow).length;
     const aboveOnContacts = getOnContacts(levelAbove);
     const numAboveOnContacts = aboveOnContacts.length;
-    console.log('On Contacts', onContacts);
+    // console.log('On Contacts', onContacts);
     Object.keys(level).forEach((key) => {
       // dealing with level below
       // vectorMakeUp();
@@ -1424,23 +1473,12 @@ function Boston_vercise(props, ref) {
           numOnContacts !== 0 &&
           updatedQuantities[key] !== 0
         ) {
-          // for (let i = 0; i < numOnContacts; i++) {
-          //   console.log('numOnContactsQuantities', key);
-          //   if (key === onContacts[i]) {
-          //     console.log('numOnContactsQuantities', updatedQuantities[onContacts[i]]);
-          //     updatedQuantities[onContacts[i]] =
-          //     // levelBelowQuantityTotal / parseFloat(numOnContacts);
-          //     // console.log('numOnContacts: ', numOnContacts);
-          //     // console.log('numOnContactsQuantities', updatedQuantities[onContacts[i]]);
-          //     parseFloat(updatedQuantities[onContacts[i]]) -
-          //     (100 * levelIncrement) / numOnContacts;
-          //   }
-          // }
-          // checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+          // console.log('LevelBelowKey: ', key);
           Object.keys(onContacts).forEach((contact) => {
-            console.log('key: ', key);
+            console.log('ONCONTACTS: ', onContacts[contact]);
             if (parseFloat(key) === onContacts[contact]) {
               // console.log('madeItHere');
+              console.log('HELLO: ', updatedQuantities[key]);
               updatedQuantities[key] =
                 parseFloat(updatedQuantities[key]) -
                 (totalAmplitude * levelIncrement) / numOnContacts;
@@ -1471,8 +1509,7 @@ function Boston_vercise(props, ref) {
               }
             });
             updatedQuantities[key] =
-              parseFloat(updatedQuantities[key]) +
-              (totalAmplitude * levelIncrement) / 3;
+              parseFloat(updatedQuantities[key]) + (totalAmplitude * levelIncrement) / 3;
             updatedSelectedValues[key] = updatedSelectedValues[levelBelowKey];
           }
         }
@@ -1480,48 +1517,170 @@ function Boston_vercise(props, ref) {
           updatedQuantities[key] = levelAboveQuantityTotal;
           updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
         }
-        // if (face[key] !== 'all') {
-        //   for (let i = 0; i < numAboveOnContacts; i++) {
-        //     if (face[key] === face[aboveOnContacts[i]]) {
-        //       updatedQuantities[key] =
-        //         levelAboveQuantityTotal / numAboveOnContacts;
-        //       console.log('UpdatedQuantities: ', updatedQuantities);
-        //       if (updatedQuantities[key] !== 0) {
-        //         updatedSelectedValues[key] =
-        //           updatedSelectedValues[aboveOnContacts[i]];
-        //       }
-        //     }
-        //   }
-        //   setSelectedValues(updatedSelectedValues);
-        //   setQuantities(updatedQuantities);
-        //   const newaboveOnContacts = getOnContacts(levelAbove);
-        //   const newnumAboveOnContacts = newaboveOnContacts.length;
-        //   if (newnumAboveOnContacts === 0) {
-        //     console.log('hello');
-        //     updatedQuantities[key] = levelAboveQuantityTotal / 3;
-        //     updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
-        //     // if (updatedQuantities[key] !== 0) {
-        //     //   updatedSelectedValues[key] = updatedSelectedValues[aboveOnContacts[0]];
-        //     // }
-        //   }
-        // } else if (face[key] === 'all') {
-        //   updatedQuantities[key] = levelAboveQuantityTotal;
-        //   if (updatedQuantities[key] !== 0) {
-        //     updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
-        //   }
-        // }
       }
     });
-    // Object.keys(updatedQuantities).forEach((key) => {
-    //   if (level[key] !== levelAbove || levelBelow) {
-    //     updatedQuantities[key] = 0;
-    //     updatedSelectedValues[key] = 'left';
-    //   }
-    // });
     setSelectedValues(updatedSelectedValues);
+    console.log('before level', previousLevel);
+    // roundAllocUp(
+    //   previousLevel,
+    //   levelAbove,
+    //   levelAboveQuantityTotal,
+    //   levelBelowQuantityTotal,
+    //   updatedQuantities,
+    //   numAboveOnContacts,
+    //   numOnContacts,
+    // );
+    easyRoundUp(updatedQuantities);
     setQuantities(updatedQuantities);
     checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
   };
+
+  // const newHandleUpButtonAmplitude = () => {
+  //   vectorMakeUpAmplitude();
+  //   const updatedQuantities = { ...quantities };
+  //   const updatedSelectedValues = { ...selectedValues };
+  //   const levelIncrement = 0.1;
+  //   const previousLevel = Math.floor(vectorLevel);
+  //   vectorLevel += levelIncrement;
+  //   const currentLevel = Math.floor(vectorLevel);
+  //   console.log('currentLevel: ', currentLevel);
+  //   console.log('previousLevel: ', previousLevel);
+  //   const levelBelow =
+  //     currentLevel !== previousLevel ? previousLevel : Math.floor(vectorLevel);
+  //   // const levelBelow = Math.floor(vectorLevel);
+  //   // const levelAbove = Math.ceil(vectorLevel);
+  //   const levelAbove = levelBelow + 1;
+  //   console.log('Level Below', levelBelow);
+  //   console.log('level Above', levelAbove);
+  //   const percDiff = vectorLevel - levelBelow;
+  //   const levelBelowQuantityTotal = totalAmplitude * (1 - percDiff);
+  //   const levelAboveQuantityTotal = totalAmplitude - levelBelowQuantityTotal;
+  //   // Want to figure out how many contacts are "on" at a level
+  //   // const levelBelowCount = 0;
+  //   // const levelAboveCount = 0;
+  //   // Object.keys(selectedValues).forEach((key) => {
+  //   //   if ((level[key] === levelBelow) && (selectedValues[key] !== 'left')) {
+  //   //     levelBelowCount += 1;
+  //   //   }
+  //   //   if ((level[key] === levelAbove) && (selectedValues[key] !== )) {
+
+  //   //   }
+  //   // });
+  //   const onContacts = getOnContacts(levelBelow);
+  //   const numOnContacts = getOnContacts(levelBelow).length;
+  //   const aboveOnContacts = getOnContacts(levelAbove);
+  //   const numAboveOnContacts = aboveOnContacts.length;
+  //   console.log('On Contacts', onContacts);
+  //   Object.keys(level).forEach((key) => {
+  //     // dealing with level below
+  //     // vectorMakeUp();
+  //     if (level[key] === levelBelow) {
+  //       if (face[key] === 'all') {
+  //         updatedQuantities[key] = levelBelowQuantityTotal;
+  //       } else if (
+  //         face[key] !== 'all' &&
+  //         numOnContacts !== 0 &&
+  //         updatedQuantities[key] !== 0
+  //       ) {
+  //         // for (let i = 0; i < numOnContacts; i++) {
+  //         //   console.log('numOnContactsQuantities', key);
+  //         //   if (key === onContacts[i]) {
+  //         //     console.log('numOnContactsQuantities', updatedQuantities[onContacts[i]]);
+  //         //     updatedQuantities[onContacts[i]] =
+  //         //     // levelBelowQuantityTotal / parseFloat(numOnContacts);
+  //         //     // console.log('numOnContacts: ', numOnContacts);
+  //         //     // console.log('numOnContactsQuantities', updatedQuantities[onContacts[i]]);
+  //         //     parseFloat(updatedQuantities[onContacts[i]]) -
+  //         //     (100 * levelIncrement) / numOnContacts;
+  //         //   }
+  //         // }
+  //         // checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+  //         Object.keys(onContacts).forEach((contact) => {
+  //           console.log('key: ', key);
+  //           if (parseFloat(key) === onContacts[contact]) {
+  //             // console.log('madeItHere');
+  //             updatedQuantities[key] =
+  //               parseFloat(updatedQuantities[key]) -
+  //               (totalAmplitude * levelIncrement) / numOnContacts;
+  //           }
+  //         });
+  //       }
+  //       // if (levelBelowQuantityTotal === 0) {
+  //       //   updatedSelectedValues[key] = 'left';
+  //       // }
+  //     }
+  //     if (level[key] === levelAbove) {
+  //       if (face[key] !== 'all') {
+  //         if (segmentedContact(levelBelow)) {
+  //           Object.keys(onContacts).forEach((contact) => {
+  //             if (face[key] === face[onContacts[contact]]) {
+  //               updatedQuantities[key] =
+  //                 parseFloat(updatedQuantities[key]) +
+  //                 (totalAmplitude * levelIncrement) / numOnContacts;
+  //               updatedSelectedValues[key] =
+  //                 updatedSelectedValues[onContacts[contact]];
+  //             }
+  //           });
+  //         } else {
+  //           let levelBelowKey = 0;
+  //           Object.keys(level).forEach((keys) => {
+  //             if (level[keys] === levelBelow) {
+  //               levelBelowKey = keys;
+  //             }
+  //           });
+  //           updatedQuantities[key] =
+  //             parseFloat(updatedQuantities[key]) +
+  //             (totalAmplitude * levelIncrement) / 3;
+  //           updatedSelectedValues[key] = updatedSelectedValues[levelBelowKey];
+  //         }
+  //       }
+  //       if (face[key] === 'all') {
+  //         updatedQuantities[key] = levelAboveQuantityTotal;
+  //         updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
+  //       }
+  //       // if (face[key] !== 'all') {
+  //       //   for (let i = 0; i < numAboveOnContacts; i++) {
+  //       //     if (face[key] === face[aboveOnContacts[i]]) {
+  //       //       updatedQuantities[key] =
+  //       //         levelAboveQuantityTotal / numAboveOnContacts;
+  //       //       console.log('UpdatedQuantities: ', updatedQuantities);
+  //       //       if (updatedQuantities[key] !== 0) {
+  //       //         updatedSelectedValues[key] =
+  //       //           updatedSelectedValues[aboveOnContacts[i]];
+  //       //       }
+  //       //     }
+  //       //   }
+  //       //   setSelectedValues(updatedSelectedValues);
+  //       //   setQuantities(updatedQuantities);
+  //       //   const newaboveOnContacts = getOnContacts(levelAbove);
+  //       //   const newnumAboveOnContacts = newaboveOnContacts.length;
+  //       //   if (newnumAboveOnContacts === 0) {
+  //       //     console.log('hello');
+  //       //     updatedQuantities[key] = levelAboveQuantityTotal / 3;
+  //       //     updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
+  //       //     // if (updatedQuantities[key] !== 0) {
+  //       //     //   updatedSelectedValues[key] = updatedSelectedValues[aboveOnContacts[0]];
+  //       //     // }
+  //       //   }
+  //       // } else if (face[key] === 'all') {
+  //       //   updatedQuantities[key] = levelAboveQuantityTotal;
+  //       //   if (updatedQuantities[key] !== 0) {
+  //       //     updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
+  //       //   }
+  //       // }
+  //     }
+  //   });
+  //   // Object.keys(updatedQuantities).forEach((key) => {
+  //   //   if (level[key] !== levelAbove || levelBelow) {
+  //   //     updatedQuantities[key] = 0;
+  //   //     updatedSelectedValues[key] = 'left';
+  //   //   }
+  //   // });
+  //   setSelectedValues(updatedSelectedValues);
+  //   easyRoundUp(updatedQuantities);
+  //   setQuantities(updatedQuantities);
+  //   checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+  // };
 
   function roundAllocDown(
     beforeLevel,
@@ -1710,7 +1869,10 @@ function Boston_vercise(props, ref) {
 
   const newHandleDownButtonAmplitude = () => {
     vectorMakeUpAmplitude();
-    const updatedQuantities = { ...quantities };
+    // const updatedQuantities = { ...quantities };
+    const newQuantities = newRoundToHundred();
+    console.log('newQuantities: ', newQuantities);
+    const updatedQuantities = { ...newQuantities };
     const updatedSelectedValues = { ...selectedValues };
     checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
     const levelIncrement = 0.1;
@@ -1783,8 +1945,7 @@ function Boston_vercise(props, ref) {
               });
               updatedSelectedValues[key] = updatedSelectedValues[levelAboveKey];
               updatedQuantities[key] =
-                parseFloat(updatedQuantities[key]) +
-                (totalAmplitude * levelIncrement) / 3;
+                parseFloat(updatedQuantities[key]) + (totalAmplitude * levelIncrement) / 3;
             }
           } else if (face[key] === 'all') {
             updatedQuantities[key] = levelBelowQuantityTotal;
@@ -1793,16 +1954,126 @@ function Boston_vercise(props, ref) {
           }
         }
       });
-    // Object.keys(updatedQuantities).forEach((key) => {
-    //   if (level[key] !== levelAbove || levelBelow) {
-    //     updatedQuantities[key] = 0;
-    //     updatedSelectedValues[key] = 'left';
-    //   }
-    // });
+    console.log('levelBelowQuantity: ', levelBelowQuantityTotal);
+    if (Math.ceil(levelBelowQuantityTotal) === totalAmplitude) {
+      Object.keys(updatedQuantities).forEach((key) => {
+        if (level[key] === levelAbove) {
+          updatedQuantities[key] = 0;
+          updatedSelectedValues[key] = 'left';
+        }
+      });
+    }
     setSelectedValues(updatedSelectedValues);
+    // roundAllocDown(
+    //   previousLevel,
+    //   levelAbove,
+    //   levelBelowQuantityTotal,
+    //   levelAboveQuantityTotal,
+    //   updatedQuantities,
+    //   numOnContacts,
+    //   numAboveOnContacts,
+    // );
+    easyRoundUp(updatedQuantities);
+
     setQuantities(updatedQuantities);
     checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
   };
+
+  // const newHandleDownButtonAmplitude = () => {
+  //   vectorMakeUpAmplitude();
+  //   const updatedQuantities = { ...quantities };
+  //   const updatedSelectedValues = { ...selectedValues };
+  //   checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+  //   const levelIncrement = 0.1;
+  //   const previousLevel = Math.ceil(vectorLevel);
+  //   vectorLevel -= levelIncrement;
+  //   const currentLevel = Math.ceil(vectorLevel);
+  //   console.log('currentLevel: ', currentLevel);
+  //   console.log('previousLevel: ', previousLevel);
+  //   const levelAbove =
+  //     currentLevel !== previousLevel ? previousLevel : Math.ceil(vectorLevel);
+  //   // const levelBelow = Math.floor(vectorLevel);
+  //   // const levelAbove = Math.ceil(vectorLevel);
+  //   const levelBelow = levelAbove - 1;
+  //   console.log('Level Below', levelBelow);
+  //   console.log('level Above', levelAbove);
+  //   const percDiff = Math.abs(vectorLevel - levelAbove);
+  //   const levelAboveQuantityTotal = totalAmplitude * (1 - percDiff);
+  //   const levelBelowQuantityTotal = totalAmplitude - levelAboveQuantityTotal;
+  //   const onContacts = getOnContacts(levelBelow);
+  //   const numOnContacts = getOnContacts(levelBelow).length;
+  //   const aboveOnContacts = getOnContacts(levelAbove);
+  //   const numAboveOnContacts = aboveOnContacts.length;
+  //   console.log('On Contacts', aboveOnContacts);
+  //   Object.keys(level)
+  //     .reverse()
+  //     .forEach((key) => {
+  //       // dealing with level above, the one that is passing current
+  //       // vectorMakeUp();
+  //       if (level[key] === levelAbove) {
+  //         if (face[key] === 'all') {
+  //           updatedQuantities[key] = levelAboveQuantityTotal;
+  //         } else if (
+  //           face[key] !== 'all' &&
+  //           numAboveOnContacts !== 0 &&
+  //           updatedQuantities[key] !== 0
+  //         ) {
+  //           Object.keys(aboveOnContacts).forEach((contact) => {
+  //             if (parseFloat(key) === aboveOnContacts[contact]) {
+  //               updatedQuantities[key] =
+  //                 parseFloat(updatedQuantities[key]) -
+  //                 (totalAmplitude * levelIncrement) / numAboveOnContacts;
+  //             }
+  //           });
+  //         }
+  //         // if (levelBelowQuantityTotal === 0) {
+  //         //   updatedSelectedValues[key] = 'left';
+  //         // }
+  //       }
+  //       if (level[key] === levelBelow) {
+  //         if (face[key] !== 'all') {
+  //           if (segmentedLevel(levelAbove)) {
+  //             // console.log(levelAbove);
+  //             console.log('Madeit: ', levelAbove);
+  //             Object.keys(aboveOnContacts).forEach((contact) => {
+  //               if (face[key] === face[aboveOnContacts[contact]]) {
+  //                 updatedQuantities[key] =
+  //                   parseFloat(updatedQuantities[key]) +
+  //                   (totalAmplitude * levelIncrement) / numAboveOnContacts;
+  //                 updatedSelectedValues[key] =
+  //                   updatedSelectedValues[aboveOnContacts[contact]];
+  //               }
+  //             });
+  //           } else {
+  //             console.log('Made it');
+  //             let levelAboveKey = 0;
+  //             Object.keys(level).forEach((keys) => {
+  //               if (level[keys] === levelAbove) {
+  //                 levelAboveKey = keys;
+  //               }
+  //             });
+  //             updatedSelectedValues[key] = updatedSelectedValues[levelAboveKey];
+  //             updatedQuantities[key] =
+  //               parseFloat(updatedQuantities[key]) +
+  //               (totalAmplitude * levelIncrement) / 3;
+  //           }
+  //         } else if (face[key] === 'all') {
+  //           updatedQuantities[key] = levelBelowQuantityTotal;
+  //           updatedSelectedValues[key] =
+  //             updatedSelectedValues[aboveOnContacts[0]];
+  //         }
+  //       }
+  //     });
+  //   // Object.keys(updatedQuantities).forEach((key) => {
+  //   //   if (level[key] !== levelAbove || levelBelow) {
+  //   //     updatedQuantities[key] = 0;
+  //   //     updatedSelectedValues[key] = 'left';
+  //   //   }
+  //   // });
+  //   setSelectedValues(updatedSelectedValues);
+  //   setQuantities(updatedQuantities);
+  //   checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+  // };
 
   let facesVec = [];
 
@@ -1857,6 +2128,10 @@ function Boston_vercise(props, ref) {
     });
     console.log('Counter: ', counter);
     Object.keys(updatedQuantities).forEach((key) => {
+      if (face[key] === 'all' || key === '0') {
+        return; // Skip this iteration
+      }
+      // skip to next iteration
       // keyLevel = getOnContacts[level[key]]
       const levelOnContacts = getOnContacts(level[key]);
       if (face[key] === 'center' && levelQuantities[level[key]] !== 0) {
@@ -1895,6 +2170,9 @@ function Boston_vercise(props, ref) {
     });
     console.log('Counter: ', counter);
     Object.keys(updatedQuantities).forEach((key) => {
+      if (face[key] === 'all' || key === '0') {
+        return; // Skip this iteration
+      }
       // keyLevel = getOnContacts[level[key]]
       const levelOnContacts = getOnContacts(level[key]);
       if (
@@ -1943,6 +2221,9 @@ function Boston_vercise(props, ref) {
     });
     console.log('Counter: ', counter);
     Object.keys(updatedQuantities).forEach((key) => {
+      if (face[key] === 'all' || key === '0') {
+        return; // Skip this iteration
+      }
       // keyLevel = getOnContacts[level[key]]
       const levelOnContacts = getOnContacts(level[key]);
       if (face[key] === 'left' && levelQuantities[level[key]] !== 0) {
@@ -1993,8 +2274,15 @@ function Boston_vercise(props, ref) {
     console.log('Counter: ', counter);
     Object.keys(updatedQuantities).forEach((key) => {
       // keyLevel = getOnContacts[level[key]]
+      if (face[key] === 'all' || key === '0') {
+        return; // Skip this iteration
+      }
       const levelOnContacts = getOnContacts(level[key]);
-      if (face[key] === 'right' && levelQuantities[level[key]] !== 0) {
+      if (
+        face[key] === 'right' &&
+        levelQuantities[level[key]] !== 0 &&
+        key !== 0
+      ) {
         // console.log('length ', getOnContacts(level[key]).length);
         // if (getOnContacts(level[key]).length > 0) {
         // console.log('facesVec ', counter);
@@ -2002,11 +2290,15 @@ function Boston_vercise(props, ref) {
         // updatedSelectedValues[key] = 'center';
         updatedQuantities[key] = (3 * levelQuantities[level[key]]) / 4;
         // }
-      } else if (face[key] === 'center' && levelQuantities[level[key]] !== 0) {
+      } else if (
+        face[key] === 'center' &&
+        levelQuantities[level[key]] !== 0 &&
+        key !== 0
+      ) {
         updatedSelectedValues[key] = selectedValues[levelOnContacts[0]]; // Need to fix this
         // updatedSelectedValues[key] = 'center';
         updatedQuantities[key] = levelQuantities[level[key]] / 4;
-      } else {
+      } else if (key !== 0) {
         updatedSelectedValues[key] = 'left';
         updatedQuantities[key] = 0;
       }
@@ -2092,10 +2384,12 @@ function Boston_vercise(props, ref) {
     let rightCount = 0;
 
     Object.keys(updatedQuantities).forEach((key) => {
+      // gets the sum of negative polarity
       if (updatedSelectedValues[key] === 'center') {
         negativeSum += parseFloat(updatedQuantities[key]);
         centerCount += 1;
         // console.log('negativeSum: ', negativeSum);
+        // gets the sum of positive polarity
       } else if (updatedSelectedValues[key] === 'right') {
         positiveSum += parseFloat(updatedQuantities[key]);
         rightCount += 1;
@@ -2104,6 +2398,7 @@ function Boston_vercise(props, ref) {
     });
 
     Object.keys(updatedQuantities).find((key) => {
+      // Negative polarity
       if (updatedSelectedValues[key] === 'center') {
         if (key === lastChangedKey) {
           negativeModifiedKey = key;
@@ -2111,6 +2406,7 @@ function Boston_vercise(props, ref) {
           return true; // exit loop
         }
       }
+      // Positive polarity
       if (updatedSelectedValues[key] === 'right') {
         if (key === lastChangedKey) {
           positiveModifiedKey = key;
@@ -2120,6 +2416,14 @@ function Boston_vercise(props, ref) {
       }
       return false; // continue looping
     });
+
+    if (negativeSum === 100) {
+      Object.keys(updatedQuantities).forEach((key) => {
+        if (key === negativeModifiedKey && updatedQuantities[key] === 0) {
+          updatedQuantities[key] = 10;
+        }
+      });
+    }
 
     if (negativeSum !== 100) {
       const negativeDifference = 100 - parseFloat(negativeSum);
@@ -2164,11 +2468,94 @@ function Boston_vercise(props, ref) {
         }
       });
     }
+    // if (negativeSum === 100) {
+    //   Object.keys(updatedQuantities).forEach((key) => {
+    //     if ()
+    //   })
+    // }
+    // roundAllocUp();
     setQuantities(updatedQuantities);
     setSelectedValues(updatedSelectedValues);
     checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
-    return quantities; // Return the modified quantities
+    // return quantities;
+    // Return the modified quantities
   }
+
+  const semiAssist = useCallback(() => {
+    // Function implementation
+    const updatedQuantities = { ...quantities };
+    let total = totalAmplitude;
+    if (props.IPG === 'Boston') {
+      if (percAmpToggle === 'left') {
+        total = 100;
+      }
+    }
+    if (props.IPG === 'Research') {
+      if (researchToggle === 'left') {
+        total = 100;
+      }
+    }
+    // const updatedSelectedValues = { ...selectedValues };
+    let count = 0;
+    const lastKey = [];
+    Object.keys(updatedQuantities).forEach((key) => {
+      if (key !== 0 && selectedValues[key] === 'center') {
+        count += 1;
+        lastKey.push(key);
+      }
+    });
+    if (count === 1) {
+      updatedQuantities[lastKey[0]] = total;
+    }
+
+    let rightCount = 0;
+    const rightLastKey = [];
+    Object.keys(updatedQuantities).forEach((key) => {
+      if (selectedValues[key] === 'right') {
+        rightCount += 1;
+        rightLastKey.push(key);
+      }
+    });
+    if (rightCount === 1) {
+      updatedQuantities[rightLastKey[0]] = total;
+    }
+    setQuantities(updatedQuantities);
+  }, [
+    percAmpToggle,
+    props.IPG,
+    quantities,
+    researchToggle,
+    selectedValues,
+    totalAmplitude,
+  ]);
+
+  // const semiAssist = () => {
+  //   const updatedQuantities = { ...quantities };
+  //   let total = totalAmplitude;
+  //   if (props.IPG === 'Boston') {
+  //     if (percAmpToggle === 'left') {
+  //       total = 100;
+  //     }
+  //   }
+  //   if (props.IPG === 'Research') {
+  //     if (researchToggle === 'left') {
+  //       total = 100;
+  //     }
+  //   }
+  //   // const updatedSelectedValues = { ...selectedValues };
+  //   let count = 0;
+  //   const lastKey = [];
+  //   Object.keys(updatedQuantities).forEach((key) => {
+  //     if (key !== 0 && selectedValues[key] === 'center') {
+  //       count += 1;
+  //       lastKey.push(key);
+  //     }
+  //   });
+  //   if (count === 1) {
+  //     updatedQuantities[lastKey[0]] = total;
+  //   }
+  //   setQuantities(updatedQuantities);
+  // };
 
   function assist() {
     isAssisted = !isAssisted;
@@ -2302,7 +2689,7 @@ function Boston_vercise(props, ref) {
     roundToHundred();
     if (percAmpToggle === 'left') {
       newHandleUpButton();
-    } else if (percAmpToggle === 'right') {
+    } else if (percAmpToggle === 'center') {
       newHandleUpButtonAmplitude();
     }
   };
@@ -2310,7 +2697,7 @@ function Boston_vercise(props, ref) {
   const handlePercAmpChangeClockwise = () => {
     if (percAmpToggle === 'left') {
       handleClockwiseButton();
-    } else if (percAmpToggle === 'right') {
+    } else if (percAmpToggle === 'center') {
       handleClockwiseButton();
     }
   };
@@ -2318,7 +2705,7 @@ function Boston_vercise(props, ref) {
   const handlePercAmpChangeCounterClockwise = () => {
     if (percAmpToggle === 'left') {
       handleCounterClockwiseButton();
-    } else if (percAmpToggle === 'right') {
+    } else if (percAmpToggle === 'center') {
       handleCounterClockwiseButton();
     }
   };
@@ -2326,7 +2713,7 @@ function Boston_vercise(props, ref) {
   const handlePercAmpChangeDown = () => {
     if (percAmpToggle === 'left') {
       newHandleDownButton();
-    } else if (percAmpToggle === 'right') {
+    } else if (percAmpToggle === 'center') {
       newHandleDownButtonAmplitude();
     }
   };
@@ -2387,7 +2774,6 @@ function Boston_vercise(props, ref) {
     return volAmpToggle;
   };
 
-  let outputTogglePosition = 'mA';
   const getStateTogglePosition = () => {
     if (props.IPG === 'Boston') {
       if (percAmpToggle === 'left') {
@@ -2481,8 +2867,8 @@ function Boston_vercise(props, ref) {
   const handleIPG = () => {
     if (props.IPG === 'Medtronic_Activa') {
       stimController = 1;
-      if (percAmpToggle !== 'right') {
-        setPercAmpToggle('right');
+      if (percAmpToggle !== 'center') {
+        setPercAmpToggle('center');
         // setIPGforOutput('')
       }
       // if (volAmpToggle === 'left') {
@@ -2495,8 +2881,8 @@ function Boston_vercise(props, ref) {
       // setIPGforOutput('mA');
     } else if (props.IPG === 'Medtronic_Percept') {
       stimController = 3;
-      if (percAmpToggle !== 'right') {
-        setPercAmpToggle('right');
+      if (percAmpToggle !== 'center') {
+        setPercAmpToggle('center');
       }
       // setIPGforOutput('mA');
     }
@@ -2529,26 +2915,6 @@ function Boston_vercise(props, ref) {
 
   const [percAmpAnimation, setPercAmpAnimation] = useState(null);
   // Percentage vs mA toggle switch
-  // const handlePercAmpToggleChange = (value, animate) => {
-  //   console.log('value', value);
-  //   const newValue = value;
-  //   setPercAmpAnimation(animate);
-  //   if (newValue === 'left') {
-  //     // setTotalAmplitude(0);
-  //     calculatePercentageFromAmplitude();
-  //     outputTogglePosition = '%';
-  //   } else if (newValue === 'right') {
-  //     outputTogglePosition = 'mA';
-  //     // let totalSum = 0;
-  //     // Object.keys(quantities).forEach((key) => {
-  //     //   totalSum += parseFloat(quantities[key]);
-  //     // });
-  //     // setTotalAmplitude(totalSum);
-  //     calculateAmplitudeFromPercentage();
-  //   }
-  //   console.log(value);
-  //   setPercAmpToggle(value);
-  // };
 
   const handlePercAmpToggleChange = (value) => {
     console.log('value', value);
@@ -2557,17 +2923,34 @@ function Boston_vercise(props, ref) {
       // setTotalAmplitude(0);
       calculatePercentageFromAmplitude();
       outputTogglePosition = '%';
-    } else if (newValue === 'right') {
+    } else if (newValue === 'center') {
       outputTogglePosition = 'mA';
-      // let totalSum = 0;
-      // Object.keys(quantities).forEach((key) => {
-      //   totalSum += parseFloat(quantities[key]);
-      // });
-      // setTotalAmplitude(totalSum);
       calculateAmplitudeFromPercentage();
     }
     console.log(value);
     setPercAmpToggle(value);
+  };
+
+  const handleResearchToggleChange = (value) => {
+    console.log('ResearchToggle; ', researchToggle);
+    console.log('NewValue: ', value);
+    const newValue = value;
+    console.log(newValue);
+    if (newValue === 'left') {
+      calculatePercentageFromAmplitude();
+      outputTogglePosition = '%';
+    } else if (newValue === 'center' && researchToggle !== 'right') {
+      calculateAmplitudeFromPercentage();
+      outputTogglePosition = 'mA';
+    } else if (newValue === 'right') {
+      if (researchToggle === 'left') {
+        calculateAmplitudeFromPercentage();
+      }
+      outputTogglePosition = 'V';
+      console.log(outputTogglePosition);
+    }
+    setResearchToggle(newValue);
+    // setResearchTogg
   };
 
   const [assistedToggle, setAssistedToggle] = useState('left');
@@ -2622,26 +3005,19 @@ function Boston_vercise(props, ref) {
 
   const [radioValue, setRadioValue] = useState('1');
   const handleSteeringModeChange = (value) => {
+    let updatedSelectedValues = { ...selectedValues };
+    let updatedQuantities = { ...quantities };
     let total = totalAmplitude;
     if (props.IPG === 'Boston') {
       if (percAmpToggle === 'left') {
         total = 100;
       }
     }
-    setRadioValue(value);
+    console.log('Value: ', value);
+    console.log('Total: ', total);
     if (value === '2') {
-      setQuantities({
-        0: total,
-        1: total,
-        2: 0,
-        3: 0,
-        4: 0,
-        5: 0,
-        6: 0,
-        7: 0,
-        8: 0,
-      });
-      setSelectedValues({
+      console.log('Made it here');
+      updatedSelectedValues = {
         0: 'right',
         1: 'center',
         2: 'left',
@@ -2651,48 +3027,51 @@ function Boston_vercise(props, ref) {
         6: 'left',
         7: 'left',
         8: 'left',
-      });
+      };
+      updatedQuantities = {
+        0: total,
+        1: total,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+        6: 0,
+        7: 0,
+        8: 0,
+      };
+      // setSelectedValues(updatedSelectedValues);
+      // setQuantities(updatedQuantities);
+      // calculateQuantitiesWithDistribution();
     }
-  };
-  const semiAssist = () => {
-    const updatedQuantities = { ...quantities };
-    let total = totalAmplitude;
-    if (props.IPG === 'Boston') {
-      if (percAmpToggle === 'left') {
-        total = 100;
-      }
-    }
-    // const updatedSelectedValues = { ...selectedValues };
-    let count = 0;
-    const lastKey = [];
-    Object.keys(updatedQuantities).forEach((key) => {
-      if (key !== 0 && selectedValues[key] === 'center') {
-        count += 1;
-        lastKey.push(key);
-      }
-    });
-    if (count === 1) {
-      updatedQuantities[lastKey[0]] = total;
-    }
-    setQuantities(updatedQuantities);
+    console.log(updatedQuantities);
+    setRadioValue(value);
+    // checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+    // semiAssist();
+    console.log('Quantities: ', quantities);
   };
 
   const radios = [
     { name: 'None', value: '1' },
-    { name: 'Assisted', value: '2' },
+    { name: 'Steering', value: '2' },
   ];
 
   const percAmpDef = [
     { name: '%', value: 'left' },
-    { name: 'mA', value: 'right' },
+    { name: 'mA', value: 'center' },
   ];
 
   const volAmpDef = [
-    { name: 'mA', value: 'left' },
+    { name: 'mA', value: 'center' },
     { name: 'V', value: 'right' },
   ];
 
-  const ampDef = [{ name: 'mA', value: 'left' }];
+  const ampDef = [{ name: 'mA', value: 'center' }];
+
+  const researchDef = [
+    { name: '%', value: 'left' },
+    { name: 'mA', value: 'center' },
+    { name: 'V', value: 'right' },
+  ];
 
   const handleVisModelChange = (event) => {
     setVisModel(event.target.value);
@@ -2738,9 +3117,28 @@ function Boston_vercise(props, ref) {
       // const newQuantities = { ...quantities };
       calculateQuantitiesWithDistributionAbbott();
     }
+    // console.log('outputTogglePosition: ', outputTogglePosition);
     if (radioValue === '1') {
       semiAssist();
     }
+    if (outputTogglePosition === 'V') {
+      console.log('here');
+      handleActivaVoltage();
+    }
+
+    // if (radioValue === '2' && props.IPG === 'Boston' && percAmpToggle === 'left') {
+    //   // assistedMode();
+    //   calculateQuantitiesWithDistribution();
+    // } else if (
+    //   radioValue === '2' &&
+    //   (outputTogglePosition === 'mA' || outputTogglePosition === 'V')
+    // ) {
+    //   calculateQuantitiesWithDistributionAbbott();
+    // }
+    // if (props.stimChanged) {
+    //   setQuantities(props.allQuantities(props.key));
+    //   props.setStimChanged(false);
+    // }
     // if (props.IPG === 'Medtronic_Activa') {
     //   if (volAmpToggle === 'left') {
     //     handleActivaAmplitude();
@@ -2749,12 +3147,19 @@ function Boston_vercise(props, ref) {
     //   }
     // }
     // assist();
-  });
+  }, [
+    props.IPG,
+    radioValue,
+    outputTogglePosition,
+    calculateQuantitiesWithDistributionAbbott,
+    semiAssist,
+    handleActivaVoltage,
+  ]);
   /// //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   return (
     <div className="container">
-      <div className="button-container">
+      <div className="">
         {/* <Form.Group className="mb-3">
           <Form.Control
             type="email"
@@ -2763,102 +3168,119 @@ function Boston_vercise(props, ref) {
             onChange={handleTitleChange}
           />
         </Form.Group> */}
-        <Form.Select
-          aria-label="Default select example"
-          value={visModel}
-          onChange={handleVisModelChange}
-        >
-          <option>Choose a model</option>
-          <option value="1">Dembek 2017</option>
-          <option value="2">FastField (Baniasadi 2020)</option>
-          <option value="3">SimBio/FieldTrip (see Horn 2017)</option>
-          <option value="4">Kuncel 2008</option>
-          <option value="5">Maedler 2012</option>
-          <option value="6">OSS-DBS (Butenko 2020)</option>
-        </Form.Select>
-        <div />
-        <div className="PercentageAmplitudeToggle">
-          {/* {props.IPG === 'Boston' && (
-            <PercentageAmplitudeToggle
-              value={percAmpToggle}
-              // switchPosition={percAmpToggle}
-              // animation={percAmpAnimation}
-              onChange={(value, anime) => handlePercAmpToggleChange(value, anime)}
-              // getSwitchAnimation={(value, switchPosition) => getSwitchAnimationPercAmp(value, switchPosition)}
-            />
-          )} */}
-          {props.IPG === 'Boston' && (
-            <ButtonGroup className="button-group">
-              {percAmpDef.map((percAmp, idx) => (
-                <ToggleButton
-                  key={idx}
-                  id={`percAmp-${idx}`}
-                  type="radio"
-                  variant={getVariant(percAmp.value)}
-                  name="percAmp"
-                  value={percAmp.value}
-                  checked={percAmpToggle === percAmp.value}
-                  onChange={(e) =>
-                    handlePercAmpToggleChange(e.currentTarget.value)
-                  }
-                >
-                  {percAmp.name}
-                </ToggleButton>
-              ))}
-            </ButtonGroup>
-          )}
-          {/* {props.IPG === 'Medtronic_Activa' && (
+        <div className="button-container">
+          <Form.Select
+            aria-label="Default select example"
+            value={visModel}
+            onChange={handleVisModelChange}
+          >
+            <option>Choose a model</option>
+            <option value="1">Dembek 2017</option>
+            <option value="2">FastField (Baniasadi 2020)</option>
+            <option value="3">SimBio/FieldTrip (see Horn 2017)</option>
+            <option value="4">Kuncel 2008</option>
+            <option value="5">Maedler 2012</option>
+            <option value="6">OSS-DBS (Butenko 2020)</option>
+          </Form.Select>
+          <div />
+          <div className="PercentageAmplitudeToggle">
+            {props.IPG === 'Boston' && (
+              <ButtonGroup className="button-group">
+                {percAmpDef.map((percAmp, idx) => (
+                  <ToggleButton
+                    key={idx}
+                    id={`percAmp-${idx}`}
+                    type="radio"
+                    variant={getVariant(percAmp.value)}
+                    name="percAmp"
+                    value={percAmp.value}
+                    checked={percAmpToggle === percAmp.value}
+                    onChange={(e) =>
+                      handlePercAmpToggleChange(e.currentTarget.value)
+                    }
+                  >
+                    {percAmp.name}
+                  </ToggleButton>
+                ))}
+              </ButtonGroup>
+            )}
+            {/* {props.IPG === 'Medtronic_Activa' && (
             <VolumeAmplitudeToggle
               value={volAmpToggle}
               onChange={(value) => handleVolAmpToggleChange(value)}
             />
           )} */}
-          {props.IPG === 'Medtronic_Activa' && (
-            <ButtonGroup className="button-group">
-              {volAmpDef.map((volAmp, idx) => (
-                <ToggleButton
-                  key={idx}
-                  id={`volAmp-${idx}`}
-                  type="radio"
-                  variant={getVariant(volAmp.value)}
-                  name="volAmp"
-                  value={volAmp.value}
-                  checked={volAmpToggle === volAmp.value}
-                  onChange={(e) =>
-                    handleVolAmpToggleChange(e.currentTarget.value)
-                  }
-                >
-                  {volAmp.name}
-                </ToggleButton>
-              ))}
-            </ButtonGroup>
-          )}
-          {(props.IPG === 'Medtronic_Percept' || props.IPG === 'Abbott') && (
-            <ButtonGroup className="button-group">
-              {ampDef.map((amp, idx) => (
-                <ToggleButton
-                  key={idx}
-                  id={`amp-${idx}`}
-                  type="radio"
-                  variant={getVariant(amp.value)}
-                  name="amp"
-                  value={amp.value}
-                  checked={ampToggle === amp.value}
-                >
-                  {amp.name}
-                </ToggleButton>
-              ))}
-            </ButtonGroup>
-          )}
-          {/* {props.IPG === 'Abbott' && (
-            <MAToggleSwitch
-              value={ampToggle}
-              // onChange={(value) => handleVolAmpToggleChange(value)}
+            {props.IPG === 'Medtronic_Activa' && (
+              <ButtonGroup className="button-group">
+                {volAmpDef.map((volAmp, idx) => (
+                  <ToggleButton
+                    key={idx}
+                    id={`volAmp-${idx}`}
+                    type="radio"
+                    variant={getVariant(volAmp.value)}
+                    name="volAmp"
+                    value={volAmp.value}
+                    checked={volAmpToggle === volAmp.value}
+                    onChange={(e) =>
+                      handleVolAmpToggleChange(e.currentTarget.value)
+                    }
+                  >
+                    {volAmp.name}
+                  </ToggleButton>
+                ))}
+              </ButtonGroup>
+            )}
+            {(props.IPG === 'Medtronic_Percept' || props.IPG === 'Abbott') && (
+              <ButtonGroup className="button-group">
+                {ampDef.map((amp, idx) => (
+                  <ToggleButton
+                    key={idx}
+                    id={`amp-${idx}`}
+                    type="radio"
+                    variant={getVariant(amp.value)}
+                    name="amp"
+                    value={amp.value}
+                    checked={ampToggle === amp.value}
+                  >
+                    {amp.name}
+                  </ToggleButton>
+                ))}
+              </ButtonGroup>
+            )}
+            {(props.IPG === 'Research') && (
+              <ButtonGroup className="button-group">
+                {researchDef.map((res, idx) => (
+                  <ToggleButton
+                    key={idx}
+                    id={`res-${idx}`}
+                    type="radio"
+                    variant={getVariant(res.value)}
+                    name="res"
+                    value={res.value}
+                    checked={researchToggle === res.value}
+                    onChange={(e) =>
+                      handleResearchToggleChange(e.currentTarget.value)
+                    }
+                  >
+                    {res.name}
+                  </ToggleButton>
+                ))}
+              </ButtonGroup>
+            )}
+          </div>
+          <div className="input-wrapper">
+            <input
+              className="param-input"
+              type="number"
+              name="quantity"
+              pattern="[0-9]+"
+              value={totalAmplitude}
+              onChange={handleTotalAmplitudeChange}
             />
-          )} */}
+            <span className="input-adornment">{outputTogglePosition}</span>
+          </div>
         </div>
-        <div />
-        <div className="button-container">
+        {/* <div className="button-container">
           <label className="puls-label">Total Amplitude</label>
           <input
             className="new-quantity-input"
@@ -2868,9 +3290,9 @@ function Boston_vercise(props, ref) {
             value={totalAmplitude}
             onChange={handleTotalAmplitudeChange}
           />
-        </div>
+        </div> */}
         <div className="button-container">
-          <label className="puls-label">Pulsewidth (us):</label>
+          {/* <label className="puls-label">Pulsewidth (us):</label>
           <input
             className="new-quantity-input"
             type="number"
@@ -2887,9 +3309,43 @@ function Boston_vercise(props, ref) {
             pattern="[0-9]+"
             value={parameters.parameter2}
             onChange={handleParameterChange('parameter2')}
-          />
+          /> */}
+          <div className="input-wrapper">
+            <input
+              className="param-input"
+              type="number"
+              name="quantity"
+              pattern="[0-9]+"
+              value={parameters.parameter1}
+              onChange={handleParameterChange('parameter1')}
+            />
+            <span className="input-adornment">μs</span>
+          </div>
+          <div className="input-wrapper">
+            <input
+              className="param-input"
+              type="number"
+              name="quantity"
+              pattern="[0-9]+"
+              value={parameters.parameter2}
+              onChange={handleParameterChange('parameter2')}
+            />
+            <span className="input-adornment">hz</span>
+          </div>
+          {/* <QuantityInput2
+            value={parameters.parameter1}
+            onChange={handleParameterChange('parameter1')}
+            min={0}
+            label="us"
+          /> */}
+          {/* <QuantityInput2
+            value={parameters.parameter2}
+            onChange={handleParameterChange('parameter2')}
+            min={0}
+            label="hz"
+          /> */}
         </div>
-        <div>
+        <div className="button-container">
           <ButtonGroup>
             {radios.map((radio, idx) => (
               <ToggleButton
@@ -2903,6 +3359,7 @@ function Boston_vercise(props, ref) {
                 onChange={(e) =>
                   handleSteeringModeChange(e.currentTarget.value)
                 }
+                // onChange={(e) => setRadioValue(e.currentTarget.value)}
               >
                 {radio.name}
               </ToggleButton>
@@ -2994,47 +3451,48 @@ function Boston_vercise(props, ref) {
           </div>
         ))}
       </div>
-      <div className="button-container">
+      <div>
         {handleIPG()}
-        {(stimController === 0 || stimController === 3) && (
-          <div className="button-container">
-            <h2>Steering</h2>
-            {(stimController === 0 || stimController === 3) && (
-              <div className="steering-container">
-                <UpArrow className="svgButtons" onClick={handlePercAmpChangeUp} />
-                {/* <UpArrow onClick={newHandleUpButton} /> */}
-                <DownArrow className="svgButtons" onClick={handlePercAmpChangeDown} />
-                {/* <ClockwiseArrow onClick={handlePercAmpChangeClockwise} />
-                <CounterClockwiseArrow
-                  onClick={handlePercAmpChangeCounterClockwise}
-                /> */}
-              </div>
-            )}
-          </div>
-        )}
+        {radioValue === '2' &&
+          (stimController === 0 || stimController === 3) && (
+            <div className="button-container">
+              {/* <h2 style={{color: 'black'}}>Steering</h2> */}
+              <span style={{color: 'black'}}>Steering</span>
+              <ButtonGroup horizontal>
+                <Button onClick={handlePercAmpChangeUp}>↑</Button>
+                <Button disabled>Level</Button>
+                <Button onClick={handlePercAmpChangeDown}>↓</Button>
+              </ButtonGroup>
+            </div>
+          )}
         {/* <div className="steering-container-special-buttons">
-          <SplitEvenButton onClick={handleSplitEvenButton} />
-          <ForwardButton onClick={handleForwardButton} />
-          <BackButton onClick={handleBackButton} />
-          <LeftButton onClick={handleRightButton} />
-          <RightButton onClick={handleLeftButton} />
+          <SplitEvenButton
+            className="svgButtons"
+            onClick={handleSplitEvenButton}
+          />
+          <ForwardButton className="svgButtons" onClick={handleForwardButton} />
+          <BackButton className="svgButtons" onClick={handleBackButton} />
+          <LeftButton className="svgButtons" onClick={handleRightButton} />
+          <RightButton className="svgButtons" onClick={handleLeftButton} />
         </div> */}
-        <div className="button-container-2">
-          {/* <OverlayTrigger placement="left" overlay={tooltipspliteven}>
-            <button
+        <div style={{ textAlign: 'center' }}>
+          {/* {outputTogglePosition} */}
+          <ButtonGroup vertical>
+            <Button
               onClick={calculateQuantitiesWithDistribution}
               className="button"
+              disabled={outputTogglePosition === 'V'}
             >
               Split Even
-            </button>
-          </OverlayTrigger>
-
-          <OverlayTrigger placement="left" overlay={tooltiprefactor}>
-            <button onClick={roundToHundred} className="button">
+            </Button>
+            <Button onClick={roundToHundred} className="button">
               Refactor
-            </button>
-          </OverlayTrigger> */}
-          <button
+            </Button>
+            <Button onClick={handleClearButton} className="button">
+              Clear
+            </Button>
+          </ButtonGroup>
+          {/* <button
             onClick={calculateQuantitiesWithDistribution}
             className="button"
           >
@@ -3045,7 +3503,7 @@ function Boston_vercise(props, ref) {
           </button>
           <button onClick={handleClearButton} className="button">
             Clear
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

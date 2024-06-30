@@ -60,15 +60,37 @@ ipcMain.on('ipc-example', async (event, arg) => {
   const fs = require('fs');
 
   // const f = fs.readFileSync('/Users/savirmadan/Documents/GitHub/leaddbs/tempData.json');
-  const f = fs.readFileSync(
-    '/Users/savirmadan/Development/lead-dbs-programmer/tempData.json',
-  );
-  console.log(f);
+  // const f = fs.readFileSync(
+  //   '/Users/savirmadan/Development/lead-dbs-programmer/tempData.json',
+  // );
+  // console.log(f);
+
+  // Changing status of app to "on"
+  const currentDirectory = app.getAppPath();
+  const directories = currentDirectory.split('/');
+
+  let result = '';
+  for (const dir of directories) {
+    result += `${dir}/`;
+
+    if (dir === 'lead-dbs-programmer') {
+      break;
+    }
+  }
+  if (currentDirectory) {
+    const fileName = 'status.json';
+    const filePath = path.join(result, fileName);
+    try {
+      fs.writeFileSync(filePath, '1');
+    } catch (error) {
+      console.error('Error writing to file:', error);
+    }
+  }
   // const separatedLine = f.split('\\\\');
   // console.log(separatedLine);
   // const k = fs.readFileSync(f);
   // console.log(k);
-  event.reply('ipc-example', msgTemplate(`pong: ${f}`));
+  // event.reply('ipc-example', msgTemplate(`pong: ${f}`));
 });
 
 ipcMain.on('import-file', async (event, arg) => {
@@ -119,6 +141,7 @@ ipcMain.on('import-previous-files', (event, fileID, importData) => {
   // // Convert the data to JSON format
   // const f = fs.readFileSync(filePath);
   // const jsonData = JSON.parse(f);
+  const fs = require('fs');
 
   const masterImportData = importData.priorStims;
   let fileKey = '';
@@ -134,10 +157,12 @@ ipcMain.on('import-previous-files', (event, fileID, importData) => {
     console.log(masterImportData);
     const fileName = importData.patientname + '_desc-stimparameters.json';
     filePath = path.join(priorStimFolder, fileID, fileName);
+    console.log('AHAHAHAHAHHA: ', filePath);
   } else {
     const priorStimFolder = masterImportData[3].folder;
     const fileName = importData.patientname + '_desc-stimparameters.json';
     filePath = path.join(priorStimFolder, fileID, fileName);
+    console.log('AHAHAHAHAHHA: ', filePath);
     console.log('1');
     console.log(fileID);
     const outputFolder = path.join(priorStimFolder, fileID);
@@ -254,10 +279,49 @@ ipcMain.on('save-file', (event, file, data) => {
       // Handle the error here
       console.error('Error writing to file:', error);
     }
-    fs.writeFileSync(file, dataString);
+    // fs.writeFileSync(file, dataString);
 
     // Send a response back to the renderer process
     event.reply('file-saved', filePath);
+  }
+});
+
+ipcMain.on('set-status', (event, arg) => {
+  // Example of saving data to a file
+  // const filePath = app.getPath('downloads') + '/data.txt';
+  // const currentDirectory = app.getAppPath();
+  // const currentDirectory = '/Users/savirmadan/Development/lead-dbs-programmer';
+  const currentDirectory = app.getAppPath();
+  const directories = currentDirectory.split('/');
+
+  // Initialize a variable to store the result
+  let result = '';
+  // Loop through the directories
+  for (const dir of directories) {
+    // Append each directory to the result
+    result += `${dir}/`;
+
+    // If the directory contains "lead-dbs-programmer", stop the loop
+    if (dir === 'lead-dbs-programmer') {
+      break;
+    }
+  }
+  // console.log(currentDirectory + '/lead-dbs-programmer');
+  if (currentDirectory) {
+    // Convert data to string format
+    const fileName = 'status.json';
+    const filePath = path.join(result, fileName);
+    // const filePath = './dist/main/webpack:/leaddbs-stimcontroller/main.js';
+    // Write data to file
+    try {
+      fs.writeFileSync(filePath, '0');
+    } catch (error) {
+      // Handle the error here
+      console.error('Error writing to file:', error);
+    }
+    // fs.writeFileSync(file, dataString);
+
+    // Send a response back to the renderer process
   }
 });
 
@@ -332,9 +396,9 @@ const createWindow = async () => {
     show: false,
     width: 1100,
     height: 1100,
-    maxWidth: 1100, // Maximum width of the window
-    // maxHeight: 1200, // Maximum height of the window
-    minWidth: 1000, // Minimum width of the window
+    // maxWidth: 1100, // Maximum width of the window
+    // // maxHeight: 1200, // Maximum height of the window
+    // minWidth: 1000, // Minimum width of the window
     // minHeight: 1200, // Minimum height of the window
     icon: getAssetPath('icon.png'),
     webPreferences: {
@@ -398,3 +462,11 @@ app
     });
   })
   .catch(console.log);
+
+ipcMain.on('zoom-level-changed', (event, zoomLevel) => {
+  if (mainWindow) {
+    const newWidth = 1100 * (1 + zoomLevel * 0.15); // Adjust the scale factor as needed
+    const newHeight = 1100 * (1 + zoomLevel * 0.1); // Adjust the scale factor as needed
+    mainWindow.setSize(newWidth, newHeight);
+  }
+});

@@ -19,13 +19,6 @@
   margin-top: 140px;
 }
 
-.container {
-  display: flex;
-  /* justify-content: space-between; */
-  width: 100%; /* Set the desired width */
-  height: 100%; /* Set the desired height */
-}
-
 .container2 {
   width: 33%; /* Set the desired width */
   height: 100%; /* Set the desired height */
@@ -77,7 +70,8 @@
 
 .right-color {
   /* background-color: blue; */
-  fill: rgba(50, 50, 244, 0.411);
+  /* fill: rgba(50, 50, 244, 0.411); */
+  fill: rgba(28, 72, 144, 0.582);
   /* Change the background color for the 'right' position */
 }
 

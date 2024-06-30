@@ -9,11 +9,21 @@
 /* Heading styles */
 .form-container {
   /* background-color: #444; */
+  /* background-color: #394D4A50; */
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   text-align: left;
   margin-top: 0 20px;
+}
+
+.stimCloseContainer {
+  display: flex;
+  justify-content: flex-end; /* Aligns the container to the right */
+  gap: 10px; /* Adjust this value to control the space between buttons */
+  /* position: fixed; */
+  right: 10px; /* Adjust this value to control the distance from the right edge */
+  /* bottom: 10px; */
 }
 
 .form-container h2{
@@ -129,3 +139,4 @@ select {
   /* display: flex; */
   justify-content: center;
 }
+

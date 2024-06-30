@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import * as React from 'react';
 import { Box, styled } from '@mui/system';
 import {
@@ -6,11 +7,6 @@ import {
 } from '@mui/base/Unstable_NumberInput';
 
 const NumberInput = React.forwardRef(function CustomNumberInput(props, ref) {
-
-  const handleIncrement = () => {
-    props.value += 1;
-  }
-
   return (
     <BaseNumberInput
       slots={{
