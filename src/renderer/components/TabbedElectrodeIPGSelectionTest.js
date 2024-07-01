@@ -100,6 +100,14 @@ function TabbedElectrodeIPGSelection({
   //   setKey(Tabs.key);
   // };
 
+  useEffect(() => {
+    if (stimChanged) {
+      // Reset states or do necessary updates on stimChanged
+      console.log('Stim changed, re-rendering...');
+      setStimChanged(false); // Reset stimChanged if it’s a one-time trigger
+    }
+  }, [stimChanged, setStimChanged]);
+
   const handleTabChange = (k) => {
     // console.log("new key=" + k + ", old key="+key + ","+ JSON.stringify(testElectrodeRef.current.getCartesiaData()));
     // console.log("new key=" + k + ", old key="+key + ", old data="+ JSON.stringify(testElectrodeRef.current.getStateQuantities()));
@@ -1745,7 +1753,7 @@ function TabbedElectrodeIPGSelection({
     if (importedData) {
       gatherImportedData(importedData);
     }
-    handleTabChange('1');
+    // handleTabChange('1');
     console.log('Tabbed all quantities: ', allQuantities);
     if (stimChanged) {
       handleTabChange(key);
@@ -1753,15 +1761,15 @@ function TabbedElectrodeIPGSelection({
     }
   }, [importedData]);
 
-  useEffect(() => {
-    if (stimChanged) {
-      console.log('STIMCHANGED: ', stimChanged);
-      console.log('Tabbed all quantities: ', allQuantities);
-      handleTabChange(key);
-      // setAllQuantities(allQuantities);
-      setStimChanged(false);
-    }
-  });
+  // useEffect(() => {
+  //   if (stimChanged) {
+  //     console.log('STIMCHANGED: ', stimChanged);
+  //     console.log('Tabbed all quantities: ', allQuantities);
+  //     handleTabChange(key);
+  //     // setAllQuantities(allQuantities);
+  //     setStimChanged(false);
+  //   }
+  // });
   // const data = 'hello';
   // function handleMatlabConnectivity() {
   //   window.electron.ipcRenderer.send('trigger-matlab-action', data);

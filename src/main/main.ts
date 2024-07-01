@@ -16,6 +16,8 @@ import * as childProcess from 'child_process';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
+ipcMain.setMaxListeners(20);
+
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -155,14 +157,12 @@ ipcMain.on('import-previous-files', (event, fileID, importData) => {
   if (masterImportData[fileKey]) {
     const priorStimFolder = masterImportData[fileKey].folder;
     console.log(masterImportData);
-    const fileName = importData.patientname + '_desc-stimparameters.json';
+    const fileName = `${importData.patientname}_desc-stimparameters.json`;
     filePath = path.join(priorStimFolder, fileID, fileName);
-    console.log('AHAHAHAHAHHA: ', filePath);
   } else {
     const priorStimFolder = masterImportData[3].folder;
-    const fileName = importData.patientname + '_desc-stimparameters.json';
+    const fileName = `${importData.patientname}_desc-stimparameters.json`;
     filePath = path.join(priorStimFolder, fileID, fileName);
-    console.log('AHAHAHAHAHHA: ', filePath);
     console.log('1');
     console.log(fileID);
     const outputFolder = path.join(priorStimFolder, fileID);
@@ -197,7 +197,8 @@ ipcMain.on('import-previous-files', (event, fileID, importData) => {
 
   console.log('JSONDATA: ', jsonData);
   // console.log(key);
-  event.reply('import-previous-files-reply', filePath, jsonData);
+  // event.reply('import-previous-files-reply', filePath, jsonData);
+  event.reply('import-previous-files-reply', jsonData);
   // event.reply('get-output-filePath', filePath);
 });
 

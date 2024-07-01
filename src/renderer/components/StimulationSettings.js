@@ -548,14 +548,31 @@ function StimulationSettings({
     setStimChanged(true);
   };
 
-  window.electron.ipcRenderer.on('import-previous-files-reply', (arg, arg1) => {
+  // window.electron.ipcRenderer.on('import-previous-files-reply', (arg, arg1) => {
+  //   // console.log('hello');
+  //   const newFilePath = arg;
+  //   const newS = arg1;
+  //   setFilePath(newFilePath);
+  //   if (arg !== 'Empty') {
+  //     console.log('here');
+  //     gatherImportedDataNew(newS);
+  //   } else if (arg === 'Empty') {
+  //     const uniqueID = generateUniqueID();
+  //     setNewStim(uniqueID);
+  //   }
+  //   // Here is where I can write an if statement for if arg1 is empty, and then I can write a statement to create
+  //   // a new one and then select that one as the stimulation setting
+  //   console.log('MATIMPORTDATA: ', matImportFile);
+  //   console.log('STIMCHANGED: ', stimChanged);
+  // });
+
+  window.electron.ipcRenderer.on('import-previous-files-reply', (arg) => {
     // console.log('hello');
-    console.log('ARG: ', arg);
-    setFilePath(arg);
-    console.log('arg1: ', arg1);
-    if (arg !== 'Empty') {
-      gatherImportedDataNew(arg1);
-    } else if (arg === 'Empty') {
+    const newS = arg;
+    if (newS !== 'Empty') {
+      console.log('here');
+      gatherImportedDataNew(newS);
+    } else if (newS === 'Empty') {
       const uniqueID = generateUniqueID();
       setNewStim(uniqueID);
     }
@@ -889,7 +906,7 @@ function StimulationSettings({
         </Dropdown>
       </div>
       <div>
-        {leftElectrode && (
+        {/* {leftElectrode && (
           <TabbedElectrodeIPGSelectionTest
             selectedElectrodeLeft={leftElectrode}
             selectedElectrodeRight={rightElectrode}
@@ -920,7 +937,7 @@ function StimulationSettings({
             stimChanged={stimChanged}
             setStimChanged={setStimChanged}
           />
-        )}
+        )} */}
       </div>
     </div>
   );

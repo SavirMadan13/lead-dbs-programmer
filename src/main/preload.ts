@@ -26,13 +26,16 @@
 
 // contextBridge.exposeInMainWorld('electron', electronHandler);
 
-
 // export type ElectronHandler = typeof electronHandler;
-
 
 // Disable no-unused-vars, broken for spread args
 /* eslint no-unused-vars: off */
-import { contextBridge, ipcRenderer, IpcRendererEvent, webFrame } from 'electron';
+import {
+  contextBridge,
+  ipcRenderer,
+  IpcRendererEvent,
+  webFrame,
+} from 'electron';
 
 export type Channels = 'ipc-example';
 
@@ -44,6 +47,24 @@ const electronHandler = {
     on(channel: Channels, func: (...args: unknown[]) => void) {
       const subscription = (_event: IpcRendererEvent, ...args: unknown[]) =>
         func(...args);
+      // const subscription = (_event: IpcRendererEvent, ...args: unknown[]) => {
+      //   try {
+      //     func(...args);
+      //   } catch (error) {
+      //     // Handle or log the error here
+      //     console.error('Error in IPC callback:', error);
+      //   }
+      // };
+      // const subscription = (_event, ...args) => {
+      //   console.log(`Received args for channel ${channel}:`, args);
+      //   if (args && args.length > 0 && args[0] !== undefined) {
+      //     func(...args);
+      //   } else {
+      //     console.error(
+      //       `Received undefined or empty args for channel ${channel}`,
+      //     );
+      //   }
+      // };
       ipcRenderer.on(channel, subscription);
 
       return () => {
@@ -83,7 +104,7 @@ const electronHandler = {
   //   },
   // },
   zoom: {
-    setZoomLevel(level) {
+    setZoomLevel(level: any) {
       webFrame.setZoomLevel(level);
       ipcRenderer.send('zoom-level-changed', level);
     },
