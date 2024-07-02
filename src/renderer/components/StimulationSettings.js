@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 /* eslint-disable react/prop-types */
 // import { useState } from 'react';
 import React, { useState, useRef, useEffect } from 'react';
@@ -420,8 +421,11 @@ function StimulationSettings({
     // console.log(allTotalAmplitudes);
 
     for (let j = 1; j < 5; j++) {
-      newTotalAmplitude[j] = jsonData.S.amplitude.leftAmplitude[j - 1];
-      newTotalAmplitude[j + 4] = jsonData.S.amplitude.rightAmplitude[j - 1];
+      // newTotalAmplitude[j] = jsonData.S.amplitude.leftAmplitude[j - 1];
+      newTotalAmplitude[j] = jsonData.S.amplitude[0][j - 1];
+      // newTotalAmplitude[j + 4] = jsonData.S.amplitude.rightAmplitude[j - 1];
+      newTotalAmplitude[j + 4] = jsonData.S.amplitude[1][j - 1];
+      console.log('newTotalAmplitude: ', newTotalAmplitude);
       const dynamicKey2 = `Ls${j}`;
       const dynamicKey3 = `Rs${j}`;
       for (let i = 0; i < 9; i++) {
@@ -509,6 +513,7 @@ function StimulationSettings({
     setAllQuantities(filteredQuantities);
     setAllTotalAmplitudes(newTotalAmplitude);
     console.log('STIMCHANGED: ', stimChanged);
+    // setLeftElectrode(leftElectrode);
     // setAllQuantities(filteredQuantities => {
     //   const newAllQuantities = { ...filteredQuantities };
     //   return filteredQuantities;
@@ -566,7 +571,7 @@ function StimulationSettings({
   //   console.log('STIMCHANGED: ', stimChanged);
   // });
 
-  window.electron.ipcRenderer.on('import-previous-files-reply', (arg) => {
+  window.electron.ipcRenderer.on('import-previous-files', (arg) => {
     // console.log('hello');
     const newS = arg;
     if (newS !== 'Empty') {
@@ -906,7 +911,7 @@ function StimulationSettings({
         </Dropdown>
       </div>
       <div>
-        {/* {leftElectrode && (
+        {leftElectrode && (
           <TabbedElectrodeIPGSelectionTest
             selectedElectrodeLeft={leftElectrode}
             selectedElectrodeRight={rightElectrode}
@@ -937,7 +942,7 @@ function StimulationSettings({
             stimChanged={stimChanged}
             setStimChanged={setStimChanged}
           />
-        )} */}
+        )}
       </div>
     </div>
   );

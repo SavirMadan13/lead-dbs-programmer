@@ -116,14 +116,335 @@ export default function App() {
   }, [zoomLevel]);
 
   return (
-    <Router>
+    // <Router>
+    //   <div className="Navbar">
+    //     <Navbar />
+    //     {/* <div>
+    //       <button onClick={zoomIn}>Zoom In</button>
+    //       <button onClick={zoomOut}>Zoom Out</button>
+    //       <button onClick={resetZoom}>Reset Zoom</button>
+    //     </div> */}
+    //     {/* <img src="./logo512Padding-300x212.png" alt="leadDBS" /> */}
+    //     <Slider
+    //       value={zoomLevel}
+    //       onChange={handleZoomChange}
+    //       aria-label="Zoom Level"
+    //       // valueLabelDisplay="auto"
+    //       step={1}
+    //       marks
+    //       min={-3}
+    //       max={3}
+    //       sx={{
+    //         '& .MuiSlider-mark': {
+    //           backgroundColor: 'black', // Change the color of the marks
+    //           height: '10px', // Adjust the height of the marks
+    //           width: '2px', // Adjust the width of the marks
+    //         },
+    //         // '& .MuiSlider-rail': {
+    //         //   backgroundColor: 'grey', // Change the color of the rail
+    //         // },
+    //       }}
+    //     />
+    //   </div>
+    //   {/* {showDropdown && (
+    //     <StimulationSettings
+    //       IPG={IPG}
+    //       setIPG={setIPG}
+    //       leftElectrode={leftElectrode}
+    //       setLeftElectrode={setLeftElectrode}
+    //       rightElectrode={rightElectrode}
+    //       setRightElectrode={setRightElectrode}
+    //       allQuantities={allQuantities}
+    //       setAllQuantities={setAllQuantities}
+    //       allSelectedValues={allSelectedValues}
+    //       setAllSelectedValues={setAllSelectedValues}
+    //       allTotalAmplitudes={allTotalAmplitudes}
+    //       setAllTotalAmplitudes={setAllTotalAmplitudes}
+    //       allTogglePositions={allTogglePositions}
+    //       setAllTogglePositions={setAllTogglePositions}
+    //       allPercAmpToggles={allPercAmpToggles}
+    //       setAllPercAmpToggles={setAllPercAmpToggles}
+    //       allVolAmpToggles={allVolAmpToggles}
+    //       setAllVolAmpToggles={setAllVolAmpToggles}
+    //       importCount={importCount}
+    //       setImportCount={setImportCount}
+    //       importDataTest={importData}
+    //       setImportDataTest={setImportData}
+    //       masterImportData={masterImportData}
+    //       setMasterImportData={setMasterImportData}
+    //       matImportFile={matImportFile}
+    //       setMatImportFile={setMatImportFile}
+    //       newImportFiles={newImportFiles}
+    //       setNewImportFiles={setNewImportFiles}
+    //       filePath={filePath}
+    //       setFilePath={setFilePath}
+    //       stimChanged={stimChanged}
+    //       setStimChanged={setStimChanged}
+    //       allStimulationParameters={allStimulationParameters}
+    //       setAllStimulationParameters={setAllStimulationParameters}
+    //       visModel={visModel}
+    //       setVisModel={setVisModel}
+    //       sessionTitle={sessionTitle}
+    //       setSessionTitle={setSessionTitle}
+    //     />
+    //   )} */}
+    //   {/* <Dropdown style={{ marginLeft: 100 }}>
+    //     <Dropdown.Toggle variant="secondary" id="dropdown-button-dark-example1">
+    //       Stimulation Settings
+    //     </Dropdown.Toggle>
+    //     <Dropdown.Menu>
+    //       <StimulationSettings
+    //         IPG={IPG}
+    //         setIPG={setIPG}
+    //         leftElectrode={leftElectrode}
+    //         setLeftElectrode={setLeftElectrode}
+    //         rightElectrode={rightElectrode}
+    //         setRightElectrode={setRightElectrode}
+    //         allQuantities={allQuantities}
+    //         setAllQuantities={setAllQuantities}
+    //         allSelectedValues={allSelectedValues}
+    //         setAllSelectedValues={setAllSelectedValues}
+    //         allTotalAmplitudes={allTotalAmplitudes}
+    //         setAllTotalAmplitudes={setAllTotalAmplitudes}
+    //         allTogglePositions={allTogglePositions}
+    //         setAllTogglePositions={setAllTogglePositions}
+    //         allPercAmpToggles={allPercAmpToggles}
+    //         setAllPercAmpToggles={setAllPercAmpToggles}
+    //         allVolAmpToggles={allVolAmpToggles}
+    //         setAllVolAmpToggles={setAllVolAmpToggles}
+    //         importCount={importCount}
+    //         setImportCount={setImportCount}
+    //         importDataTest={importData}
+    //         setImportDataTest={setImportData}
+    //         masterImportData={masterImportData}
+    //         setMasterImportData={setMasterImportData}
+    //         matImportFile={matImportFile}
+    //         setMatImportFile={setMatImportFile}
+    //         newImportFiles={newImportFiles}
+    //         setNewImportFiles={setNewImportFiles}
+    //         filePath={filePath}
+    //         setFilePath={setFilePath}
+    //         stimChanged={stimChanged}
+    //         setStimChanged={setStimChanged}
+    //       />
+    //     </Dropdown.Menu>
+    //   </Dropdown> */}
+    //   {/* <StimulationSettings
+    //     IPG={IPG}
+    //     setIPG={setIPG}
+    //     leftElectrode={leftElectrode}
+    //     setLeftElectrode={setLeftElectrode}
+    //     rightElectrode={rightElectrode}
+    //     setRightElectrode={setRightElectrode}
+    //     allQuantities={allQuantities}
+    //     setAllQuantities={setAllQuantities}
+    //     allSelectedValues={allSelectedValues}
+    //     setAllSelectedValues={setAllSelectedValues}
+    //     allTotalAmplitudes={allTotalAmplitudes}
+    //     setAllTotalAmplitudes={setAllTotalAmplitudes}
+    //     allTogglePositions={allTogglePositions}
+    //     setAllTogglePositions={setAllTogglePositions}
+    //     allPercAmpToggles={allPercAmpToggles}
+    //     setAllPercAmpToggles={setAllPercAmpToggles}
+    //     allVolAmpToggles={allVolAmpToggles}
+    //     setAllVolAmpToggles={setAllVolAmpToggles}
+    //     importCount={importCount}
+    //     setImportCount={setImportCount}
+    //     importDataTest={importData}
+    //     setImportDataTest={setImportData}
+    //     masterImportData={masterImportData}
+    //     setMasterImportData={setMasterImportData}
+    //     matImportFile={matImportFile}
+    //     setMatImportFile={setMatImportFile}
+    //     newImportFiles={newImportFiles}
+    //     setNewImportFiles={setNewImportFiles}
+    //     filePath={filePath}
+    //     setFilePath={setFilePath}
+    //     stimChanged={stimChanged}
+    //     setStimChanged={setStimChanged}
+    //     allStimulationParameters={allStimulationParameters}
+    //     setAllStimulationParameters={setAllStimulationParameters}
+    //     visModel={visModel}
+    //     setVisModel={setVisModel}
+    //     sessionTitle={sessionTitle}
+    //     setSessionTitle={setSessionTitle}
+    //   /> */}
+    //   {/* {leftElectrode && (
+    //     <TabbedElectrodeIPGSelectionTest
+    //       selectedElectrodeLeft={leftElectrode}
+    //       selectedElectrodeRight={rightElectrode}
+    //       IPG={IPG}
+    //       // key={key}
+    //       // setKey={setKey}
+    //       allQuantities={allQuantities}
+    //       setAllQuantities={setAllQuantities}
+    //       allSelectedValues={allSelectedValues}
+    //       setAllSelectedValues={setAllSelectedValues}
+    //       allTotalAmplitudes={allTotalAmplitudes}
+    //       setAllTotalAmplitudes={setAllTotalAmplitudes}
+    //       allStimulationParameters={allStimulationParameters}
+    //       setAllStimulationParameters={setAllStimulationParameters}
+    //       visModel={visModel}
+    //       setVisModel={setVisModel}
+    //       sessionTitle={sessionTitle}
+    //       setSessionTitle={setSessionTitle}
+    //       allTogglePositions={allTogglePositions}
+    //       setAllTogglePositions={setAllTogglePositions}
+    //       allPercAmpToggles={allPercAmpToggles}
+    //       setAllPercAmpToggles={setAllPercAmpToggles}
+    //       allVolAmpToggles={allVolAmpToggles}
+    //       setAllVolAmpToggles={setAllVolAmpToggles}
+    //       filePath={filePath}
+    //       setFilePath={setFilePath}
+    //       matImportFile={matImportFile}
+    //       stimChanged={stimChanged}
+    //       setStimChanged={setStimChanged}
+    //     />
+    //   )} */}
+    //   {/* <TabbedElectrodeIPGSelectionTest
+    //     selectedElectrodeLeft={leftElectrode}
+    //     selectedElectrodeRight={rightElectrode}
+    //     IPG={IPG}
+    //     allQuantities={allQuantities}
+    //     setAllQuantities={setAllQuantities}
+    //     allSelectedValues={allSelectedValues}
+    //     setAllSelectedValues={setAllSelectedValues}
+    //     allTotalAmplitudes={allTotalAmplitudes}
+    //     setAllTotalAmplitudes={setAllTotalAmplitudes}
+    //     allStimulationParameters={allStimulationParameters}
+    //     setAllStimulationParameters={setAllStimulationParameters}
+    //     visModel={visModel}
+    //     setVisModel={setVisModel}
+    //     sessionTitle={sessionTitle}
+    //     setSessionTitle={setSessionTitle}
+    //     allTogglePositions={allTogglePositions}
+    //     setAllTogglePositions={setAllTogglePositions}
+    //     allPercAmpToggles={allPercAmpToggles}
+    //     setAllPercAmpToggles={setAllPercAmpToggles}
+    //     allVolAmpToggles={allVolAmpToggles}
+    //     setAllVolAmpToggles={setAllVolAmpToggles}
+    //     filePath={filePath}
+    //     setFilePath={setFilePath}
+    //     matImportFile={matImportFile}
+    //     stimChanged={stimChanged}
+    //     setStimChanged={setStimChanged}
+    //   /> */}
+    //   <Routes>
+    //     {/* <Route path="/" element={<Hello />} /> */}
+    //     {/* <Route
+    //       path="/"
+    //       element={<Navigate to ="/new-route" />}
+    //     /> */}
+    //     {/* <Route
+    //       path="/"
+    //       element={
+    //         <div>
+    //           <img src={LeadDbsImage} alt="Description of your image" />
+    //           <div></div>
+    //           <Link to="/stimulation-settings">
+    //             <button className="button">Get Started</button>
+    //           </Link>
+    //         </div>
+    //       }
+    //     /> */}
+    //     <Route path="/testing" element={<AssistedButtons />} />
+    //     <Route
+    //       path="/setup"
+    //       element={
+    //         <div>
+    //           <StimulationSettings
+    //             IPG={IPG}
+    //             setIPG={setIPG}
+    //             leftElectrode={leftElectrode}
+    //             setLeftElectrode={setLeftElectrode}
+    //             rightElectrode={rightElectrode}
+    //             setRightElectrode={setRightElectrode}
+    //             allQuantities={allQuantities}
+    //             setAllQuantities={setAllQuantities}
+    //             allSelectedValues={allSelectedValues}
+    //             setAllSelectedValues={setAllSelectedValues}
+    //             allTotalAmplitudes={allTotalAmplitudes}
+    //             setAllTotalAmplitudes={setAllTotalAmplitudes}
+    //             allTogglePositions={allTogglePositions}
+    //             setAllTogglePositions={setAllTogglePositions}
+    //             allPercAmpToggles={allPercAmpToggles}
+    //             setAllPercAmpToggles={setAllPercAmpToggles}
+    //             allVolAmpToggles={allVolAmpToggles}
+    //             setAllVolAmpToggles={setAllVolAmpToggles}
+    //             importCount={importCount}
+    //             setImportCount={setImportCount}
+    //             importDataTest={importData}
+    //             setImportDataTest={setImportData}
+    //             masterImportData={masterImportData}
+    //             setMasterImportData={setMasterImportData}
+    //             matImportFile={matImportFile}
+    //             setMatImportFile={setMatImportFile}
+    //             newImportFiles={newImportFiles}
+    //             setNewImportFiles={setNewImportFiles}
+    //             filePath={filePath}
+    //             setFilePath={setFilePath}
+    //             stimChanged={stimChanged}
+    //             setStimChanged={setStimChanged}           />
+    //           <Link to="/tabbed-selection">
+    //             <button className="button">Next</button>
+    //           </Link>
+    //         </div>
+    //       }
+    //     />
+    //     <Route
+    //       path="/tabbed-selection"
+    //       element={
+    //         <TabbedElectrodeIPGSelectionTest
+    //           selectedElectrodeLeft={leftElectrode}
+    //           selectedElectrodeRight={rightElectrode}
+    //           IPG={IPG}
+    //           // key={key}
+    //           // setKey={setKey}
+    //           allQuantities={allQuantities}
+    //           setAllQuantities={setAllQuantities}
+    //           allSelectedValues={allSelectedValues}
+    //           setAllSelectedValues={setAllSelectedValues}
+    //           allTotalAmplitudes={allTotalAmplitudes}
+    //           setAllTotalAmplitudes={setAllTotalAmplitudes}
+    //           allStimulationParameters={allStimulationParameters}
+    //           setAllStimulationParameters={setAllStimulationParameters}
+    //           visModel={visModel}
+    //           setVisModel={setVisModel}
+    //           sessionTitle={sessionTitle}
+    //           setSessionTitle={setSessionTitle}
+    //           allTogglePositions={allTogglePositions}
+    //           setAllTogglePositions={setAllTogglePositions}
+    //           allPercAmpToggles={allPercAmpToggles}
+    //           setAllPercAmpToggles={setAllPercAmpToggles}
+    //           allVolAmpToggles={allVolAmpToggles}
+    //           setAllVolAmpToggles={setAllVolAmpToggles}
+    //           filePath={filePath}
+    //           setFilePath={setFilePath}
+    //           matImportFile={matImportFile}
+    //           stimChanged={stimChanged}
+    //           setStimChanged={setStimChanged}
+    //         />
+    //       }
+    //     />
+    //     <Route
+    //       path="end-session"
+    //       element={
+    //         <ExportData
+    //           allQuantities={allQuantities}
+    //           allSelectedValues={allSelectedValues}
+    //         />
+    //       }
+    //     />
+    //   </Routes>
+    // </Router>
+    <div>
       <div className="Navbar">
         <Navbar />
         {/* <div>
-          <button onClick={zoomIn}>Zoom In</button>
-          <button onClick={zoomOut}>Zoom Out</button>
-          <button onClick={resetZoom}>Reset Zoom</button>
-        </div> */}
+      <button onClick={zoomIn}>Zoom In</button>
+      <button onClick={zoomOut}>Zoom Out</button>
+      <button onClick={resetZoom}>Reset Zoom</button>
+    </div> */}
         {/* <img src="./logo512Padding-300x212.png" alt="leadDBS" /> */}
         <Slider
           value={zoomLevel}
@@ -146,7 +467,7 @@ export default function App() {
           }}
         />
       </div>
-      {showDropdown && (
+      {/* {showDropdown && (
         <StimulationSettings
           IPG={IPG}
           setIPG={setIPG}
@@ -179,56 +500,49 @@ export default function App() {
           filePath={filePath}
           setFilePath={setFilePath}
           stimChanged={stimChanged}
-          setStimChanged={setStimChanged}
-          allStimulationParameters={allStimulationParameters}
-          setAllStimulationParameters={setAllStimulationParameters}
-          visModel={visModel}
-          setVisModel={setVisModel}
-          sessionTitle={sessionTitle}
-          setSessionTitle={setSessionTitle}
-        />
-      )}
+          setStimChanged={setStimChanged} allStimulationParameters={undefined} setAllStimulationParameters={undefined} visModel={undefined} setVisModel={undefined} sessionTitle={undefined} setSessionTitle={undefined}        />
+      )} */}
       {/* <Dropdown style={{ marginLeft: 100 }}>
-        <Dropdown.Toggle variant="secondary" id="dropdown-button-dark-example1">
-          Stimulation Settings
-        </Dropdown.Toggle>
-        <Dropdown.Menu>
-          <StimulationSettings
-            IPG={IPG}
-            setIPG={setIPG}
-            leftElectrode={leftElectrode}
-            setLeftElectrode={setLeftElectrode}
-            rightElectrode={rightElectrode}
-            setRightElectrode={setRightElectrode}
-            allQuantities={allQuantities}
-            setAllQuantities={setAllQuantities}
-            allSelectedValues={allSelectedValues}
-            setAllSelectedValues={setAllSelectedValues}
-            allTotalAmplitudes={allTotalAmplitudes}
-            setAllTotalAmplitudes={setAllTotalAmplitudes}
-            allTogglePositions={allTogglePositions}
-            setAllTogglePositions={setAllTogglePositions}
-            allPercAmpToggles={allPercAmpToggles}
-            setAllPercAmpToggles={setAllPercAmpToggles}
-            allVolAmpToggles={allVolAmpToggles}
-            setAllVolAmpToggles={setAllVolAmpToggles}
-            importCount={importCount}
-            setImportCount={setImportCount}
-            importDataTest={importData}
-            setImportDataTest={setImportData}
-            masterImportData={masterImportData}
-            setMasterImportData={setMasterImportData}
-            matImportFile={matImportFile}
-            setMatImportFile={setMatImportFile}
-            newImportFiles={newImportFiles}
-            setNewImportFiles={setNewImportFiles}
-            filePath={filePath}
-            setFilePath={setFilePath}
-            stimChanged={stimChanged}
-            setStimChanged={setStimChanged}
-          />
-        </Dropdown.Menu>
-      </Dropdown> */}
+    <Dropdown.Toggle variant="secondary" id="dropdown-button-dark-example1">
+      Stimulation Settings
+    </Dropdown.Toggle>
+    <Dropdown.Menu>
+      <StimulationSettings
+        IPG={IPG}
+        setIPG={setIPG}
+        leftElectrode={leftElectrode}
+        setLeftElectrode={setLeftElectrode}
+        rightElectrode={rightElectrode}
+        setRightElectrode={setRightElectrode}
+        allQuantities={allQuantities}
+        setAllQuantities={setAllQuantities}
+        allSelectedValues={allSelectedValues}
+        setAllSelectedValues={setAllSelectedValues}
+        allTotalAmplitudes={allTotalAmplitudes}
+        setAllTotalAmplitudes={setAllTotalAmplitudes}
+        allTogglePositions={allTogglePositions}
+        setAllTogglePositions={setAllTogglePositions}
+        allPercAmpToggles={allPercAmpToggles}
+        setAllPercAmpToggles={setAllPercAmpToggles}
+        allVolAmpToggles={allVolAmpToggles}
+        setAllVolAmpToggles={setAllVolAmpToggles}
+        importCount={importCount}
+        setImportCount={setImportCount}
+        importDataTest={importData}
+        setImportDataTest={setImportData}
+        masterImportData={masterImportData}
+        setMasterImportData={setMasterImportData}
+        matImportFile={matImportFile}
+        setMatImportFile={setMatImportFile}
+        newImportFiles={newImportFiles}
+        setNewImportFiles={setNewImportFiles}
+        filePath={filePath}
+        setFilePath={setFilePath}
+        stimChanged={stimChanged}
+        setStimChanged={setStimChanged}
+      />
+    </Dropdown.Menu>
+  </Dropdown> */}
       <StimulationSettings
         IPG={IPG}
         setIPG={setIPG}
@@ -269,7 +583,7 @@ export default function App() {
         sessionTitle={sessionTitle}
         setSessionTitle={setSessionTitle}
       />
-      {leftElectrode && (
+      {/* {leftElectrode && (
         <TabbedElectrodeIPGSelectionTest
           selectedElectrodeLeft={leftElectrode}
           selectedElectrodeRight={rightElectrode}
@@ -300,321 +614,7 @@ export default function App() {
           stimChanged={stimChanged}
           setStimChanged={setStimChanged}
         />
-      )}
-      {/* <TabbedElectrodeIPGSelectionTest
-        selectedElectrodeLeft={leftElectrode}
-        selectedElectrodeRight={rightElectrode}
-        IPG={IPG}
-        allQuantities={allQuantities}
-        setAllQuantities={setAllQuantities}
-        allSelectedValues={allSelectedValues}
-        setAllSelectedValues={setAllSelectedValues}
-        allTotalAmplitudes={allTotalAmplitudes}
-        setAllTotalAmplitudes={setAllTotalAmplitudes}
-        allStimulationParameters={allStimulationParameters}
-        setAllStimulationParameters={setAllStimulationParameters}
-        visModel={visModel}
-        setVisModel={setVisModel}
-        sessionTitle={sessionTitle}
-        setSessionTitle={setSessionTitle}
-        allTogglePositions={allTogglePositions}
-        setAllTogglePositions={setAllTogglePositions}
-        allPercAmpToggles={allPercAmpToggles}
-        setAllPercAmpToggles={setAllPercAmpToggles}
-        allVolAmpToggles={allVolAmpToggles}
-        setAllVolAmpToggles={setAllVolAmpToggles}
-        filePath={filePath}
-        setFilePath={setFilePath}
-        matImportFile={matImportFile}
-        stimChanged={stimChanged}
-        setStimChanged={setStimChanged}
-      /> */}
-      <Routes>
-        {/* <Route path="/" element={<Hello />} /> */}
-        {/* <Route
-          path="/"
-          element={<Navigate to ="/new-route" />}
-        /> */}
-        {/* <Route
-          path="/"
-          element={
-            <div>
-              <img src={LeadDbsImage} alt="Description of your image" />
-              <div></div>
-              <Link to="/stimulation-settings">
-                <button className="button">Get Started</button>
-              </Link>
-            </div>
-          }
-        /> */}
-        <Route path="/testing" element={<AssistedButtons />} />
-        <Route
-          path="/stim"
-          element={
-            <div>
-              <StimulationSettings
-                IPG={IPG}
-                setIPG={setIPG}
-                leftElectrode={leftElectrode}
-                setLeftElectrode={setLeftElectrode}
-                rightElectrode={rightElectrode}
-                setRightElectrode={setRightElectrode}
-                allQuantities={allQuantities}
-                setAllQuantities={setAllQuantities}
-                allSelectedValues={allSelectedValues}
-                setAllSelectedValues={setAllSelectedValues}
-                allTotalAmplitudes={allTotalAmplitudes}
-                setAllTotalAmplitudes={setAllTotalAmplitudes}
-                allTogglePositions={allTogglePositions}
-                setAllTogglePositions={setAllTogglePositions}
-                allPercAmpToggles={allPercAmpToggles}
-                setAllPercAmpToggles={setAllPercAmpToggles}
-                allVolAmpToggles={allVolAmpToggles}
-                setAllVolAmpToggles={setAllVolAmpToggles}
-                importCount={importCount}
-                setImportCount={setImportCount}
-                importDataTest={importData}
-                setImportDataTest={setImportData}
-                masterImportData={masterImportData}
-                setMasterImportData={setMasterImportData}
-                matImportFile={matImportFile}
-                setMatImportFile={setMatImportFile}
-                newImportFiles={newImportFiles}
-                setNewImportFiles={setNewImportFiles}
-                filePath={filePath}
-                setFilePath={setFilePath}
-                stimChanged={stimChanged}
-                setStimChanged={setStimChanged} allStimulationParameters={undefined} setAllStimulationParameters={undefined} visModel={undefined} setVisModel={undefined} sessionTitle={undefined} setSessionTitle={undefined}              />
-              <Link to="/tabbed-selection">
-                <button className="button">Next</button>
-              </Link>
-            </div>
-          }
-        />
-        <Route
-          path="/tabbed-selection"
-          element={
-            <TabbedElectrodeIPGSelectionTest
-              selectedElectrodeLeft={leftElectrode}
-              selectedElectrodeRight={rightElectrode}
-              IPG={IPG}
-              // key={key}
-              // setKey={setKey}
-              allQuantities={allQuantities}
-              setAllQuantities={setAllQuantities}
-              allSelectedValues={allSelectedValues}
-              setAllSelectedValues={setAllSelectedValues}
-              allTotalAmplitudes={allTotalAmplitudes}
-              setAllTotalAmplitudes={setAllTotalAmplitudes}
-              allStimulationParameters={allStimulationParameters}
-              setAllStimulationParameters={setAllStimulationParameters}
-              visModel={visModel}
-              setVisModel={setVisModel}
-              sessionTitle={sessionTitle}
-              setSessionTitle={setSessionTitle}
-              allTogglePositions={allTogglePositions}
-              setAllTogglePositions={setAllTogglePositions}
-              allPercAmpToggles={allPercAmpToggles}
-              setAllPercAmpToggles={setAllPercAmpToggles}
-              allVolAmpToggles={allVolAmpToggles}
-              setAllVolAmpToggles={setAllVolAmpToggles}
-              filePath={filePath}
-              setFilePath={setFilePath}
-              matImportFile={matImportFile}
-              stimChanged={stimChanged}
-              setStimChanged={setStimChanged}
-            />
-          }
-        />
-        <Route
-          path="end-session"
-          element={
-            <ExportData
-              allQuantities={allQuantities}
-              allSelectedValues={allSelectedValues}
-            />
-          }
-        />
-      </Routes>
-    </Router>
-  //   <div>
-  //     <div className="Navbar">
-  //       <Navbar />
-  //       {/* <div>
-  //     <button onClick={zoomIn}>Zoom In</button>
-  //     <button onClick={zoomOut}>Zoom Out</button>
-  //     <button onClick={resetZoom}>Reset Zoom</button>
-  //   </div> */}
-  //       {/* <img src="./logo512Padding-300x212.png" alt="leadDBS" /> */}
-  //       <Slider
-  //         value={zoomLevel}
-  //         onChange={handleZoomChange}
-  //         aria-label="Zoom Level"
-  //         // valueLabelDisplay="auto"
-  //         step={1}
-  //         marks
-  //         min={-3}
-  //         max={3}
-  //         sx={{
-  //           '& .MuiSlider-mark': {
-  //             backgroundColor: 'black', // Change the color of the marks
-  //             height: '10px', // Adjust the height of the marks
-  //             width: '2px', // Adjust the width of the marks
-  //           },
-  //           // '& .MuiSlider-rail': {
-  //           //   backgroundColor: 'grey', // Change the color of the rail
-  //           // },
-  //         }}
-  //       />
-  //     </div>
-  //     {/* {showDropdown && (
-  //       <StimulationSettings
-  //         IPG={IPG}
-  //         setIPG={setIPG}
-  //         leftElectrode={leftElectrode}
-  //         setLeftElectrode={setLeftElectrode}
-  //         rightElectrode={rightElectrode}
-  //         setRightElectrode={setRightElectrode}
-  //         allQuantities={allQuantities}
-  //         setAllQuantities={setAllQuantities}
-  //         allSelectedValues={allSelectedValues}
-  //         setAllSelectedValues={setAllSelectedValues}
-  //         allTotalAmplitudes={allTotalAmplitudes}
-  //         setAllTotalAmplitudes={setAllTotalAmplitudes}
-  //         allTogglePositions={allTogglePositions}
-  //         setAllTogglePositions={setAllTogglePositions}
-  //         allPercAmpToggles={allPercAmpToggles}
-  //         setAllPercAmpToggles={setAllPercAmpToggles}
-  //         allVolAmpToggles={allVolAmpToggles}
-  //         setAllVolAmpToggles={setAllVolAmpToggles}
-  //         importCount={importCount}
-  //         setImportCount={setImportCount}
-  //         importDataTest={importData}
-  //         setImportDataTest={setImportData}
-  //         masterImportData={masterImportData}
-  //         setMasterImportData={setMasterImportData}
-  //         matImportFile={matImportFile}
-  //         setMatImportFile={setMatImportFile}
-  //         newImportFiles={newImportFiles}
-  //         setNewImportFiles={setNewImportFiles}
-  //         filePath={filePath}
-  //         setFilePath={setFilePath}
-  //         stimChanged={stimChanged}
-  //         setStimChanged={setStimChanged} allStimulationParameters={undefined} setAllStimulationParameters={undefined} visModel={undefined} setVisModel={undefined} sessionTitle={undefined} setSessionTitle={undefined}        />
-  //     )} */}
-  //     {/* <Dropdown style={{ marginLeft: 100 }}>
-  //   <Dropdown.Toggle variant="secondary" id="dropdown-button-dark-example1">
-  //     Stimulation Settings
-  //   </Dropdown.Toggle>
-  //   <Dropdown.Menu>
-  //     <StimulationSettings
-  //       IPG={IPG}
-  //       setIPG={setIPG}
-  //       leftElectrode={leftElectrode}
-  //       setLeftElectrode={setLeftElectrode}
-  //       rightElectrode={rightElectrode}
-  //       setRightElectrode={setRightElectrode}
-  //       allQuantities={allQuantities}
-  //       setAllQuantities={setAllQuantities}
-  //       allSelectedValues={allSelectedValues}
-  //       setAllSelectedValues={setAllSelectedValues}
-  //       allTotalAmplitudes={allTotalAmplitudes}
-  //       setAllTotalAmplitudes={setAllTotalAmplitudes}
-  //       allTogglePositions={allTogglePositions}
-  //       setAllTogglePositions={setAllTogglePositions}
-  //       allPercAmpToggles={allPercAmpToggles}
-  //       setAllPercAmpToggles={setAllPercAmpToggles}
-  //       allVolAmpToggles={allVolAmpToggles}
-  //       setAllVolAmpToggles={setAllVolAmpToggles}
-  //       importCount={importCount}
-  //       setImportCount={setImportCount}
-  //       importDataTest={importData}
-  //       setImportDataTest={setImportData}
-  //       masterImportData={masterImportData}
-  //       setMasterImportData={setMasterImportData}
-  //       matImportFile={matImportFile}
-  //       setMatImportFile={setMatImportFile}
-  //       newImportFiles={newImportFiles}
-  //       setNewImportFiles={setNewImportFiles}
-  //       filePath={filePath}
-  //       setFilePath={setFilePath}
-  //       stimChanged={stimChanged}
-  //       setStimChanged={setStimChanged}
-  //     />
-  //   </Dropdown.Menu>
-  // </Dropdown> */}
-  //     <StimulationSettings
-  //       IPG={IPG}
-  //       setIPG={setIPG}
-  //       leftElectrode={leftElectrode}
-  //       setLeftElectrode={setLeftElectrode}
-  //       rightElectrode={rightElectrode}
-  //       setRightElectrode={setRightElectrode}
-  //       allQuantities={allQuantities}
-  //       setAllQuantities={setAllQuantities}
-  //       allSelectedValues={allSelectedValues}
-  //       setAllSelectedValues={setAllSelectedValues}
-  //       allTotalAmplitudes={allTotalAmplitudes}
-  //       setAllTotalAmplitudes={setAllTotalAmplitudes}
-  //       allTogglePositions={allTogglePositions}
-  //       setAllTogglePositions={setAllTogglePositions}
-  //       allPercAmpToggles={allPercAmpToggles}
-  //       setAllPercAmpToggles={setAllPercAmpToggles}
-  //       allVolAmpToggles={allVolAmpToggles}
-  //       setAllVolAmpToggles={setAllVolAmpToggles}
-  //       importCount={importCount}
-  //       setImportCount={setImportCount}
-  //       importDataTest={importData}
-  //       setImportDataTest={setImportData}
-  //       masterImportData={masterImportData}
-  //       setMasterImportData={setMasterImportData}
-  //       matImportFile={matImportFile}
-  //       setMatImportFile={setMatImportFile}
-  //       newImportFiles={newImportFiles}
-  //       setNewImportFiles={setNewImportFiles}
-  //       filePath={filePath}
-  //       setFilePath={setFilePath}
-  //       stimChanged={stimChanged}
-  //       setStimChanged={setStimChanged}
-  //       allStimulationParameters={allStimulationParameters}
-  //       setAllStimulationParameters={setAllStimulationParameters}
-  //       visModel={visModel}
-  //       setVisModel={setVisModel}
-  //       sessionTitle={sessionTitle}
-  //       setSessionTitle={setSessionTitle}
-  //     />
-  //     {leftElectrode && (
-  //       <TabbedElectrodeIPGSelectionTest
-  //         selectedElectrodeLeft={leftElectrode}
-  //         selectedElectrodeRight={rightElectrode}
-  //         IPG={IPG}
-  //         // key={key}
-  //         // setKey={setKey}
-  //         allQuantities={allQuantities}
-  //         setAllQuantities={setAllQuantities}
-  //         allSelectedValues={allSelectedValues}
-  //         setAllSelectedValues={setAllSelectedValues}
-  //         allTotalAmplitudes={allTotalAmplitudes}
-  //         setAllTotalAmplitudes={setAllTotalAmplitudes}
-  //         allStimulationParameters={allStimulationParameters}
-  //         setAllStimulationParameters={setAllStimulationParameters}
-  //         visModel={visModel}
-  //         setVisModel={setVisModel}
-  //         sessionTitle={sessionTitle}
-  //         setSessionTitle={setSessionTitle}
-  //         allTogglePositions={allTogglePositions}
-  //         setAllTogglePositions={setAllTogglePositions}
-  //         allPercAmpToggles={allPercAmpToggles}
-  //         setAllPercAmpToggles={setAllPercAmpToggles}
-  //         allVolAmpToggles={allVolAmpToggles}
-  //         setAllVolAmpToggles={setAllVolAmpToggles}
-  //         filePath={filePath}
-  //         setFilePath={setFilePath}
-  //         matImportFile={matImportFile}
-  //         stimChanged={stimChanged}
-  //         setStimChanged={setStimChanged}
-  //       />
-  //     )}
-  //   </div>
+      )} */}
+    </div>
   );
 }

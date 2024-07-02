@@ -35,7 +35,7 @@ export default function Navbar() {
           <Typography>Component Testing</Typography>
         </IconButton>
       </NavLink> */}
-      <NavLink to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+      {/* <NavLink to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
         <IconButton>
           <Typography>Setup</Typography>
         </IconButton>
@@ -47,7 +47,7 @@ export default function Navbar() {
         <IconButton>
           <Typography>Electrode Model</Typography>
         </IconButton>
-      </NavLink>
+      </NavLink> */}
       {/* <NavLink
         to="/end-session"
         style={{ textDecoration: 'none', color: 'inherit' }}
@@ -74,7 +74,7 @@ export default function Navbar() {
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           Lead-DBS Programmer
         </Typography>
-        {/* {isMobile ? (
+        {isMobile ? (
           <>
             <IconButton color="inherit" onClick={() => toggleDrawer(true)}>
               Button
@@ -91,7 +91,7 @@ export default function Navbar() {
           </>
         ) : (
           menuItems
-        )} */}
+        )}
       </Toolbar>
       {/* <StimulationSettings /> */}
     </AppBar>

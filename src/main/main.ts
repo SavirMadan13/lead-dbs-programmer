@@ -16,7 +16,7 @@ import * as childProcess from 'child_process';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
-ipcMain.setMaxListeners(20);
+ipcMain.setMaxListeners(Infinity);
 
 class AppUpdater {
   constructor() {
@@ -198,7 +198,7 @@ ipcMain.on('import-previous-files', (event, fileID, importData) => {
   console.log('JSONDATA: ', jsonData);
   // console.log(key);
   // event.reply('import-previous-files-reply', filePath, jsonData);
-  event.reply('import-previous-files-reply', jsonData);
+  event.reply('import-previous-files', jsonData);
   // event.reply('get-output-filePath', filePath);
 });
 
