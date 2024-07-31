@@ -1,8 +1,11 @@
+/* eslint-disable react/button-has-type */
 /* eslint-disable react/jsx-pascal-case */
 /* eslint-disable camelcase */
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import ToggleButton from 'react-bootstrap/ToggleButton';
 import 'react-tabs/style/react-tabs.css';
 import './TabbedElectrodeIPGSelection.css';
 import BostonCartesia from './electrode_models/BostonCartesia';
@@ -60,6 +63,7 @@ function TabbedElectrodeIPGSelection({
   matImportFile,
   stimChanged,
   setStimChanged,
+  namingConvention,
 }) {
   const testElectrodeRef = React.createRef();
   // const [selectedElectrode, setSelectedElectrode] = useState('');
@@ -88,8 +92,8 @@ function TabbedElectrodeIPGSelection({
   //   setSelectedElectrode(event.target.value);
   // };
 
-  const [key, setKey] = useState('1');
-
+  const [key, setKey] = useState('5');
+  // const [namingConvention, setNamingConvention] = useState('clinical');
   const fileInputRef = useRef(null);
 
   // const [allQuantities, setAllQuantities] = useState({});
@@ -98,6 +102,19 @@ function TabbedElectrodeIPGSelection({
   // const handleChange = () => {
   //   console.log("key="+key + ","+ Tabs.key);
   //   setKey(Tabs.key);
+  // };
+
+  // const getVariant = (value) => {
+  //   return 'outline-secondary';
+  // };
+
+  // const namingConventionDef = [
+  //   { name: 'clinical', value: 'clinical' },
+  //   { name: 'lead-dbs', value: 'lead-dbs' },
+  // ];
+
+  // const handleNamingConventionChange = (newConvention) => {
+  //   setNamingConvention(newConvention);
   // };
 
   useEffect(() => {
@@ -386,6 +403,7 @@ function TabbedElectrodeIPGSelection({
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
         // stimChanged={stimChanged}
         // setStimChanged={setStimChanged}
         // outputIPG={outputIPG}
@@ -440,6 +458,7 @@ function TabbedElectrodeIPGSelection({
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
       />
     ),
     medtronic_3389: (
@@ -457,6 +476,7 @@ function TabbedElectrodeIPGSelection({
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
       />
     ),
     medtronic_3387: (
@@ -474,6 +494,7 @@ function TabbedElectrodeIPGSelection({
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
       />
     ),
     medtronic_3391: (
@@ -491,6 +512,7 @@ function TabbedElectrodeIPGSelection({
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
       />
     ),
     medtronic_b33005: (
@@ -508,6 +530,7 @@ function TabbedElectrodeIPGSelection({
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
       />
     ),
     medtronic_b33015: (
@@ -525,6 +548,7 @@ function TabbedElectrodeIPGSelection({
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
       />
     ),
     abbott_activetip_2mm: (
@@ -532,6 +556,7 @@ function TabbedElectrodeIPGSelection({
         ref={testElectrodeRef}
         key={key}
         name={key}
+        allQuantities={allQuantities}
         quantities={allQuantities[key]}
         selectedValues={allSelectedValues[key]}
         IPG={IPG}
@@ -542,6 +567,7 @@ function TabbedElectrodeIPGSelection({
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
       />
     ),
     abbott_activetip_3mm: (
@@ -549,6 +575,7 @@ function TabbedElectrodeIPGSelection({
         ref={testElectrodeRef}
         key={key}
         name={key}
+        allQuantities={allQuantities}
         quantities={allQuantities[key]}
         selectedValues={allSelectedValues[key]}
         IPG={IPG}
@@ -559,6 +586,7 @@ function TabbedElectrodeIPGSelection({
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
       />
     ),
     abbott_directed_6172: (
@@ -576,6 +604,7 @@ function TabbedElectrodeIPGSelection({
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
       />
     ),
     abbott_directed_6173: (
@@ -593,6 +622,7 @@ function TabbedElectrodeIPGSelection({
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
       />
     ),
   };
@@ -611,7 +641,8 @@ function TabbedElectrodeIPGSelection({
   const calculatePercentageFromAmplitude = (quantities, totalAmplitude) => {
     const updatedQuantities = { ...quantities };
     Object.keys(updatedQuantities).forEach((element) => {
-      updatedQuantities[element] = (parseFloat(updatedQuantities[element]) * 100) / totalAmplitude;
+      updatedQuantities[element] =
+        (parseFloat(updatedQuantities[element]) * 100) / totalAmplitude;
     });
     console.log(updatedQuantities);
     return updatedQuantities;
@@ -1697,7 +1728,7 @@ function TabbedElectrodeIPGSelection({
     const outputData = gatherExportedData5();
     console.log('OUTPUTDATA: ', outputData);
     window.electron.ipcRenderer.sendMessage('save-file', filePath, outputData);
-    // window.electron.ipcRenderer.sendMessage('close-window');
+    window.electron.ipcRenderer.sendMessage('close-window');
     // window.electron.ipcRenderer.sendMessage('close-window');
 
     // Listen for a response from the main process
@@ -1777,62 +1808,39 @@ function TabbedElectrodeIPGSelection({
 
   return (
     <div>
+      <div style={{ marginTop: '30px' }}></div>
+      {/* <div>
+        <h4>Contact Naming Convention</h4>
+        <ButtonGroup>
+          {namingConventionDef.map((name, idx) => (
+            <ToggleButton
+              key={idx}
+              id={`volAmp-${idx}`}
+              type="radio"
+              variant={getVariant(name.value)}
+              name="name"
+              value={name.value}
+              checked={namingConvention === name.value}
+              onChange={(e) => handleNamingConventionChange(e.currentTarget.value)}
+            >
+              {name.name}
+            </ToggleButton>
+          ))}
+        </ButtonGroup>
+      </div> */}
       <div className="stimCloseContainer">
-        <button className="export-button" onClick={sendDataToMain}>
-            Stimulate
-          </button>
-          <button className="export-button" onClick={quitApp}>
+        {/* <button className="export-button" onClick={sendDataToMain}>
+            Stimulate and Close
+          </button> */}
+        {/* <button className="export-button" onClick={quitApp}>
             Close
-          </button>
+          </button> */}
       </div>
       <Tabs className="tabs-container">
         <TabList className="tabs-container">
-          <Tab onClick={() => handleTabChange('1')}>Left Hemisphere</Tab>
           <Tab onClick={() => handleTabChange('5')}>Right Hemisphere</Tab>
+          <Tab onClick={() => handleTabChange('1')}>Left Hemisphere</Tab>
         </TabList>
-        <TabPanel>
-          <Tabs>
-            {/* <Tabs onClick={handleChange}> */}
-            <TabList>
-              <Tab key="1" onClick={() => handleTabChange('1')}>
-                Program 1
-              </Tab>
-              <Tab key="2" onClick={() => handleTabChange('2')}>
-                Program 2
-              </Tab>
-              <Tab key="3" onClick={() => handleTabChange('3')}>
-                Program 3
-              </Tab>
-              <Tab key="4" onClick={() => handleTabChange('4')}>
-                Program 4
-              </Tab>
-            </TabList>
-            {hemisphereData.left.map((tabState, index) => (
-              <TabPanel key={index}>
-                {/* <h2>Unit:</h2>
-                <select
-                  value={tabState.unit}
-                  onChange={(e) => handleUnitChange(e, index, 'left')}
-                >
-                  <option value="V">V</option>
-                  <option value="mA">mA</option>
-                </select>
-
-                <h2>Value:</h2>
-                <input
-                  type="text"
-                  value={tabState.value}
-                  onChange={(e) => handleValueChange(e, index, 'left')}
-                  placeholder={`Enter value in ${tabState.unit}`}
-                /> */}
-                <div className="form-container">
-                  {testElectrodeOptions[selectedElectrodeLeft]}
-                </div>
-              </TabPanel>
-            ))}
-          </Tabs>
-        </TabPanel>
-
         <TabPanel>
           <Tabs>
             <TabList>
@@ -1876,6 +1884,49 @@ function TabbedElectrodeIPGSelection({
             ))}
           </Tabs>
         </TabPanel>
+
+        <TabPanel>
+          <Tabs>
+            {/* <Tabs onClick={handleChange}> */}
+            <TabList>
+              <Tab key="1" onClick={() => handleTabChange('1')}>
+                Program 1
+              </Tab>
+              <Tab key="2" onClick={() => handleTabChange('2')}>
+                Program 2
+              </Tab>
+              <Tab key="3" onClick={() => handleTabChange('3')}>
+                Program 3
+              </Tab>
+              <Tab key="4" onClick={() => handleTabChange('4')}>
+                Program 4
+              </Tab>
+            </TabList>
+            {hemisphereData.left.map((tabState, index) => (
+              <TabPanel key={index}>
+                {/* <h2>Unit:</h2>
+                <select
+                  value={tabState.unit}
+                  onChange={(e) => handleUnitChange(e, index, 'left')}
+                >
+                  <option value="V">V</option>
+                  <option value="mA">mA</option>
+                </select>
+
+                <h2>Value:</h2>
+                <input
+                  type="text"
+                  value={tabState.value}
+                  onChange={(e) => handleValueChange(e, index, 'left')}
+                  placeholder={`Enter value in ${tabState.unit}`}
+                /> */}
+                <div className="form-container">
+                  {testElectrodeOptions[selectedElectrodeLeft]}
+                </div>
+              </TabPanel>
+            ))}
+          </Tabs>
+        </TabPanel>
       </Tabs>
       <div className="export-button-container">
         {/* <button
@@ -1891,7 +1942,7 @@ function TabbedElectrodeIPGSelection({
           accept=".json"
           onChange={handleFileChange}
           style={{ display: 'none' }}
-       // Hide the input element
+          // Hide the input element
         />
         {/* <button className="export-button" onClick={gatherExportedData2}>
           Visualize
@@ -1906,6 +1957,11 @@ function TabbedElectrodeIPGSelection({
         <button className="export-button" onClick={quitApp}>
           Close
         </button> */}
+      </div>
+      <div style={{ textAlign: 'center', paddingBottom: '35px' }}>
+        <button className="export-button-final" onClick={sendDataToMain}>
+          Stimulate and Close
+        </button>
       </div>
     </div>
   );

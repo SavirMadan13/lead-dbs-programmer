@@ -75,7 +75,7 @@ ipcMain.on('ipc-example', async (event, arg) => {
   for (const dir of directories) {
     result += `${dir}/`;
 
-    if (dir === 'lead-dbs-programmer') {
+    if (dir === 'programmer') {
       break;
     }
   }
@@ -95,8 +95,8 @@ ipcMain.on('ipc-example', async (event, arg) => {
   // event.reply('ipc-example', msgTemplate(`pong: ${f}`));
 });
 
-ipcMain.on('import-file', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `${pingPong}`;
+ipcMain.on('import-file', async (event) => {
+  // const msgTemplate = (pingPong: string) => `${pingPong}`;
   const fs = require('fs');
   const currentDirectory = app.getAppPath();
   const directories = currentDirectory.split('/');
@@ -110,7 +110,7 @@ ipcMain.on('import-file', async (event, arg) => {
     result += `${dir}/`;
 
     // If the directory contains "lead-dbs-programmer", stop the loop
-    if (dir === 'lead-dbs-programmer') {
+    if (dir === 'programmer') {
       break;
     }
   }
@@ -154,13 +154,45 @@ ipcMain.on('import-previous-files', (event, fileID, importData) => {
   });
   console.log('FILEKEY');
   let filePath = '';
+  // if (masterImportData[fileKey]) {
+  //   const priorStimFolder = masterImportData[fileKey].folder;
+  //   console.log(masterImportData);
+  //   const fileName = `${importData.patientname}_desc-stimparameters.json`;
+  //   filePath = path.join(priorStimFolder, fileID, fileName);
+  // } else {
+  //   console.log('AHAHAHAHAHAH', masterImportData);
+  //   const priorStimFolder = masterImportData[3].folder;
+  //   const fileName = `${importData.patientname}_desc-stimparameters.json`;
+  //   filePath = path.join(priorStimFolder, fileID, fileName);
+  //   console.log('1');
+  //   console.log(fileID);
+  //   const outputFolder = path.join(priorStimFolder, fileID);
+  //   if (!fs.existsSync(outputFolder)) {
+  //     fs.mkdirSync(outputFolder);
+  //     console.log('2');
+  //     fs.writeFileSync(filePath, JSON.stringify({}), 'utf8');
+  //     console.log('3');
+  //   }
+  // }
+
   if (masterImportData[fileKey]) {
     const priorStimFolder = masterImportData[fileKey].folder;
     console.log(masterImportData);
     const fileName = `${importData.patientname}_desc-stimparameters.json`;
     filePath = path.join(priorStimFolder, fileID, fileName);
   } else {
-    const priorStimFolder = masterImportData[3].folder;
+    let priorStimFolder;
+    if (masterImportData[3] && masterImportData[3].folder) {
+      priorStimFolder = masterImportData[3].folder;
+    } else {
+      // Create a temporary folder for the data
+      priorStimFolder = path.join(__dirname, 'tempFolder');
+      if (!fs.existsSync(priorStimFolder)) {
+        fs.mkdirSync(priorStimFolder);
+        console.log('Temporary folder created');
+      }
+    }
+
     const fileName = `${importData.patientname}_desc-stimparameters.json`;
     filePath = path.join(priorStimFolder, fileID, fileName);
     console.log('1');
@@ -179,8 +211,11 @@ ipcMain.on('import-previous-files', (event, fileID, importData) => {
     const f = fs.readFileSync(filePath, 'utf8');
     if (f.trim() === '') {
       // If the file is empty, create the file and pass back a message
-      fs.writeFileSync(filePath, JSON.stringify({}), 'utf8');
-      console.log('File is empty. Created a new file.');
+      try {
+        fs.writeFileSync(filePath, JSON.stringify({}), 'utf8');
+      } catch {
+        console.log('File is empty. Created a new file.');
+      }
       // const jsonData = 'Empty';
     } else {
       // Convert the data to JSON format
@@ -262,7 +297,7 @@ ipcMain.on('save-file', (event, file, data) => {
     result += `${dir}/`;
 
     // If the directory contains "lead-dbs-programmer", stop the loop
-    if (dir === 'lead-dbs-programmer') {
+    if (dir === 'programmer') {
       break;
     }
   }
@@ -303,7 +338,7 @@ ipcMain.on('set-status', (event, arg) => {
     result += `${dir}/`;
 
     // If the directory contains "lead-dbs-programmer", stop the loop
-    if (dir === 'lead-dbs-programmer') {
+    if (dir === 'programmer') {
       break;
     }
   }

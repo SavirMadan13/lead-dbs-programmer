@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 /* eslint-disable camelcase */
 // /* eslint-disable no-restricted-globals */
 // /* eslint-disable react/prop-types */
@@ -44,11 +45,11 @@ import PercentageAmplitudeToggle from '../../PercentageAmplitudeToggle';
 import AssistedToggle from '../../AssistedToggle';
 import VolumeAmplitudeToggle from '../../VoltageAmplitudeToggle';
 import MAToggleSwitch from '../../MAToggleSwitch';
+import NewTripleToggle from '../../NewTripleToggle';
 
 function Medtronic_3387(props, ref) {
   const svgs = [
     <HeadTop key="headTop" />,
-    <HeadBottom key="headBottom" />,
     <Contact key="4" level="4" />,
     <Contact key="3" level="3" face="center" />,
     <Contact key="2" level="2" face="center" />,
@@ -76,13 +77,68 @@ function Medtronic_3387(props, ref) {
     4: 'all',
   };
 
-  const names = {
+  // const names = {
+  //   0: IPG,
+  //   1: 1,
+  //   2: 2,
+  //   3: 3,
+  //   4: 4,
+  //   5: 5,
+  //   6: 6,
+  //   7: 7,
+  //   8: 8,
+  // };
+
+  const [names, setNames] = useState({
     0: IPG,
-    1: 0,
-    2: 1,
-    3: 2,
-    4: 3,
-  };
+    1: 1,
+    2: 2,
+    3: 3,
+    4: 4,
+  });
+
+  useEffect(() => {
+    let newNames = [];
+    if (props.contactNaming === 'clinical') {
+      if (props.name < 5) {
+        newNames = {
+          0: IPG,
+          1: '0',
+          2: '1',
+          3: '2',
+          4: '3',
+        };
+      } else {
+        newNames = {
+          0: IPG,
+          1: '4',
+          2: '5',
+          3: '6',
+          4: '7',
+        };
+      }
+    } else {
+      if (props.name < 5) {
+        newNames = {
+          0: IPG,
+          1: 'k9',
+          2: 'k10',
+          3: 'k11',
+          4: 'k12',
+        };
+      } else {
+        newNames = {
+          0: IPG,
+          1: 'k1',
+          2: 'k2',
+          3: 'k3',
+          4: 'k4',
+        };
+      }
+    }
+
+    setNames(newNames);
+  }, []);
 
   const [percAmpToggle, setPercAmpToggle] = useState(
     props.percAmpToggle || 'left',
@@ -136,6 +192,10 @@ function Medtronic_3387(props, ref) {
       2: 'left',
       3: 'left',
       4: 'left',
+      5: 'left',
+      6: 'left',
+      7: 'left',
+      8: 'left',
       // Initialize other images here
     },
   );
@@ -146,6 +206,10 @@ function Medtronic_3387(props, ref) {
     2: null,
     3: null,
     4: null,
+    5: null,
+    6: null,
+    7: null,
+    8: null,
   });
 
   const newInitialQuantities =
@@ -156,6 +220,10 @@ function Medtronic_3387(props, ref) {
           2: 0,
           3: 0,
           4: 0,
+          5: 0,
+          6: 0,
+          7: 0,
+          8: 0,
         }
       : {
           0: 0,
@@ -163,6 +231,10 @@ function Medtronic_3387(props, ref) {
           2: 0,
           3: 0,
           4: 0,
+          5: 0,
+          6: 0,
+          7: 0,
+          8: 0,
         };
 
   const [quantities, setQuantities] = useState(
@@ -274,6 +346,7 @@ function Medtronic_3387(props, ref) {
 
   const calculateQuantitiesWithDistribution = () => {
     // Calculate the quantity increment for 'center' and 'right' values
+    console.log('PROPS: ', props.name);
     let total = 0;
     if (percAmpToggle === 'left') {
       total = 100;
@@ -324,14 +397,7 @@ function Medtronic_3387(props, ref) {
 
   const calculateQuantitiesWithDistributionAbbott = () => {
     // Calculate the quantity increment for 'center' and 'right' values
-    let total = 0;
-    if (percAmpToggle === 'left') {
-      total = 100;
-    } else if (percAmpToggle === 'center') {
-      total = totalAmplitude;
-    }
-
-    total = totalAmplitude;
+    const total = totalAmplitude;
 
     // total = totalAmplitude;
     console.log('total: ', total);
@@ -449,20 +515,56 @@ function Medtronic_3387(props, ref) {
     const rightQuantityIncrement = (total - totalRightSum) / rightCount;
 
     // const updatedQuantities = { ...quantities }; // Create a copy of the quantities object
+    console.log('CENTER COUNT: ', totalCenterSum);
+    if (centerCount > 1) {
+      if (totalCenterSum < total) {
+        if (selectedValues[lastChangedKey] === 'center') {
+          roundUpdatedQuantities[lastChangedKey] = total - totalCenterSum;
+        }
+      } else {
+        Object.keys(selectedValues).forEach((key) => {
+          const value = selectedValues[key];
+          if (value === 'left') {
+            roundUpdatedQuantities[key] = 0;
+          } else if (value === 'center') {
+            roundUpdatedQuantities[key] =
+              parseFloat(roundUpdatedQuantities[key]) + centerQuantityIncrement;
+          }
+        });
+      }
+    } else {
+      Object.keys(selectedValues).forEach((key) => {
+        if (selectedValues[key] === 'center') {
+          roundUpdatedQuantities[key] = total;
+        }
+      });
+    }
+
+    if (rightCount > 1) {
+      if (totalRightSum < total) {
+        if (selectedValues[lastChangedKey] === 'right') {
+          roundUpdatedQuantities[lastChangedKey] = total - totalRightSum;
+        }
+      } else {
+        Object.keys(selectedValues).forEach((key) => {
+          const value = selectedValues[key];
+          if (value === 'left') {
+            roundUpdatedQuantities[key] = 0;
+          } else if (value === 'right') {
+            roundUpdatedQuantities[key] =
+              parseFloat(roundUpdatedQuantities[key]) + rightQuantityIncrement;
+          }
+        });
+      }
+    } else {
+      Object.keys(selectedValues).forEach((key) => {
+        if (selectedValues[key] === 'right') {
+          roundUpdatedQuantities[key] = total;
+        }
+      });
+    }
 
     // Update the quantities based on selected values
-    Object.keys(selectedValues).forEach((key) => {
-      const value = selectedValues[key];
-      if (value === 'left') {
-        roundUpdatedQuantities[key] = 0;
-      } else if (value === 'center') {
-        roundUpdatedQuantities[key] =
-          parseFloat(roundUpdatedQuantities[key]) + centerQuantityIncrement;
-      } else if (value === 'right') {
-        roundUpdatedQuantities[key] =
-          parseFloat(roundUpdatedQuantities[key]) + rightQuantityIncrement;
-      }
-    });
     setQuantities(roundUpdatedQuantities); // Update the state with the new quantities
     console.log(roundUpdatedQuantities);
   };
@@ -1477,7 +1579,8 @@ function Medtronic_3387(props, ref) {
               }
             });
             updatedQuantities[key] =
-              parseFloat(updatedQuantities[key]) + (totalAmplitude * levelIncrement) / 3;
+              parseFloat(updatedQuantities[key]) +
+              (totalAmplitude * levelIncrement) / 3;
             updatedSelectedValues[key] = updatedSelectedValues[levelBelowKey];
           }
         }
@@ -1913,7 +2016,8 @@ function Medtronic_3387(props, ref) {
               });
               updatedSelectedValues[key] = updatedSelectedValues[levelAboveKey];
               updatedQuantities[key] =
-                parseFloat(updatedQuantities[key]) + (totalAmplitude * levelIncrement) / 3;
+                parseFloat(updatedQuantities[key]) +
+                (totalAmplitude * levelIncrement) / 3;
             }
           } else if (face[key] === 'all') {
             updatedQuantities[key] = levelBelowQuantityTotal;
@@ -2831,6 +2935,7 @@ function Medtronic_3387(props, ref) {
   };
 
   let stimController = 0;
+  const [currentLabel, setCurrentLabel] = useState('mA');
   // Generating here a more simple key code for the IPG that is selected
   const handleIPG = () => {
     if (props.IPG === 'Medtronic_Activa') {
@@ -2907,14 +3012,17 @@ function Medtronic_3387(props, ref) {
     if (newValue === 'left') {
       calculatePercentageFromAmplitude();
       outputTogglePosition = '%';
+      setCurrentLabel('mA');
     } else if (newValue === 'center' && researchToggle !== 'right') {
       calculateAmplitudeFromPercentage();
       outputTogglePosition = 'mA';
+      setCurrentLabel('mA');
     } else if (newValue === 'right') {
       if (researchToggle === 'left') {
         calculateAmplitudeFromPercentage();
       }
       outputTogglePosition = 'V';
+      setCurrentLabel('V');
       console.log(outputTogglePosition);
     }
     setResearchToggle(newValue);
@@ -2931,11 +3039,17 @@ function Medtronic_3387(props, ref) {
 
   const handleVolAmpToggleChange = (value) => {
     const newValue = value;
+    console.log('VolAmpToggleChange');
     if (newValue === 'left') {
       outputTogglePosition = 'mA';
+      calculateQuantitiesWithDistribution();
+      // setCurrentLabel('mA');
     } else if (newValue === 'right') {
       outputTogglePosition = 'V';
+      // setCurrentLabel('V');
+      console.log('Current Label: ', currentLabel);
     }
+    setCurrentLabel(outputTogglePosition);
     setVolAmpToggle(value);
   };
 
@@ -3085,11 +3199,10 @@ function Medtronic_3387(props, ref) {
       // const newQuantities = { ...quantities };
       calculateQuantitiesWithDistributionAbbott();
     }
-    // console.log('outputTogglePosition: ', outputTogglePosition);
-    if (radioValue === '1') {
+    if (radioValue === '1' && props.IPG !== 'Abbott') {
       semiAssist();
     }
-    if (outputTogglePosition === 'V') {
+    if (currentLabel === 'V' && props.IPG === 'Medtronic_Activa') {
       console.log('here');
       handleActivaVoltage();
     }
@@ -3215,7 +3328,7 @@ function Medtronic_3387(props, ref) {
                 ))}
               </ButtonGroup>
             )}
-            {(props.IPG === 'Research') && (
+            {props.IPG === 'Research' && (
               <ButtonGroup className="button-group">
                 {researchDef.map((res, idx) => (
                   <ToggleButton
@@ -3242,10 +3355,12 @@ function Medtronic_3387(props, ref) {
               type="number"
               name="quantity"
               pattern="[0-9]+"
+              step="0.1"
+              min="0"
               value={totalAmplitude}
               onChange={handleTotalAmplitudeChange}
             />
-            <span className="input-adornment">{outputTogglePosition}</span>
+            <span className="input-adornment">{currentLabel}</span>
           </div>
         </div>
         {/* <div className="button-container">
@@ -3368,6 +3483,18 @@ function Medtronic_3387(props, ref) {
                       //   )
                       // }
                     />
+                    {/* <NewTripleToggle
+                      key={ipg.key}
+                      switchPosition={selectedValues[ipg.key]}
+                      animation={animation[ipg.key]}
+                      quantity={quantities[ipg.key]}
+                      onChange={(value, anime) =>
+                        handleTripleToggleChange(value, anime, ipg.key)
+                      }
+                      onQuantityChange={(quantity) =>
+                        handleQuantityChange(quantity, ipg.key)
+                      }
+                    /> */}
                   </div>
                 )}
               </div>
@@ -3409,6 +3536,16 @@ function Medtronic_3387(props, ref) {
                     //   handleQuantityChange(value, animation, quantity, svg.key)
                     // }
                   />
+                  {/* <NewTripleToggle
+                    key={svg.key}
+                    quantity={quantities[svg.key]}
+                    onChange={(value, anime) =>
+                      handleTripleToggleChange(value, anime, svg.key)
+                    }
+                    onQuantityChange={(quantity) =>
+                      handleQuantityChange(quantity, svg.key)
+                    }
+                  /> */}
                 </div>
               )}
             </div>
@@ -3425,14 +3562,34 @@ function Medtronic_3387(props, ref) {
           (stimController === 0 || stimController === 3) && (
             <div className="button-container">
               {/* <h2 style={{color: 'black'}}>Steering</h2> */}
-              <span style={{color: 'black'}}>Steering</span>
+              <span style={{ color: 'black' }}>Steering</span>
               <ButtonGroup horizontal>
                 <Button onClick={handlePercAmpChangeUp}>↑</Button>
                 <Button disabled>Level</Button>
                 <Button onClick={handlePercAmpChangeDown}>↓</Button>
               </ButtonGroup>
+              <ButtonGroup horizontal>
+                <Button onClick={handlePercAmpChangeClockwise}>↻</Button>
+                <Button disabled>Post-Lat</Button>
+                <Button onClick={handlePercAmpChangeCounterClockwise}>↺</Button>
+              </ButtonGroup>
             </div>
           )}
+        {radioValue === '2' && (
+          <div className="steering-container-special-buttons">
+            <SplitEvenButton
+              className="svgButtons"
+              onClick={handleSplitEvenButton}
+            />
+            <ForwardButton
+              className="svgButtons"
+              onClick={handleForwardButton}
+            />
+            <BackButton className="svgButtons" onClick={handleBackButton} />
+            <LeftButton className="svgButtons" onClick={handleRightButton} />
+            <RightButton className="svgButtons" onClick={handleLeftButton} />
+          </div>
+        )}
         {/* <div className="steering-container-special-buttons">
           <SplitEvenButton
             className="svgButtons"
@@ -3449,17 +3606,24 @@ function Medtronic_3387(props, ref) {
             <Button
               onClick={calculateQuantitiesWithDistribution}
               className="button"
-              disabled={outputTogglePosition === 'V'}
+              disabled={currentLabel === 'V'}
+              title="Split evenly among active contacts"
             >
               Split Even
             </Button>
-            <Button onClick={roundToHundred} className="button">
+            <Button
+              onClick={roundToHundred}
+              className="button"
+              disabled={currentLabel === 'V'}
+              title="Adjust contact values to fill total amplitude"
+            >
               Refactor
             </Button>
             <Button onClick={handleClearButton} className="button">
               Clear
             </Button>
           </ButtonGroup>
+          {/* <NewTripleToggle /> */}
           {/* <button
             onClick={calculateQuantitiesWithDistribution}
             className="button"

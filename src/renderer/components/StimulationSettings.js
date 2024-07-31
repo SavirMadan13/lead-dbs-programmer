@@ -6,7 +6,7 @@ import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directe
 import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import { Dropdown } from 'react-bootstrap';
+import { Dropdown, ButtonGroup, ToggleButton } from 'react-bootstrap';
 import TabbedElectrodeIPGSelectionTest from './TabbedElectrodeIPGSelectionTest';
 import BostonCartesiaTest from './electrode_models/BostonCartesiaTest';
 
@@ -54,13 +54,16 @@ function StimulationSettings({
   // const [leftElectrode, setLeftElectrode] = useState('');
   // const [rightElectrode, setRightElectrode] = useState('');
   let importData = [];
+  const [renderKey, setRenderKey] = useState(0);
   const [testData, setTestData] = useState(importDataTest || '');
   if (importCount === 0) {
+    console.log('HERE');
     window.electron.ipcRenderer.sendMessage('import-file', ['ping']);
     const newCount = importCount + 1;
     setImportCount(newCount);
   }
-
+  // window.electron.ipcRenderer.sendMessage('import-file', ['ping']);
+  const [patientName, setPatientName] = useState('');
   const handleImportedElectrode = (importedElectrode) => {
     if (importedElectrode === 'Boston Scientific Vercise Directed') {
       setLeftElectrode('boston_vercise_directed');
@@ -153,22 +156,32 @@ function StimulationSettings({
   window.electron.ipcRenderer.once('import-file', (arg) => {
     importData = arg;
     // setTestData(importData);
+    console.log('HERE');
     console.log('Import Data', importData);
     setMasterImportData(arg);
     const numElectrodes = 'numElectrodes';
     const selectedElectrode = importData.electrodeModel;
     const stimDatasets = importData.priorStims;
+    const testerLabel = importData.label;
+    setPatientName(importData.patientname);
     const stimDatasetList = {};
     Object.keys(stimDatasets).forEach((key) => {
       if (key >= 2) {
         stimDatasetList[key] = stimDatasets[key].name;
       }
     });
+    console.log('HELLO', stimDatasetList);
     if (Object.keys(stimDatasetList).length === 0) {
       const uniqueID = generateUniqueID();
-      stimDatasetList[3] = uniqueID;
+      stimDatasetList[3] = testerLabel;
       // setNewStim(uniqueID);
     }
+    window.electron.ipcRenderer.sendMessage(
+      'import-previous-files',
+      stimDatasetList[3],
+      // key,
+      arg,
+    );
     setTestData(stimDatasetList);
     setImportDataTest(stimDatasetList);
     // setMatImportFile(stimDatasetList[3]);
@@ -539,6 +552,7 @@ function StimulationSettings({
   const fileInputRef = useRef(null);
   const [newStims, setNewStims] = useState([]);
   const handleImportFileChange = (e) => {
+    console.log('E: ', e);
     // console.log('E: ', masterImportData);
     console.log('NewStims ', newStims.includes(e.target.value));
     // if (!newStims.includes(e.target.value)) {
@@ -550,6 +564,7 @@ function StimulationSettings({
     );
     // }
     setMatImportFile(e.target.value);
+    // renderKey
     setStimChanged(true);
   };
 
@@ -577,12 +592,18 @@ function StimulationSettings({
     if (newS !== 'Empty') {
       console.log('here');
       gatherImportedDataNew(newS);
-    } else if (newS === 'Empty') {
-      const uniqueID = generateUniqueID();
-      setNewStim(uniqueID);
     }
+    // else if (newS === 'Empty') {
+    //   setAllQuantities({});
+    //   setAllSelectedValues({});
+    //   setAllTogglePositions({});
+    //   setAllPercAmpToggles({});
+    //   setAllVolAmpToggles({});
+    //   setAllTotalAmplitudes({});
+    // }
     // Here is where I can write an if statement for if arg1 is empty, and then I can write a statement to create
     // a new one and then select that one as the stimulation setting
+    setRenderKey(renderKey + 1);
     console.log('MATIMPORTDATA: ', matImportFile);
     console.log('STIMCHANGED: ', stimChanged);
   });
@@ -604,7 +625,14 @@ function StimulationSettings({
     console.log(updatedImportDataTest);
     console.log(newStim);
     setMatImportFile(newStim);
+    setRenderKey(renderKey + 1);
     setNewStim('');
+    setAllQuantities({});
+    setAllSelectedValues({});
+    setAllTogglePositions({});
+    setAllPercAmpToggles({});
+    setAllVolAmpToggles({});
+    setAllTotalAmplitudes({});
   };
 
   const handleNewStimText = (event) => {
@@ -620,6 +648,20 @@ function StimulationSettings({
   //     gatherImportedData(importedData);
   //   }
   // }, [importedData]);
+  const [namingConvention, setNamingConvention] = useState('clinical');
+  const getVariant2 = (value) => {
+    return 'outline-secondary';
+  };
+
+  const namingConventionDef = [
+    { name: 'clinical', value: 'clinical' },
+    { name: 'lead-dbs', value: 'lead-dbs' },
+  ];
+
+  const handleNamingConventionChange = (newConvention) => {
+    setNamingConvention(newConvention);
+    setRenderKey(renderKey + 1);
+  };
 
   return (
     // <div style={{ justifyContent: 'horizontal', width: '300px' }}>
@@ -799,6 +841,11 @@ function StimulationSettings({
     //   /> */}
     // </div>
     <div>
+      <div
+        style={{ paddingLeft: '25px', fontWeight: 'bold', fontSize: '16px' }}
+      >
+        Patient: {patientName}
+      </div>
       <div className="stimulationSettingsContainer">
         <div />
         <div className="stim-id-group">
@@ -909,14 +956,37 @@ function StimulationSettings({
             </select>
           </Dropdown.Menu>
         </Dropdown>
+        <div
+          style={{ paddingBottom: '20px', float: 'right', marginRight: '20px' }}
+        >
+          <h4 style={{fontSize: '16px', marginBottom: '2px'}}>Contact Naming</h4>
+          <ButtonGroup>
+            {namingConventionDef.map((name, idx) => (
+              <ToggleButton
+                key={idx}
+                id={`name-${idx}`}
+                type="radio"
+                variant={getVariant2(name.value)}
+                name="name"
+                value={name.value}
+                checked={namingConvention === name.value}
+                onChange={(e) =>
+                  handleNamingConventionChange(e.currentTarget.value)
+                }
+              >
+                {name.name}
+              </ToggleButton>
+            ))}
+          </ButtonGroup>
+        </div>
       </div>
       <div>
         {leftElectrode && (
           <TabbedElectrodeIPGSelectionTest
+            key={renderKey}
             selectedElectrodeLeft={leftElectrode}
             selectedElectrodeRight={rightElectrode}
             IPG={IPG}
-            // key={key}
             // setKey={setKey}
             allQuantities={allQuantities}
             setAllQuantities={setAllQuantities}
@@ -941,6 +1011,7 @@ function StimulationSettings({
             matImportFile={matImportFile}
             stimChanged={stimChanged}
             setStimChanged={setStimChanged}
+            namingConvention={namingConvention}
           />
         )}
       </div>

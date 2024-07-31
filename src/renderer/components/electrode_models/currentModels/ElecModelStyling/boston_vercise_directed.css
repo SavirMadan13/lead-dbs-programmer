@@ -6,6 +6,7 @@
 
 .container {
   display: flex;
+  /* margin-bottom: -25px; */
 }
 
 .stimulationSettingsContainer {
@@ -58,8 +59,10 @@
 
 .left-contacts {
   flex: 1;
+   margin-top: -100px;
   margin-top: 140px;
 }
+
 
 .left-hx-contacts {
   flex: 1;
@@ -224,6 +227,16 @@
 
 .export-button {
   background-color: #007BFF;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.export-button-final {
+  background-color: #169558;
   color: #fff;
   border: none;
   padding: 10px 20px;

@@ -70,7 +70,7 @@ export default function App() {
   const [allSelectedValues, setAllSelectedValues] = useState({});
   const [allTotalAmplitudes, setAllTotalAmplitudes] = useState({});
   const [allStimulationParameters, setAllStimulationParameters] = useState({});
-  const [visModel, setVisModel] = useState('6');
+  const [visModel, setVisModel] = useState('3');
   const [sessionTitle, setSessionTitle] = useState('');
   const [allTogglePositions, setAllTogglePositions] = useState({});
   const [allPercAmpToggles, setAllPercAmpToggles] = useState({});
@@ -104,7 +104,7 @@ export default function App() {
     window.electron.zoom.resetZoom();
   };
 
-  const [zoomLevel, setZoomLevel] = useState(0);
+  const [zoomLevel, setZoomLevel] = useState(-1);
 
   const handleZoomChange = (event, newValue) => {
     setZoomLevel(newValue);
@@ -454,7 +454,7 @@ export default function App() {
           step={1}
           marks
           min={-3}
-          max={3}
+          max={1}
           sx={{
             '& .MuiSlider-mark': {
               backgroundColor: 'black', // Change the color of the marks

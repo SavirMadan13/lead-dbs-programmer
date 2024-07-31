@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 /* eslint-disable camelcase */
 // /* eslint-disable no-restricted-globals */
 // /* eslint-disable react/prop-types */
@@ -44,11 +45,11 @@ import PercentageAmplitudeToggle from '../../PercentageAmplitudeToggle';
 import AssistedToggle from '../../AssistedToggle';
 import VolumeAmplitudeToggle from '../../VoltageAmplitudeToggle';
 import MAToggleSwitch from '../../MAToggleSwitch';
+import NewTripleToggle from '../../NewTripleToggle';
 
 function Boston_vercise(props, ref) {
   const svgs = [
     <HeadTop key="headTop" />,
-    <HeadBottom key="headBottom" />,
     <Contact key="8" level="4" />,
     <Contact key="7" level="3" face="center" />,
     <Contact key="6" level="2" face="center" />,
@@ -88,17 +89,84 @@ function Boston_vercise(props, ref) {
     8: 'all',
   };
 
-  const names = {
+  // const names = {
+  //   0: IPG,
+  //   1: 1,
+  //   2: 2,
+  //   3: 3,
+  //   4: 4,
+  //   5: 5,
+  //   6: 6,
+  //   7: 7,
+  //   8: 8,
+  // };
+
+  const [names, setNames] = useState({
     0: IPG,
     1: 1,
     2: 2,
     3: 3,
     4: 4,
-    5: 5,
-    6: 6,
-    7: 7,
-    8: 8,
-  };
+  });
+
+  useEffect(() => {
+    let newNames = [];
+    if (props.contactNaming === 'clinical') {
+      if (props.name < 5) {
+        newNames = {
+          0: IPG,
+          1: 'L1',
+          2: 'L2',
+          3: 'L3',
+          4: 'L4',
+          5: 'L5',
+          6: 'L6',
+          7: 'L7',
+          8: 'L8',
+        };
+      } else {
+        newNames = {
+          0: IPG,
+          1: 'R1',
+          2: 'R2',
+          3: 'R3',
+          4: 'R4',
+          5: 'R5',
+          6: 'R6',
+          7: 'R7',
+          8: 'R8',
+        };
+      }
+    } else {
+      if (props.name < 5) {
+        newNames = {
+          0: IPG,
+          1: 'k9',
+          2: 'k10',
+          3: 'k11',
+          4: 'k12',
+          5: 'k13',
+          6: 'k14',
+          7: 'k15',
+          8: 'k16',
+        };
+      } else {
+        newNames = {
+          0: IPG,
+          1: 'k1',
+          2: 'k2',
+          3: 'k3',
+          4: 'k4',
+          5: 'k5',
+          6: 'k6',
+          7: 'k7',
+          8: 'k8',
+        };
+      }
+    }
+
+    setNames(newNames);
+  }, []);
 
   const [percAmpToggle, setPercAmpToggle] = useState(
     props.percAmpToggle || 'left',
@@ -306,6 +374,7 @@ function Boston_vercise(props, ref) {
 
   const calculateQuantitiesWithDistribution = () => {
     // Calculate the quantity increment for 'center' and 'right' values
+    console.log('PROPS: ', props.name);
     let total = 0;
     if (percAmpToggle === 'left') {
       total = 100;
@@ -356,14 +425,7 @@ function Boston_vercise(props, ref) {
 
   const calculateQuantitiesWithDistributionAbbott = () => {
     // Calculate the quantity increment for 'center' and 'right' values
-    let total = 0;
-    if (percAmpToggle === 'left') {
-      total = 100;
-    } else if (percAmpToggle === 'center') {
-      total = totalAmplitude;
-    }
-
-    total = totalAmplitude;
+    const total = totalAmplitude;
 
     // total = totalAmplitude;
     console.log('total: ', total);
@@ -481,20 +543,56 @@ function Boston_vercise(props, ref) {
     const rightQuantityIncrement = (total - totalRightSum) / rightCount;
 
     // const updatedQuantities = { ...quantities }; // Create a copy of the quantities object
+    console.log('CENTER COUNT: ', totalCenterSum);
+    if (centerCount > 1) {
+      if (totalCenterSum < total) {
+        if (selectedValues[lastChangedKey] === 'center') {
+          roundUpdatedQuantities[lastChangedKey] = total - totalCenterSum;
+        }
+      } else {
+        Object.keys(selectedValues).forEach((key) => {
+          const value = selectedValues[key];
+          if (value === 'left') {
+            roundUpdatedQuantities[key] = 0;
+          } else if (value === 'center') {
+            roundUpdatedQuantities[key] =
+              parseFloat(roundUpdatedQuantities[key]) + centerQuantityIncrement;
+          }
+        });
+      }
+    } else {
+      Object.keys(selectedValues).forEach((key) => {
+        if (selectedValues[key] === 'center') {
+          roundUpdatedQuantities[key] = total;
+        }
+      });
+    }
+
+    if (rightCount > 1) {
+      if (totalRightSum < total) {
+        if (selectedValues[lastChangedKey] === 'right') {
+          roundUpdatedQuantities[lastChangedKey] = total - totalRightSum;
+        }
+      } else {
+        Object.keys(selectedValues).forEach((key) => {
+          const value = selectedValues[key];
+          if (value === 'left') {
+            roundUpdatedQuantities[key] = 0;
+          } else if (value === 'right') {
+            roundUpdatedQuantities[key] =
+              parseFloat(roundUpdatedQuantities[key]) + rightQuantityIncrement;
+          }
+        });
+      }
+    } else {
+      Object.keys(selectedValues).forEach((key) => {
+        if (selectedValues[key] === 'right') {
+          roundUpdatedQuantities[key] = total;
+        }
+      });
+    }
 
     // Update the quantities based on selected values
-    Object.keys(selectedValues).forEach((key) => {
-      const value = selectedValues[key];
-      if (value === 'left') {
-        roundUpdatedQuantities[key] = 0;
-      } else if (value === 'center') {
-        roundUpdatedQuantities[key] =
-          parseFloat(roundUpdatedQuantities[key]) + centerQuantityIncrement;
-      } else if (value === 'right') {
-        roundUpdatedQuantities[key] =
-          parseFloat(roundUpdatedQuantities[key]) + rightQuantityIncrement;
-      }
-    });
     setQuantities(roundUpdatedQuantities); // Update the state with the new quantities
     console.log(roundUpdatedQuantities);
   };
@@ -1509,7 +1607,8 @@ function Boston_vercise(props, ref) {
               }
             });
             updatedQuantities[key] =
-              parseFloat(updatedQuantities[key]) + (totalAmplitude * levelIncrement) / 3;
+              parseFloat(updatedQuantities[key]) +
+              (totalAmplitude * levelIncrement) / 3;
             updatedSelectedValues[key] = updatedSelectedValues[levelBelowKey];
           }
         }
@@ -1945,7 +2044,8 @@ function Boston_vercise(props, ref) {
               });
               updatedSelectedValues[key] = updatedSelectedValues[levelAboveKey];
               updatedQuantities[key] =
-                parseFloat(updatedQuantities[key]) + (totalAmplitude * levelIncrement) / 3;
+                parseFloat(updatedQuantities[key]) +
+                (totalAmplitude * levelIncrement) / 3;
             }
           } else if (face[key] === 'all') {
             updatedQuantities[key] = levelBelowQuantityTotal;
@@ -2863,6 +2963,7 @@ function Boston_vercise(props, ref) {
   };
 
   let stimController = 0;
+  const [currentLabel, setCurrentLabel] = useState('mA');
   // Generating here a more simple key code for the IPG that is selected
   const handleIPG = () => {
     if (props.IPG === 'Medtronic_Activa') {
@@ -2939,14 +3040,17 @@ function Boston_vercise(props, ref) {
     if (newValue === 'left') {
       calculatePercentageFromAmplitude();
       outputTogglePosition = '%';
+      setCurrentLabel('mA');
     } else if (newValue === 'center' && researchToggle !== 'right') {
       calculateAmplitudeFromPercentage();
       outputTogglePosition = 'mA';
+      setCurrentLabel('mA');
     } else if (newValue === 'right') {
       if (researchToggle === 'left') {
         calculateAmplitudeFromPercentage();
       }
       outputTogglePosition = 'V';
+      setCurrentLabel('V');
       console.log(outputTogglePosition);
     }
     setResearchToggle(newValue);
@@ -2963,11 +3067,17 @@ function Boston_vercise(props, ref) {
 
   const handleVolAmpToggleChange = (value) => {
     const newValue = value;
+    console.log('VolAmpToggleChange');
     if (newValue === 'left') {
       outputTogglePosition = 'mA';
+      calculateQuantitiesWithDistribution();
+      // setCurrentLabel('mA');
     } else if (newValue === 'right') {
       outputTogglePosition = 'V';
+      // setCurrentLabel('V');
+      console.log('Current Label: ', currentLabel);
     }
+    setCurrentLabel(outputTogglePosition);
     setVolAmpToggle(value);
   };
 
@@ -3117,11 +3227,10 @@ function Boston_vercise(props, ref) {
       // const newQuantities = { ...quantities };
       calculateQuantitiesWithDistributionAbbott();
     }
-    // console.log('outputTogglePosition: ', outputTogglePosition);
-    if (radioValue === '1') {
+    if (radioValue === '1' && props.IPG !== 'Abbott') {
       semiAssist();
     }
-    if (outputTogglePosition === 'V') {
+    if (currentLabel === 'V' && props.IPG === 'Medtronic_Activa') {
       console.log('here');
       handleActivaVoltage();
     }
@@ -3247,7 +3356,7 @@ function Boston_vercise(props, ref) {
                 ))}
               </ButtonGroup>
             )}
-            {(props.IPG === 'Research') && (
+            {props.IPG === 'Research' && (
               <ButtonGroup className="button-group">
                 {researchDef.map((res, idx) => (
                   <ToggleButton
@@ -3274,10 +3383,12 @@ function Boston_vercise(props, ref) {
               type="number"
               name="quantity"
               pattern="[0-9]+"
+              step="0.1"
+              min="0"
               value={totalAmplitude}
               onChange={handleTotalAmplitudeChange}
             />
-            <span className="input-adornment">{outputTogglePosition}</span>
+            <span className="input-adornment">{currentLabel}</span>
           </div>
         </div>
         {/* <div className="button-container">
@@ -3400,6 +3511,18 @@ function Boston_vercise(props, ref) {
                       //   )
                       // }
                     />
+                    {/* <NewTripleToggle
+                      key={ipg.key}
+                      switchPosition={selectedValues[ipg.key]}
+                      animation={animation[ipg.key]}
+                      quantity={quantities[ipg.key]}
+                      onChange={(value, anime) =>
+                        handleTripleToggleChange(value, anime, ipg.key)
+                      }
+                      onQuantityChange={(quantity) =>
+                        handleQuantityChange(quantity, ipg.key)
+                      }
+                    /> */}
                   </div>
                 )}
               </div>
@@ -3441,6 +3564,16 @@ function Boston_vercise(props, ref) {
                     //   handleQuantityChange(value, animation, quantity, svg.key)
                     // }
                   />
+                  {/* <NewTripleToggle
+                    key={svg.key}
+                    quantity={quantities[svg.key]}
+                    onChange={(value, anime) =>
+                      handleTripleToggleChange(value, anime, svg.key)
+                    }
+                    onQuantityChange={(quantity) =>
+                      handleQuantityChange(quantity, svg.key)
+                    }
+                  /> */}
                 </div>
               )}
             </div>
@@ -3457,14 +3590,34 @@ function Boston_vercise(props, ref) {
           (stimController === 0 || stimController === 3) && (
             <div className="button-container">
               {/* <h2 style={{color: 'black'}}>Steering</h2> */}
-              <span style={{color: 'black'}}>Steering</span>
+              <span style={{ color: 'black' }}>Steering</span>
               <ButtonGroup horizontal>
                 <Button onClick={handlePercAmpChangeUp}>↑</Button>
                 <Button disabled>Level</Button>
                 <Button onClick={handlePercAmpChangeDown}>↓</Button>
               </ButtonGroup>
+              <ButtonGroup horizontal>
+                <Button onClick={handlePercAmpChangeClockwise}>↻</Button>
+                <Button disabled>Post-Lat</Button>
+                <Button onClick={handlePercAmpChangeCounterClockwise}>↺</Button>
+              </ButtonGroup>
             </div>
           )}
+        {radioValue === '2' && (
+          <div className="steering-container-special-buttons">
+            <SplitEvenButton
+              className="svgButtons"
+              onClick={handleSplitEvenButton}
+            />
+            <ForwardButton
+              className="svgButtons"
+              onClick={handleForwardButton}
+            />
+            <BackButton className="svgButtons" onClick={handleBackButton} />
+            <LeftButton className="svgButtons" onClick={handleRightButton} />
+            <RightButton className="svgButtons" onClick={handleLeftButton} />
+          </div>
+        )}
         {/* <div className="steering-container-special-buttons">
           <SplitEvenButton
             className="svgButtons"
@@ -3481,17 +3634,24 @@ function Boston_vercise(props, ref) {
             <Button
               onClick={calculateQuantitiesWithDistribution}
               className="button"
-              disabled={outputTogglePosition === 'V'}
+              disabled={currentLabel === 'V'}
+              title="Split evenly among active contacts"
             >
               Split Even
             </Button>
-            <Button onClick={roundToHundred} className="button">
+            <Button
+              onClick={roundToHundred}
+              className="button"
+              disabled={currentLabel === 'V'}
+              title="Adjust contact values to fill total amplitude"
+            >
               Refactor
             </Button>
             <Button onClick={handleClearButton} className="button">
               Clear
             </Button>
           </ButtonGroup>
+          {/* <NewTripleToggle /> */}
           {/* <button
             onClick={calculateQuantitiesWithDistribution}
             className="button"

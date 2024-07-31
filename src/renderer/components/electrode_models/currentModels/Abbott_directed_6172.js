@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 /* eslint-disable camelcase */
 // /* eslint-disable no-restricted-globals */
 // /* eslint-disable react/prop-types */
@@ -44,11 +45,12 @@ import PercentageAmplitudeToggle from '../../PercentageAmplitudeToggle';
 import AssistedToggle from '../../AssistedToggle';
 import VolumeAmplitudeToggle from '../../VoltageAmplitudeToggle';
 import MAToggleSwitch from '../../MAToggleSwitch';
+import NewTripleToggle from '../../NewTripleToggle';
 
 function Abbott_directed_6172(props, ref) {
   const svgs = [
     <HeadTop key="headTop" />,
-    <HeadBottom key="headBottom" />,
+    <Contact key="headBottom" fill="transparent" />,
     <Contact key="8" level="4" />,
     <Contact key="5" level="3" face="center" />,
     <Contact key="2" level="2" face="center" />,
@@ -94,17 +96,88 @@ function Abbott_directed_6172(props, ref) {
     8: 'all',
   };
 
-  const names = {
+  // const names = {
+  //   0: IPG,
+  //   1: 1,
+  //   2: 2,
+  //   3: 3,
+  //   4: 4,
+  //   5: 5,
+  //   6: 6,
+  //   7: 7,
+  //   8: 8,
+  // };
+
+  const [names, setNames] = useState({
     0: IPG,
-    1: 0,
-    2: '1A',
-    3: '1C',
-    4: '1B',
-    5: '2A',
-    6: '2C',
-    7: '2B',
-    8: 3,
-  };
+    1: 1,
+    2: 2,
+    3: 3,
+    4: 4,
+    5: 5,
+    6: 6,
+    7: 7,
+    8: 8,
+  });
+
+  useEffect(() => {
+    let newNames = [];
+    if (props.contactNaming === 'clinical') {
+      if (props.name < 5) {
+        newNames = {
+          0: IPG,
+          1: 'L1',
+          2: 'L2A',
+          3: 'L2B',
+          4: 'L2C',
+          5: 'L3A',
+          6: 'L3B',
+          7: 'L3C',
+          8: 'L4',
+        };
+      } else {
+        newNames = {
+          0: IPG,
+          1: 'R9',
+          2: 'R10A',
+          3: 'R10B',
+          4: 'R10C',
+          5: 'R11A',
+          6: 'R11B',
+          7: 'R11C',
+          8: 'R12',
+        };
+      }
+    } else {
+      if (props.name < 5) {
+        newNames = {
+          0: IPG,
+          1: 'k9',
+          2: 'k10',
+          3: 'k11',
+          4: 'k12',
+          5: 'k13',
+          6: 'k14',
+          7: 'k15',
+          8: 'k16',
+        };
+      } else {
+        newNames = {
+          0: IPG,
+          1: 'k1',
+          2: 'k2',
+          3: 'k3',
+          4: 'k4',
+          5: 'k5',
+          6: 'k6',
+          7: 'k7',
+          8: 'k8',
+        };
+      }
+    }
+
+    setNames(newNames);
+  }, []);
 
   const [percAmpToggle, setPercAmpToggle] = useState(
     props.percAmpToggle || 'left',
@@ -312,6 +385,7 @@ function Abbott_directed_6172(props, ref) {
 
   const calculateQuantitiesWithDistribution = () => {
     // Calculate the quantity increment for 'center' and 'right' values
+    console.log('PROPS: ', props.name);
     let total = 0;
     if (percAmpToggle === 'left') {
       total = 100;
@@ -362,14 +436,7 @@ function Abbott_directed_6172(props, ref) {
 
   const calculateQuantitiesWithDistributionAbbott = () => {
     // Calculate the quantity increment for 'center' and 'right' values
-    let total = 0;
-    if (percAmpToggle === 'left') {
-      total = 100;
-    } else if (percAmpToggle === 'center') {
-      total = totalAmplitude;
-    }
-
-    total = totalAmplitude;
+    const total = totalAmplitude;
 
     // total = totalAmplitude;
     console.log('total: ', total);
@@ -487,20 +554,56 @@ function Abbott_directed_6172(props, ref) {
     const rightQuantityIncrement = (total - totalRightSum) / rightCount;
 
     // const updatedQuantities = { ...quantities }; // Create a copy of the quantities object
+    console.log('CENTER COUNT: ', totalCenterSum);
+    if (centerCount > 1) {
+      if (totalCenterSum < total) {
+        if (selectedValues[lastChangedKey] === 'center') {
+          roundUpdatedQuantities[lastChangedKey] = total - totalCenterSum;
+        }
+      } else {
+        Object.keys(selectedValues).forEach((key) => {
+          const value = selectedValues[key];
+          if (value === 'left') {
+            roundUpdatedQuantities[key] = 0;
+          } else if (value === 'center') {
+            roundUpdatedQuantities[key] =
+              parseFloat(roundUpdatedQuantities[key]) + centerQuantityIncrement;
+          }
+        });
+      }
+    } else {
+      Object.keys(selectedValues).forEach((key) => {
+        if (selectedValues[key] === 'center') {
+          roundUpdatedQuantities[key] = total;
+        }
+      });
+    }
+
+    if (rightCount > 1) {
+      if (totalRightSum < total) {
+        if (selectedValues[lastChangedKey] === 'right') {
+          roundUpdatedQuantities[lastChangedKey] = total - totalRightSum;
+        }
+      } else {
+        Object.keys(selectedValues).forEach((key) => {
+          const value = selectedValues[key];
+          if (value === 'left') {
+            roundUpdatedQuantities[key] = 0;
+          } else if (value === 'right') {
+            roundUpdatedQuantities[key] =
+              parseFloat(roundUpdatedQuantities[key]) + rightQuantityIncrement;
+          }
+        });
+      }
+    } else {
+      Object.keys(selectedValues).forEach((key) => {
+        if (selectedValues[key] === 'right') {
+          roundUpdatedQuantities[key] = total;
+        }
+      });
+    }
 
     // Update the quantities based on selected values
-    Object.keys(selectedValues).forEach((key) => {
-      const value = selectedValues[key];
-      if (value === 'left') {
-        roundUpdatedQuantities[key] = 0;
-      } else if (value === 'center') {
-        roundUpdatedQuantities[key] =
-          parseFloat(roundUpdatedQuantities[key]) + centerQuantityIncrement;
-      } else if (value === 'right') {
-        roundUpdatedQuantities[key] =
-          parseFloat(roundUpdatedQuantities[key]) + rightQuantityIncrement;
-      }
-    });
     setQuantities(roundUpdatedQuantities); // Update the state with the new quantities
     console.log(roundUpdatedQuantities);
   };
@@ -1515,7 +1618,8 @@ function Abbott_directed_6172(props, ref) {
               }
             });
             updatedQuantities[key] =
-              parseFloat(updatedQuantities[key]) + (totalAmplitude * levelIncrement) / 3;
+              parseFloat(updatedQuantities[key]) +
+              (totalAmplitude * levelIncrement) / 3;
             updatedSelectedValues[key] = updatedSelectedValues[levelBelowKey];
           }
         }
@@ -1951,7 +2055,8 @@ function Abbott_directed_6172(props, ref) {
               });
               updatedSelectedValues[key] = updatedSelectedValues[levelAboveKey];
               updatedQuantities[key] =
-                parseFloat(updatedQuantities[key]) + (totalAmplitude * levelIncrement) / 3;
+                parseFloat(updatedQuantities[key]) +
+                (totalAmplitude * levelIncrement) / 3;
             }
           } else if (face[key] === 'all') {
             updatedQuantities[key] = levelBelowQuantityTotal;
@@ -2869,6 +2974,7 @@ function Abbott_directed_6172(props, ref) {
   };
 
   let stimController = 0;
+  const [currentLabel, setCurrentLabel] = useState('mA');
   // Generating here a more simple key code for the IPG that is selected
   const handleIPG = () => {
     if (props.IPG === 'Medtronic_Activa') {
@@ -2945,14 +3051,17 @@ function Abbott_directed_6172(props, ref) {
     if (newValue === 'left') {
       calculatePercentageFromAmplitude();
       outputTogglePosition = '%';
+      setCurrentLabel('mA');
     } else if (newValue === 'center' && researchToggle !== 'right') {
       calculateAmplitudeFromPercentage();
       outputTogglePosition = 'mA';
+      setCurrentLabel('mA');
     } else if (newValue === 'right') {
       if (researchToggle === 'left') {
         calculateAmplitudeFromPercentage();
       }
       outputTogglePosition = 'V';
+      setCurrentLabel('V');
       console.log(outputTogglePosition);
     }
     setResearchToggle(newValue);
@@ -2969,11 +3078,17 @@ function Abbott_directed_6172(props, ref) {
 
   const handleVolAmpToggleChange = (value) => {
     const newValue = value;
+    console.log('VolAmpToggleChange');
     if (newValue === 'left') {
       outputTogglePosition = 'mA';
+      calculateQuantitiesWithDistribution();
+      // setCurrentLabel('mA');
     } else if (newValue === 'right') {
       outputTogglePosition = 'V';
+      // setCurrentLabel('V');
+      console.log('Current Label: ', currentLabel);
     }
+    setCurrentLabel(outputTogglePosition);
     setVolAmpToggle(value);
   };
 
@@ -3123,11 +3238,10 @@ function Abbott_directed_6172(props, ref) {
       // const newQuantities = { ...quantities };
       calculateQuantitiesWithDistributionAbbott();
     }
-    // console.log('outputTogglePosition: ', outputTogglePosition);
-    if (radioValue === '1') {
+    if (radioValue === '1' && props.IPG !== 'Abbott') {
       semiAssist();
     }
-    if (outputTogglePosition === 'V') {
+    if (currentLabel === 'V' && props.IPG === 'Medtronic_Activa') {
       console.log('here');
       handleActivaVoltage();
     }
@@ -3253,7 +3367,7 @@ function Abbott_directed_6172(props, ref) {
                 ))}
               </ButtonGroup>
             )}
-            {(props.IPG === 'Research') && (
+            {props.IPG === 'Research' && (
               <ButtonGroup className="button-group">
                 {researchDef.map((res, idx) => (
                   <ToggleButton
@@ -3280,10 +3394,12 @@ function Abbott_directed_6172(props, ref) {
               type="number"
               name="quantity"
               pattern="[0-9]+"
+              step="0.1"
+              min="0"
               value={totalAmplitude}
               onChange={handleTotalAmplitudeChange}
             />
-            <span className="input-adornment">{outputTogglePosition}</span>
+            <span className="input-adornment">{currentLabel}</span>
           </div>
         </div>
         {/* <div className="button-container">
@@ -3406,6 +3522,18 @@ function Abbott_directed_6172(props, ref) {
                       //   )
                       // }
                     />
+                    {/* <NewTripleToggle
+                      key={ipg.key}
+                      switchPosition={selectedValues[ipg.key]}
+                      animation={animation[ipg.key]}
+                      quantity={quantities[ipg.key]}
+                      onChange={(value, anime) =>
+                        handleTripleToggleChange(value, anime, ipg.key)
+                      }
+                      onQuantityChange={(quantity) =>
+                        handleQuantityChange(quantity, ipg.key)
+                      }
+                    /> */}
                   </div>
                 )}
               </div>
@@ -3483,6 +3611,16 @@ function Abbott_directed_6172(props, ref) {
                     //   handleQuantityChange(value, animation, quantity, svg.key)
                     // }
                   />
+                  {/* <NewTripleToggle
+                    key={svg.key}
+                    quantity={quantities[svg.key]}
+                    onChange={(value, anime) =>
+                      handleTripleToggleChange(value, anime, svg.key)
+                    }
+                    onQuantityChange={(quantity) =>
+                      handleQuantityChange(quantity, svg.key)
+                    }
+                  /> */}
                 </div>
               )}
             </div>
@@ -3538,7 +3676,7 @@ function Abbott_directed_6172(props, ref) {
           (stimController === 0 || stimController === 3) && (
             <div className="button-container">
               {/* <h2 style={{color: 'black'}}>Steering</h2> */}
-              <span style={{color: 'black'}}>Steering</span>
+              <span style={{ color: 'black' }}>Steering</span>
               <ButtonGroup horizontal>
                 <Button onClick={handlePercAmpChangeUp}>↑</Button>
                 <Button disabled>Level</Button>
@@ -3582,17 +3720,24 @@ function Abbott_directed_6172(props, ref) {
             <Button
               onClick={calculateQuantitiesWithDistribution}
               className="button"
-              disabled={outputTogglePosition === 'V'}
+              disabled={currentLabel === 'V'}
+              title="Split evenly among active contacts"
             >
               Split Even
             </Button>
-            <Button onClick={roundToHundred} className="button">
+            <Button
+              onClick={roundToHundred}
+              className="button"
+              disabled={currentLabel === 'V'}
+              title="Adjust contact values to fill total amplitude"
+            >
               Refactor
             </Button>
             <Button onClick={handleClearButton} className="button">
               Clear
             </Button>
           </ButtonGroup>
+          {/* <NewTripleToggle /> */}
           {/* <button
             onClick={calculateQuantitiesWithDistribution}
             className="button"
