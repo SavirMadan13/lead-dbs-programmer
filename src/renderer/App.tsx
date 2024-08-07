@@ -70,7 +70,7 @@ export default function App() {
   const [allSelectedValues, setAllSelectedValues] = useState({});
   const [allTotalAmplitudes, setAllTotalAmplitudes] = useState({});
   const [allStimulationParameters, setAllStimulationParameters] = useState({});
-  const [visModel, setVisModel] = useState('3');
+  const [visModel, setVisModel] = useState(['6']);
   const [sessionTitle, setSessionTitle] = useState('');
   const [allTogglePositions, setAllTogglePositions] = useState({});
   const [allPercAmpToggles, setAllPercAmpToggles] = useState({});
@@ -84,10 +84,86 @@ export default function App() {
   const [filePath, setFilePath] = useState('');
   const [stimChanged, setStimChanged] = useState(true);
 
+  const [newCount, setNewCount] = useState(0);
+
+  useEffect(() => {
+    window.electron.ipcRenderer.sendMessage('import-file', ['ping']);
+  }, []);
+
+  const handleImportedElectrode = (importedElectrode) => {
+    if (importedElectrode === 'Boston Scientific Vercise Directed') {
+      setLeftElectrode('boston_vercise_directed');
+      setRightElectrode('boston_vercise_directed');
+      setIPG('Boston');
+    } else if (importedElectrode === 'Medtronic 3389') {
+      setLeftElectrode('medtronic_3389');
+      setRightElectrode('medtronic_3389');
+      setIPG('Medtronic_Activa');
+    } else if (importedElectrode === 'Medtronic 3387') {
+      setLeftElectrode('medtronic_3387');
+      setRightElectrode('medtronic_3387');
+      setIPG('Medtronic_Activa');
+    } else if (importedElectrode === 'Medtronic 3391') {
+      setLeftElectrode('medtronic_3391');
+      setRightElectrode('medtronic_3391');
+      setIPG('Medtronic_Activa');
+    } else if (importedElectrode === 'Medtronic B33005') {
+      setLeftElectrode('medtronic_b33005');
+      setRightElectrode('medtronic_b33005');
+      setIPG('Medtronic_Percept');
+    } else if (importedElectrode === 'Medtronic B33015') {
+      setLeftElectrode('medtronic_b33015');
+      setRightElectrode('medtronic_b33015');
+      setIPG('Medtronic_Percept');
+    } else if (importedElectrode === 'Boston Scientific Vercise') {
+      setLeftElectrode('boston_scientific_vercise');
+      setRightElectrode('boston_scientific_vercise');
+      setIPG('Boston');
+    } else if (importedElectrode === 'Boston Scientific Vercise Cartesia HX') {
+      setLeftElectrode('boston_scientific_vercise_cartesia_hx');
+      setRightElectrode('boston_scientific_vercise_cartesia_hx');
+      setIPG('Boston');
+    } else if (importedElectrode === 'Boston Scientific Vercise Cartesia X') {
+      setLeftElectrode('boston_scientific_vercise_cartesia_x');
+      setRightElectrode('boston_scientific_vercise_cartesia_x');
+      setIPG('Boston');
+    } else if (importedElectrode === 'Abbott ActiveTip (6146-6149)') {
+      setLeftElectrode('abbott_activetip_2mm');
+      setRightElectrode('abbott_activetip_2mm');
+      setIPG('Abbott');
+    } else if (importedElectrode === 'Abbott ActiveTip (6142-6145)') {
+      setLeftElectrode('abbott_activetip_3mm');
+      setRightElectrode('abbott_activetip_3mm');
+      setIPG('Abbott');
+    } else if (importedElectrode === 'Abbott Directed 6172 (short)') {
+      setLeftElectrode('abbott_directed_6172');
+      setRightElectrode('abbott_directed_6172');
+      setIPG('Abbott');
+    } else if (importedElectrode === 'Abbott Directed 6173 (long)') {
+      setLeftElectrode('abbott_directed_6173');
+      setRightElectrode('abbott_directed_6173');
+      setIPG('Abbott');
+    }
+  };
+
+  window.electron.ipcRenderer.once('import-file', (arg) => {
+    const newImportedData = arg;
+    // setTestData(importData);
+    console.log('HERE');
+    console.log('Import Data App', newImportedData.label);
+    const numElectrodes = 'numElectrodes';
+    setMatImportFile(newImportedData.label);
+    const selectedElectrode = newImportedData.electrodeModel;
+    // setMatImportFile(stimDatasetList[3]);
+    // console.log('Stimdatasetlabel: ', stimDatasetList);
+    // console.log('masterData: ', arg);
+    handleImportedElectrode(selectedElectrode);
+  });
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowDropdown(false);
-    }, 1); // Adjust the time to your preference (in milliseconds)
+    }, 1000); // Adjust the time to your preference (in milliseconds)
 
     return () => clearTimeout(timer);
   }, []);

@@ -124,26 +124,127 @@ ipcMain.on('import-file', async (event) => {
   event.reply('import-file', jsonData);
 });
 
-ipcMain.on('import-previous-files', (event, fileID, importData) => {
-  // console.log(fileID);
-  // const masterImportData = importData.priorStims;
-  // // console.log('MasterimportData: ', masterImportData);
-  // let fileKey = '';
-  // Object.keys(masterImportData).forEach((key) => {
-  //   if (masterImportData[key].name === fileID) {
-  //     fileKey = key;
-  //   }
-  // });
-  // const priorStimFolder = masterImportData[fileKey].folder;
-  // // console.log('priorStimFolder: ', priorStimFolder);
-  // const fileName = importData.patientname + '_desc-stimparameters.json';
-  // const filePath = path.join(priorStimFolder, fileID, fileName);
-  // // const matData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+// const NewStims = {};
 
-  // // Convert the data to JSON format
-  // const f = fs.readFileSync(filePath);
-  // const jsonData = JSON.parse(f);
+// ipcMain.on('import-previous-files', (event, fileID, importData) => {
+//   // console.log(fileID);
+//   // const masterImportData = importData.priorStims;
+//   // // console.log('MasterimportData: ', masterImportData);
+//   // let fileKey = '';
+//   // Object.keys(masterImportData).forEach((key) => {
+//   //   if (masterImportData[key].name === fileID) {
+//   //     fileKey = key;
+//   //   }
+//   // });
+//   // const priorStimFolder = masterImportData[fileKey].folder;
+//   // // console.log('priorStimFolder: ', priorStimFolder);
+//   // const fileName = importData.patientname + '_desc-stimparameters.json';
+//   // const filePath = path.join(priorStimFolder, fileID, fileName);
+//   // // const matData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+
+//   // // Convert the data to JSON format
+//   // const f = fs.readFileSync(filePath);
+//   // const jsonData = JSON.parse(f);
+//   const fs = require('fs');
+
+//   const masterImportData = importData.priorStims;
+//   let fileKey = '';
+//   Object.keys(masterImportData).forEach((key) => {
+//     if (masterImportData[key].name === fileID) {
+//       fileKey = key;
+//     }
+//   });
+//   console.log('FILEKEY', fileID);
+//   let filePath = '';
+//   // if (masterImportData[fileKey]) {
+//   //   const priorStimFolder = masterImportData[fileKey].folder;
+//   //   console.log(masterImportData);
+//   //   const fileName = `${importData.patientname}_desc-stimparameters.json`;
+//   //   filePath = path.join(priorStimFolder, fileID, fileName);
+//   // } else {
+//   //   console.log('AHAHAHAHAHAH', masterImportData);
+//   //   const priorStimFolder = masterImportData[3].folder;
+//   //   const fileName = `${importData.patientname}_desc-stimparameters.json`;
+//   //   filePath = path.join(priorStimFolder, fileID, fileName);
+//   //   console.log('1');
+//   //   console.log(fileID);
+//   //   const outputFolder = path.join(priorStimFolder, fileID);
+//   //   if (!fs.existsSync(outputFolder)) {
+//   //     fs.mkdirSync(outputFolder);
+//   //     console.log('2');
+//   //     fs.writeFileSync(filePath, JSON.stringify({}), 'utf8');
+//   //     console.log('3');
+//   //   }
+//   // }
+
+//   if (masterImportData[fileKey]) {
+//     const priorStimFolder = masterImportData[fileKey].folder;
+//     console.log(masterImportData);
+//     const fileName = `${importData.patientname}_desc-stimparameters.json`;
+//     filePath = path.join(priorStimFolder, fileID, fileName);
+//   } else {
+//     let priorStimFolder;
+//     if (masterImportData[2] && masterImportData[2].folder) {
+//       priorStimFolder = masterImportData[2].folder;
+//     } else {
+//       // Create a temporary folder for the data
+//       priorStimFolder = path.join(__dirname, 'tempFolder');
+//       if (!fs.existsSync(priorStimFolder)) {
+//         fs.mkdirSync(priorStimFolder);
+//         console.log('Temporary folder created');
+//       }
+//     }
+
+//     const fileName = `${importData.patientname}_desc-stimparameters.json`;
+//     console.log('PRIOR STIM NAME: ', priorStimFolder);
+//     filePath = path.join(priorStimFolder, fileID, fileName);
+//     console.log('1');
+//     console.log(fileID);
+//     const outputFolder = path.join(priorStimFolder, fileID);
+//     if (!fs.existsSync(outputFolder)) {
+//       fs.mkdirSync(outputFolder);
+//       console.log('2');
+//       fs.writeFileSync(filePath, JSON.stringify({}), 'utf8');
+//       console.log('3');
+//     }
+//   }
+//   let jsonData = 'Empty';
+
+//   if (fs.existsSync(filePath)) {
+//     const f = fs.readFileSync(filePath, 'utf8');
+//     if (f.trim() === '') {
+//       // If the file is empty, create the file and pass back a message
+//       try {
+//         fs.writeFileSync(filePath, JSON.stringify({}), 'utf8');
+//       } catch {
+//         console.log('File is empty. Created a new file.');
+//       }
+//       // const jsonData = 'Empty';
+//     } else {
+//       // Convert the data to JSON format
+//       jsonData = JSON.parse(f);
+//       console.log('Data read successfully:', jsonData);
+//     }
+//   } else {
+//     // If the file doesn't exist, create the file and pass back a message
+//     fs.writeFileSync(filePath, JSON.stringify({}), 'utf8');
+//     console.log('File does not exist. Created a new file.');
+//     // const jsonData = 'Empty';
+//   }
+//   console.log('FILEPATH; ', filePath);
+
+//   console.log('JSONDATA: ', jsonData);
+//   // console.log(key);
+//   // event.reply('import-previous-files-reply', filePath, jsonData);
+//   event.reply('import-previous-files', jsonData);
+//   // event.reply('get-output-filePath', filePath);
+// });
+
+const NewStims = {};
+
+ipcMain.on('import-previous-files', (event, fileID, importData) => {
   const fs = require('fs');
+  const path = require('path');
 
   const masterImportData = importData.priorStims;
   let fileKey = '';
@@ -152,89 +253,24 @@ ipcMain.on('import-previous-files', (event, fileID, importData) => {
       fileKey = key;
     }
   });
-  console.log('FILEKEY');
-  let filePath = '';
-  // if (masterImportData[fileKey]) {
-  //   const priorStimFolder = masterImportData[fileKey].folder;
-  //   console.log(masterImportData);
-  //   const fileName = `${importData.patientname}_desc-stimparameters.json`;
-  //   filePath = path.join(priorStimFolder, fileID, fileName);
-  // } else {
-  //   console.log('AHAHAHAHAHAH', masterImportData);
-  //   const priorStimFolder = masterImportData[3].folder;
-  //   const fileName = `${importData.patientname}_desc-stimparameters.json`;
-  //   filePath = path.join(priorStimFolder, fileID, fileName);
-  //   console.log('1');
-  //   console.log(fileID);
-  //   const outputFolder = path.join(priorStimFolder, fileID);
-  //   if (!fs.existsSync(outputFolder)) {
-  //     fs.mkdirSync(outputFolder);
-  //     console.log('2');
-  //     fs.writeFileSync(filePath, JSON.stringify({}), 'utf8');
-  //     console.log('3');
-  //   }
-  // }
 
+  let filePath = '';
+  let jsonData = 'Empty';
   if (masterImportData[fileKey]) {
     const priorStimFolder = masterImportData[fileKey].folder;
-    console.log(masterImportData);
     const fileName = `${importData.patientname}_desc-stimparameters.json`;
     filePath = path.join(priorStimFolder, fileID, fileName);
-  } else {
-    let priorStimFolder;
-    if (masterImportData[3] && masterImportData[3].folder) {
-      priorStimFolder = masterImportData[3].folder;
-    } else {
-      // Create a temporary folder for the data
-      priorStimFolder = path.join(__dirname, 'tempFolder');
-      if (!fs.existsSync(priorStimFolder)) {
-        fs.mkdirSync(priorStimFolder);
-        console.log('Temporary folder created');
-      }
-    }
-
-    const fileName = `${importData.patientname}_desc-stimparameters.json`;
-    filePath = path.join(priorStimFolder, fileID, fileName);
-    console.log('1');
-    console.log(fileID);
-    const outputFolder = path.join(priorStimFolder, fileID);
-    if (!fs.existsSync(outputFolder)) {
-      fs.mkdirSync(outputFolder);
-      console.log('2');
-      fs.writeFileSync(filePath, JSON.stringify({}), 'utf8');
-      console.log('3');
-    }
-  }
-  let jsonData = 'Empty';
-
-  if (fs.existsSync(filePath)) {
     const f = fs.readFileSync(filePath, 'utf8');
-    if (f.trim() === '') {
-      // If the file is empty, create the file and pass back a message
-      try {
-        fs.writeFileSync(filePath, JSON.stringify({}), 'utf8');
-      } catch {
-        console.log('File is empty. Created a new file.');
-      }
-      // const jsonData = 'Empty';
-    } else {
-      // Convert the data to JSON format
-      jsonData = JSON.parse(f);
-      console.log('Data read successfully:', jsonData);
-    }
+    jsonData = JSON.parse(f);
   } else {
-    // If the file doesn't exist, create the file and pass back a message
-    fs.writeFileSync(filePath, JSON.stringify({}), 'utf8');
-    console.log('File does not exist. Created a new file.');
-    // const jsonData = 'Empty';
+    // Save in NewStims variable
+    if (!NewStims[fileID]) {
+      NewStims[fileID] = {};
+    }
+    jsonData = NewStims[fileID];
   }
-  console.log('FILEPATH; ', filePath);
 
-  console.log('JSONDATA: ', jsonData);
-  // console.log(key);
-  // event.reply('import-previous-files-reply', filePath, jsonData);
   event.reply('import-previous-files', jsonData);
-  // event.reply('get-output-filePath', filePath);
 });
 
 ipcMain.on('open-file', (event, arg) => {

@@ -72,15 +72,15 @@ function StimulationSettings({
     } else if (importedElectrode === 'Medtronic 3389') {
       setLeftElectrode('medtronic_3389');
       setRightElectrode('medtronic_3389');
-      setIPG('Medtronic_Percept');
+      setIPG('Medtronic_Activa');
     } else if (importedElectrode === 'Medtronic 3387') {
       setLeftElectrode('medtronic_3387');
       setRightElectrode('medtronic_3387');
-      setIPG('Medtronic_Percept');
+      setIPG('Medtronic_Activa');
     } else if (importedElectrode === 'Medtronic 3391') {
       setLeftElectrode('medtronic_3391');
       setRightElectrode('medtronic_3391');
-      setIPG('Medtronic_Percept');
+      setIPG('Medtronic_Activa');
     } else if (importedElectrode === 'Medtronic B33005') {
       setLeftElectrode('medtronic_b33005');
       setRightElectrode('medtronic_b33005');
@@ -173,21 +173,22 @@ function StimulationSettings({
     console.log('HELLO', stimDatasetList);
     if (Object.keys(stimDatasetList).length === 0) {
       const uniqueID = generateUniqueID();
-      stimDatasetList[3] = testerLabel;
+      stimDatasetList[2] = testerLabel;
       // setNewStim(uniqueID);
     }
+    console.log('STIMDATASETLIST: ', stimDatasetList);
     window.electron.ipcRenderer.sendMessage(
       'import-previous-files',
-      stimDatasetList[3],
-      // key,
+      stimDatasetList[2],
       arg,
     );
+    console.log('STIM DATASET LIST: ', stimDatasetList);
     setTestData(stimDatasetList);
     setImportDataTest(stimDatasetList);
     // setMatImportFile(stimDatasetList[3]);
     // console.log('Stimdatasetlabel: ', stimDatasetList);
     // console.log('masterData: ', arg);
-    handleImportedElectrode(selectedElectrode);
+    // handleImportedElectrode(selectedElectrode);
   });
 
   const handleDebugButton = () => {
@@ -212,7 +213,16 @@ function StimulationSettings({
         selectedLeftElectrode.includes('Medtronic') ||
         selectedLeftElectrode.includes('medtronic')
       ) {
-        setIPG('Medtronic_Percept');
+        if (
+          selectedLeftElectrode === 'medtronic_3387' ||
+          selectedLeftElectrode === 'medtronic_3389' ||
+          selectedLeftElectrode === 'medtronic_3391'
+        ) {
+          setIPG('Medtronic_Activa');
+        } else {
+          setIPG('Medtronic_Percept');
+        }
+        // setIPG('Medtronic_Percept');
       } else if (
         selectedLeftElectrode.includes('Abbott') ||
         selectedLeftElectrode.includes('abbott')
@@ -234,7 +244,16 @@ function StimulationSettings({
       if (selectedRightElectrode.includes('Boston')) {
         setIPG('Boston');
       } else if (selectedRightElectrode.includes('Medtronic')) {
-        setIPG('Medtronic_Percept');
+        if (
+          selectedRightElectrode === 'medtronic_3387' ||
+          selectedRightElectrode === 'medtronic_3389' ||
+          selectedRightElectrode === 'medtronic_3391'
+        ) {
+          setIPG('Medtronic_Activa');
+        } else {
+          setIPG('Medtronic_Percept');
+        }
+        // setIPG('Medtronic_Percept');
       } else if (selectedRightElectrode.includes('Abbott')) {
         setIPG('Abbott');
       }
@@ -435,9 +454,9 @@ function StimulationSettings({
 
     for (let j = 1; j < 5; j++) {
       // newTotalAmplitude[j] = jsonData.S.amplitude.leftAmplitude[j - 1];
-      newTotalAmplitude[j] = jsonData.S.amplitude[0][j - 1];
+      newTotalAmplitude[j] = jsonData.S.amplitude[1][j - 1];
       // newTotalAmplitude[j + 4] = jsonData.S.amplitude.rightAmplitude[j - 1];
-      newTotalAmplitude[j + 4] = jsonData.S.amplitude[1][j - 1];
+      newTotalAmplitude[j + 4] = jsonData.S.amplitude[0][j - 1];
       console.log('newTotalAmplitude: ', newTotalAmplitude);
       const dynamicKey2 = `Ls${j}`;
       const dynamicKey3 = `Rs${j}`;
@@ -465,6 +484,19 @@ function StimulationSettings({
             newSelectedValues[j][0] = 'center';
           } else if (jsonData.S[dynamicKey2].case.pol === 2) {
             newSelectedValues[j][0] = 'right';
+          }
+          if (jsonData.S[dynamicKey2].va === 2) {
+            setAllVolAmpToggles({
+              0: 'right',
+              1: 'right',
+              2: 'right',
+              3: 'right',
+              4: 'right',
+              5: 'right',
+              6: 'right',
+              7: 'right',
+              8: 'right',
+            });
           }
         }
         if (jsonData.S[dynamicKey3][dynamicKey1]) {
@@ -593,14 +625,6 @@ function StimulationSettings({
       console.log('here');
       gatherImportedDataNew(newS);
     }
-    // else if (newS === 'Empty') {
-    //   setAllQuantities({});
-    //   setAllSelectedValues({});
-    //   setAllTogglePositions({});
-    //   setAllPercAmpToggles({});
-    //   setAllVolAmpToggles({});
-    //   setAllTotalAmplitudes({});
-    // }
     // Here is where I can write an if statement for if arg1 is empty, and then I can write a statement to create
     // a new one and then select that one as the stimulation setting
     setRenderKey(renderKey + 1);
@@ -981,7 +1005,7 @@ function StimulationSettings({
         </div>
       </div>
       <div>
-        {leftElectrode && (
+        {(leftElectrode || rightElectrode) && (
           <TabbedElectrodeIPGSelectionTest
             key={renderKey}
             selectedElectrodeLeft={leftElectrode}

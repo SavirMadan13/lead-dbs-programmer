@@ -302,7 +302,7 @@ function Boston_vercise_directed_new(props, ref) {
     },
   );
 
-  const [visModel, setVisModel] = useState(props.visModel || '6');
+  const [visModel, setVisModel] = useState(props.visModel || '3');
 
   const [sessionTitle, setSessionTitle] = useState(props.sessionTitle || '');
 
@@ -2973,7 +2973,8 @@ function Boston_vercise_directed_new(props, ref) {
   };
 
   let stimController = 0;
-  const [currentLabel, setCurrentLabel] = useState('mA');
+  // const [currentLabel, setCurrentLabel] = useState('mA');
+  const [currentLabel, setCurrentLabel] = useState(volAmpToggle === 'right' ? 'V' : 'mA');
   // Generating here a more simple key code for the IPG that is selected
   const handleIPG = () => {
     if (props.IPG === 'Medtronic_Activa') {
@@ -3241,7 +3242,7 @@ function Boston_vercise_directed_new(props, ref) {
       semiAssist();
     }
     if (currentLabel === 'V' && props.IPG === 'Medtronic_Activa') {
-      console.log('here');
+      // console.log('here');
       handleActivaVoltage();
     }
 
@@ -3267,6 +3268,7 @@ function Boston_vercise_directed_new(props, ref) {
     // }
     // assist();
   }, [
+    currentLabel,
     props.IPG,
     radioValue,
     outputTogglePosition,

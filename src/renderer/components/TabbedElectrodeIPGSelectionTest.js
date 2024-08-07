@@ -95,7 +95,7 @@ function TabbedElectrodeIPGSelection({
   const [key, setKey] = useState('5');
   // const [namingConvention, setNamingConvention] = useState('clinical');
   const fileInputRef = useRef(null);
-
+  const [visualizationModel, setVisualizationModel] = useState('3');
   // const [allQuantities, setAllQuantities] = useState({});
   // const [allSelectedValues, setAllSelectedValues] = useState({});
 
@@ -161,6 +161,9 @@ function TabbedElectrodeIPGSelection({
       [key]: testElectrodeRef.current.getStateVisModel(),
     };
     setVisModel(updatedVisModel);
+    console.log('updatedVIsMOdel: ', updatedVisModel);
+    const tempModel = testElectrodeRef.current.getStateVisModel();
+    setVisualizationModel(tempModel);
 
     const updatedSessionTitle = {
       ...sessionTitle,
@@ -398,12 +401,14 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visModel[1]}
+        // visModel={visModel[1]}
+        visModel={visualizationModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
         contactNaming={namingConvention}
+        adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
         // stimChanged={stimChanged}
         // setStimChanged={setStimChanged}
         // outputIPG={outputIPG}
@@ -419,7 +424,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visModel[1]}
+        visModel={visualizationModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -436,7 +441,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visModel[1]}
+        visModel={visualizationModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -453,7 +458,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visModel[1]}
+        visModel={visualizationModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -471,7 +476,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visModel[1]}
+        visModel={visualizationModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -489,7 +494,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visModel[1]}
+        visModel={visualizationModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -507,7 +512,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visModel[1]}
+        visModel={visualizationModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -525,7 +530,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visModel[1]}
+        visModel={visualizationModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -543,7 +548,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visModel[1]}
+        visModel={visualizationModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -562,7 +567,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visModel[1]}
+        visModel={visualizationModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -581,7 +586,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visModel[1]}
+        visModel={visualizationModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -599,7 +604,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visModel[1]}
+        visModel={visualizationModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -617,7 +622,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visModel[1]}
+        visModel={visualizationModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -1616,6 +1621,7 @@ function TabbedElectrodeIPGSelection({
         }
         activeArray.push(j + 4);
         newActiveArray.push(j);
+        console.log(allSelectedValues);
         rightHemiArr[j - 1] = activeContacts(allSelectedValues[j]);
         data.S.activecontacts[j + 3] = activeContacts(allSelectedValues[j + 4]);
         rightAmpArray[j + 4] = parseFloat(allTotalAmplitudes[j + 4]);
@@ -1683,7 +1689,8 @@ function TabbedElectrodeIPGSelection({
     }
 
     let exportVisModel = '';
-    // console.log(visModel[1]);
+    visModel[1] = visualizationModel;
+    console.log(visModel[1]);
     if (visModel[1] === '1') {
       console.log('here');
       exportVisModel = 'Dembek 2017';

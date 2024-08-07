@@ -2935,7 +2935,8 @@ function Medtronic_3389(props, ref) {
   };
 
   let stimController = 0;
-  const [currentLabel, setCurrentLabel] = useState('mA');
+  // const [currentLabel, setCurrentLabel] = useState('mA');
+  const [currentLabel, setCurrentLabel] = useState(volAmpToggle === 'right' ? 'V' : 'mA');
   // Generating here a more simple key code for the IPG that is selected
   const handleIPG = () => {
     if (props.IPG === 'Medtronic_Activa') {
