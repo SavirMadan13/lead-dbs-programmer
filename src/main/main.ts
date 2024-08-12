@@ -18,6 +18,11 @@ import { resolveHtmlPath } from './util';
 
 ipcMain.setMaxListeners(Infinity);
 
+console.log = () => {};
+console.error = () => {};
+console.warn = () => {};
+console.info = () => {};
+
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -79,15 +84,15 @@ ipcMain.on('ipc-example', async (event, arg) => {
       break;
     }
   }
-  if (currentDirectory) {
-    const fileName = 'status.json';
-    const filePath = path.join(result, fileName);
-    try {
-      fs.writeFileSync(filePath, '1');
-    } catch (error) {
-      console.error('Error writing to file:', error);
-    }
-  }
+  // if (currentDirectory) {
+  //   const fileName = 'status.json';
+  //   const filePath = path.join(result, fileName);
+  //   try {
+  //     fs.writeFileSync(filePath, '1');
+  //   } catch (error) {
+  //     console.error('Error writing to file:', error);
+  //   }
+  // }
   // const separatedLine = f.split('\\\\');
   // console.log(separatedLine);
   // const k = fs.readFileSync(f);
@@ -101,6 +106,7 @@ ipcMain.on('import-file', async (event) => {
   const currentDirectory = app.getAppPath();
   const directories = currentDirectory.split('/');
 
+  console.log('CURRENTDIRECTORY: ', currentDirectory);
   // Initialize a variable to store the result
   let result = '';
 
@@ -115,8 +121,15 @@ ipcMain.on('import-file', async (event) => {
     }
   }
 
-  const fileName = 'inputData.json';
-  const filePath = path.join(result, fileName);
+  const prefsFileName = 'Preferences.json';
+  const prefsFilePath = path.join(result, prefsFileName);
+  const k = fs.readFileSync(prefsFilePath);
+  const prefsData = JSON.parse(k);
+  const leadPath = prefsData.LeadDBS_Path;
+  let normalLeadPath = leadPath.replace(/\\\//g, '/');
+  let filePath = path.join(normalLeadPath, 'programmer/inputData.json');
+  // const fileName = 'inputData.json';
+  // const filePath = path.join(result, fileName);
   console.log(filePath);
   // const testFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/lead-dbs-programmer/inputData.json';
   const f = fs.readFileSync(filePath);
@@ -341,8 +354,15 @@ ipcMain.on('save-file', (event, file, data) => {
   if (currentDirectory) {
     // Convert data to string format
     const dataString = JSON.stringify(data);
-    const fileName = 'data.json';
-    const filePath = path.join(result, fileName);
+    const prefsFileName = 'Preferences.json';
+    const prefsFilePath = path.join(result, prefsFileName);
+    const k = fs.readFileSync(prefsFilePath);
+    const prefsData = JSON.parse(k);
+    const leadPath = prefsData.LeadDBS_Path;
+    let normalLeadPath = leadPath.replace(/\\\//g, '/');
+    let filePath = path.join(normalLeadPath, 'programmer/data.json');
+    // const fileName = 'data.json';
+    // const filePath = path.join(result, fileName);
     // const filePath = './dist/main/webpack:/leaddbs-stimcontroller/main.js';
     // Write data to file
     try {
