@@ -13,6 +13,12 @@ import checkNodeEnv from '../scripts/check-node-env';
 
 // When an ESLint server is running, we can't set the NODE_ENV so we'll check if it's
 // at the dev webpack config is not accidentally run in a production environment
+
+console.log = () => {};
+console.error = () => {};
+console.warn = () => {};
+console.info = () => {};
+
 if (process.env.NODE_ENV === 'production') {
   checkNodeEnv('development');
 }
@@ -204,6 +210,7 @@ const configuration: webpack.Configuration = {
           preloadProcess.kill();
           process.exit(code!);
         })
+        // .on('error', (spawnError) => console.error(spawnError));
         .on('error', (spawnError) => console.error(spawnError));
       return middlewares;
     },

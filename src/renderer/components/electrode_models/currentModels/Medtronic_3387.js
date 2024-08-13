@@ -111,10 +111,10 @@ function Medtronic_3387(props, ref) {
       } else {
         newNames = {
           0: IPG,
-          1: '4',
-          2: '5',
-          3: '6',
-          4: '7',
+          1: '8',
+          2: '9',
+          3: '10',
+          4: '11',
         };
       }
     } else {

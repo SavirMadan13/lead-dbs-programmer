@@ -1,1 +1,8 @@
-{"numElectrodes":2,"electrodeModel":"Medtronic 3387","label":"20240807005938","patientname":"sub-CbctDbs0139","priorStims":[{"name":".","folder":"/Volumes/Expansion/ClinicalLocalizations/Output/Patient0139Output/derivatives/leaddbs/sub-CbctDbs0139/stimulations/MNI152NLin2009bAsym","date":"06-Aug-2024 12:11:52","bytes":0,"isdir":true,"datenum":739470.50824074075},{"name":"..","folder":"/Volumes/Expansion/ClinicalLocalizations/Output/Patient0139Output/derivatives/leaddbs/sub-CbctDbs0139/stimulations/MNI152NLin2009bAsym","date":"06-Aug-2024 12:11:52","bytes":0,"isdir":true,"datenum":739470.50824074075},{"name":"2024080613192","folder":"/Volumes/Expansion/ClinicalLocalizations/Output/Patient0139Output/derivatives/leaddbs/sub-CbctDbs0139/stimulations/MNI152NLin2009bAsym","date":"06-Aug-2024 16:52:11","bytes":0,"isdir":true,"datenum":739470.70290509262},{"name":"20240806396545","folder":"/Volumes/Expansion/ClinicalLocalizations/Output/Patient0139Output/derivatives/leaddbs/sub-CbctDbs0139/stimulations/MNI152NLin2009bAsym","date":"06-Aug-2024 12:11:52","bytes":0,"isdir":true,"datenum":739470.50824074075},{"name":"20240806844453","folder":"/Volumes/Expansion/ClinicalLocalizations/Output/Patient0139Output/derivatives/leaddbs/sub-CbctDbs0139/stimulations/MNI152NLin2009bAsym","date":"06-Aug-2024 16:47:43","bytes":0,"isdir":true,"datenum":739470.69980324071},{"name":"20240806947234","folder":"/Volumes/Expansion/ClinicalLocalizations/Output/Patient0139Output/derivatives/leaddbs/sub-CbctDbs0139/stimulations/MNI152NLin2009bAsym","date":"06-Aug-2024 16:54:26","bytes":0,"isdir":true,"datenum":739470.70446759264}]}
+{
+	"numElectrodes": 2,
+	"electrodeModel": "Medtronic 3387",
+	"label": "20240813110635",
+	"patientname": "sub-CbctDbs0125",
+	"stimDir": "\/Volumes\/Expansion\/ClinicalLocalizations\/Output\/Patient0125Output\/derivatives\/leaddbs\/sub-CbctDbs0125\/stimulations\/MNI152NLin2009bAsym",
+	"priorStims": []
+}

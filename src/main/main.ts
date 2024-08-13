@@ -32,6 +32,8 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
+let stimulationDirectory = '';
+let patientID = '';
 
 const startServer = () => {
   // Start the Express server in a child process
@@ -134,6 +136,10 @@ ipcMain.on('import-file', async (event) => {
   // const testFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/lead-dbs-programmer/inputData.json';
   const f = fs.readFileSync(filePath);
   const jsonData = JSON.parse(f);
+  let stimPath = jsonData.stimDir;
+  stimulationDirectory = stimPath.replace(/\\\//g, '/');
+  patientID = jsonData.patientname;
+  console.log('STIMDIREC; ', stimulationDirectory);
   event.reply('import-file', jsonData);
 });
 
@@ -361,6 +367,10 @@ ipcMain.on('save-file', (event, file, data) => {
     const leadPath = prefsData.LeadDBS_Path;
     let normalLeadPath = leadPath.replace(/\\\//g, '/');
     let filePath = path.join(normalLeadPath, 'programmer/data.json');
+    // console.log('DATALABEL: ', data.S.label);
+    const outputFolder = path.join(stimulationDirectory, data.S.label);
+    const outputFileName = `${patientID}_desc-stimparameters.json`;
+    const outputFilePath = path.join(outputFolder, outputFileName);
     // const fileName = 'data.json';
     // const filePath = path.join(result, fileName);
     // const filePath = './dist/main/webpack:/leaddbs-stimcontroller/main.js';
@@ -371,7 +381,18 @@ ipcMain.on('save-file', (event, file, data) => {
       // Handle the error here
       console.error('Error writing to file:', error);
     }
-    // fs.writeFileSync(file, dataString);
+    // Extract the directory path from the file path
+    const dir = path.dirname(outputFilePath);
+
+    // Check if the directory exists
+    if (!fs.existsSync(dir)) {
+      // If the directory doesn't exist, create it (including any necessary subdirectories)
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    // Now you can create or open the file
+    fs.writeFileSync(outputFilePath, dataString, { flag: 'w' });
+    // fs.writeFileSync(outputFilePath, dataString);
 
     // Send a response back to the renderer process
     event.reply('file-saved', filePath);
