@@ -1,8 +1,1 @@
-{
-	"numElectrodes": 2,
-	"electrodeModel": "Medtronic 3387",
-	"label": "20240813110635",
-	"patientname": "sub-CbctDbs0125",
-	"stimDir": "\/Volumes\/Expansion\/ClinicalLocalizations\/Output\/Patient0125Output\/derivatives\/leaddbs\/sub-CbctDbs0125\/stimulations\/MNI152NLin2009bAsym",
-	"priorStims": []
-}
+{"numElectrodes":2,"electrodeModel":"Medtronic B33005","label":"20240604153721","patientname":"sub-CbctDbs0350","priorStims":[{"name":".","folder":"/Users/savirmadan/Documents/Localizations/LeadDBS/Output/Patient0350Output/derivatives/leaddbs/sub-CbctDbs0350/stimulations/MNI152NLin2009bAsym","date":"04-Jun-2024 12:10:30","bytes":0,"isdir":true,"datenum":739407.5072916667},{"name":"..","folder":"/Users/savirmadan/Documents/Localizations/LeadDBS/Output/Patient0350Output/derivatives/leaddbs/sub-CbctDbs0350/stimulations/MNI152NLin2009bAsym","date":"04-Jun-2024 11:28:36","bytes":0,"isdir":true,"datenum":739407.47819444444},{"name":"20240604418818","folder":"/Users/savirmadan/Documents/Localizations/LeadDBS/Output/Patient0350Output/derivatives/leaddbs/sub-CbctDbs0350/stimulations/MNI152NLin2009bAsym","date":"04-Jun-2024 12:12:19","bytes":0,"isdir":true,"datenum":739407.5085532408},{"name":"20240604452495","folder":"/Users/savirmadan/Documents/Localizations/LeadDBS/Output/Patient0350Output/derivatives/leaddbs/sub-CbctDbs0350/stimulations/MNI152NLin2009bAsym","date":"04-Jun-2024 11:28:44","bytes":0,"isdir":true,"datenum":739407.478287037},{"name":"20240604957942","folder":"/Users/savirmadan/Documents/Localizations/LeadDBS/Output/Patient0350Output/derivatives/leaddbs/sub-CbctDbs0350/stimulations/MNI152NLin2009bAsym","date":"04-Jun-2024 11:49:33","bytes":0,"isdir":true,"datenum":739407.49274305557}]}

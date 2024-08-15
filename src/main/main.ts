@@ -18,10 +18,10 @@ import { resolveHtmlPath } from './util';
 
 ipcMain.setMaxListeners(Infinity);
 
-console.log = () => {};
-console.error = () => {};
-console.warn = () => {};
-console.info = () => {};
+// console.log = () => {};
+// console.error = () => {};
+// console.warn = () => {};
+// console.info = () => {};
 
 class AppUpdater {
   constructor() {
@@ -128,19 +128,53 @@ ipcMain.on('import-file', async (event) => {
   const k = fs.readFileSync(prefsFilePath);
   const prefsData = JSON.parse(k);
   const leadPath = prefsData.LeadDBS_Path;
-  let normalLeadPath = leadPath.replace(/\\\//g, '/');
-  let filePath = path.join(normalLeadPath, 'programmer/inputData.json');
-  // const fileName = 'inputData.json';
-  // const filePath = path.join(result, fileName);
-  console.log(filePath);
-  // const testFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/lead-dbs-programmer/inputData.json';
-  const f = fs.readFileSync(filePath);
-  const jsonData = JSON.parse(f);
-  let stimPath = jsonData.stimDir;
-  stimulationDirectory = stimPath.replace(/\\\//g, '/');
-  patientID = jsonData.patientname;
-  console.log('STIMDIREC; ', stimulationDirectory);
-  event.reply('import-file', jsonData);
+
+  // let normalLeadPath = leadPath.replace(/\\\//g, '/');
+  // let filePath = path.join(normalLeadPath, 'programmer/inputData.json');
+  // // const fileName = 'inputData.json';
+  // // const filePath = path.join(result, fileName);
+  // console.log(filePath);
+  // // const testFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/lead-dbs-programmer/inputData.json';
+  // const f = fs.readFileSync(filePath);
+  // const jsonData = JSON.parse(f);
+  // let stimPath = jsonData.stimDir;
+  // stimulationDirectory = stimPath.replace(/\\\//g, '/');
+  // patientID = jsonData.patientname;
+  // console.log('STIMDIREC; ', stimulationDirectory);
+  // event.reply('import-file', jsonData);
+
+  try {
+    // Normalize the lead path
+    let normalLeadPath = leadPath.replace(/\\\//g, '/');
+    let filePath = path.join(normalLeadPath, 'programmer/inputData.json');
+    console.log(filePath);
+
+    // Read the file
+    const f = fs.readFileSync(filePath);
+
+    // Parse the JSON data
+    const jsonData = JSON.parse(f);
+
+    // Extract and normalize the stimulation directory
+    let stimPath = jsonData.stimDir;
+    stimulationDirectory = stimPath.replace(/\\\//g, '/');
+    patientID = jsonData.patientname;
+
+    // Log and send the data
+    console.log('STIMDIREC:', stimulationDirectory);
+    event.reply('import-file', jsonData);
+  } catch (err) {
+    // Handle specific errors
+    if (err.code === 'ENOENT') {
+      console.error('File not found:', filePath);
+    } else if (err.name === 'SyntaxError') {
+      console.error('Error parsing JSON:', err.message);
+    } else {
+      console.error('An unexpected error occurred:', err);
+    }
+    // Optionally, you could send an error reply to the event
+    event.reply('import-file-error', err.message);
+  }
 });
 
 // const NewStims = {};
@@ -266,18 +300,24 @@ ipcMain.on('import-previous-files', (event, fileID, importData) => {
   const path = require('path');
 
   const masterImportData = importData.priorStims;
+  console.log('MasterImportData: ', masterImportData);
   let fileKey = '';
+  console.log('FILEID: ', fileID);
   Object.keys(masterImportData).forEach((key) => {
+    console.log('KEY: ', key);
     if (masterImportData[key].name === fileID) {
       fileKey = key;
     }
   });
+  console.log('FILEKEY: ', fileKey);
 
   let filePath = '';
   let jsonData = 'Empty';
   if (masterImportData[fileKey]) {
+    console.log(masterImportData[fileKey]);
     const priorStimFolder = masterImportData[fileKey].folder;
     const fileName = `${importData.patientname}_desc-stimparameters.json`;
+    console.log('PriorSTIMFOLDER; ', priorStimFolder);
     filePath = path.join(priorStimFolder, fileID, fileName);
     const f = fs.readFileSync(filePath, 'utf8');
     jsonData = JSON.parse(f);

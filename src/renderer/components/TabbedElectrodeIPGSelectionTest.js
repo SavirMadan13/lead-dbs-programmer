@@ -1744,6 +1744,10 @@ function TabbedElectrodeIPGSelection({
     });
   };
 
+  const closeFunction = () => {
+    window.electron.ipcRenderer.sendMessage('close-window');
+  };
+
   const quitApp = () => {
     // window.electron.ipcRenderer.sendMessage('set-status');
     window.electron.ipcRenderer.sendMessage('close-window');
@@ -1968,6 +1972,9 @@ function TabbedElectrodeIPGSelection({
       <div style={{ textAlign: 'center', paddingBottom: '35px' }}>
         <button className="export-button-final" onClick={sendDataToMain}>
           Stimulate and Close
+        </button>
+        <button className="export-button-final" onClick={closeFunction}>
+          Close
         </button>
       </div>
     </div>

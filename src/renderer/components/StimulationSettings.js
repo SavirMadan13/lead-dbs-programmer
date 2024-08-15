@@ -162,21 +162,23 @@ function StimulationSettings({
     const numElectrodes = 'numElectrodes';
     const selectedElectrode = importData.electrodeModel;
     const stimDatasets = importData.priorStims;
+    console.log('STIMDATASETS: ', stimDatasets);
     const testerLabel = importData.label;
     setPatientName(importData.patientname);
+    // const stimDatasetList = stimDatasets;
     const stimDatasetList = {};
     Object.keys(stimDatasets).forEach((key) => {
       if (key >= 2) {
         stimDatasetList[key] = stimDatasets[key].name;
       }
     });
-    console.log('HELLO', stimDatasetList);
     if (Object.keys(stimDatasetList).length === 0) {
       const uniqueID = generateUniqueID();
       stimDatasetList[2] = testerLabel;
       // setNewStim(uniqueID);
     }
     console.log('STIMDATASETLIST: ', stimDatasetList);
+    console.log('StimDatasetList[0]: ', stimDatasetList[0]);
     window.electron.ipcRenderer.sendMessage(
       'import-previous-files',
       stimDatasetList[2],
