@@ -1735,7 +1735,7 @@ function TabbedElectrodeIPGSelection({
     const outputData = gatherExportedData5();
     console.log('OUTPUTDATA: ', outputData);
     window.electron.ipcRenderer.sendMessage('save-file', filePath, outputData);
-    window.electron.ipcRenderer.sendMessage('close-window');
+    // window.electron.ipcRenderer.sendMessage('close-window');
     // window.electron.ipcRenderer.sendMessage('close-window');
 
     // Listen for a response from the main process

@@ -1,12 +1,12 @@
 {
-  "name": "electron-react-boilerplate",
+  "name": "LeadDBSProgrammer",
   "version": "4.6.0",
-  "description": "A foundation for scalable desktop apps",
+  "description": "Lead-DBS Programmer Tool",
   "license": "MIT",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://github.com/electron-react-boilerplate"
+    "name": "Lead-DBS",
+    "email": "savirmadan@gmail.com",
+    "url": "https://github.com/netstim"
   },
   "main": "./dist/main/main.js",
   "scripts": {

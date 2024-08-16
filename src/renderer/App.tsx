@@ -233,6 +233,7 @@ export default function App() {
           setImportNewS(arg.S);
 
           const tempPatients = arg.labels;
+          console.log(tempPatients);
 
           let initialStates;
 

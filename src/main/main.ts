@@ -18,9 +18,9 @@ import { resolveHtmlPath } from './util';
 
 ipcMain.setMaxListeners(Infinity);
 
-console.log = () => {};
-console.warn = () => {};
-console.error = () => {};
+// console.log = () => {};
+// console.warn = () => {};
+// console.error = () => {};
 
 class AppUpdater {
   constructor() {
@@ -31,6 +31,8 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
+let stimulationDirectory = '';
+let patientID = '';
 
 const startServer = () => {
   // Start the Express server in a child process
@@ -79,19 +81,19 @@ ipcMain.on('ipc-example', async (event, arg) => {
   for (const dir of directories) {
     result += `${dir}/`;
 
-    if (dir === 'programmergroup') {
+    if (dir === 'programmer') {
       break;
     }
   }
-  if (currentDirectory) {
-    const fileName = 'status.json';
-    const filePath = path.join(result, fileName);
-    try {
-      fs.writeFileSync(filePath, '1');
-    } catch (error) {
-      console.error('Error writing to file:', error);
-    }
-  }
+  // if (currentDirectory) {
+  //   const fileName = 'status.json';
+  //   const filePath = path.join(result, fileName);
+  //   try {
+  //     fs.writeFileSync(filePath, '1');
+  //   } catch (error) {
+  //     console.error('Error writing to file:', error);
+  //   }
+  // }
   // const separatedLine = f.split('\\\\');
   // console.log(separatedLine);
   // const k = fs.readFileSync(f);
@@ -114,19 +116,63 @@ ipcMain.on('import-file', async (event, arg) => {
     result += `${dir}/`;
 
     // If the directory contains "lead-dbs-programmer", stop the loop
-    if (dir === 'programmergroup') {
+    if (dir === 'programmer') {
       break;
     }
   }
 
-  const fileName = 'inputData.json';
-  const filePath = path.join(result, fileName);
-  console.log(filePath);
-  // const testFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/lead-dbs-programmer/inputData.json';
-  const f = fs.readFileSync(filePath);
-  const jsonData = JSON.parse(f);
-  console.log('MADEITHERE');
-  event.reply('import-file', jsonData);
+  const prefsFileName = 'Preferences.json';
+  const prefsFilePath = path.join(result, prefsFileName);
+  const k = fs.readFileSync(prefsFilePath);
+  const prefsData = JSON.parse(k);
+  const leadPath = prefsData.LeadDBS_Path;
+
+  // let normalLeadPath = leadPath.replace(/\\\//g, '/');
+  // let filePath = path.join(normalLeadPath, 'programmer/inputData.json');
+  // // const fileName = 'inputData.json';
+  // // const filePath = path.join(result, fileName);
+  // console.log(filePath);
+  // // const testFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/lead-dbs-programmer/inputData.json';
+  // const f = fs.readFileSync(filePath);
+  // const jsonData = JSON.parse(f);
+  // let stimPath = jsonData.stimDir;
+  // stimulationDirectory = stimPath.replace(/\\\//g, '/');
+  // patientID = jsonData.patientname;
+  // console.log('STIMDIREC; ', stimulationDirectory);
+  // event.reply('import-file', jsonData);
+
+  try {
+    // Normalize the lead path
+    let normalLeadPath = leadPath.replace(/\\\//g, '/');
+    let filePath = path.join(normalLeadPath, 'programmer/inputData.json');
+    console.log(filePath);
+
+    // Read the file
+    const f = fs.readFileSync(filePath);
+
+    // Parse the JSON data
+    const jsonData = JSON.parse(f);
+
+    // Extract and normalize the stimulation directory
+    let stimPath = jsonData.stimDir;
+    stimulationDirectory = stimPath.replace(/\\\//g, '/');
+    patientID = jsonData.patientname;
+
+    // Log and send the data
+    console.log('STIMDIREC:', stimulationDirectory);
+    event.reply('import-file', jsonData);
+  } catch (err) {
+    // Handle specific errors
+    if (err.code === 'ENOENT') {
+      console.error('File not found:', filePath);
+    } else if (err.name === 'SyntaxError') {
+      console.error('Error parsing JSON:', err.message);
+    } else {
+      console.error('An unexpected error occurred:', err);
+    }
+    // Optionally, you could send an error reply to the event
+    event.reply('import-file-error', err.message);
+  }
 });
 
 ipcMain.on('import-previous-files', (event, fileID, importData) => {
@@ -249,6 +295,49 @@ ipcMain.on('close-window', (event, arg) => {
 const { dialog } = require('electron');
 const fs = require('fs');
 
+// ipcMain.on('save-file', (event, file, data) => {
+//   // Example of saving data to a file
+//   // const filePath = app.getPath('downloads') + '/data.txt';
+//   // const currentDirectory = app.getAppPath();
+//   // const currentDirectory = '/Users/savirmadan/Development/lead-dbs-programmer';
+//   console.log('FILE: ', file);
+//   const currentDirectory = app.getAppPath();
+//   const directories = currentDirectory.split('/');
+
+//   // Initialize a variable to store the result
+//   let result = '';
+
+//   // Loop through the directories
+//   for (const dir of directories) {
+//     // Append each directory to the result
+//     result += `${dir}/`;
+
+//     // If the directory contains "lead-dbs-programmer", stop the loop
+//     if (dir === 'programmergroup') {
+//       break;
+//     }
+//   }
+//   // console.log(currentDirectory + '/lead-dbs-programmer');
+//   if (currentDirectory) {
+//     // Convert data to string format
+//     const dataString = JSON.stringify(data);
+//     const fileName = 'data.json';
+//     const filePath = path.join(result, fileName);
+//     // const filePath = './dist/main/webpack:/leaddbs-stimcontroller/main.js';
+//     // Write data to file
+//     try {
+//       fs.writeFileSync(filePath, dataString);
+//     } catch (error) {
+//       // Handle the error here
+//       console.error('Error writing to file:', error);
+//     }
+//     // fs.writeFileSync(file, dataString);
+
+//     // Send a response back to the renderer process
+//     event.reply('file-saved', filePath);
+//   }
+// });
+
 ipcMain.on('save-file', (event, file, data) => {
   // Example of saving data to a file
   // const filePath = app.getPath('downloads') + '/data.txt';
@@ -267,7 +356,7 @@ ipcMain.on('save-file', (event, file, data) => {
     result += `${dir}/`;
 
     // If the directory contains "lead-dbs-programmer", stop the loop
-    if (dir === 'programmergroup') {
+    if (dir === 'programmer') {
       break;
     }
   }
@@ -275,8 +364,19 @@ ipcMain.on('save-file', (event, file, data) => {
   if (currentDirectory) {
     // Convert data to string format
     const dataString = JSON.stringify(data);
-    const fileName = 'data.json';
-    const filePath = path.join(result, fileName);
+    const prefsFileName = 'Preferences.json';
+    const prefsFilePath = path.join(result, prefsFileName);
+    const k = fs.readFileSync(prefsFilePath);
+    const prefsData = JSON.parse(k);
+    const leadPath = prefsData.LeadDBS_Path;
+    let normalLeadPath = leadPath.replace(/\\\//g, '/');
+    let filePath = path.join(normalLeadPath, 'programmer/data.json');
+    // console.log('DATALABEL: ', data.S.label);
+    // const outputFolder = path.join(stimulationDirectory, data.S.label);
+    // const outputFileName = `${patientID}_desc-stimparameters.json`;
+    // const outputFilePath = path.join(outputFolder, outputFileName);
+    // const fileName = 'data.json';
+    // const filePath = path.join(result, fileName);
     // const filePath = './dist/main/webpack:/leaddbs-stimcontroller/main.js';
     // Write data to file
     try {
@@ -285,7 +385,18 @@ ipcMain.on('save-file', (event, file, data) => {
       // Handle the error here
       console.error('Error writing to file:', error);
     }
-    // fs.writeFileSync(file, dataString);
+    // // Extract the directory path from the file path
+    // const dir = path.dirname(outputFilePath);
+
+    // // Check if the directory exists
+    // if (!fs.existsSync(dir)) {
+    //   // If the directory doesn't exist, create it (including any necessary subdirectories)
+    //   fs.mkdirSync(dir, { recursive: true });
+    // }
+
+    // // Now you can create or open the file
+    // fs.writeFileSync(outputFilePath, dataString, { flag: 'w' });
+    // fs.writeFileSync(outputFilePath, dataString);
 
     // Send a response back to the renderer process
     event.reply('file-saved', filePath);
@@ -406,7 +517,8 @@ const createWindow = async () => {
     // // maxHeight: 1200, // Maximum height of the window
     // minWidth: 1000, // Minimum width of the window
     // minHeight: 1200, // Minimum height of the window
-    icon: getAssetPath('icon.png'),
+    // icon: getAssetPath('icon.png'),
+    icon: getAssetPath('lead_dbs_icon_web.png'),
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
