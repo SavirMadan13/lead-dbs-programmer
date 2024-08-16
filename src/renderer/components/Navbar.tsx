@@ -74,7 +74,7 @@ export default function Navbar() {
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           Lead-DBS Programmer
         </Typography>
-        {isMobile ? (
+        {/* {isMobile ? (
           <>
             <IconButton color="inherit" onClick={() => toggleDrawer(true)}>
               Button
@@ -91,7 +91,7 @@ export default function Navbar() {
           </>
         ) : (
           menuItems
-        )}
+        )} */}
       </Toolbar>
       {/* <StimulationSettings /> */}
     </AppBar>

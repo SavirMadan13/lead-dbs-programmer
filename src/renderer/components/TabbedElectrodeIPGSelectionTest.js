@@ -1970,7 +1970,7 @@ function TabbedElectrodeIPGSelection({
         </button> */}
       </div>
       <div style={{ textAlign: 'center', paddingBottom: '35px' }}>
-        <button className="export-button-final" onClick={sendDataToMain}>
+        <button className="export-button-final" onClick={sendDataToMain} style={{ marginRight: '15px' }}>
           Stimulate and Close
         </button>
         <button className="export-button-final" onClick={closeFunction}>

@@ -1,1 +1,1277 @@
-{"numElectrodes":2,"electrodeModel":"Medtronic B33005","label":"20240604153721","patientname":"sub-CbctDbs0350","priorStims":[{"name":".","folder":"/Users/savirmadan/Documents/Localizations/LeadDBS/Output/Patient0350Output/derivatives/leaddbs/sub-CbctDbs0350/stimulations/MNI152NLin2009bAsym","date":"04-Jun-2024 12:10:30","bytes":0,"isdir":true,"datenum":739407.5072916667},{"name":"..","folder":"/Users/savirmadan/Documents/Localizations/LeadDBS/Output/Patient0350Output/derivatives/leaddbs/sub-CbctDbs0350/stimulations/MNI152NLin2009bAsym","date":"04-Jun-2024 11:28:36","bytes":0,"isdir":true,"datenum":739407.47819444444},{"name":"20240604418818","folder":"/Users/savirmadan/Documents/Localizations/LeadDBS/Output/Patient0350Output/derivatives/leaddbs/sub-CbctDbs0350/stimulations/MNI152NLin2009bAsym","date":"04-Jun-2024 12:12:19","bytes":0,"isdir":true,"datenum":739407.5085532408},{"name":"20240604452495","folder":"/Users/savirmadan/Documents/Localizations/LeadDBS/Output/Patient0350Output/derivatives/leaddbs/sub-CbctDbs0350/stimulations/MNI152NLin2009bAsym","date":"04-Jun-2024 11:28:44","bytes":0,"isdir":true,"datenum":739407.478287037},{"name":"20240604957942","folder":"/Users/savirmadan/Documents/Localizations/LeadDBS/Output/Patient0350Output/derivatives/leaddbs/sub-CbctDbs0350/stimulations/MNI152NLin2009bAsym","date":"04-Jun-2024 11:49:33","bytes":0,"isdir":true,"datenum":739407.49274305557}]}
+{
+	"numElectrodes": 2,
+	"electrodeModel": "Boston Scientific Vercise Directed",
+	"label": "20240816095538",
+	"labels": [
+		"20240505557076",
+		"20240806201227",
+		[]
+	],
+	"patientname": "sub-CbctDbs0333",
+	"stimDir": "\/Volumes\/Expansion\/OLD\/Patient0333Output\/derivatives\/leaddbs\/sub-CbctDbs0333\/stimulations\/MNI152NLin2009bAsym",
+	"S": [
+		{
+			"label": "20240505557076",
+			"Rs1": {
+				"k0": {
+					"perc": 100,
+					"pol": 1,
+					"imp": 1
+				},
+				"k1": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k2": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k3": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k4": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k5": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k6": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k7": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 100,
+					"pol": 2
+				},
+				"amp": 2,
+				"va": 2
+			},
+			"Rs2": {
+				"k0": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k1": {
+					"perc": 100,
+					"pol": 1,
+					"imp": 1
+				},
+				"k2": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k3": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k4": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k5": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k6": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k7": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 100,
+					"pol": 2
+				},
+				"amp": 0,
+				"frequency": 0,
+				"va": 0
+			},
+			"Rs3": {
+				"k0": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k1": {
+					"perc": 100,
+					"pol": 1,
+					"imp": 1
+				},
+				"k2": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k3": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k4": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k5": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k6": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k7": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 100,
+					"pol": 2
+				},
+				"amp": 0,
+				"frequency": 0,
+				"va": 0
+			},
+			"Rs4": {
+				"k0": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k1": {
+					"perc": 100,
+					"pol": 1,
+					"imp": 1
+				},
+				"k2": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k3": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k4": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k5": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k6": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k7": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 100,
+					"pol": 2
+				},
+				"amp": 0,
+				"frequency": 0,
+				"va": 0
+			},
+			"Ls1": {
+				"k8": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k9": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k10": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k11": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k12": {
+					"perc": 100,
+					"pol": 1,
+					"imp": 1
+				},
+				"k13": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k14": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k15": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 100,
+					"pol": 2
+				},
+				"amp": 4,
+				"va": 2
+			},
+			"Ls2": {
+				"k8": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k9": {
+					"perc": 100,
+					"pol": 1,
+					"imp": 1
+				},
+				"k10": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k11": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k12": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k13": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k14": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k15": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 100,
+					"pol": 2
+				},
+				"amp": 0,
+				"frequency": 0,
+				"va": 0
+			},
+			"Ls3": {
+				"k8": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k9": {
+					"perc": 100,
+					"pol": 1,
+					"imp": 1
+				},
+				"k10": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k11": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k12": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k13": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k14": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k15": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 100,
+					"pol": 2
+				},
+				"amp": 0,
+				"frequency": 0,
+				"va": 0
+			},
+			"Ls4": {
+				"k8": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k9": {
+					"perc": 100,
+					"pol": 1,
+					"imp": 1
+				},
+				"k10": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k11": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k12": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k13": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k14": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k15": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 100,
+					"pol": 2
+				},
+				"amp": 0,
+				"frequency": 0,
+				"va": 0
+			},
+			"active": [
+				[1],
+				[1]
+			],
+			"model": "SimBio\/FieldTrip (see Horn 2017)",
+			"monopolarmodel": 0,
+			"amplitude": [
+				[2,0,0,0],
+				[4,0,0,0]
+			],
+			"activecontacts": [
+				[1,0,0,0,0,0,0,0],
+				[0,0,0,0,1,0,0,0]
+			],
+			"template": "warp",
+			"sources": [1,2,3,4],
+			"elmodel": [
+				[
+					"boston_vercise_directed",
+					"boston_vercise_directed"
+				]
+			],
+			"ipg": "Boston",
+			"volume": [0,89.25156472]
+		},
+		{
+			"label": "20240806201227",
+			"Rs1": {
+				"k0": {
+					"perc": 100,
+					"pol": 1,
+					"imp": 1
+				},
+				"k1": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k2": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k3": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k4": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k5": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k6": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k7": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 100,
+					"pol": 2
+				},
+				"amp": 2,
+				"va": 2
+			},
+			"Rs2": {
+				"k0": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k1": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k2": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k3": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k4": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k5": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k6": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k7": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 0,
+					"pol": 0
+				},
+				"amp": 0,
+				"frequency": 0,
+				"pulseWidth": 0,
+				"va": 0
+			},
+			"Rs3": {
+				"k0": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k1": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k2": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k3": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k4": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k5": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k6": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k7": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 0,
+					"pol": 0
+				},
+				"amp": 0,
+				"frequency": 0,
+				"pulseWidth": 0,
+				"va": 0
+			},
+			"Rs4": {
+				"k0": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k1": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k2": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k3": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k4": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k5": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k6": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k7": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 0,
+					"pol": 0
+				},
+				"amp": 0,
+				"frequency": 0,
+				"pulseWidth": 0,
+				"va": 0
+			},
+			"Ls1": {
+				"k8": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k9": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k10": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k11": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k12": {
+					"perc": 100,
+					"pol": 1,
+					"imp": 1
+				},
+				"k13": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k14": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k15": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 100,
+					"pol": 2
+				},
+				"amp": 4,
+				"va": 2
+			},
+			"Ls2": {
+				"k8": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k9": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k10": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k11": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k12": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k13": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k14": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k15": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 0,
+					"pol": 0
+				},
+				"amp": 0,
+				"frequency": 0,
+				"pulseWidth": 0,
+				"va": 0
+			},
+			"Ls3": {
+				"k8": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k9": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k10": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k11": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k12": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k13": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k14": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k15": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 0,
+					"pol": 0
+				},
+				"amp": 0,
+				"frequency": 0,
+				"pulseWidth": 0,
+				"va": 0
+			},
+			"Ls4": {
+				"k8": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k9": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k10": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k11": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k12": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k13": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k14": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k15": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 0,
+					"pol": 0
+				},
+				"amp": 0,
+				"frequency": 0,
+				"pulseWidth": 0,
+				"va": 0
+			},
+			"active": [
+				[1],
+				[1]
+			],
+			"model": "SimBio\/FieldTrip (see Horn 2017)",
+			"monopolarmodel": 0,
+			"amplitude": [
+				[2,0,0,0],
+				[4,0,0,0]
+			],
+			"activecontacts": [
+				[1,0,0,0,0,0,0,0],
+				[0,0,0,0,1,0,0,0]
+			],
+			"template": "warp",
+			"sources": [1,2,3,4],
+			"elmodel": [
+				[
+					"boston_vercise_directed",
+					"boston_vercise_directed"
+				]
+			],
+			"ipg": "Boston",
+			"volume": [0,85.61062518]
+		},
+		{
+			"label": [],
+			"Rs1": {
+				"k0": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k1": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k2": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k3": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k4": {
+					"perc": 100,
+					"pol": 1,
+					"imp": 1
+				},
+				"k5": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k6": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k7": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 100,
+					"pol": 2
+				},
+				"amp": 4,
+				"va": 2
+			},
+			"Rs2": {
+				"k0": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k1": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k2": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k3": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k4": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k5": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k6": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k7": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 0,
+					"pol": 0
+				},
+				"amp": 0,
+				"frequency": 0,
+				"pulseWidth": 0,
+				"va": 0
+			},
+			"Rs3": {
+				"k0": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k1": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k2": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k3": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k4": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k5": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k6": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k7": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 0,
+					"pol": 0
+				},
+				"amp": 0,
+				"frequency": 0,
+				"pulseWidth": 0,
+				"va": 0
+			},
+			"Rs4": {
+				"k0": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k1": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k2": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k3": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k4": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k5": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k6": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k7": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 0,
+					"pol": 0
+				},
+				"amp": 0,
+				"frequency": 0,
+				"pulseWidth": 0,
+				"va": 0
+			},
+			"Ls1": {
+				"k8": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k9": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k10": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k11": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k12": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k13": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k14": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k15": {
+					"perc": 100,
+					"pol": 1,
+					"imp": 1
+				},
+				"case": {
+					"perc": 100,
+					"pol": 2
+				},
+				"amp": 2,
+				"va": 2
+			},
+			"Ls2": {
+				"k8": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k9": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k10": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k11": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k12": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k13": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k14": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k15": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 0,
+					"pol": 0
+				},
+				"amp": 0,
+				"frequency": 0,
+				"pulseWidth": 0,
+				"va": 0
+			},
+			"Ls3": {
+				"k8": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k9": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k10": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k11": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k12": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k13": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k14": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k15": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 0,
+					"pol": 0
+				},
+				"amp": 0,
+				"frequency": 0,
+				"pulseWidth": 0,
+				"va": 0
+			},
+			"Ls4": {
+				"k8": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k9": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k10": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k11": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k12": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k13": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k14": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"k15": {
+					"perc": 0,
+					"pol": 0,
+					"imp": 1
+				},
+				"case": {
+					"perc": 0,
+					"pol": 0
+				},
+				"amp": 0,
+				"frequency": 0,
+				"pulseWidth": 0,
+				"va": 0
+			},
+			"active": [
+				[1],
+				[1]
+			],
+			"model": "SimBio\/FieldTrip (see Horn 2017)",
+			"monopolarmodel": 0,
+			"amplitude": [
+				[4,0,0,0],
+				[2,0,0,0]
+			],
+			"activecontacts": [
+				[0,0,0,0,1,0,0,0],
+				[0,0,0,0,0,0,0,1]
+			],
+			"template": "warp",
+			"sources": [1,2,3,4],
+			"elmodel": [
+				[
+					"boston_vercise_directed",
+					"boston_vercise_directed"
+				]
+			],
+			"ipg": "Boston",
+			"volume": 85.59656869
+		}
+	]
+}

@@ -1,696 +1,437 @@
-/* eslint-disable react/self-closing-comp */
 import { MemoryRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
 import Dropdown from 'react-bootstrap/dropdown';
-import { Container } from 'react-bootstrap';
 import { Slider } from '@mui/material';
-import ImageDisplay from './components/ImageDisplay';
-import ElectrodeIPGSelection from './components/ElectrodeIPGSelection';
-import TripleToggle from './components/TripleToggle';
-import { ReactComponent as MySVG } from './components/electrode_models/images/IPG.svg';
-import StimulationParameters from './components/StimulationParameters';
-import ElectrodeSide from './components/ElectrodeSide';
-import TabbedElectrodeIPGSelection from './components/TabbedElectrodeIPGSelection';
 import TabbedElectrodeIPGSelectionTest from './components/TabbedElectrodeIPGSelectionTest';
-import MatToJsonConverter from './components/MatToJsonConverter';
-import JsonLoaderComponent from './components/extractPolValues';
-import JSONDataExtractor from './components/JSONDataExtractor';
-import NewBostonCartesiaTest from './components/NewBostonCartesiaTest';
-import TripleToggleTest from './components/TripleToggleTest';
 import Navbar from './components/Navbar';
 // import Navbar from 'react-bootstrap/Navbar'
 import StimulationSettings from './components/StimulationSettings';
-import PercentageAmplitudeToggle from './components/PercentageAmplitudeToggle';
-import AssistedToggle from './components/AssistedToggle';
-import LeadDbsImage from './logo512Padding-300x212.png';
-import MAToggleSwitch from './components/MAToggleSwitch';
-import ExportData from './components/ExportData';
-import AssistedButtons from './components/AssistedButtons';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { ButtonGroup, Button } from 'react-bootstrap';
+import GroupArchitecture from './components/GroupArchitecture';
+
+const importData = [];
 
 function Hello() {
   return (
     <div>
       <h1>Stimulation Controller</h1>
-      <div className="stimulation-parameters">
-        {/* <StimulationParameters /> */}
-      </div>
-      <div className="stimulation-parameters">
-        {/* <StimulationParameters /> */}
-      </div>
+      <div className="stimulation-parameters" />
+      <div className="stimulation-parameters" />
       <div className="Hello">
-        {/* <ElectrodeIPGSelection /> */}
-        {/* <JsonLoaderComponent /> */}
-        {/* <JSONDataExtractor /> */}
-        {/* <TripleToggleTest /> */}
-        <TabbedElectrodeIPGSelectionTest IPG={undefined} selectedElectrodeLeft={undefined} selectedElectrodeRight={undefined} allQuantities={undefined} setAllQuantities={undefined} allSelectedValues={undefined} setAllSelectedValues={undefined} allTotalAmplitudes={undefined} setAllTotalAmplitudes={undefined} allStimulationParameters={undefined} setAllStimulationParameters={undefined} visModel={undefined} setVisModel={undefined} sessionTitle={undefined} setSessionTitle={undefined} allTogglePositions={undefined} setAllTogglePositions={undefined} allPercAmpToggles={undefined} setAllPercAmpToggles={undefined} allVolAmpToggles={undefined} setAllVolAmpToggles={undefined} filePath={undefined} setFilePath={undefined} matImportFile={undefined} stimChanged={undefined} setStimChanged={undefined} />
-        {/* <NewBostonCartesiaTest /> */}
-        {/* <ElectrodeSide /> */}
-        {/* <TripleToggle /> */}
-        {/* <StimulationParameters /> */}
-        {/* <ElectrodeIPGSelection />
-        <ElectrodeModel /> */}
+        <TabbedElectrodeIPGSelectionTest
+          IPG={undefined}
+          selectedElectrodeLeft={undefined}
+          selectedElectrodeRight={undefined}
+          allQuantities={undefined}
+          setAllQuantities={undefined}
+          allSelectedValues={undefined}
+          setAllSelectedValues={undefined}
+          allTotalAmplitudes={undefined}
+          setAllTotalAmplitudes={undefined}
+          allStimulationParameters={undefined}
+          setAllStimulationParameters={undefined}
+          visModel={undefined}
+          setVisModel={undefined}
+          sessionTitle={undefined}
+          setSessionTitle={undefined}
+          allTogglePositions={undefined}
+          setAllTogglePositions={undefined}
+          allPercAmpToggles={undefined}
+          setAllPercAmpToggles={undefined}
+          allVolAmpToggles={undefined}
+          filePath={undefined}
+          setFilePath={undefined}
+          matImportFile={undefined}
+          stimChanged={undefined}
+          setStimChanged={undefined}
+        />
       </div>
     </div>
   );
 }
 
-// const RedirectToNewRoute = () => {
-//   return <Navigate to="/new-route" />;
-// };
-
 export default function App() {
-  const [IPG, setIPG] = useState('');
-  const [leftElectrode, setLeftElectrode] = useState('');
-  const [rightElectrode, setRightElectrode] = useState('');
-  // const [key, setKey] = useState('1');
-  const [allQuantities, setAllQuantities] = useState({});
-  const [allSelectedValues, setAllSelectedValues] = useState({});
-  const [allTotalAmplitudes, setAllTotalAmplitudes] = useState({});
-  const [allStimulationParameters, setAllStimulationParameters] = useState({});
-  const [visModel, setVisModel] = useState(['6']);
-  const [sessionTitle, setSessionTitle] = useState('');
-  const [allTogglePositions, setAllTogglePositions] = useState({});
-  const [allPercAmpToggles, setAllPercAmpToggles] = useState({});
-  const [allVolAmpToggles, setAllVolAmpToggles] = useState({});
-  const [importCount, setImportCount] = useState(0);
-  const [importData, setImportData] = useState('');
-  const [masterImportData, setMasterImportData] = useState('');
-  const [matImportFile, setMatImportFile] = useState(null);
-  const [newImportFiles, setNewImportFiles] = useState(null);
-  const [showDropdown, setShowDropdown] = useState(true);
-  const [filePath, setFilePath] = useState('');
-  const [stimChanged, setStimChanged] = useState(true);
+  let electrodeList: any[] = [];
+  const [patientName, setPatientName] = useState('');
+  const [patients, setPatients] = useState([]);
+  const [patientStates, setPatientStates] = useState({});
+  const [importNewS, setImportNewS] = useState({});
+  const [electrodeMaster, setElectrodeMaster] = useState('');
+  const [ipgMaster, setIpgMaster] = useState('');
 
-  const [newCount, setNewCount] = useState(0);
-
-  useEffect(() => {
-    window.electron.ipcRenderer.sendMessage('import-file', ['ping']);
-  }, []);
+  const initialState = {
+    IPG: '',
+    leftElectrode: '',
+    rightElectrode: '',
+    allQuantities: {},
+    allSelectedValues: {},
+    allTotalAmplitudes: {},
+    allStimulationParameters: {},
+    visModel: '3',
+    sessionTitle: '',
+    allTogglePositions: {},
+    allPercAmpToggles: {},
+    allVolAmpToggles: {},
+    importCount: 0,
+    importData: '',
+    masterImportData: '',
+    matImportFile: null,
+    newImportFiles: null,
+    showDropdown: true,
+    filePath: '',
+    stimChanged: true,
+  };
 
   const handleImportedElectrode = (importedElectrode) => {
-    if (importedElectrode === 'Boston Scientific Vercise Directed') {
-      setLeftElectrode('boston_vercise_directed');
-      setRightElectrode('boston_vercise_directed');
-      setIPG('Boston');
-    } else if (importedElectrode === 'Medtronic 3389') {
-      setLeftElectrode('medtronic_3389');
-      setRightElectrode('medtronic_3389');
-      setIPG('Medtronic_Activa');
-    } else if (importedElectrode === 'Medtronic 3387') {
-      setLeftElectrode('medtronic_3387');
-      setRightElectrode('medtronic_3387');
-      setIPG('Medtronic_Activa');
-    } else if (importedElectrode === 'Medtronic 3391') {
-      setLeftElectrode('medtronic_3391');
-      setRightElectrode('medtronic_3391');
-      setIPG('Medtronic_Activa');
-    } else if (importedElectrode === 'Medtronic B33005') {
-      setLeftElectrode('medtronic_b33005');
-      setRightElectrode('medtronic_b33005');
-      setIPG('Medtronic_Percept');
-    } else if (importedElectrode === 'Medtronic B33015') {
-      setLeftElectrode('medtronic_b33015');
-      setRightElectrode('medtronic_b33015');
-      setIPG('Medtronic_Percept');
-    } else if (importedElectrode === 'Boston Scientific Vercise') {
-      setLeftElectrode('boston_scientific_vercise');
-      setRightElectrode('boston_scientific_vercise');
-      setIPG('Boston');
-    } else if (importedElectrode === 'Boston Scientific Vercise Cartesia HX') {
-      setLeftElectrode('boston_scientific_vercise_cartesia_hx');
-      setRightElectrode('boston_scientific_vercise_cartesia_hx');
-      setIPG('Boston');
-    } else if (importedElectrode === 'Boston Scientific Vercise Cartesia X') {
-      setLeftElectrode('boston_scientific_vercise_cartesia_x');
-      setRightElectrode('boston_scientific_vercise_cartesia_x');
-      setIPG('Boston');
-    } else if (importedElectrode === 'Abbott ActiveTip (6146-6149)') {
-      setLeftElectrode('abbott_activetip_2mm');
-      setRightElectrode('abbott_activetip_2mm');
-      setIPG('Abbott');
-    } else if (importedElectrode === 'Abbott ActiveTip (6142-6145)') {
-      setLeftElectrode('abbott_activetip_3mm');
-      setRightElectrode('abbott_activetip_3mm');
-      setIPG('Abbott');
-    } else if (importedElectrode === 'Abbott Directed 6172 (short)') {
-      setLeftElectrode('abbott_directed_6172');
-      setRightElectrode('abbott_directed_6172');
-      setIPG('Abbott');
-    } else if (importedElectrode === 'Abbott Directed 6173 (long)') {
-      setLeftElectrode('abbott_directed_6173');
-      setRightElectrode('abbott_directed_6173');
-      setIPG('Abbott');
+    switch (importedElectrode) {
+      case 'Boston Scientific Vercise Directed':
+        return 'boston_vercise_directed';
+      case 'Medtronic 3389':
+        return 'medtronic_3389';
+      case 'Medtronic 3387':
+        return 'medtronic_3387';
+      case 'Medtronic 3391':
+        return 'medtronic_3391';
+      case 'Medtronic B33005':
+        return 'medtronic_b33005';
+      case 'Medtronic B33015':
+        return 'medtronic_b33015';
+      case 'Boston Scientific Vercise':
+        return 'boston_scientific_vercise';
+      case 'Boston Scientific Vercise Cartesia HX':
+        return 'boston_scientific_vercise_cartesia_hx';
+      case 'Boston Scientific Vercise Cartesia X':
+        return 'boston_scientific_vercise_cartesia_x';
+      case 'Abbott ActiveTip (6146-6149)':
+        return 'abott_activetip_2mm';
+      case 'Abbott ActiveTip (6142-6145)':
+        return 'abbott_activetip_3mm';
+      case 'Abbott Directed 6172 (short)':
+        return 'abott_directed_6172';
+      case 'Abbott Directed 6173 (long)':
+        return 'abott_directed_6173';
+      default:
+        return '';
     }
   };
 
-  window.electron.ipcRenderer.once('import-file', (arg) => {
-    const newImportedData = arg;
-    // setTestData(importData);
-    console.log('HERE');
-    console.log('Import Data App', newImportedData.label);
-    const numElectrodes = 'numElectrodes';
-    setMatImportFile(newImportedData.label);
-    const selectedElectrode = newImportedData.electrodeModel;
-    // setMatImportFile(stimDatasetList[3]);
-    // console.log('Stimdatasetlabel: ', stimDatasetList);
-    // console.log('masterData: ', arg);
-    handleImportedElectrode(selectedElectrode);
-  });
+  const handleIPG = (importedElectrode) => {
+    if (importedElectrode.includes('Boston')) {
+      return 'Boston';
+    }
+    if (importedElectrode.includes('Medtronic')) {
+      return 'Medtronic_Percept';
+    }
+    if (importedElectrode.includes('Abbott')) {
+      return 'Abbott';
+    }
+    return '';
+  };
+
+  window.electron.ipcRenderer.sendMessage('import-file', ['ping']);
+
+  const gatherImportedDataNew = (jsonData) => {
+    console.log(jsonData);
+
+    const newQuantities = {};
+    const newSelectedValues = {};
+    const newTotalAmplitude = {};
+    const newAllQuantities = {};
+
+    for (let j = 1; j < 5; j++) {
+      newTotalAmplitude[j] = jsonData.amplitude[0][j - 1];
+      newTotalAmplitude[j + 4] = jsonData.amplitude[1][j - 1];
+
+      console.log('newTotalAmplitude: ', newTotalAmplitude);
+
+      const dynamicKey2 = `Ls${j}`;
+      const dynamicKey3 = `Rs${j}`;
+
+      for (let i = 0; i < 9; i++) {
+        const dynamicKey = `k${i + 7}`;
+        const dynamicKey1 = `k${i}`;
+
+        if (jsonData[dynamicKey2] && jsonData[dynamicKey2][dynamicKey]) {
+          newQuantities[j] = newQuantities[j] || {};
+          newQuantities[j][i] = parseFloat(
+            jsonData[dynamicKey2][dynamicKey].perc,
+          );
+          newQuantities[j][0] = parseFloat(jsonData[dynamicKey2].case.perc);
+
+          const { pol } = jsonData[dynamicKey2][dynamicKey];
+          newSelectedValues[j] = newSelectedValues[j] || {};
+          newSelectedValues[j][i] =
+            pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
+
+          const casePol = jsonData[dynamicKey2].case.pol;
+          newSelectedValues[j][0] =
+            casePol === 0 ? 'left' : casePol === 1 ? 'center' : 'right';
+        }
+
+        if (jsonData[dynamicKey3] && jsonData[dynamicKey3][dynamicKey1]) {
+          newQuantities[j + 4] = newQuantities[j + 4] || {};
+          newQuantities[j + 4][i + 1] = parseFloat(
+            jsonData[dynamicKey3][dynamicKey1].perc,
+          );
+          newQuantities[j + 4][0] = parseFloat(jsonData[dynamicKey3].case.perc);
+
+          const { pol } = jsonData[dynamicKey3][dynamicKey1];
+          newSelectedValues[j + 4] = newSelectedValues[j + 4] || {};
+          newSelectedValues[j + 4][i + 1] =
+            pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
+
+          const casePol = jsonData[dynamicKey3].case.pol;
+          newSelectedValues[j + 4][0] =
+            casePol === 0 ? 'left' : casePol === 1 ? 'center' : 'right';
+        }
+      }
+
+      newAllQuantities[j] = newQuantities[j];
+      newAllQuantities[j + 4] = newQuantities[j + 4];
+    }
+
+    const filteredValues = Object.keys(newSelectedValues)
+      .filter((key) => Object.keys(newSelectedValues[key]).length > 0)
+      .reduce((obj, key) => {
+        obj[key] = newSelectedValues[key];
+        return obj;
+      }, {});
+
+    const filteredQuantities = Object.keys(newQuantities)
+      .filter((key) => Object.keys(newQuantities[key]).length > 0)
+      .reduce((obj, key) => {
+        obj[key] = newQuantities[key];
+        return obj;
+      }, {});
+
+    console.log('filtered', filteredQuantities);
+
+    return {
+      filteredQuantities,
+      filteredValues,
+      newTotalAmplitude,
+    };
+  };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowDropdown(false);
-    }, 1000); // Adjust the time to your preference (in milliseconds)
+    console.log(window.electron.ipcRenderer);
+    if (window.electron && window.electron.ipcRenderer) {
+      window.electron.ipcRenderer.once('import-file', (arg) => {
+        try {
+          console.log('Received import-file event');
+          console.log('Import Data:', arg.patientname);
+          setPatientName(arg.patientname);
+          console.log(arg);
+          electrodeList = arg.electrodeModel;
+          const outputElectrode = handleImportedElectrode(electrodeList);
+          const outputIPG = handleIPG(electrodeList);
+          setElectrodeMaster(outputElectrode);
+          setIpgMaster(outputIPG);
+          setImportNewS(arg.S);
 
-    return () => clearTimeout(timer);
+          const tempPatients = arg.labels;
+
+          let initialStates;
+
+          if (tempPatients.length === 1) {
+            const patient = tempPatients[0];
+            const electrodes = electrodeList[0];
+            const processedS = arg.S[0]
+              ? gatherImportedDataNew(arg.S[0])
+              : {
+                  filteredQuantities: {},
+                  filteredValues: {},
+                  newTotalAmplitude: {},
+                };
+            initialStates = {
+              [patient]: {
+                ...initialState,
+                leftElectrode: outputElectrode,
+                rightElectrode: outputElectrode,
+                IPG: outputIPG,
+                allQuantities: processedS.filteredQuantities,
+                allSelectedValues: processedS.filteredValues,
+                allTotalAmplitudes: processedS.newTotalAmplitude,
+              },
+            };
+          } else {
+            initialStates = tempPatients.reduce((acc, patient, index) => {
+              console.log(`Processing patient ${index + 1}`);
+              const electrodes = electrodeList[index];
+              const processedS = arg.S[index]
+                ? gatherImportedDataNew(arg.S[index])
+                : {
+                    filteredQuantities: {},
+                    filteredValues: {},
+                    newTotalAmplitude: {},
+                  };
+              acc[patient] = {
+                ...initialState,
+                leftElectrode: outputElectrode,
+                rightElectrode: outputElectrode,
+                IPG: outputIPG,
+                allQuantities: processedS.filteredQuantities,
+                allSelectedValues: processedS.filteredValues,
+                allTotalAmplitudes: processedS.newTotalAmplitude,
+              };
+              return acc;
+            }, {});
+          }
+
+          console.log('Patients:', tempPatients);
+          setPatientStates(initialStates);
+          setPatients(tempPatients);
+        } catch (error) {
+          console.error('Error processing import-file event:', error);
+        }
+      });
+    } else {
+      console.error('ipcRenderer is not available');
+    }
   }, []);
 
-  const zoomIn = () => {
-    window.electron.zoom.zoomIn();
-  };
-
-  const zoomOut = () => {
-    window.electron.zoom.zoomOut();
-  };
-
-  const resetZoom = () => {
-    window.electron.zoom.resetZoom();
-  };
+  // useEffect(() => {
+  //   console.log(window.electron.ipcRenderer);
+  //   if (window.electron && window.electron.ipcRenderer) {
+  //     window.electron.ipcRenderer.once('import-file', (arg) => {
+  //       try {
+  //         console.log('Received import-file event');
+  //         console.log('Import Data:', arg.patientname);
+  //         setPatientName(arg.patientname);
+  //         console.log(arg);
+  //         // electrodeList = arg.electrodeModel;
+  //         electrodeList = arg.electrodeModel;
+  //         const outputElectrode = handleImportedElectrode(electrodeList);
+  //         const outputIPG = handleIPG(electrodeList);
+  //         setElectrodeMaster(outputElectrode);
+  //         setIpgMaster(outputIPG);
+  //         setImportNewS(arg.S);
+  //         const tempPatients = arg.labels;
+  //         const initialStates = tempPatients.reduce((acc, patient, index) => {
+  //           console.log(`Processing patient ${index + 1}`);
+  //           const electrodes = electrodeList[index];
+  //           console.log('Electrodes:', electrodes);
+  //           // const outputElectrode = handleImportedElectrode(electrodes);
+  //           // const outputIPG = handleIPG(electrodes);
+  //           console.log('ARG.S.Index: ', arg.S[index]);
+  //           const processedS = arg.S[index]
+  //             ? gatherImportedDataNew(arg.S[index])
+  //             : {
+  //                 filteredQuantities: {},
+  //                 filteredValues: {},
+  //                 newTotalAmplitude: {},
+  //               };
+  //           acc[patient] = {
+  //             ...initialState,
+  //             leftElectrode: outputElectrode,
+  //             rightElectrode: outputElectrode,
+  //             IPG: outputIPG,
+  //             allQuantities: processedS.filteredQuantities,
+  //             allSelectedValues: processedS.filteredValues,
+  //             allTotalAmplitudes: processedS.newTotalAmplitude,
+  //           };
+  //           return acc;
+  //         }, {});
+  //         console.log('Patients:', tempPatients);
+  //         setPatientStates(initialStates);
+  //         setPatients(tempPatients);
+  //       } catch (error) {
+  //         console.error('Error processing import-file event:', error);
+  //       }
+  //     });
+  //   } else {
+  //     console.error('ipcRenderer is not available');
+  //   }
+  // }, []);
 
   const [zoomLevel, setZoomLevel] = useState(-1);
 
   const handleZoomChange = (event, newValue) => {
     setZoomLevel(newValue);
-    window.electron.zoom.setZoomLevel(newValue);
+    if (window.electron && window.electron.zoom) {
+      window.electron.zoom.setZoomLevel(newValue);
+    } else {
+      console.error('Zoom functionality is not available');
+    }
   };
 
-  useEffect(() => {
-    window.electron.zoom.setZoomLevel(zoomLevel);
-  }, [zoomLevel]);
+  // const appContainerRef = useRef(null);
+
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     const width = window.innerWidth;
+  //     const height = window.innerHeight;
+
+  //     // Base dimensions that match your design
+  //     const baseWidth = 1100;
+  //     const baseHeight = 800;
+
+  //     // Calculate the scale factor to fit the current window size
+  //     const scaleX = width / baseWidth;
+  //     const scaleY = height / baseHeight;
+  //     const scale = Math.min(scaleX, scaleY);
+
+  //     // Apply the scale transform
+  //     appContainerRef.current.style.transform = `scale(${scale})`;
+  //   };
+
+  //   // Set up a resize observer to call handleResize on size changes
+  //   const resizeObserver = new ResizeObserver(handleResize);
+  //   resizeObserver.observe(document.body);
+
+  //   // Initial scale application
+  //   handleResize();
+
+  //   // Clean up on component unmount
+  //   return () => {
+  //     resizeObserver.disconnect();
+  //   };
+  // }, []);
 
   return (
-    // <Router>
-    //   <div className="Navbar">
-    //     <Navbar />
-    //     {/* <div>
-    //       <button onClick={zoomIn}>Zoom In</button>
-    //       <button onClick={zoomOut}>Zoom Out</button>
-    //       <button onClick={resetZoom}>Reset Zoom</button>
-    //     </div> */}
-    //     {/* <img src="./logo512Padding-300x212.png" alt="leadDBS" /> */}
-    //     <Slider
-    //       value={zoomLevel}
-    //       onChange={handleZoomChange}
-    //       aria-label="Zoom Level"
-    //       // valueLabelDisplay="auto"
-    //       step={1}
-    //       marks
-    //       min={-3}
-    //       max={3}
-    //       sx={{
-    //         '& .MuiSlider-mark': {
-    //           backgroundColor: 'black', // Change the color of the marks
-    //           height: '10px', // Adjust the height of the marks
-    //           width: '2px', // Adjust the width of the marks
-    //         },
-    //         // '& .MuiSlider-rail': {
-    //         //   backgroundColor: 'grey', // Change the color of the rail
-    //         // },
-    //       }}
-    //     />
-    //   </div>
-    //   {/* {showDropdown && (
-    //     <StimulationSettings
-    //       IPG={IPG}
-    //       setIPG={setIPG}
-    //       leftElectrode={leftElectrode}
-    //       setLeftElectrode={setLeftElectrode}
-    //       rightElectrode={rightElectrode}
-    //       setRightElectrode={setRightElectrode}
-    //       allQuantities={allQuantities}
-    //       setAllQuantities={setAllQuantities}
-    //       allSelectedValues={allSelectedValues}
-    //       setAllSelectedValues={setAllSelectedValues}
-    //       allTotalAmplitudes={allTotalAmplitudes}
-    //       setAllTotalAmplitudes={setAllTotalAmplitudes}
-    //       allTogglePositions={allTogglePositions}
-    //       setAllTogglePositions={setAllTogglePositions}
-    //       allPercAmpToggles={allPercAmpToggles}
-    //       setAllPercAmpToggles={setAllPercAmpToggles}
-    //       allVolAmpToggles={allVolAmpToggles}
-    //       setAllVolAmpToggles={setAllVolAmpToggles}
-    //       importCount={importCount}
-    //       setImportCount={setImportCount}
-    //       importDataTest={importData}
-    //       setImportDataTest={setImportData}
-    //       masterImportData={masterImportData}
-    //       setMasterImportData={setMasterImportData}
-    //       matImportFile={matImportFile}
-    //       setMatImportFile={setMatImportFile}
-    //       newImportFiles={newImportFiles}
-    //       setNewImportFiles={setNewImportFiles}
-    //       filePath={filePath}
-    //       setFilePath={setFilePath}
-    //       stimChanged={stimChanged}
-    //       setStimChanged={setStimChanged}
-    //       allStimulationParameters={allStimulationParameters}
-    //       setAllStimulationParameters={setAllStimulationParameters}
-    //       visModel={visModel}
-    //       setVisModel={setVisModel}
-    //       sessionTitle={sessionTitle}
-    //       setSessionTitle={setSessionTitle}
-    //     />
-    //   )} */}
-    //   {/* <Dropdown style={{ marginLeft: 100 }}>
-    //     <Dropdown.Toggle variant="secondary" id="dropdown-button-dark-example1">
-    //       Stimulation Settings
-    //     </Dropdown.Toggle>
-    //     <Dropdown.Menu>
-    //       <StimulationSettings
-    //         IPG={IPG}
-    //         setIPG={setIPG}
-    //         leftElectrode={leftElectrode}
-    //         setLeftElectrode={setLeftElectrode}
-    //         rightElectrode={rightElectrode}
-    //         setRightElectrode={setRightElectrode}
-    //         allQuantities={allQuantities}
-    //         setAllQuantities={setAllQuantities}
-    //         allSelectedValues={allSelectedValues}
-    //         setAllSelectedValues={setAllSelectedValues}
-    //         allTotalAmplitudes={allTotalAmplitudes}
-    //         setAllTotalAmplitudes={setAllTotalAmplitudes}
-    //         allTogglePositions={allTogglePositions}
-    //         setAllTogglePositions={setAllTogglePositions}
-    //         allPercAmpToggles={allPercAmpToggles}
-    //         setAllPercAmpToggles={setAllPercAmpToggles}
-    //         allVolAmpToggles={allVolAmpToggles}
-    //         setAllVolAmpToggles={setAllVolAmpToggles}
-    //         importCount={importCount}
-    //         setImportCount={setImportCount}
-    //         importDataTest={importData}
-    //         setImportDataTest={setImportData}
-    //         masterImportData={masterImportData}
-    //         setMasterImportData={setMasterImportData}
-    //         matImportFile={matImportFile}
-    //         setMatImportFile={setMatImportFile}
-    //         newImportFiles={newImportFiles}
-    //         setNewImportFiles={setNewImportFiles}
-    //         filePath={filePath}
-    //         setFilePath={setFilePath}
-    //         stimChanged={stimChanged}
-    //         setStimChanged={setStimChanged}
-    //       />
-    //     </Dropdown.Menu>
-    //   </Dropdown> */}
-    //   {/* <StimulationSettings
-    //     IPG={IPG}
-    //     setIPG={setIPG}
-    //     leftElectrode={leftElectrode}
-    //     setLeftElectrode={setLeftElectrode}
-    //     rightElectrode={rightElectrode}
-    //     setRightElectrode={setRightElectrode}
-    //     allQuantities={allQuantities}
-    //     setAllQuantities={setAllQuantities}
-    //     allSelectedValues={allSelectedValues}
-    //     setAllSelectedValues={setAllSelectedValues}
-    //     allTotalAmplitudes={allTotalAmplitudes}
-    //     setAllTotalAmplitudes={setAllTotalAmplitudes}
-    //     allTogglePositions={allTogglePositions}
-    //     setAllTogglePositions={setAllTogglePositions}
-    //     allPercAmpToggles={allPercAmpToggles}
-    //     setAllPercAmpToggles={setAllPercAmpToggles}
-    //     allVolAmpToggles={allVolAmpToggles}
-    //     setAllVolAmpToggles={setAllVolAmpToggles}
-    //     importCount={importCount}
-    //     setImportCount={setImportCount}
-    //     importDataTest={importData}
-    //     setImportDataTest={setImportData}
-    //     masterImportData={masterImportData}
-    //     setMasterImportData={setMasterImportData}
-    //     matImportFile={matImportFile}
-    //     setMatImportFile={setMatImportFile}
-    //     newImportFiles={newImportFiles}
-    //     setNewImportFiles={setNewImportFiles}
-    //     filePath={filePath}
-    //     setFilePath={setFilePath}
-    //     stimChanged={stimChanged}
-    //     setStimChanged={setStimChanged}
-    //     allStimulationParameters={allStimulationParameters}
-    //     setAllStimulationParameters={setAllStimulationParameters}
-    //     visModel={visModel}
-    //     setVisModel={setVisModel}
-    //     sessionTitle={sessionTitle}
-    //     setSessionTitle={setSessionTitle}
-    //   /> */}
-    //   {/* {leftElectrode && (
-    //     <TabbedElectrodeIPGSelectionTest
-    //       selectedElectrodeLeft={leftElectrode}
-    //       selectedElectrodeRight={rightElectrode}
-    //       IPG={IPG}
-    //       // key={key}
-    //       // setKey={setKey}
-    //       allQuantities={allQuantities}
-    //       setAllQuantities={setAllQuantities}
-    //       allSelectedValues={allSelectedValues}
-    //       setAllSelectedValues={setAllSelectedValues}
-    //       allTotalAmplitudes={allTotalAmplitudes}
-    //       setAllTotalAmplitudes={setAllTotalAmplitudes}
-    //       allStimulationParameters={allStimulationParameters}
-    //       setAllStimulationParameters={setAllStimulationParameters}
-    //       visModel={visModel}
-    //       setVisModel={setVisModel}
-    //       sessionTitle={sessionTitle}
-    //       setSessionTitle={setSessionTitle}
-    //       allTogglePositions={allTogglePositions}
-    //       setAllTogglePositions={setAllTogglePositions}
-    //       allPercAmpToggles={allPercAmpToggles}
-    //       setAllPercAmpToggles={setAllPercAmpToggles}
-    //       allVolAmpToggles={allVolAmpToggles}
-    //       setAllVolAmpToggles={setAllVolAmpToggles}
-    //       filePath={filePath}
-    //       setFilePath={setFilePath}
-    //       matImportFile={matImportFile}
-    //       stimChanged={stimChanged}
-    //       setStimChanged={setStimChanged}
-    //     />
-    //   )} */}
-    //   {/* <TabbedElectrodeIPGSelectionTest
-    //     selectedElectrodeLeft={leftElectrode}
-    //     selectedElectrodeRight={rightElectrode}
-    //     IPG={IPG}
-    //     allQuantities={allQuantities}
-    //     setAllQuantities={setAllQuantities}
-    //     allSelectedValues={allSelectedValues}
-    //     setAllSelectedValues={setAllSelectedValues}
-    //     allTotalAmplitudes={allTotalAmplitudes}
-    //     setAllTotalAmplitudes={setAllTotalAmplitudes}
-    //     allStimulationParameters={allStimulationParameters}
-    //     setAllStimulationParameters={setAllStimulationParameters}
-    //     visModel={visModel}
-    //     setVisModel={setVisModel}
-    //     sessionTitle={sessionTitle}
-    //     setSessionTitle={setSessionTitle}
-    //     allTogglePositions={allTogglePositions}
-    //     setAllTogglePositions={setAllTogglePositions}
-    //     allPercAmpToggles={allPercAmpToggles}
-    //     setAllPercAmpToggles={setAllPercAmpToggles}
-    //     allVolAmpToggles={allVolAmpToggles}
-    //     setAllVolAmpToggles={setAllVolAmpToggles}
-    //     filePath={filePath}
-    //     setFilePath={setFilePath}
-    //     matImportFile={matImportFile}
-    //     stimChanged={stimChanged}
-    //     setStimChanged={setStimChanged}
-    //   /> */}
-    //   <Routes>
-    //     {/* <Route path="/" element={<Hello />} /> */}
-    //     {/* <Route
-    //       path="/"
-    //       element={<Navigate to ="/new-route" />}
-    //     /> */}
-    //     {/* <Route
-    //       path="/"
-    //       element={
-    //         <div>
-    //           <img src={LeadDbsImage} alt="Description of your image" />
-    //           <div></div>
-    //           <Link to="/stimulation-settings">
-    //             <button className="button">Get Started</button>
-    //           </Link>
-    //         </div>
-    //       }
-    //     /> */}
-    //     <Route path="/testing" element={<AssistedButtons />} />
-    //     <Route
-    //       path="/setup"
-    //       element={
-    //         <div>
-    //           <StimulationSettings
-    //             IPG={IPG}
-    //             setIPG={setIPG}
-    //             leftElectrode={leftElectrode}
-    //             setLeftElectrode={setLeftElectrode}
-    //             rightElectrode={rightElectrode}
-    //             setRightElectrode={setRightElectrode}
-    //             allQuantities={allQuantities}
-    //             setAllQuantities={setAllQuantities}
-    //             allSelectedValues={allSelectedValues}
-    //             setAllSelectedValues={setAllSelectedValues}
-    //             allTotalAmplitudes={allTotalAmplitudes}
-    //             setAllTotalAmplitudes={setAllTotalAmplitudes}
-    //             allTogglePositions={allTogglePositions}
-    //             setAllTogglePositions={setAllTogglePositions}
-    //             allPercAmpToggles={allPercAmpToggles}
-    //             setAllPercAmpToggles={setAllPercAmpToggles}
-    //             allVolAmpToggles={allVolAmpToggles}
-    //             setAllVolAmpToggles={setAllVolAmpToggles}
-    //             importCount={importCount}
-    //             setImportCount={setImportCount}
-    //             importDataTest={importData}
-    //             setImportDataTest={setImportData}
-    //             masterImportData={masterImportData}
-    //             setMasterImportData={setMasterImportData}
-    //             matImportFile={matImportFile}
-    //             setMatImportFile={setMatImportFile}
-    //             newImportFiles={newImportFiles}
-    //             setNewImportFiles={setNewImportFiles}
-    //             filePath={filePath}
-    //             setFilePath={setFilePath}
-    //             stimChanged={stimChanged}
-    //             setStimChanged={setStimChanged}           />
-    //           <Link to="/tabbed-selection">
-    //             <button className="button">Next</button>
-    //           </Link>
-    //         </div>
-    //       }
-    //     />
-    //     <Route
-    //       path="/tabbed-selection"
-    //       element={
-    //         <TabbedElectrodeIPGSelectionTest
-    //           selectedElectrodeLeft={leftElectrode}
-    //           selectedElectrodeRight={rightElectrode}
-    //           IPG={IPG}
-    //           // key={key}
-    //           // setKey={setKey}
-    //           allQuantities={allQuantities}
-    //           setAllQuantities={setAllQuantities}
-    //           allSelectedValues={allSelectedValues}
-    //           setAllSelectedValues={setAllSelectedValues}
-    //           allTotalAmplitudes={allTotalAmplitudes}
-    //           setAllTotalAmplitudes={setAllTotalAmplitudes}
-    //           allStimulationParameters={allStimulationParameters}
-    //           setAllStimulationParameters={setAllStimulationParameters}
-    //           visModel={visModel}
-    //           setVisModel={setVisModel}
-    //           sessionTitle={sessionTitle}
-    //           setSessionTitle={setSessionTitle}
-    //           allTogglePositions={allTogglePositions}
-    //           setAllTogglePositions={setAllTogglePositions}
-    //           allPercAmpToggles={allPercAmpToggles}
-    //           setAllPercAmpToggles={setAllPercAmpToggles}
-    //           allVolAmpToggles={allVolAmpToggles}
-    //           setAllVolAmpToggles={setAllVolAmpToggles}
-    //           filePath={filePath}
-    //           setFilePath={setFilePath}
-    //           matImportFile={matImportFile}
-    //           stimChanged={stimChanged}
-    //           setStimChanged={setStimChanged}
-    //         />
-    //       }
-    //     />
-    //     <Route
-    //       path="end-session"
-    //       element={
-    //         <ExportData
-    //           allQuantities={allQuantities}
-    //           allSelectedValues={allSelectedValues}
-    //         />
-    //       }
-    //     />
-    //   </Routes>
-    // </Router>
     <div>
       <div className="Navbar">
         <Navbar />
-        {/* <div>
-      <button onClick={zoomIn}>Zoom In</button>
-      <button onClick={zoomOut}>Zoom Out</button>
-      <button onClick={resetZoom}>Reset Zoom</button>
-    </div> */}
-        {/* <img src="./logo512Padding-300x212.png" alt="leadDBS" /> */}
         <Slider
           value={zoomLevel}
           onChange={handleZoomChange}
           aria-label="Zoom Level"
-          // valueLabelDisplay="auto"
           step={1}
           marks
           min={-3}
           max={1}
           sx={{
             '& .MuiSlider-mark': {
-              backgroundColor: 'black', // Change the color of the marks
-              height: '10px', // Adjust the height of the marks
-              width: '2px', // Adjust the width of the marks
+              backgroundColor: 'black',
+              height: '10px',
+              width: '2px',
             },
-            // '& .MuiSlider-rail': {
-            //   backgroundColor: 'grey', // Change the color of the rail
-            // },
           }}
         />
       </div>
-      {/* {showDropdown && (
-        <StimulationSettings
-          IPG={IPG}
-          setIPG={setIPG}
-          leftElectrode={leftElectrode}
-          setLeftElectrode={setLeftElectrode}
-          rightElectrode={rightElectrode}
-          setRightElectrode={setRightElectrode}
-          allQuantities={allQuantities}
-          setAllQuantities={setAllQuantities}
-          allSelectedValues={allSelectedValues}
-          setAllSelectedValues={setAllSelectedValues}
-          allTotalAmplitudes={allTotalAmplitudes}
-          setAllTotalAmplitudes={setAllTotalAmplitudes}
-          allTogglePositions={allTogglePositions}
-          setAllTogglePositions={setAllTogglePositions}
-          allPercAmpToggles={allPercAmpToggles}
-          setAllPercAmpToggles={setAllPercAmpToggles}
-          allVolAmpToggles={allVolAmpToggles}
-          setAllVolAmpToggles={setAllVolAmpToggles}
-          importCount={importCount}
-          setImportCount={setImportCount}
-          importDataTest={importData}
-          setImportDataTest={setImportData}
-          masterImportData={masterImportData}
-          setMasterImportData={setMasterImportData}
-          matImportFile={matImportFile}
-          setMatImportFile={setMatImportFile}
-          newImportFiles={newImportFiles}
-          setNewImportFiles={setNewImportFiles}
-          filePath={filePath}
-          setFilePath={setFilePath}
-          stimChanged={stimChanged}
-          setStimChanged={setStimChanged} allStimulationParameters={undefined} setAllStimulationParameters={undefined} visModel={undefined} setVisModel={undefined} sessionTitle={undefined} setSessionTitle={undefined}        />
-      )} */}
-      {/* <Dropdown style={{ marginLeft: 100 }}>
-    <Dropdown.Toggle variant="secondary" id="dropdown-button-dark-example1">
-      Stimulation Settings
-    </Dropdown.Toggle>
-    <Dropdown.Menu>
-      <StimulationSettings
-        IPG={IPG}
-        setIPG={setIPG}
-        leftElectrode={leftElectrode}
-        setLeftElectrode={setLeftElectrode}
-        rightElectrode={rightElectrode}
-        setRightElectrode={setRightElectrode}
-        allQuantities={allQuantities}
-        setAllQuantities={setAllQuantities}
-        allSelectedValues={allSelectedValues}
-        setAllSelectedValues={setAllSelectedValues}
-        allTotalAmplitudes={allTotalAmplitudes}
-        setAllTotalAmplitudes={setAllTotalAmplitudes}
-        allTogglePositions={allTogglePositions}
-        setAllTogglePositions={setAllTogglePositions}
-        allPercAmpToggles={allPercAmpToggles}
-        setAllPercAmpToggles={setAllPercAmpToggles}
-        allVolAmpToggles={allVolAmpToggles}
-        setAllVolAmpToggles={setAllVolAmpToggles}
-        importCount={importCount}
-        setImportCount={setImportCount}
-        importDataTest={importData}
-        setImportDataTest={setImportData}
-        masterImportData={masterImportData}
-        setMasterImportData={setMasterImportData}
-        matImportFile={matImportFile}
-        setMatImportFile={setMatImportFile}
-        newImportFiles={newImportFiles}
-        setNewImportFiles={setNewImportFiles}
-        filePath={filePath}
-        setFilePath={setFilePath}
-        stimChanged={stimChanged}
-        setStimChanged={setStimChanged}
-      />
-    </Dropdown.Menu>
-  </Dropdown> */}
-      <StimulationSettings
-        IPG={IPG}
-        setIPG={setIPG}
-        leftElectrode={leftElectrode}
-        setLeftElectrode={setLeftElectrode}
-        rightElectrode={rightElectrode}
-        setRightElectrode={setRightElectrode}
-        allQuantities={allQuantities}
-        setAllQuantities={setAllQuantities}
-        allSelectedValues={allSelectedValues}
-        setAllSelectedValues={setAllSelectedValues}
-        allTotalAmplitudes={allTotalAmplitudes}
-        setAllTotalAmplitudes={setAllTotalAmplitudes}
-        allTogglePositions={allTogglePositions}
-        setAllTogglePositions={setAllTogglePositions}
-        allPercAmpToggles={allPercAmpToggles}
-        setAllPercAmpToggles={setAllPercAmpToggles}
-        allVolAmpToggles={allVolAmpToggles}
-        setAllVolAmpToggles={setAllVolAmpToggles}
-        importCount={importCount}
-        setImportCount={setImportCount}
-        importDataTest={importData}
-        setImportDataTest={setImportData}
-        masterImportData={masterImportData}
-        setMasterImportData={setMasterImportData}
-        matImportFile={matImportFile}
-        setMatImportFile={setMatImportFile}
-        newImportFiles={newImportFiles}
-        setNewImportFiles={setNewImportFiles}
-        filePath={filePath}
-        setFilePath={setFilePath}
-        stimChanged={stimChanged}
-        setStimChanged={setStimChanged}
-        allStimulationParameters={allStimulationParameters}
-        setAllStimulationParameters={setAllStimulationParameters}
-        visModel={visModel}
-        setVisModel={setVisModel}
-        sessionTitle={sessionTitle}
-        setSessionTitle={setSessionTitle}
-      />
-      {/* {leftElectrode && (
-        <TabbedElectrodeIPGSelectionTest
-          selectedElectrodeLeft={leftElectrode}
-          selectedElectrodeRight={rightElectrode}
-          IPG={IPG}
-          // key={key}
-          // setKey={setKey}
-          allQuantities={allQuantities}
-          setAllQuantities={setAllQuantities}
-          allSelectedValues={allSelectedValues}
-          setAllSelectedValues={setAllSelectedValues}
-          allTotalAmplitudes={allTotalAmplitudes}
-          setAllTotalAmplitudes={setAllTotalAmplitudes}
-          allStimulationParameters={allStimulationParameters}
-          setAllStimulationParameters={setAllStimulationParameters}
-          visModel={visModel}
-          setVisModel={setVisModel}
-          sessionTitle={sessionTitle}
-          setSessionTitle={setSessionTitle}
-          allTogglePositions={allTogglePositions}
-          setAllTogglePositions={setAllTogglePositions}
-          allPercAmpToggles={allPercAmpToggles}
-          setAllPercAmpToggles={setAllPercAmpToggles}
-          allVolAmpToggles={allVolAmpToggles}
-          setAllVolAmpToggles={setAllVolAmpToggles}
-          filePath={filePath}
-          setFilePath={setFilePath}
-          matImportFile={matImportFile}
-          stimChanged={stimChanged}
-          setStimChanged={setStimChanged}
-        />
-      )} */}
+      {/* {handleIPCInfo} */}
+      <div
+        style={{ paddingLeft: '25px', fontWeight: 'bold', fontSize: '16px' }}
+      >
+        Patient: {patientName}
+      </div>
+      <div>
+        {patients.length > 0 && (
+          <GroupArchitecture
+            patients={patients}
+            setPatients={setPatients}
+            electrodeList={electrodeList}
+            patientStates={patientStates}
+            setPatientStates={setPatientStates}
+            importNewS={importNewS}
+            electrodeMaster={electrodeMaster}
+            ipgMaster={ipgMaster}
+          />
+        )}
+      </div>
     </div>
   );
 }
