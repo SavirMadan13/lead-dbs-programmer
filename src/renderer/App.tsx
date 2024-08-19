@@ -122,13 +122,17 @@ export default function App() {
     if (importedElectrode.includes('Boston')) {
       return 'Boston';
     }
-    if (importedElectrode.includes('Medtronic')) {
-      return 'Medtronic_Percept';
-    }
     if (importedElectrode.includes('Abbott')) {
       return 'Abbott';
     }
-    return '';
+    if (
+      importedElectrode === 'medtronic_3387' ||
+      importedElectrode === 'medtronic_3389' ||
+      importedElectrode === 'medtronic_3391'
+    ) {
+      return 'Medtronic_Activa';
+    }
+    return 'Medtronic_Percept';
   };
 
   window.electron.ipcRenderer.sendMessage('import-file', ['ping']);
