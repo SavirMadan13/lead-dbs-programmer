@@ -202,15 +202,18 @@ function StimulationSettings({
       ) {
         setIPG('Boston');
       } else if (
-        selectedLeftElectrode.includes('Medtronic') ||
-        selectedLeftElectrode.includes('medtronic')
-      ) {
-        setIPG('Medtronic_Percept');
-      } else if (
         selectedLeftElectrode.includes('Abbott') ||
         selectedLeftElectrode.includes('abbott')
       ) {
         setIPG('Abbott');
+      } else if (
+        selectedLeftElectrode === 'medtronic_3389' ||
+        selectedLeftElectrode === 'medtronic_3387' ||
+        selectedLeftElectrode === 'medtronic_3391'
+      ) {
+        setIPG('Medtronic_Activa');
+      } else {
+        setIPG('Medtronic_Percept');
       }
     }
     setRightElectrode(selectedLeftElectrode);

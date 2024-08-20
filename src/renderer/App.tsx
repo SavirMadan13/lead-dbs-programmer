@@ -126,9 +126,9 @@ export default function App() {
       return 'Abbott';
     }
     if (
-      importedElectrode === 'medtronic_3387' ||
-      importedElectrode === 'medtronic_3389' ||
-      importedElectrode === 'medtronic_3391'
+      importedElectrode === 'Medtronic 3387' ||
+      importedElectrode === 'Medtronic 3389' ||
+      importedElectrode === 'Medtronic 3391'
     ) {
       return 'Medtronic_Activa';
     }
