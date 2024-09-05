@@ -64,6 +64,7 @@ function TabbedElectrodeIPGSelection({
   stimChanged,
   setStimChanged,
   namingConvention,
+  selectedPatient,
 }) {
   const testElectrodeRef = React.createRef();
   // const [selectedElectrode, setSelectedElectrode] = useState('');
@@ -164,6 +165,7 @@ function TabbedElectrodeIPGSelection({
     console.log('updatedVIsMOdel: ', updatedVisModel);
     const tempModel = testElectrodeRef.current.getStateVisModel();
     setVisualizationModel(tempModel);
+    setVisModel(tempModel);
 
     const updatedSessionTitle = {
       ...sessionTitle,
@@ -402,7 +404,7 @@ function TabbedElectrodeIPGSelection({
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
         // visModel={visModel[1]}
-        visModel={visualizationModel}
+        visModel={visModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -424,7 +426,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visualizationModel}
+        visModel={visModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -441,7 +443,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visualizationModel}
+        visModel={visModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -458,7 +460,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visualizationModel}
+        visModel={visModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -476,7 +478,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visualizationModel}
+        visModel={visModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -494,7 +496,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visualizationModel}
+        visModel={visModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -512,7 +514,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visualizationModel}
+        visModel={visModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -530,7 +532,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visualizationModel}
+        visModel={visModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -548,7 +550,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visualizationModel}
+        visModel={visModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -567,7 +569,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visualizationModel}
+        visModel={visModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -586,7 +588,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visualizationModel}
+        visModel={visModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -604,7 +606,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visualizationModel}
+        visModel={visModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -622,7 +624,7 @@ function TabbedElectrodeIPGSelection({
         IPG={IPG}
         totalAmplitude={allTotalAmplitudes[key]}
         parameters={allStimulationParameters[key]}
-        visModel={visualizationModel}
+        visModel={visModel}
         sessionTitle={sessionTitle[1]}
         togglePosition={allTogglePositions[key]}
         percAmpToggle={allPercAmpToggles[key]}
@@ -1491,7 +1493,7 @@ function TabbedElectrodeIPGSelection({
     const rightHemiArr = [];
     const data = {
       S: {
-        label: matImportFile,
+        label: selectedPatient,
         Rs1: {},
         Rs2: {},
         Rs3: {},
@@ -1735,7 +1737,7 @@ function TabbedElectrodeIPGSelection({
     const outputData = gatherExportedData5();
     console.log('OUTPUTDATA: ', outputData);
     window.electron.ipcRenderer.sendMessage('save-file', filePath, outputData);
-    // window.electron.ipcRenderer.sendMessage('close-window');
+    window.electron.ipcRenderer.sendMessage('close-window');
     // window.electron.ipcRenderer.sendMessage('close-window');
 
     // Listen for a response from the main process

@@ -144,6 +144,7 @@ export default function App() {
     const newSelectedValues = {};
     const newTotalAmplitude = {};
     const newAllQuantities = {};
+    const newAllVolAmpToggles = {};
 
     for (let j = 1; j < 5; j++) {
       newTotalAmplitude[j] = jsonData.amplitude[0][j - 1];
@@ -153,6 +154,17 @@ export default function App() {
 
       const dynamicKey2 = `Ls${j}`;
       const dynamicKey3 = `Rs${j}`;
+      if (jsonData[dynamicKey2]['va'] === 2) {
+        newAllVolAmpToggles[j] = 'center';
+      } else if (jsonData[dynamicKey2]['va'] === 1) {
+        newAllVolAmpToggles[j] = 'right';
+      }
+
+      if (jsonData[dynamicKey3]['va'] === 2) {
+        newAllVolAmpToggles[j+4] = 'center';
+      } else if (jsonData[dynamicKey3]['va'] === 1) {
+        newAllVolAmpToggles[j+4] = 'right';
+      }
 
       for (let i = 0; i < 9; i++) {
         const dynamicKey = `k${i + 7}`;
@@ -212,11 +224,25 @@ export default function App() {
       }, {});
 
     console.log('filtered', filteredQuantities);
+    let outputVisModel = '3';
+    if (jsonData.model === 'Dembek 2017') {
+      outputVisModel = '1';
+    } else if (jsonData.model === 'Fastfield (Baniasadi 2020)') {
+      outputVisModel = '2';
+    } else if (jsonData.model === 'Kuncel 2008') {
+      outputVisModel = '4';
+    } else if (jsonData.model === 'Maedler 2012') {
+      outputVisModel = '5';
+    } else if (jsonData.model === 'OSS-DBS (Butenko 2020)') {
+      outputVisModel = '6';
+    }
 
     return {
       filteredQuantities,
       filteredValues,
       newTotalAmplitude,
+      outputVisModel,
+      newAllVolAmpToggles,
     };
   };
 
@@ -237,20 +263,32 @@ export default function App() {
           setImportNewS(arg.S);
 
           const tempPatients = arg.labels;
-          console.log(tempPatients);
+          console.log('TEMPPAtients', tempPatients);
 
           let initialStates;
 
           if (tempPatients.length === 1) {
             const patient = tempPatients[0];
             const electrodes = electrodeList[0];
-            const processedS = arg.S[0]
-              ? gatherImportedDataNew(arg.S[0])
-              : {
-                  filteredQuantities: {},
-                  filteredValues: {},
-                  newTotalAmplitude: {},
-                };
+            console.log(arg.S);
+            // const processedS = arg.S
+            //   ? gatherImportedDataNew(arg.S)
+            //   : {
+            //       filteredQuantities: {},
+            //       filteredValues: {},
+            //       newTotalAmplitude: {},
+            //     };
+            const processedS =
+              Array.isArray(arg.S) && arg.S.length === 0
+                ? {
+                    filteredQuantities: {},
+                    filteredValues: {},
+                    newTotalAmplitude: {},
+                    outputVisModel: '3',
+                    newAllVolAmpToggles: {},
+                  }
+                : gatherImportedDataNew(arg.S);
+            console.log(arg.S);
             initialStates = {
               [patient]: {
                 ...initialState,
@@ -260,6 +298,8 @@ export default function App() {
                 allQuantities: processedS.filteredQuantities,
                 allSelectedValues: processedS.filteredValues,
                 allTotalAmplitudes: processedS.newTotalAmplitude,
+                visModel: processedS.outputVisModel,
+                allVolAmpToggles: processedS.newAllVolAmpToggles,
               },
             };
           } else {
@@ -272,6 +312,8 @@ export default function App() {
                     filteredQuantities: {},
                     filteredValues: {},
                     newTotalAmplitude: {},
+                    outputVisModel: '3',
+                    newAllVolAmpToggles: {},
                   };
               acc[patient] = {
                 ...initialState,
@@ -281,12 +323,14 @@ export default function App() {
                 allQuantities: processedS.filteredQuantities,
                 allSelectedValues: processedS.filteredValues,
                 allTotalAmplitudes: processedS.newTotalAmplitude,
+                visModel: processedS.outputVisModel,
+                allVolAmpToggles: processedS.newAllVolAmpToggles,
               };
               return acc;
             }, {});
           }
 
-          console.log('Patients:', tempPatients);
+          console.log('Patients:', initialStates);
           setPatientStates(initialStates);
           setPatients(tempPatients);
         } catch (error) {

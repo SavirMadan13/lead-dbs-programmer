@@ -53,6 +53,7 @@ function StimulationSettings({
   setSessionTitle,
   patientStates,
   importNewS,
+  selectedPatient,
 }) {
   // const [IPG, setIPG] = useState('');
   // const [leftElectrode, setLeftElectrode] = useState('');
@@ -780,6 +781,7 @@ function StimulationSettings({
             setStimChanged={setStimChanged}
             patientStates={patientStates}
             namingConvention={namingConvention}
+            selectedPatient={selectedPatient}
           />
         )}
       </div>

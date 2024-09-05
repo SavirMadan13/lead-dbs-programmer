@@ -22,6 +22,10 @@ ipcMain.setMaxListeners(Infinity);
 // console.warn = () => {};
 // console.error = () => {};
 
+// const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
+// console.log(args);
+// const inputFilePath = args[0]; // Get the first argument
+const inputFilePath = '/Users/savirmadan/Documents/Localization/Output/CbctDbs0147/derivatives/leaddbs/sub-CbctDbs0147/stimulations/MNI152NLin2009bAsym/inputData.json';
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -145,6 +149,7 @@ ipcMain.on('import-file', async (event, arg) => {
     // Normalize the lead path
     let normalLeadPath = leadPath.replace(/\\\//g, '/');
     let filePath = path.join(normalLeadPath, 'programmer/inputData.json');
+    filePath = inputFilePath;
     console.log(filePath);
 
     // Read the file
@@ -152,7 +157,7 @@ ipcMain.on('import-file', async (event, arg) => {
 
     // Parse the JSON data
     const jsonData = JSON.parse(f);
-
+    console.log(jsonData);
     // Extract and normalize the stimulation directory
     let stimPath = jsonData.stimDir;
     stimulationDirectory = stimPath.replace(/\\\//g, '/');
@@ -371,6 +376,18 @@ ipcMain.on('save-file', (event, file, data) => {
     const leadPath = prefsData.LeadDBS_Path;
     let normalLeadPath = leadPath.replace(/\\\//g, '/');
     let filePath = path.join(normalLeadPath, 'programmer/data.json');
+
+    // trying out new patient specific saving
+
+    const f = fs.readFileSync(inputFilePath);
+
+    // Parse the JSON data
+    const jsonData = JSON.parse(f);
+
+    // Extract and normalize the stimulation directory
+    let stimPath = jsonData.stimDir;
+    stimulationDirectory = stimPath.replace(/\\\//g, '/');
+    let newStimFilePath = path.join(stimulationDirectory, 'data.json');
     // console.log('DATALABEL: ', data.S.label);
     // const outputFolder = path.join(stimulationDirectory, data.S.label);
     // const outputFileName = `${patientID}_desc-stimparameters.json`;
@@ -381,6 +398,7 @@ ipcMain.on('save-file', (event, file, data) => {
     // Write data to file
     try {
       fs.writeFileSync(filePath, dataString);
+      fs.writeFileSync(newStimFilePath, dataString);
     } catch (error) {
       // Handle the error here
       console.error('Error writing to file:', error);
@@ -511,8 +529,8 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 935,
-    height: 990,
+    width: 1100,
+    height: 1100,
     // maxWidth: 1100, // Maximum width of the window
     // // maxHeight: 1200, // Maximum height of the window
     // minWidth: 1000, // Minimum width of the window
