@@ -3429,27 +3429,29 @@ function Abbott_activetip_2mm(props, ref) {
             label="hz"
           /> */}
         </div>
-        <div className="button-container">
-          <ButtonGroup>
-            {radios.map((radio, idx) => (
-              <ToggleButton
-                key={idx}
-                id={`radio-${idx}`}
-                type="radio"
-                variant={idx % 2 ? 'outline-success' : 'outline-danger'}
-                name="radio"
-                value={radio.value}
-                checked={radioValue === radio.value}
-                onChange={(e) =>
-                  handleSteeringModeChange(e.currentTarget.value)
-                }
-                // onChange={(e) => setRadioValue(e.currentTarget.value)}
-              >
-                {radio.name}
-              </ToggleButton>
-            ))}
-          </ButtonGroup>
-        </div>
+        {(props.IPG === 'Boston' || props.IPG === 'Medtronic_Percept') && (
+          <div className="button-container">
+            <ButtonGroup>
+              {radios.map((radio, idx) => (
+                <ToggleButton
+                  key={idx}
+                  id={`radio-${idx}`}
+                  type="radio"
+                  variant={idx % 2 ? 'outline-success' : 'outline-danger'}
+                  name="radio"
+                  value={radio.value}
+                  checked={radioValue === radio.value}
+                  onChange={(e) =>
+                    handleSteeringModeChange(e.currentTarget.value)
+                  }
+                  // onChange={(e) => setRadioValue(e.currentTarget.value)}
+                >
+                  {radio.name}
+                </ToggleButton>
+              ))}
+            </ButtonGroup>
+          </div>
+        )}
       </div>
       <div className="container2">
         <div className="IPG">
@@ -3569,14 +3571,14 @@ function Abbott_activetip_2mm(props, ref) {
                 <Button disabled>Level</Button>
                 <Button onClick={handlePercAmpChangeDown}>↓</Button>
               </ButtonGroup>
-              <ButtonGroup horizontal>
+              {/* <ButtonGroup horizontal>
                 <Button onClick={handlePercAmpChangeClockwise}>↻</Button>
                 <Button disabled>Post-Lat</Button>
                 <Button onClick={handlePercAmpChangeCounterClockwise}>↺</Button>
-              </ButtonGroup>
+              </ButtonGroup> */}
             </div>
           )}
-        {radioValue === '2' && (
+        {/* {radioValue === '2' && (
           <div className="steering-container-special-buttons">
             <SplitEvenButton
               className="svgButtons"
@@ -3590,7 +3592,7 @@ function Abbott_activetip_2mm(props, ref) {
             <LeftButton className="svgButtons" onClick={handleRightButton} />
             <RightButton className="svgButtons" onClick={handleLeftButton} />
           </div>
-        )}
+        )} */}
         {/* <div className="steering-container-special-buttons">
           <SplitEvenButton
             className="svgButtons"

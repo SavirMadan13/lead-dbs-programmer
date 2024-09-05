@@ -2936,7 +2936,9 @@ function Medtronic_3391(props, ref) {
 
   let stimController = 0;
   // const [currentLabel, setCurrentLabel] = useState('mA');
-  const [currentLabel, setCurrentLabel] = useState(volAmpToggle === 'right' ? 'V' : 'mA');
+  const [currentLabel, setCurrentLabel] = useState(
+    volAmpToggle === 'right' ? 'V' : 'mA',
+  );
   // Generating here a more simple key code for the IPG that is selected
   const handleIPG = () => {
     if (props.IPG === 'Medtronic_Activa') {
@@ -3429,7 +3431,30 @@ function Medtronic_3391(props, ref) {
             label="hz"
           /> */}
         </div>
-        <div className="button-container">
+        {(props.IPG === 'Boston' || props.IPG === 'Medtronic_Percept') && (
+          <div className="button-container">
+            <ButtonGroup>
+              {radios.map((radio, idx) => (
+                <ToggleButton
+                  key={idx}
+                  id={`radio-${idx}`}
+                  type="radio"
+                  variant={idx % 2 ? 'outline-success' : 'outline-danger'}
+                  name="radio"
+                  value={radio.value}
+                  checked={radioValue === radio.value}
+                  onChange={(e) =>
+                    handleSteeringModeChange(e.currentTarget.value)
+                  }
+                  // onChange={(e) => setRadioValue(e.currentTarget.value)}
+                >
+                  {radio.name}
+                </ToggleButton>
+              ))}
+            </ButtonGroup>
+          </div>
+        )}
+        {/* <div className="button-container">
           <ButtonGroup>
             {radios.map((radio, idx) => (
               <ToggleButton
@@ -3449,7 +3474,7 @@ function Medtronic_3391(props, ref) {
               </ToggleButton>
             ))}
           </ButtonGroup>
-        </div>
+        </div> */}
       </div>
       <div className="container2">
         <div className="IPG">
@@ -3569,14 +3594,14 @@ function Medtronic_3391(props, ref) {
                 <Button disabled>Level</Button>
                 <Button onClick={handlePercAmpChangeDown}>↓</Button>
               </ButtonGroup>
-              <ButtonGroup horizontal>
+              {/* <ButtonGroup horizontal>
                 <Button onClick={handlePercAmpChangeClockwise}>↻</Button>
                 <Button disabled>Post-Lat</Button>
                 <Button onClick={handlePercAmpChangeCounterClockwise}>↺</Button>
-              </ButtonGroup>
+              </ButtonGroup> */}
             </div>
           )}
-        {radioValue === '2' && (
+        {/* {radioValue === '2' && (
           <div className="steering-container-special-buttons">
             <SplitEvenButton
               className="svgButtons"
@@ -3590,7 +3615,7 @@ function Medtronic_3391(props, ref) {
             <LeftButton className="svgButtons" onClick={handleRightButton} />
             <RightButton className="svgButtons" onClick={handleLeftButton} />
           </div>
-        )}
+        )} */}
         {/* <div className="steering-container-special-buttons">
           <SplitEvenButton
             className="svgButtons"

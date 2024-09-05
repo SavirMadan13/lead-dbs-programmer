@@ -1691,20 +1691,20 @@ function TabbedElectrodeIPGSelection({
     }
 
     let exportVisModel = '';
-    visModel[1] = visualizationModel;
+    // visModel[1] = visModel;
     console.log(visModel[1]);
-    if (visModel[1] === '1') {
+    if (visModel === '1') {
       console.log('here');
       exportVisModel = 'Dembek 2017';
-    } else if (visModel[1] === '2') {
+    } else if (visModel === '2') {
       exportVisModel = 'Fastfield (Baniasadi 2020)';
-    } else if (visModel[1] === '3') {
+    } else if (visModel === '3') {
       exportVisModel = 'SimBio/FieldTrip (see Horn 2017)';
-    } else if (visModel[1] === '4') {
+    } else if (visModel === '4') {
       exportVisModel = 'Kuncel 2008';
-    } else if (visModel[1] === '5') {
+    } else if (visModel === '5') {
       exportVisModel = 'Maedler 2012';
-    } else if (visModel[1] === '6') {
+    } else if (visModel === '6') {
       exportVisModel = 'OSS-DBS (Butenko 2020)';
     }
     // console.log('export vis model', exportVisModel);

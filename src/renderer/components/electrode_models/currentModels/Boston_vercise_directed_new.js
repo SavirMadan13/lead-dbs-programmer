@@ -3468,27 +3468,29 @@ function Boston_vercise_directed_new(props, ref) {
             label="hz"
           /> */}
         </div>
-        <div className="button-container">
-          <ButtonGroup>
-            {radios.map((radio, idx) => (
-              <ToggleButton
-                key={idx}
-                id={`radio-${idx}`}
-                type="radio"
-                variant={idx % 2 ? 'outline-success' : 'outline-danger'}
-                name="radio"
-                value={radio.value}
-                checked={radioValue === radio.value}
-                onChange={(e) =>
-                  handleSteeringModeChange(e.currentTarget.value)
-                }
-                // onChange={(e) => setRadioValue(e.currentTarget.value)}
-              >
-                {radio.name}
-              </ToggleButton>
-            ))}
-          </ButtonGroup>
-        </div>
+        {(props.IPG === 'Boston' || props.IPG === 'Medtronic_Percept') && (
+          <div className="button-container">
+            <ButtonGroup>
+              {radios.map((radio, idx) => (
+                <ToggleButton
+                  key={idx}
+                  id={`radio-${idx}`}
+                  type="radio"
+                  variant={idx % 2 ? 'outline-success' : 'outline-danger'}
+                  name="radio"
+                  value={radio.value}
+                  checked={radioValue === radio.value}
+                  onChange={(e) =>
+                    handleSteeringModeChange(e.currentTarget.value)
+                  }
+                  // onChange={(e) => setRadioValue(e.currentTarget.value)}
+                >
+                  {radio.name}
+                </ToggleButton>
+              ))}
+            </ButtonGroup>
+          </div>
+        )}
       </div>
       <div className="container2">
         <div className="IPG">

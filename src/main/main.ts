@@ -22,10 +22,10 @@ ipcMain.setMaxListeners(Infinity);
 // console.warn = () => {};
 // console.error = () => {};
 
-// const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
-// console.log(args);
-// const inputFilePath = args[0]; // Get the first argument
-const inputFilePath = '/Users/savirmadan/Documents/Localization/Output/CbctDbs0147/derivatives/leaddbs/sub-CbctDbs0147/stimulations/MNI152NLin2009bAsym/inputData.json';
+const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
+console.log(args);
+const inputFilePath = args[0]; // Get the first argument
+// const inputFilePath = '/Users/savirmadan/Documents/Localization/Output/CbctDbs0147/derivatives/leaddbs/sub-CbctDbs0147/stimulations/MNI152NLin2009bAsym/inputData.json';
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
