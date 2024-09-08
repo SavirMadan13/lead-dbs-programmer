@@ -1747,7 +1747,7 @@ function TabbedElectrodeIPGSelection({
   };
 
   const closeFunction = () => {
-    window.electron.ipcRenderer.sendMessage('close-window');
+    window.electron.ipcRenderer.sendMessage('close-window-new');
   };
 
   const quitApp = () => {

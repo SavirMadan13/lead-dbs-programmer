@@ -137,7 +137,7 @@ export default function App() {
 
   window.electron.ipcRenderer.sendMessage('import-file', ['ping']);
 
-  const gatherImportedDataNew = (jsonData) => {
+  const gatherImportedDataNew = (jsonData, outputIPG) => {
     console.log(jsonData);
 
     const newQuantities = {};
@@ -216,7 +216,7 @@ export default function App() {
         return obj;
       }, {});
 
-    const filteredQuantities = Object.keys(newQuantities)
+    let filteredQuantities = Object.keys(newQuantities)
       .filter((key) => Object.keys(newQuantities[key]).length > 0)
       .reduce((obj, key) => {
         obj[key] = newQuantities[key];
@@ -237,6 +237,23 @@ export default function App() {
       outputVisModel = '6';
     }
 
+    console.log('TEST!L: ', outputIPG);
+    if (outputIPG.includes('Medtronic')) {
+      Object.keys(filteredQuantities).forEach((key) => {
+        console.log('Test: ', filteredQuantities[key]);
+        Object.keys(filteredQuantities[key]).forEach((key2) => {
+          filteredQuantities[key][key2] = (filteredQuantities[key][key2] / 100) * newTotalAmplitude[key];
+        });
+      });
+    }
+
+    Object.keys(newAllVolAmpToggles).forEach((key) => {
+      if (newAllVolAmpToggles[key] === 1) {
+        setIpgMaster('Medtronic_Activa');
+        return '';
+      }
+    });
+
     return {
       filteredQuantities,
       filteredValues,
@@ -244,6 +261,8 @@ export default function App() {
       outputVisModel,
       newAllVolAmpToggles,
     };
+
+    // Need to add some type of filtering here that detects whether it is Medtronic Activa, and then needs to put just mA values, not %
   };
 
   useEffect(() => {
@@ -258,6 +277,7 @@ export default function App() {
           electrodeList = arg.electrodeModel;
           const outputElectrode = handleImportedElectrode(electrodeList);
           const outputIPG = handleIPG(electrodeList);
+          console.log('Tester: ', outputIPG);
           setElectrodeMaster(outputElectrode);
           setIpgMaster(outputIPG);
           setImportNewS(arg.S);
@@ -287,7 +307,7 @@ export default function App() {
                     outputVisModel: '3',
                     newAllVolAmpToggles: {},
                   }
-                : gatherImportedDataNew(arg.S);
+                : gatherImportedDataNew(arg.S, outputIPG);
             console.log(arg.S);
             initialStates = {
               [patient]: {
@@ -307,7 +327,7 @@ export default function App() {
               console.log(`Processing patient ${index + 1}`);
               const electrodes = electrodeList[index];
               const processedS = arg.S[index]
-                ? gatherImportedDataNew(arg.S[index])
+                ? gatherImportedDataNew(arg.S[index], outputIPG)
                 : {
                     filteredQuantities: {},
                     filteredValues: {},

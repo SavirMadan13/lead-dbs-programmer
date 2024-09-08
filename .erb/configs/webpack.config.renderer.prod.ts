@@ -18,6 +18,11 @@ import deleteSourceMaps from '../scripts/delete-source-maps';
 checkNodeEnv('production');
 deleteSourceMaps();
 
+console.log = () => {};
+console.error = () => {};
+console.warn = () => {};
+console.info = () => {};
+
 const configuration: webpack.Configuration = {
   devtool: 'source-map',
 

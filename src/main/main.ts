@@ -18,14 +18,14 @@ import { resolveHtmlPath } from './util';
 
 ipcMain.setMaxListeners(Infinity);
 
-// console.log = () => {};
-// console.warn = () => {};
-// console.error = () => {};
+console.log = () => {};
+console.warn = () => {};
+console.error = () => {};
 
 const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
 console.log(args);
 const inputFilePath = args[0]; // Get the first argument
-// const inputFilePath = '/Users/savirmadan/Documents/Localization/Output/CbctDbs0147/derivatives/leaddbs/sub-CbctDbs0147/stimulations/MNI152NLin2009bAsym/inputData.json';
+// const inputFilePath = '/Users/savirmadan/Documents/inputData.json';
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -125,11 +125,11 @@ ipcMain.on('import-file', async (event, arg) => {
     }
   }
 
-  const prefsFileName = 'Preferences.json';
-  const prefsFilePath = path.join(result, prefsFileName);
-  const k = fs.readFileSync(prefsFilePath);
-  const prefsData = JSON.parse(k);
-  const leadPath = prefsData.LeadDBS_Path;
+  // const prefsFileName = 'Preferences.json';
+  // const prefsFilePath = path.join(result, prefsFileName);
+  // const k = fs.readFileSync(prefsFilePath);
+  // const prefsData = JSON.parse(k);
+  // const leadPath = prefsData.LeadDBS_Path;
 
   // let normalLeadPath = leadPath.replace(/\\\//g, '/');
   // let filePath = path.join(normalLeadPath, 'programmer/inputData.json');
@@ -147,9 +147,9 @@ ipcMain.on('import-file', async (event, arg) => {
 
   try {
     // Normalize the lead path
-    let normalLeadPath = leadPath.replace(/\\\//g, '/');
-    let filePath = path.join(normalLeadPath, 'programmer/inputData.json');
-    filePath = inputFilePath;
+    // let normalLeadPath = leadPath.replace(/\\\//g, '/');
+    // let filePath = path.join(normalLeadPath, 'programmer/inputData.json');
+    const filePath = inputFilePath;
     console.log(filePath);
 
     // Read the file
@@ -297,6 +297,48 @@ ipcMain.on('close-window', (event, arg) => {
   // }
 });
 
+ipcMain.on('close-window-new', (event, arg) => {
+  // setTimeout(() => {
+  //   app.quit();
+  // }, 5000); // 5000 milliseconds = 5 seconds
+
+  const fs = require('fs');
+
+  const f = fs.readFileSync(inputFilePath);
+
+  // Parse the JSON data
+  const jsonData = JSON.parse(f);
+
+  let stimPath = jsonData.stimDir;
+  stimulationDirectory = stimPath.replace(/\\\//g, '/');
+  let newStimFilePath = path.join(stimulationDirectory, 'data.json');
+
+  // Create a valid JSON object
+  let jsonDataToWrite = {
+    message: 'App Closed Without Saving Parameters',
+    timestamp: new Date().toISOString(), // Optional: add a timestamp or any other data
+  };
+
+  try {
+    // Convert the object to a JSON string
+    let dataString = JSON.stringify(jsonDataToWrite, null, 2); // 'null, 2' adds indentation for readability
+    // Write the JSON string to the file
+    fs.writeFileSync(newStimFilePath, dataString);
+    console.log('File written successfully!');
+  } catch (error) {
+    // Handle the error here
+    console.error('Error writing to file:', error);
+  }
+
+  app.quit();
+
+  // const currentWindow = BrowserWindow.getFocusedWindow();
+  // if (currentWindow) {
+  //   currentWindow.close();
+  //   event.reply('window-closed', 'Window closed');
+  // }
+});
+
 const { dialog } = require('electron');
 const fs = require('fs');
 
@@ -369,13 +411,13 @@ ipcMain.on('save-file', (event, file, data) => {
   if (currentDirectory) {
     // Convert data to string format
     const dataString = JSON.stringify(data);
-    const prefsFileName = 'Preferences.json';
-    const prefsFilePath = path.join(result, prefsFileName);
-    const k = fs.readFileSync(prefsFilePath);
-    const prefsData = JSON.parse(k);
-    const leadPath = prefsData.LeadDBS_Path;
-    let normalLeadPath = leadPath.replace(/\\\//g, '/');
-    let filePath = path.join(normalLeadPath, 'programmer/data.json');
+    // const prefsFileName = 'Preferences.json';
+    // const prefsFilePath = path.join(result, prefsFileName);
+    // const k = fs.readFileSync(prefsFilePath);
+    // const prefsData = JSON.parse(k);
+    // const leadPath = prefsData.LeadDBS_Path;
+    // let normalLeadPath = leadPath.replace(/\\\//g, '/');
+    // let filePath = path.join(normalLeadPath, 'programmer/data.json');
 
     // trying out new patient specific saving
 
@@ -397,7 +439,7 @@ ipcMain.on('save-file', (event, file, data) => {
     // const filePath = './dist/main/webpack:/leaddbs-stimcontroller/main.js';
     // Write data to file
     try {
-      fs.writeFileSync(filePath, dataString);
+      // fs.writeFileSync(filePath, dataString);
       fs.writeFileSync(newStimFilePath, dataString);
     } catch (error) {
       // Handle the error here
@@ -417,7 +459,8 @@ ipcMain.on('save-file', (event, file, data) => {
     // fs.writeFileSync(outputFilePath, dataString);
 
     // Send a response back to the renderer process
-    event.reply('file-saved', filePath);
+    // event.reply('file-saved', filePath);
+    event.reply('file-saved', newStimFilePath);
   }
 });
 

@@ -6,6 +6,11 @@ import baseConfig from './webpack.config.base';
 import webpackPaths from './webpack.paths';
 import checkNodeEnv from '../scripts/check-node-env';
 
+console.log = () => {};
+console.error = () => {};
+console.warn = () => {};
+console.info = () => {};
+
 // When an ESLint server is running, we can't set the NODE_ENV so we'll check if it's
 // at the dev webpack config is not accidentally run in a production environment
 if (process.env.NODE_ENV === 'production') {
