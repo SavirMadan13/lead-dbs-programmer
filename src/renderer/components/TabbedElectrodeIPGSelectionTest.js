@@ -1515,9 +1515,12 @@ function TabbedElectrodeIPGSelection({
     };
 
     data.S.elmodel = [selectedElectrodeLeft, selectedElectrodeRight];
-    // console.log('length', Object.keys(allQuantities[1]));
+    const programs = Object.keys(allQuantities);
+    const firstProgram = programs[0];
+    console.log('Programs: ', programs);
+    console.log('length', programs[0]);
 
-    const loopSize = Object.keys(allQuantities[1]).length;
+    const loopSize = Object.keys(allQuantities[firstProgram]).length;
     // console.log('loopSize: ', loopSize);
     // data.S.label = 'Num1';
     const activeArray = [];
@@ -1623,8 +1626,8 @@ function TabbedElectrodeIPGSelection({
         }
         activeArray.push(j + 4);
         newActiveArray.push(j);
-        console.log(allSelectedValues);
-        rightHemiArr[j - 1] = activeContacts(allSelectedValues[j]);
+        console.log('All Selected Values: ', j);
+        // rightHemiArr[j - 1] = activeContacts(allSelectedValues[j]);
         data.S.activecontacts[j + 3] = activeContacts(allSelectedValues[j + 4]);
         rightAmpArray[j + 4] = parseFloat(allTotalAmplitudes[j + 4]);
       } else {
