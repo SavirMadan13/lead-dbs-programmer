@@ -11,6 +11,9 @@ import StimulationSettings from './components/StimulationSettings';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import GroupArchitecture from './components/GroupArchitecture';
+import PatientDatabase from './components/PatientDatabase';
+import PatientDetails from './components/PatientDetails';
+import { PatientProvider } from './components/PatientContext'; // Import the context provider
 
 const importData = [];
 
@@ -156,16 +159,16 @@ export default function App() {
 
       const dynamicKey2 = `Ls${j}`;
       const dynamicKey3 = `Rs${j}`;
-      if (jsonData[dynamicKey2]['va'] === 2) {
+      if (jsonData[dynamicKey2].va === 2) {
         newAllVolAmpToggles[j] = 'center';
-      } else if (jsonData[dynamicKey2]['va'] === 1) {
+      } else if (jsonData[dynamicKey2].va === 1) {
         newAllVolAmpToggles[j] = 'right';
       }
 
-      if (jsonData[dynamicKey3]['va'] === 2) {
-        newAllVolAmpToggles[j+4] = 'center';
-      } else if (jsonData[dynamicKey3]['va'] === 1) {
-        newAllVolAmpToggles[j+4] = 'right';
+      if (jsonData[dynamicKey3].va === 2) {
+        newAllVolAmpToggles[j + 4] = 'center';
+      } else if (jsonData[dynamicKey3].va === 1) {
+        newAllVolAmpToggles[j + 4] = 'right';
       }
 
       for (let i = 0; i < 9; i++) {
@@ -218,7 +221,7 @@ export default function App() {
         return obj;
       }, {});
 
-    let filteredQuantities = Object.keys(newQuantities)
+    const filteredQuantities = Object.keys(newQuantities)
       .filter((key) => Object.keys(newQuantities[key]).length > 0)
       .reduce((obj, key) => {
         obj[key] = newQuantities[key];
@@ -244,7 +247,8 @@ export default function App() {
       Object.keys(filteredQuantities).forEach((key) => {
         console.log('Test: ', filteredQuantities[key]);
         Object.keys(filteredQuantities[key]).forEach((key2) => {
-          filteredQuantities[key][key2] = (filteredQuantities[key][key2] / 100) * newTotalAmplitude[key];
+          filteredQuantities[key][key2] =
+            (filteredQuantities[key][key2] / 100) * newTotalAmplitude[key];
         });
       });
     }
@@ -484,13 +488,13 @@ export default function App() {
         /> */}
       </div>
       {/* {handleIPCInfo} */}
-      <div
+      {/* <div
         // style={{ textAlign: 'right', fontWeight: 'bold', fontSize: '16px', paddingRight: '100px'}}
         style={{textAlign: 'center', fontWeight: 'bold', fontSize: '20px'}}
       >
         Patient: {patientName}
-      </div>
-      <div>
+      </div> */}
+      {/* <div>
         {patients.length > 0 && (
           <GroupArchitecture
             patients={patients}
@@ -503,7 +507,16 @@ export default function App() {
             ipgMaster={ipgMaster}
           />
         )}
-      </div>
+      </div> */}
+      {/* <PatientDatabase /> */}
+      <PatientProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<PatientDatabase />} />
+            <Route path="/patient/:id" element={<PatientDetails />} />
+          </Routes>
+        </Router>
+      </PatientProvider>
     </div>
   );
 }
