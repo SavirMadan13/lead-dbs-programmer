@@ -86,7 +86,10 @@ const electronHandler = {
   zoom: {
     setZoomLevel(level: any) {
       webFrame.setZoomLevel(level);
-      ipcRenderer.send('zoom-level-changed', level);
+      // ipcRenderer.send('zoom-level-changed', level);
+      ipcRenderer.on('zoom-level-changed', (event, zoomLevel) => {
+        webFrame.setZoomLevel(zoomLevel);
+      });
     },
   },
 };

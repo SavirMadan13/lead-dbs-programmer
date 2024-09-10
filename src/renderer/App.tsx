@@ -418,7 +418,7 @@ export default function App() {
   //   }
   // }, []);
 
-  const [zoomLevel, setZoomLevel] = useState(-1);
+  const [zoomLevel, setZoomLevel] = useState(-3);
 
   const handleZoomChange = (event, newValue) => {
     setZoomLevel(newValue);
@@ -466,7 +466,7 @@ export default function App() {
     <div>
       <div className="Navbar">
         <Navbar />
-        <Slider
+        {/* <Slider
           value={zoomLevel}
           onChange={handleZoomChange}
           aria-label="Zoom Level"
@@ -481,11 +481,12 @@ export default function App() {
               width: '2px',
             },
           }}
-        />
+        /> */}
       </div>
       {/* {handleIPCInfo} */}
       <div
-        style={{ paddingLeft: '25px', fontWeight: 'bold', fontSize: '16px' }}
+        // style={{ textAlign: 'right', fontWeight: 'bold', fontSize: '16px', paddingRight: '100px'}}
+        style={{textAlign: 'center', fontWeight: 'bold', fontSize: '20px'}}
       >
         Patient: {patientName}
       </div>

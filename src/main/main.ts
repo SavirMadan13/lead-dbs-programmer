@@ -22,10 +22,11 @@ console.log = () => {};
 console.warn = () => {};
 console.error = () => {};
 
-// const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
-// console.log(args);
-// const inputFilePath = args[0]; // Get the first argument
-const inputFilePath = '/Users/savirmadan/Documents/Localization/Output/Patient0357Output/derivatives/leaddbs/sub-CbctDbs0357/stimulations/MNI152NLin2009bAsym/inputData.json';
+const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
+console.log(args);
+const inputFilePath = args[0]; // Get the first argument
+// const inputFilePath =
+//   '/Users/savirmadan/Documents/Localization/Output/Patient0357Output/derivatives/leaddbs/sub-CbctDbs0357/stimulations/MNI152NLin2009bAsym/inputData.json';
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -159,7 +160,7 @@ ipcMain.on('import-file', async (event, arg) => {
     const jsonData = JSON.parse(f);
     console.log(jsonData);
     // Extract and normalize the stimulation directory
-    let stimPath = jsonData.stimDir;
+    const stimPath = jsonData.stimDir;
     stimulationDirectory = stimPath.replace(/\\\//g, '/');
     patientID = jsonData.patientname;
 
@@ -309,19 +310,19 @@ ipcMain.on('close-window-new', (event, arg) => {
   // Parse the JSON data
   const jsonData = JSON.parse(f);
 
-  let stimPath = jsonData.stimDir;
+  const stimPath = jsonData.stimDir;
   stimulationDirectory = stimPath.replace(/\\\//g, '/');
-  let newStimFilePath = path.join(stimulationDirectory, 'data.json');
+  const newStimFilePath = path.join(stimulationDirectory, 'data.json');
 
   // Create a valid JSON object
-  let jsonDataToWrite = {
+  const jsonDataToWrite = {
     message: 'App Closed Without Saving Parameters',
     timestamp: new Date().toISOString(), // Optional: add a timestamp or any other data
   };
 
   try {
     // Convert the object to a JSON string
-    let dataString = JSON.stringify(jsonDataToWrite, null, 2); // 'null, 2' adds indentation for readability
+    const dataString = JSON.stringify(jsonDataToWrite, null, 2); // 'null, 2' adds indentation for readability
     // Write the JSON string to the file
     fs.writeFileSync(newStimFilePath, dataString);
     console.log('File written successfully!');
@@ -427,9 +428,9 @@ ipcMain.on('save-file', (event, file, data) => {
     const jsonData = JSON.parse(f);
 
     // Extract and normalize the stimulation directory
-    let stimPath = jsonData.stimDir;
+    const stimPath = jsonData.stimDir;
     stimulationDirectory = stimPath.replace(/\\\//g, '/');
-    let newStimFilePath = path.join(stimulationDirectory, 'data.json');
+    const newStimFilePath = path.join(stimulationDirectory, 'data.json');
     // console.log('DATALABEL: ', data.S.label);
     // const outputFolder = path.join(stimulationDirectory, data.S.label);
     // const outputFileName = `${patientID}_desc-stimparameters.json`;
@@ -573,8 +574,8 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1100,
-    height: 1100,
+    width: 1100 * (1 + -3 * 0.15),
+    height: 1100 * (1 + -3 * 0.1),
     // maxWidth: 1100, // Maximum width of the window
     // // maxHeight: 1200, // Maximum height of the window
     // minWidth: 1000, // Minimum width of the window
@@ -586,6 +587,18 @@ const createWindow = async () => {
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
+  });
+
+  // Set up the resize event listener to recalculate zoom level
+  mainWindow.on('resize', () => {
+    const [currentWidth, currentHeight] = mainWindow.getSize();
+
+    // Calculate the zoom level based on window size change.
+    const baseWidth = 1100; // Default window width
+    const zoomLevel = (currentWidth / baseWidth - 1) / 0.15;
+
+    // Send the zoom level to the renderer process
+    mainWindow.webContents.send('zoom-level-changed', zoomLevel);
   });
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
@@ -645,7 +658,7 @@ app
 
 ipcMain.on('zoom-level-changed', (event, zoomLevel) => {
   if (mainWindow) {
-    const newWidth = 1100 * (1 + zoomLevel * 0.15); // Adjust the scale factor as needed
+    const newWidth = 1100 * (1 + zoomLevel * 0.14); // Adjust the scale factor as needed
     const newHeight = 1100 * (1 + zoomLevel * 0.1); // Adjust the scale factor as needed
     mainWindow.setSize(newWidth, newHeight);
   }

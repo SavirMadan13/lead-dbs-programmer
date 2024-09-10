@@ -78,7 +78,7 @@ function GroupArchitecture({
     }));
   };
 
-  const [zoomLevel, setZoomLevel] = useState(0);
+  const [zoomLevel, setZoomLevel] = useState(-3);
 
   const handleZoomChange = (event, newValue) => {
     setZoomLevel(newValue);
@@ -182,7 +182,7 @@ function GroupArchitecture({
 
   return (
     <div>
-      <div style={{ paddingLeft: '45px' }}>
+      <div style={{ paddingLeft: '45px', marginBottom: '-100px' }}>
         <PatientSelector
           selectedPatient={selectedPatient}
           setSelectedPatient={setSelectedPatient}
