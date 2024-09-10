@@ -647,12 +647,13 @@ function StimulationSettings({
         {/* <div className="stim-id-group"></div> */}
         <div />
         <Dropdown>
-          <Dropdown.Toggle>Electrode Model</Dropdown.Toggle>
+          <Dropdown.Toggle>Implanted Hardware</Dropdown.Toggle>
           <Dropdown.Menu style={{ width: '350px', paddingLeft: '10px' }}>
             <h2 style={{ fontSize: 16 }}>Left Electrode</h2>
             <select
               value={leftElectrode}
               onChange={(e) => handleLeftElectrodeChange(e)}
+              // disabled
             >
               <option value="">None</option>
               <option value="abbott_activetip_2mm">

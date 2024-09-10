@@ -245,6 +245,16 @@
   font-size: 16px;
 }
 
+.export-button-final-discard {
+  background-color: rgba(230, 0, 0, 0.709);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
 .import-button {
   background-color: #007BFF;
   color: #fff;
@@ -639,4 +649,22 @@ h2 {
 .svgButtons:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5); /* Add focus outline */
+}
+
+.electrode-label {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  /* background-color: #f9f9f9; */
+  /* padding: 10px 15px; */
+  /* border-radius: 5px; */
+  /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
+  /* text-align: center; */
+  margin-top: 30px;
+  /* max-width: 300px; */
+  margin-left: 5px;
+  /* margin-right: auto; */
+  word-wrap: break-word; /* Ensure long words wrap properly */
+  z-index: 20;
 }

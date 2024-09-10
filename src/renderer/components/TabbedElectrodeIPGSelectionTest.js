@@ -250,6 +250,39 @@ function TabbedElectrodeIPGSelection({
     // }
   };
 
+  const convertElectrode = (electrode) => {
+    switch (electrode) {
+      case 'boston_vercise_directed':
+        return 'Boston Scientific Vercise Directed';
+      case 'medtronic_3389':
+        return 'Medtronic 3389';
+      case 'medtronic_3387':
+        return 'Medtronic 3387';
+      case 'medtronic_3391':
+        return 'Medtronic 3391';
+      case 'medtronic_b33005':
+        return 'Medtronic B33005';
+      case 'medtronic_b33015':
+        return 'Medtronic B33015';
+      case 'boston_scientific_vercise':
+        return 'Boston Scientific Vercise';
+      case 'boston_scientific_vercise_cartesia_hx':
+        return 'Boston Scientific Vercise Cartesia HX';
+      case 'boston_scientific_vercise_cartesia_x':
+        return 'Boston Scientific Vercise Cartesia X';
+      case 'abott_activetip_2mm':
+        return 'Abbott ActiveTip (6146-6149)';
+      case 'abbott_activetip_3mm':
+        return 'Abbott ActiveTip (6142-6145)';
+      case 'abott_directed_6172':
+        return 'Abbott Directed 6172 (short)';
+      case 'abott_directed_6173':
+        return 'Abbott Directed 6173 (long)';
+      default:
+        return '';
+    }
+  };
+
   const testElectrodeOptions = {
     BostonCartesia: (
       <BostonCartesia
@@ -1629,7 +1662,7 @@ function TabbedElectrodeIPGSelection({
         console.log('All Selected Values: ', j);
         // rightHemiArr[j - 1] = activeContacts(allSelectedValues[j]);
         data.S.activecontacts[j + 3] = activeContacts(allSelectedValues[j + 4]);
-        rightAmpArray[j + 4] = parseFloat(allTotalAmplitudes[j + 4]);
+        // rightAmpArray[j + 4] = parseFloat(allTotalAmplitudes[j + 4]);
       } else {
         for (let i = 1; i < loopSize; i++) {
           let dynamicKey = `k${i - 1}`;
@@ -1651,7 +1684,7 @@ function TabbedElectrodeIPGSelection({
     }
     // data.S.activecontacts.push(rightHemiArr);
     // data.S.activecontacts.push(leftHemiArr);
-    const totalAmpArray = leftAmpArray.push(rightAmpArray);
+    // const totalAmpArray = leftAmpArray.push(rightAmpArray);
     // data.S.amplitude{1} = leftAmpArray;
     // data.S.amplitude{2} = rightAmpArray;
     const leftAmplitude = [];
@@ -1684,18 +1717,18 @@ function TabbedElectrodeIPGSelection({
       for (let j = 1; j < loopSize; j++) {
         zerosArr.push(0);
       }
-      if (data.S.activecontacts[i]) {
-        if (data.S.activecontacts[i] === null) {
-          data.S.activecontacts[i] = zerosArr;
+      if (data.S.activecontacts[i-1]) {
+        if (data.S.activecontacts[i-1] === null) {
+          data.S.activecontacts[i-1] = zerosArr;
         }
       } else {
-        data.S.activecontacts[i] = zerosArr;
+        data.S.activecontacts[i-1] = zerosArr;
       }
     }
 
     let exportVisModel = '';
     // visModel[1] = visModel;
-    console.log(visModel[1]);
+    // console.log(visModel[1]);
     if (visModel === '1') {
       console.log('here');
       exportVisModel = 'Dembek 2017';
@@ -1712,7 +1745,10 @@ function TabbedElectrodeIPGSelection({
     }
     // console.log('export vis model', exportVisModel);
     data.S.model = exportVisModel;
-
+    // if (Array.isArray(data.S.activecontacts) && data.S.activecontacts.length > 0 && data.S.activecontacts[0] === undefined) {
+    //   data.S.activecontacts.shift();
+    // }
+    console.log(data.S.activecontacts);
     return data;
   };
 
@@ -1895,6 +1931,9 @@ function TabbedElectrodeIPGSelection({
                 {/* </div> */}
                 <div className="form-container">
                   {testElectrodeOptions[selectedElectrodeRight]}
+                  <div className="electrode-label">
+                    {convertElectrode(selectedElectrodeRight)}
+                  </div>
                 </div>
               </TabPanel>
             ))}
@@ -1938,6 +1977,9 @@ function TabbedElectrodeIPGSelection({
                 /> */}
                 <div className="form-container">
                   {testElectrodeOptions[selectedElectrodeLeft]}
+                  <div className="electrode-label">
+                    {convertElectrode(selectedElectrodeLeft)}
+                  </div>
                 </div>
               </TabPanel>
             ))}
@@ -1975,11 +2017,11 @@ function TabbedElectrodeIPGSelection({
         </button> */}
       </div>
       <div style={{ textAlign: 'center', paddingBottom: '35px' }}>
-        <button className="export-button-final" onClick={sendDataToMain} style={{ marginRight: '15px' }}>
-          Stimulate and Close
+        <button className="export-button-final-discard" onClick={closeFunction} style={{marginRight: '15px'}}>
+          Discard and Close
         </button>
-        <button className="export-button-final" onClick={closeFunction}>
-          Close
+        <button className="export-button-final" onClick={sendDataToMain}>
+          Stimulate and Close
         </button>
       </div>
     </div>
