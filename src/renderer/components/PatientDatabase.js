@@ -15,6 +15,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Typography,
 } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -96,103 +97,131 @@ function PatientDatabase() {
   );
 
   return (
-    <Container>
-      <h1>Patient Database</h1>
+    <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <Container style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Typography variant="h3" style={{ fontWeight: 'bold', marginBottom: '20px' }}>
+          Patient Database
+        </Typography>
 
-      <Button variant="contained" color="primary" onClick={handleOpenDialog}>
-        Add Patient
-      </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleOpenDialog}
+          style={{ fontSize: '18px', padding: '10px 20px', marginBottom: '20px' }}
+        >
+          Add Patient
+        </Button>
 
-      {/* Search Input */}
-      <TextField
-        label="Search"
-        variant="outlined"
-        fullWidth
-        margin="normal"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)} // Update search term state
-      />
+        {/* Search Input */}
+        <TextField
+          label="Search"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)} // Update search term state
+          InputLabelProps={{ style: { fontSize: '18px' } }} // Label font size
+          InputProps={{ style: { fontSize: '18px' } }} // Input font size
+        />
 
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>{isEditing ? 'Edit Patient' : 'Add Patient'}</DialogTitle>
-        <DialogContent>
-          <TextField
-            margin="dense"
-            label="Name"
-            name="name"
-            fullWidth
-            value={currentPatient.name}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            label="Age"
-            name="age"
-            type="number"
-            fullWidth
-            value={currentPatient.age}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            label="Diagnosis"
-            name="diagnosis"
-            fullWidth
-            value={currentPatient.diagnosis}
-            onChange={handleInputChange}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="secondary">
-            Cancel
-          </Button>
-          <Button
-            onClick={isEditing ? updatePatient : addPatient}
-            color="primary"
-          >
-            {isEditing ? 'Update' : 'Add'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        <Dialog open={openDialog} onClose={handleCloseDialog}>
+          <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>
+            {isEditing ? 'Edit Patient' : 'Add Patient'}
+          </DialogTitle>
+          <DialogContent>
+            <TextField
+              margin="dense"
+              label="Name"
+              name="name"
+              fullWidth
+              value={currentPatient.name}
+              onChange={handleInputChange}
+              InputLabelProps={{ style: { fontSize: '18px' } }}
+              InputProps={{ style: { fontSize: '18px' } }}
+            />
+            <TextField
+              margin="dense"
+              label="Age"
+              name="age"
+              type="number"
+              fullWidth
+              value={currentPatient.age}
+              onChange={handleInputChange}
+              InputLabelProps={{ style: { fontSize: '18px' } }}
+              InputProps={{ style: { fontSize: '18px' } }}
+            />
+            <TextField
+              margin="dense"
+              label="Diagnosis"
+              name="diagnosis"
+              fullWidth
+              value={currentPatient.diagnosis}
+              onChange={handleInputChange}
+              InputLabelProps={{ style: { fontSize: '18px' } }}
+              InputProps={{ style: { fontSize: '18px' } }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog} color="secondary" style={{ fontSize: '18px' }}>
+              Cancel
+            </Button>
+            <Button
+              onClick={isEditing ? updatePatient : addPatient}
+              color="primary"
+              style={{ fontSize: '18px' }}
+            >
+              {isEditing ? 'Update' : 'Add'}
+            </Button>
+          </DialogActions>
+        </Dialog>
 
-      {/* Patient List Table */}
-      <TableContainer component={Paper} style={{ marginTop: '20px' }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Age</TableCell>
-              <TableCell>Diagnosis</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredPatients.map((patient) => (
-              <TableRow key={patient.id}>
-                <TableCell>{patient.id}</TableCell>
-                <TableCell
-                  style={{ cursor: 'pointer', color: 'blue' }}
-                  onClick={() => handleNameClick(patient)}
-                >
-                  {patient.name}
-                </TableCell>
-                <TableCell>{patient.age}</TableCell>
-                <TableCell>{patient.diagnosis}</TableCell>
-                <TableCell>
-                  <IconButton onClick={() => editPatient(patient)} color="primary">
-                    <Edit />
-                  </IconButton>
-                  <IconButton onClick={() => deletePatient(patient.id)} color="secondary">
-                    <Delete />
-                  </IconButton>
-                </TableCell>
+        {/* Patient List Table */}
+        <TableContainer component={Paper} style={{ flex: 1, marginTop: '20px' }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell style={{ fontSize: '18px', fontWeight: 'bold' }}>ID</TableCell>
+                <TableCell style={{ fontSize: '18px', fontWeight: 'bold' }}>Name</TableCell>
+                <TableCell style={{ fontSize: '18px', fontWeight: 'bold' }}>Age</TableCell>
+                <TableCell style={{ fontSize: '18px', fontWeight: 'bold' }}>Diagnosis</TableCell>
+                <TableCell style={{ fontSize: '18px', fontWeight: 'bold' }}>Actions</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Container>
+            </TableHead>
+            <TableBody>
+              {filteredPatients.map((patient) => (
+                <TableRow key={patient.id}>
+                  <TableCell style={{ fontSize: '16px' }}>{patient.id}</TableCell>
+                  <TableCell
+                    style={{ fontSize: '16px', cursor: 'pointer', color: 'blue' }}
+                    onClick={() => handleNameClick(patient)}
+                  >
+                    {patient.name}
+                  </TableCell>
+                  <TableCell style={{ fontSize: '16px' }}>{patient.age}</TableCell>
+                  <TableCell style={{ fontSize: '16px' }}>{patient.diagnosis}</TableCell>
+                  <TableCell>
+                    <IconButton
+                      onClick={() => editPatient(patient)}
+                      color="primary"
+                      style={{ fontSize: '16px' }}
+                    >
+                      <Edit />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => deletePatient(patient.id)}
+                      color="secondary"
+                      style={{ fontSize: '16px' }}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Container>
+    </div>
   );
 }
 

@@ -22,11 +22,10 @@ console.log = () => {};
 console.warn = () => {};
 console.error = () => {};
 
-const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
-console.log(args);
-const inputFilePath = args[0]; // Get the first argument
-// const inputFilePath =
-//   '/Users/savirmadan/Documents/Localization/Output/Patient0357Output/derivatives/leaddbs/sub-CbctDbs0357/stimulations/MNI152NLin2009bAsym/inputData.json';
+// const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
+// console.log(args);
+// const inputFilePath = args[0]; // Get the first argument
+const inputFilePath = '/Users/savirmadan/Downloads/inputData.json';
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -39,23 +38,23 @@ let mainWindow: BrowserWindow | null = null;
 let stimulationDirectory = '';
 let patientID = '';
 
-const startServer = () => {
-  // Start the Express server in a child process
-  const serverProcess = childProcess.spawn('node', ['dist/server.js'], {
-    cwd: path.join(__dirname, '../'), // Adjust the path as needed
-    stdio: 'inherit',
-  });
+// const startServer = () => {
+//   // Start the Express server in a child process
+//   const serverProcess = childProcess.spawn('node', ['dist/server.js'], {
+//     cwd: path.join(__dirname, '../'), // Adjust the path as needed
+//     stdio: 'inherit',
+//   });
 
-  serverProcess.on('error', (err) => {
-    console.error('Failed to start server:', err);
-  });
+//   serverProcess.on('error', (err) => {
+//     console.error('Failed to start server:', err);
+//   });
 
-  serverProcess.on('exit', (code, signal) => {
-    console.log('Server process exited with code:', code);
-  });
+//   serverProcess.on('exit', (code, signal) => {
+//     console.log('Server process exited with code:', code);
+//   });
 
-  return serverProcess;
-};
+//   return serverProcess;
+// };
 
 app
   .whenReady()
