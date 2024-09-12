@@ -573,8 +573,10 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1100 * (1 + -3 * 0.15),
-    height: 1100 * (1 + -3 * 0.1),
+    // width: 1100 * (1 + -3 * 0.15),
+    // height: 1100 * (1 + -3 * 0.1),
+    width: 1100,
+    height: 1100,
     // maxWidth: 1100, // Maximum width of the window
     // // maxHeight: 1200, // Maximum height of the window
     // minWidth: 1000, // Minimum width of the window
@@ -657,8 +659,8 @@ app
 
 ipcMain.on('zoom-level-changed', (event, zoomLevel) => {
   if (mainWindow) {
-    const newWidth = 1100 * (1 + zoomLevel * 0.14); // Adjust the scale factor as needed
-    const newHeight = 1100 * (1 + zoomLevel * 0.1); // Adjust the scale factor as needed
+    const newWidth = 1100 * (1 + 0 * 0.14); // Adjust the scale factor as needed
+    const newHeight = 1100 * (1 + 0 * 0.1); // Adjust the scale factor as needed
     mainWindow.setSize(newWidth, newHeight);
   }
 });

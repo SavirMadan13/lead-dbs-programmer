@@ -97,35 +97,40 @@ function PatientDatabase() {
   );
 
   return (
-    <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Container style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-        <Typography variant="h3" style={{ fontWeight: 'bold', marginBottom: '20px' }}>
-          Patient Database
-        </Typography>
-
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleOpenDialog}
-          style={{ fontSize: '18px', padding: '10px 20px', marginBottom: '20px' }}
-        >
-          Add Patient
-        </Button>
-
+    // <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    //   <Container style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    //     <Typography variant="h3" style={{ fontWeight: 'bold', marginBottom: '20px' }}>
+    //       Patient Database
+    //     </Typography>
+    <div
+      style={{
+        width: '100vw',
+        // height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <Typography
+        variant="h3"
+        style={{ fontWeight: 'bold', marginBottom: '20px' }}
+      >
+        DBS Database
+      </Typography>
+      <TextField
+        label="Search"
+        variant="outlined"
+        width="100px"
+        margin="normal"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)} // Update search term state
+        InputLabelProps={{ style: { fontSize: '14px' } }} // Label font size
+        InputProps={{ style: { fontSize: '14px' } }} // Input font size
+      />
+      <Container style={{ display: 'flex', flexDirection: 'column' }}>
         {/* Search Input */}
-        <TextField
-          label="Search"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)} // Update search term state
-          InputLabelProps={{ style: { fontSize: '18px' } }} // Label font size
-          InputProps={{ style: { fontSize: '18px' } }} // Input font size
-        />
 
         <Dialog open={openDialog} onClose={handleCloseDialog}>
-          <DialogTitle style={{ fontSize: '24px', fontWeight: 'bold' }}>
+          <DialogTitle style={{ fontSize: '14px', fontWeight: 'bold' }}>
             {isEditing ? 'Edit Patient' : 'Add Patient'}
           </DialogTitle>
           <DialogContent>
@@ -136,8 +141,8 @@ function PatientDatabase() {
               fullWidth
               value={currentPatient.name}
               onChange={handleInputChange}
-              InputLabelProps={{ style: { fontSize: '18px' } }}
-              InputProps={{ style: { fontSize: '18px' } }}
+              InputLabelProps={{ style: { fontSize: '14px' } }}
+              InputProps={{ style: { fontSize: '14px' } }}
             />
             <TextField
               margin="dense"
@@ -147,8 +152,8 @@ function PatientDatabase() {
               fullWidth
               value={currentPatient.age}
               onChange={handleInputChange}
-              InputLabelProps={{ style: { fontSize: '18px' } }}
-              InputProps={{ style: { fontSize: '18px' } }}
+              InputLabelProps={{ style: { fontSize: '14px' } }}
+              InputProps={{ style: { fontSize: '14px' } }}
             />
             <TextField
               margin="dense"
@@ -157,18 +162,22 @@ function PatientDatabase() {
               fullWidth
               value={currentPatient.diagnosis}
               onChange={handleInputChange}
-              InputLabelProps={{ style: { fontSize: '18px' } }}
-              InputProps={{ style: { fontSize: '18px' } }}
+              InputLabelProps={{ style: { fontSize: '14px' } }}
+              InputProps={{ style: { fontSize: '14px' } }}
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseDialog} color="secondary" style={{ fontSize: '18px' }}>
+            <Button
+              onClick={handleCloseDialog}
+              color="secondary"
+              style={{ fontSize: '14px' }}
+            >
               Cancel
             </Button>
             <Button
               onClick={isEditing ? updatePatient : addPatient}
               color="primary"
-              style={{ fontSize: '18px' }}
+              style={{ fontSize: '14px' }}
             >
               {isEditing ? 'Update' : 'Add'}
             </Button>
@@ -176,29 +185,52 @@ function PatientDatabase() {
         </Dialog>
 
         {/* Patient List Table */}
-        <TableContainer component={Paper} style={{ flex: 1, marginTop: '20px' }}>
+        <TableContainer
+          component={Paper}
+          style={{ flex: 1, marginTop: '20px' }}
+        >
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell style={{ fontSize: '18px', fontWeight: 'bold' }}>ID</TableCell>
-                <TableCell style={{ fontSize: '18px', fontWeight: 'bold' }}>Name</TableCell>
-                <TableCell style={{ fontSize: '18px', fontWeight: 'bold' }}>Age</TableCell>
-                <TableCell style={{ fontSize: '18px', fontWeight: 'bold' }}>Diagnosis</TableCell>
-                <TableCell style={{ fontSize: '18px', fontWeight: 'bold' }}>Actions</TableCell>
+                <TableCell style={{ fontSize: '14px', fontWeight: 'bold' }}>
+                  ID
+                </TableCell>
+                <TableCell style={{ fontSize: '14px', fontWeight: 'bold' }}>
+                  Name
+                </TableCell>
+                <TableCell style={{ fontSize: '14px', fontWeight: 'bold' }}>
+                  Age
+                </TableCell>
+                <TableCell style={{ fontSize: '14px', fontWeight: 'bold' }}>
+                  Diagnosis
+                </TableCell>
+                <TableCell style={{ fontSize: '14px', fontWeight: 'bold' }}>
+                  Actions
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredPatients.map((patient) => (
                 <TableRow key={patient.id}>
-                  <TableCell style={{ fontSize: '16px' }}>{patient.id}</TableCell>
+                  <TableCell style={{ fontSize: '16px' }}>
+                    {patient.id}
+                  </TableCell>
                   <TableCell
-                    style={{ fontSize: '16px', cursor: 'pointer', color: 'blue' }}
+                    style={{
+                      fontSize: '16px',
+                      cursor: 'pointer',
+                      color: 'blue',
+                    }}
                     onClick={() => handleNameClick(patient)}
                   >
                     {patient.name}
                   </TableCell>
-                  <TableCell style={{ fontSize: '16px' }}>{patient.age}</TableCell>
-                  <TableCell style={{ fontSize: '16px' }}>{patient.diagnosis}</TableCell>
+                  <TableCell style={{ fontSize: '16px' }}>
+                    {patient.age}
+                  </TableCell>
+                  <TableCell style={{ fontSize: '16px' }}>
+                    {patient.diagnosis}
+                  </TableCell>
                   <TableCell>
                     <IconButton
                       onClick={() => editPatient(patient)}
@@ -221,6 +253,19 @@ function PatientDatabase() {
           </Table>
         </TableContainer>
       </Container>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleOpenDialog}
+        style={{
+          fontSize: '14px',
+          padding: '10px 20px',
+          marginBottom: '20px',
+          width: '150px',
+        }}
+      >
+        Add Patient
+      </Button>
     </div>
   );
 }

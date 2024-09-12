@@ -4,6 +4,7 @@ import './App.css';
 
 import Dropdown from 'react-bootstrap/dropdown';
 import { Slider } from '@mui/material';
+import CBCTImage from 'assets/CBCT.png';
 import TabbedElectrodeIPGSelectionTest from './components/TabbedElectrodeIPGSelectionTest';
 import Navbar from './components/Navbar';
 // import Navbar from 'react-bootstrap/Navbar'
@@ -15,6 +16,7 @@ import PatientDatabase from './components/PatientDatabase';
 import PatientDetails from './components/PatientDetails';
 import { PatientProvider } from './components/PatientContext'; // Import the context provider
 import Programmer from './Programmer';
+import ClinicalScores from './components/ClinicalScores';
 
 export default function App() {
   return (
@@ -28,9 +30,21 @@ export default function App() {
             <Route path="/" element={<PatientDatabase />} />
             <Route path="/patient/:id" element={<PatientDetails />} />
             <Route path="/programmer" element={<Programmer />} />
+            <Route
+              path="/clinical-scores"
+              element={
+                <div style={{maxWidth: '1000px'}}>
+                  <ClinicalScores />
+                </div>
+              }
+            />
           </Routes>
         </Router>
       </PatientProvider>
+      {/* <div className="footer">
+        <hr className="divider" />
+        <img src={CBCTImage} alt="img" />
+      </div> */}
     </div>
   );
 }
