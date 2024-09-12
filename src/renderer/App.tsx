@@ -17,12 +17,36 @@ import PatientDetails from './components/PatientDetails';
 import { PatientProvider } from './components/PatientContext'; // Import the context provider
 import Programmer from './Programmer';
 import ClinicalScores from './components/ClinicalScores';
+// const { ipcRenderer } = require('electron');
 
 export default function App() {
+
+  // const [directoryPath, setDirectoryPath] = useState(null);
+
+  // Load the stored folder path when the component mounts
+  // useEffect(() => {
+  //   const loadFolderPath = async () => {
+  //     const savedPath = await ipcRenderer.invoke('get-folder-path');
+  //     if (savedPath) {
+  //       setDirectoryPath(savedPath);
+  //     }
+  //   };
+  //   loadFolderPath();
+  // }, []);
+
+  // // Function to handle folder selection
+  // const selectFolder = async () => {
+  //   const selectedPath = await ipcRenderer.invoke('select-folder');
+  //   if (selectedPath) {
+  //     setDirectoryPath(selectedPath);
+  //   }
+  // };
+
   return (
     <div>
       <div className="Navbar">
         <Navbar />
+        {/* <button onClick={selectFolder}>Select Save Directory</button> */}
       </div>
       <PatientProvider>
         <Router>

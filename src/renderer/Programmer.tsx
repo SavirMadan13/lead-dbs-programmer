@@ -5,7 +5,15 @@ import './App.css';
 // import Navbar from 'react-bootstrap/Navbar'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import GroupArchitecture from './components/GroupArchitecture';
+// import './components/electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
+// import './components/TabbedElectrodeIPGSelection.css';
+// import './components/electrode_models/currentModels/ElecModelStyling/BostonCartesia.css';
+import TabbedElectrodeIPGSelectionTest from './components/TabbedElectrodeIPGSelectionTest';
+// import './components/TabbedElectrodeIPGSelection.css';
 
+function Hello() {
+  return <TabbedElectrodeIPGSelectionTest />;
+}
 
 function Programmer() {
   let electrodeList: any[] = [];
@@ -19,7 +27,6 @@ function Programmer() {
   const location = useLocation();
   const navigate = useNavigate(); // Initialize the navigate hook
   // const { patient } = location.state || {}; // Retrieve patient data from navigation state
-
 
   const initialState = {
     IPG: '',
