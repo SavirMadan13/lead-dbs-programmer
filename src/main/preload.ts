@@ -54,6 +54,7 @@ const electronHandler = {
     once(channel: Channels, func: (...args: unknown[]) => void) {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
     },
+    invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args), // Add invoke method
   },
   // zoom: {
   //   zoomIn() {

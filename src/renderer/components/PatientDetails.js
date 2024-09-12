@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { PatientContext } from './PatientContext'; // Import the context
 import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
@@ -10,6 +10,10 @@ function PatientDetails({ directoryPath }) {
   const navigate = useNavigate(); // Initialize the navigate hook
 
   const [timeline, setTimeline] = useState(''); // For timeline selection
+
+  useEffect(() => {
+    // Listen for the selected folder path when a new one is selected
+  }, []);
 
   if (!patient) {
     return <div>Patient not found</div>;

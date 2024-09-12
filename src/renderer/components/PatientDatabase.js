@@ -23,7 +23,7 @@ import { Edit, Delete } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { PatientContext } from './PatientContext';
 
-function PatientDatabase({ directoryPath }) {
+function PatientDatabase({ key, directoryPath }) {
   const { patients, setPatients } = useContext(PatientContext);
   const [currentPatient, setCurrentPatient] = useState({
     id: '',

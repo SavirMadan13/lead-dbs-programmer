@@ -431,8 +431,10 @@ ipcMain.on('save-file', (event, file, data, historical) => {
 
   try {
     // Ensure that the directories exist, if not, create them
-    if (!fs.existsSync(patientDir)) fs.mkdirSync(patientDir, { recursive: true });
-    if (!fs.existsSync(sessionDir)) fs.mkdirSync(sessionDir, { recursive: true });
+    if (!fs.existsSync(patientDir))
+      fs.mkdirSync(patientDir, { recursive: true });
+    if (!fs.existsSync(sessionDir))
+      fs.mkdirSync(sessionDir, { recursive: true });
 
     // Convert the data to a string format (JSON)
     const dataString = JSON.stringify(data, null, 2);
@@ -619,19 +621,82 @@ const createWindow = async () => {
   //   }
   // });
 
-  // Handle folder selection
-  ipcMain.on('select-folder', async (event) => {
-    const result = await dialog.showOpenDialog(mainWindow, {
-      properties: ['openDirectory'],
-    });
+  // Handle folder selection - this one works
+  // ipcMain.on('select-folder', async (event) => {
+  //   const result = await dialog.showOpenDialog(mainWindow, {
+  //     properties: ['openDirectory'],
+  //   });
 
-    if (!result.canceled) {
-      const folderPath = result.filePaths[0];
-      const filePath = path.join(folderPath, 'dataset_description.json');
+  //   if (!result.canceled) {
+  //     const folderPath = result.filePaths[0];
+  //     const filePath = path.join(folderPath, 'dataset_description.json');
 
-      // Check if the JSON file exists
+  //     // Check if the JSON file exists
+  //     if (fs.existsSync(filePath)) {
+  //       // Read the file and send data back to renderer
+  //       fs.readFile(filePath, 'utf-8', (err, data) => {
+  //         if (err) {
+  //           console.error('Error reading JSON file:', err);
+  //           event.sender.send('file-read-error', 'Error reading JSON file');
+  //         } else {
+  //           try {
+  //             const patients = JSON.parse(data);
+  //             event.sender.send('folder-selected', folderPath, patients); // Send parsed patient data
+  //             event.sender.send('file-read-success', patients); // Send parsed patient data
+  //           } catch (error) {
+  //             console.error('Error parsing JSON file:', error);
+  //             event.sender.send('file-read-error', 'Error parsing JSON file');
+  //           }
+  //         }
+  //       });
+  //     } else {
+  //       // If file does not exist, just send null
+  //       event.sender.send(
+  //         'folder-selected',
+  //         folderPath,
+  //       );
+  //     }
+  //   } else {
+  //     event.sender.send('folder-selected', null);
+  //   }
+  // });
+
+  // Define the path to your hidden folder and the JSON file
+  const hiddenDirPath = path.join(
+    app.getPath('userData'),
+    '.lead-dbs-programmer',
+  );
+  const jsonFilePath = path.join(hiddenDirPath, 'config.json');
+
+  // Ensure the hidden directory exists
+  const ensureDirectoryExists = (dirPath: string) => {
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+    }
+  };
+
+  // Save the directory path to the JSON file
+  const saveDirectoryPath = (directoryPath: string) => {
+    ensureDirectoryExists(hiddenDirPath);
+    const data = { directoryPath };
+    fs.writeFileSync(jsonFilePath, JSON.stringify(data), 'utf-8');
+  };
+
+  // Load the saved directory path from the JSON file
+  const loadDirectoryPath = () => {
+    if (fs.existsSync(jsonFilePath)) {
+      const data = fs.readFileSync(jsonFilePath, 'utf-8');
+      return JSON.parse(data).directoryPath;
+    }
+    return null;
+  };
+
+  // IPC to handle folder selection and save path
+  ipcMain.on('select-folder', async (event, directoryPath) => {
+    if (directoryPath) {
+      console.log('IRECTORYPATH: ', directoryPath);
+      const filePath = path.join(directoryPath, 'dataset_description.json');
       if (fs.existsSync(filePath)) {
-        // Read the file and send data back to renderer
         fs.readFile(filePath, 'utf-8', (err, data) => {
           if (err) {
             console.error('Error reading JSON file:', err);
@@ -639,8 +704,9 @@ const createWindow = async () => {
           } else {
             try {
               const patients = JSON.parse(data);
-              event.sender.send('folder-selected', folderPath, patients); // Send parsed patient data
-              event.sender.send('file-read-success', patients); // Send parsed patient data
+              console.log('PATIENTS: ', patients);
+              event.sender.send('folder-selected', directoryPath, patients);
+              event.sender.send('file-read-success', patients);
             } catch (error) {
               console.error('Error parsing JSON file:', error);
               event.sender.send('file-read-error', 'Error parsing JSON file');
@@ -648,15 +714,50 @@ const createWindow = async () => {
           }
         });
       } else {
-        // If file does not exist, just send null
-        event.sender.send(
-          'folder-selected',
-          folderPath,
-        );
+        event.sender.send('folder-selected', directoryPath);
       }
     } else {
-      event.sender.send('folder-selected', null);
+      const result = await dialog.showOpenDialog({
+        properties: ['openDirectory'],
+      });
+
+      if (!result.canceled) {
+        const folderPath = result.filePaths[0];
+        const filePath = path.join(folderPath, 'dataset_description.json');
+
+        // Save the selected directory path
+        saveDirectoryPath(folderPath);
+
+        // Check if the JSON file exists in the selected folder
+        if (fs.existsSync(filePath)) {
+          fs.readFile(filePath, 'utf-8', (err, data) => {
+            if (err) {
+              console.error('Error reading JSON file:', err);
+              event.sender.send('file-read-error', 'Error reading JSON file');
+            } else {
+              try {
+                const patients = JSON.parse(data);
+                console.log('PATIENTS: ', patients);
+                event.sender.send('folder-selected', folderPath, patients);
+                event.sender.send('file-read-success', patients);
+              } catch (error) {
+                console.error('Error parsing JSON file:', error);
+                event.sender.send('file-read-error', 'Error parsing JSON file');
+              }
+            }
+          });
+        } else {
+          event.sender.send('folder-selected', folderPath);
+        }
+      } else {
+        event.sender.send('folder-selected', null);
+      }
     }
+  });
+
+  // IPC to load the saved directory path when the app starts
+  ipcMain.handle('get-saved-directory', () => {
+    return loadDirectoryPath();
   });
 
   // Handle writing the JSON file
