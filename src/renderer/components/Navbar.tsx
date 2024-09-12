@@ -72,7 +72,7 @@ export default function Navbar() {
     <AppBar position="fixed">
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Lead-DBS Programmer
+          {/* Lead-DBS Programmer */}
         </Typography>
         {/* {isMobile ? (
           <>

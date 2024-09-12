@@ -6,7 +6,7 @@ body {
   position: relative;
   color: white;
   height: 100vh;
-  background: #212121;
+  /* background: #212121; */
   font-family: sans-serif;
   overflow-y: visible;
   /* Scroll for overflow-y is an option */
@@ -72,5 +72,48 @@ a:hover {
   /* top: 200px;
   left: -500px; */
   /* left: -300px; */
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  /* background-color: #f1f1f1; */
+  padding: 10px 0;
+}
+
+.divider {
+  border: none;
+  /* border-top: 2px solid #ccc; */
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.footer-image {
+  max-width: 100px; /* Adjust size to fit your design */
+  height: auto;
+}
+
+/* In App.css or a separate CSS file */
+.select-button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.select-button:hover {
+  background-color: #0056b3;
+}
+
+.selected-directory {
+  font-size: 14px;
+  color: #333;
+  margin-top: 10px;
 }
 

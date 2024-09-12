@@ -65,6 +65,7 @@ function TabbedElectrodeIPGSelection({
   setStimChanged,
   namingConvention,
   selectedPatient,
+  historical,
 }) {
   const testElectrodeRef = React.createRef();
   // const [selectedElectrode, setSelectedElectrode] = useState('');
@@ -1775,8 +1776,14 @@ function TabbedElectrodeIPGSelection({
   const sendDataToMain = () => {
     const outputData = gatherExportedData5();
     console.log('OUTPUTDATA: ', outputData);
-    window.electron.ipcRenderer.sendMessage('save-file', filePath, outputData);
-    window.electron.ipcRenderer.sendMessage('close-window');
+    console.log('Historical: ', historical);
+    window.electron.ipcRenderer.sendMessage(
+      'save-file',
+      filePath,
+      outputData,
+      historical,
+    );
+    // window.electron.ipcRenderer.sendMessage('close-window');
     // window.electron.ipcRenderer.sendMessage('close-window');
 
     // Listen for a response from the main process

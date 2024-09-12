@@ -92,6 +92,9 @@ const electronHandler = {
       });
     },
   },
+  selectFolder: () => {
+    ipcRenderer.send('select-folder'); // Send message to trigger folder selection
+  },
 };
 
 contextBridge.exposeInMainWorld('electron', electronHandler);

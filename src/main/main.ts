@@ -18,15 +18,15 @@ import { resolveHtmlPath } from './util';
 
 ipcMain.setMaxListeners(Infinity);
 
-console.log = () => {};
-console.warn = () => {};
-console.error = () => {};
+// console.log = () => {};
+// console.warn = () => {};
+// console.error = () => {};
 
-const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
-console.log(args);
-const inputFilePath = args[0]; // Get the first argument
-// const inputFilePath =
-//   '/Users/savirmadan/Documents/Localization/Output/Patient0357Output/derivatives/leaddbs/sub-CbctDbs0357/stimulations/MNI152NLin2009bAsym/inputData.json';
+// const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
+// console.log(args);
+// const inputFilePath = args[0]; // Get the first argument
+const inputFilePath =
+  '/Users/savirmadan/Documents/Localization/Output/Patient0357Output/derivatives/leaddbs/sub-CbctDbs0357/stimulations/MNI152NLin2009bAsym/inputData.json';
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -386,83 +386,72 @@ const fs = require('fs');
 //   }
 // });
 
-ipcMain.on('save-file', (event, file, data) => {
-  // Example of saving data to a file
-  // const filePath = app.getPath('downloads') + '/data.txt';
-  // const currentDirectory = app.getAppPath();
-  // const currentDirectory = '/Users/savirmadan/Development/lead-dbs-programmer';
-  console.log('FILE: ', file);
-  const currentDirectory = app.getAppPath();
-  const directories = currentDirectory.split('/');
+// ipcMain.on('save-file', (event, file, data) => {
+//   // Example of saving data to a file
+//   // const filePath = app.getPath('downloads') + '/data.txt';
+//   // const currentDirectory = app.getAppPath();
+//   // const currentDirectory = '/Users/savirmadan/Development/lead-dbs-programmer';
+//   console.log('FILE: ', file);
+//   const currentDirectory = app.getAppPath();
+//   // console.log(currentDirectory + '/lead-dbs-programmer');
+//   if (currentDirectory) {
+//     // Convert data to string format
+//     const dataString = JSON.stringify(data);
+//     const f = fs.readFileSync(inputFilePath);
 
-  // Initialize a variable to store the result
-  let result = '';
+//     // Parse the JSON data
+//     const jsonData = JSON.parse(f);
 
-  // Loop through the directories
-  for (const dir of directories) {
-    // Append each directory to the result
-    result += `${dir}/`;
+//     // Extract and normalize the stimulation directory
+//     const stimPath = jsonData.stimDir;
+//     stimulationDirectory = stimPath.replace(/\\\//g, '/');
+//     const newStimFilePath = path.join(stimulationDirectory, 'data.json');
+//     try {
+//       console.log(newStimFilePath);
+//       fs.writeFileSync(newStimFilePath, dataString);
+//     } catch (error) {
+//       // Handle the error here
+//       console.error('Error writing to file:', error);
+//     }
+//     event.reply('file-saved', newStimFilePath);
+//   }
+// });
 
-    // If the directory contains "lead-dbs-programmer", stop the loop
-    if (dir === 'programmer') {
-      break;
-    }
+ipcMain.on('save-file', (event, file, data, historical) => {
+  const { patient, timeline, directoryPath } = historical;
+
+  if (!patient || !timeline || !directoryPath) {
+    console.error('Missing patient, timeline, or directoryPath');
+    return;
   }
-  // console.log(currentDirectory + '/lead-dbs-programmer');
-  if (currentDirectory) {
-    // Convert data to string format
-    const dataString = JSON.stringify(data);
-    // const prefsFileName = 'Preferences.json';
-    // const prefsFilePath = path.join(result, prefsFileName);
-    // const k = fs.readFileSync(prefsFilePath);
-    // const prefsData = JSON.parse(k);
-    // const leadPath = prefsData.LeadDBS_Path;
-    // let normalLeadPath = leadPath.replace(/\\\//g, '/');
-    // let filePath = path.join(normalLeadPath, 'programmer/data.json');
 
-    // trying out new patient specific saving
+  // Construct the proper folder structure based on the patient ID and timeline
+  const patientDir = path.join(directoryPath, `sub-${patient.id}`);
+  const sessionDir = path.join(patientDir, `ses-${timeline}`);
 
-    const f = fs.readFileSync(inputFilePath);
+  try {
+    // Ensure that the directories exist, if not, create them
+    if (!fs.existsSync(patientDir)) fs.mkdirSync(patientDir, { recursive: true });
+    if (!fs.existsSync(sessionDir)) fs.mkdirSync(sessionDir, { recursive: true });
 
-    // Parse the JSON data
-    const jsonData = JSON.parse(f);
+    // Convert the data to a string format (JSON)
+    const dataString = JSON.stringify(data, null, 2);
 
-    // Extract and normalize the stimulation directory
-    const stimPath = jsonData.stimDir;
-    stimulationDirectory = stimPath.replace(/\\\//g, '/');
-    const newStimFilePath = path.join(stimulationDirectory, 'data.json');
-    // console.log('DATALABEL: ', data.S.label);
-    // const outputFolder = path.join(stimulationDirectory, data.S.label);
-    // const outputFileName = `${patientID}_desc-stimparameters.json`;
-    // const outputFilePath = path.join(outputFolder, outputFileName);
-    // const fileName = 'data.json';
-    // const filePath = path.join(result, fileName);
-    // const filePath = './dist/main/webpack:/leaddbs-stimcontroller/main.js';
-    // Write data to file
-    try {
-      // fs.writeFileSync(filePath, dataString);
-      console.log(newStimFilePath);
-      fs.writeFileSync(newStimFilePath, dataString);
-    } catch (error) {
-      // Handle the error here
-      console.error('Error writing to file:', error);
-    }
-    // // Extract the directory path from the file path
-    // const dir = path.dirname(outputFilePath);
+    // Dynamically name the file based on patient and timeline
+    const fileName = `sub-${patient.id}_ses-${timeline}_stim.json`;
+    const filePath = path.join(sessionDir, fileName);
 
-    // // Check if the directory exists
-    // if (!fs.existsSync(dir)) {
-    //   // If the directory doesn't exist, create it (including any necessary subdirectories)
-    //   fs.mkdirSync(dir, { recursive: true });
-    // }
+    // Write the data to the file
+    fs.writeFileSync(filePath, dataString);
 
-    // // Now you can create or open the file
-    // fs.writeFileSync(outputFilePath, dataString, { flag: 'w' });
-    // fs.writeFileSync(outputFilePath, dataString);
+    // Send the file path back to the renderer process
+    event.reply('file-saved', filePath);
 
-    // Send a response back to the renderer process
-    // event.reply('file-saved', filePath);
-    event.reply('file-saved', newStimFilePath);
+    console.log(`Data saved successfully to ${filePath}`);
+  } catch (error) {
+    // Handle any errors in the saving process
+    console.error('Error writing to file:', error);
+    event.reply('file-save-error', error.message);
   }
 });
 
@@ -616,6 +605,76 @@ const createWindow = async () => {
 
   mainWindow.on('closed', () => {
     mainWindow = null;
+  });
+
+  // ipcMain.on('select-folder', async (event) => {
+  //   const result = await dialog.showOpenDialog(mainWindow, {
+  //     properties: ['openDirectory'],
+  //   });
+
+  //   if (!result.canceled) {
+  //     event.sender.send('folder-selected', result.filePaths[0]); // Send back the selected folder path
+  //   } else {
+  //     event.sender.send('folder-selected', null); // Send null if canceled
+  //   }
+  // });
+
+  // Handle folder selection
+  ipcMain.on('select-folder', async (event) => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      properties: ['openDirectory'],
+    });
+
+    if (!result.canceled) {
+      const folderPath = result.filePaths[0];
+      const filePath = path.join(folderPath, 'dataset_description.json');
+
+      // Check if the JSON file exists
+      if (fs.existsSync(filePath)) {
+        // Read the file and send data back to renderer
+        fs.readFile(filePath, 'utf-8', (err, data) => {
+          if (err) {
+            console.error('Error reading JSON file:', err);
+            event.sender.send('file-read-error', 'Error reading JSON file');
+          } else {
+            try {
+              const patients = JSON.parse(data);
+              event.sender.send('folder-selected', folderPath, patients); // Send parsed patient data
+              event.sender.send('file-read-success', patients); // Send parsed patient data
+            } catch (error) {
+              console.error('Error parsing JSON file:', error);
+              event.sender.send('file-read-error', 'Error parsing JSON file');
+            }
+          }
+        });
+      } else {
+        // If file does not exist, just send null
+        event.sender.send(
+          'folder-selected',
+          folderPath,
+        );
+      }
+    } else {
+      event.sender.send('folder-selected', null);
+    }
+  });
+
+  // Handle writing the JSON file
+  ipcMain.on('save-patients-json', (event, folderPath, patients) => {
+    const filePath = path.join(folderPath, 'dataset_description.json');
+
+    fs.writeFile(filePath, JSON.stringify(patients, null, 2), (err) => {
+      if (err) {
+        console.error('Error saving JSON file:', err);
+        event.sender.send('json-save-error', 'Error saving file');
+      } else {
+        event.sender.send('json-saved', 'File saved successfully');
+      }
+    });
+  });
+
+  app.on('window-all-closed', function () {
+    if (process.platform !== 'darwin') app.quit();
   });
 
   const menuBuilder = new MenuBuilder(mainWindow);

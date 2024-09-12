@@ -23,6 +23,7 @@ function GroupArchitecture({
   importNewS,
   electrodeMaster,
   ipgMaster,
+  historical,
 }) {
   const [selectedPatient, setSelectedPatient] = useState(null);
 
@@ -273,6 +274,7 @@ function GroupArchitecture({
           patientStates={patientStates}
           importNewS={importNewS}
           selectedPatient={selectedPatient}
+          historical={historical}
         />
       )}
     </div>

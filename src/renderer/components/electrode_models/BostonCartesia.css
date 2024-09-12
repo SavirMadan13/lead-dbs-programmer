@@ -71,13 +71,13 @@
 }
 .center-color {
   /* background-color: green; */
-  fill: rgba(229, 40, 40, 0.41);
+  /* fill: rgba(229, 40, 40, 0.41); */
   /* Change the background color for the 'center' position */
 }
 
 .right-color {
   /* background-color: blue; */
-  fill: rgba(50, 50, 244, 0.411);
+  /* fill: rgba(50, 50, 244, 0.411); */
   /* Change the background color for the 'right' position */
 }
 

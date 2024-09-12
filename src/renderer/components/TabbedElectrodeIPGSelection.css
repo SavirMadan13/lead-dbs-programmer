@@ -107,13 +107,6 @@ select {
   background-color: #c091fa;
 }
 
-.button-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
 .export-button-container {
   display: flex;
   flex-direction: column;
