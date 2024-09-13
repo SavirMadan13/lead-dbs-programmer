@@ -106,78 +106,92 @@ ipcMain.on('ipc-example', async (event, arg) => {
   // event.reply('ipc-example', msgTemplate(`pong: ${f}`));
 });
 
-ipcMain.on('import-file', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `${pingPong}`;
+// ipcMain.on('import-file', async (event, arg, id, timeline, directoryPath) => {
+//   const msgTemplate = (pingPong: string) => `${pingPong}`;
+//   const fs = require('fs');
+//   const currentDirectory = app.getAppPath();
+//   const directories = currentDirectory.split('/');
+
+//   try {
+//     // Normalize the lead path
+//     // let normalLeadPath = leadPath.replace(/\\\//g, '/');
+//     // let filePath = path.join(normalLeadPath, 'programmer/inputData.json');
+//     // const filePath = inputFilePath;
+//     const filePath = '/Users/savirmadan/Documents/DBS_Database_Framework/sub-623215/ses-6months/sub-623215_ses-6months_stim.json';
+//     console.log(filePath);
+
+//     // Read the file
+//     const f = fs.readFileSync(filePath);
+
+//     // Parse the JSON data
+//     const jsonData = JSON.parse(f);
+//     console.log(jsonData);
+//     // Extract and normalize the stimulation directory
+//     // const stimPath = jsonData.stimDir;
+//     // stimulationDirectory = stimPath.replace(/\\\//g, '/');
+//     // patientID = jsonData.patientname;
+
+//     // Log and send the data
+//     // console.log('STIMDIREC:', stimulationDirectory);
+//     event.reply('import-file', jsonData);
+//   } catch (err) {
+//     // Handle specific errors
+//     if (err.code === 'ENOENT') {
+//       console.error('File not found:', filePath);
+//     } else if (err.name === 'SyntaxError') {
+//       console.error('Error parsing JSON:', err.message);
+//     } else {
+//       console.error('An unexpected error occurred:', err);
+//     }
+//     // Optionally, you could send an error reply to the event
+//     event.reply('import-file-error', err.message);
+//   }
+// });
+
+ipcMain.on('import-file', async (event, id, timeline, directoryPath) => {
   const fs = require('fs');
-  const currentDirectory = app.getAppPath();
-  const directories = currentDirectory.split('/');
-
-  // Initialize a variable to store the result
-  let result = '';
-
-  // Loop through the directories
-  for (const dir of directories) {
-    // Append each directory to the result
-    result += `${dir}/`;
-
-    // If the directory contains "lead-dbs-programmer", stop the loop
-    if (dir === 'programmer') {
-      break;
-    }
-  }
-
-  // const prefsFileName = 'Preferences.json';
-  // const prefsFilePath = path.join(result, prefsFileName);
-  // const k = fs.readFileSync(prefsFilePath);
-  // const prefsData = JSON.parse(k);
-  // const leadPath = prefsData.LeadDBS_Path;
-
-  // let normalLeadPath = leadPath.replace(/\\\//g, '/');
-  // let filePath = path.join(normalLeadPath, 'programmer/inputData.json');
-  // // const fileName = 'inputData.json';
-  // // const filePath = path.join(result, fileName);
-  // console.log(filePath);
-  // // const testFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/lead-dbs-programmer/inputData.json';
-  // const f = fs.readFileSync(filePath);
-  // const jsonData = JSON.parse(f);
-  // let stimPath = jsonData.stimDir;
-  // stimulationDirectory = stimPath.replace(/\\\//g, '/');
-  // patientID = jsonData.patientname;
-  // console.log('STIMDIREC; ', stimulationDirectory);
-  // event.reply('import-file', jsonData);
-
   try {
-    // Normalize the lead path
-    // let normalLeadPath = leadPath.replace(/\\\//g, '/');
-    // let filePath = path.join(normalLeadPath, 'programmer/inputData.json');
-    const filePath = inputFilePath;
-    console.log(filePath);
+    // Validate id, timeline, and directoryPath
+    if (!id || !timeline || !directoryPath) {
+      console.error('Missing patient ID, timeline, or directoryPath');
+      event.reply('import-file-error', 'Missing patient ID, timeline, or directoryPath');
+      return;
+    }
+
+    // Construct the file path dynamically based on the directoryPath, patient id, and timeline
+    const patientDir = path.join(directoryPath, `sub-${id}`);
+    const sessionDir = path.join(patientDir, `ses-${timeline}`);
+    const fileName = `sub-${id}_ses-${timeline}_stim.json`;
+    const filePath = path.join(sessionDir, fileName);
+
+    // Check if the file exists before trying to read it
+    if (!fs.existsSync(filePath)) {
+      console.error('File not found:', filePath);
+      event.reply('import-file', 'File not found');
+      return;
+    }
 
     // Read the file
-    const f = fs.readFileSync(filePath);
+    const fileData = fs.readFileSync(filePath);
 
     // Parse the JSON data
-    const jsonData = JSON.parse(f);
-    console.log(jsonData);
-    // Extract and normalize the stimulation directory
-    const stimPath = jsonData.stimDir;
-    stimulationDirectory = stimPath.replace(/\\\//g, '/');
-    patientID = jsonData.patientname;
+    const jsonData = JSON.parse(fileData);
 
-    // Log and send the data
-    console.log('STIMDIREC:', stimulationDirectory);
+    // Log and send the data back to the renderer process
+    console.log(jsonData);
     event.reply('import-file', jsonData);
   } catch (err) {
     // Handle specific errors
     if (err.code === 'ENOENT') {
       console.error('File not found:', filePath);
+      event.reply('import-file-error', 'File not found');
     } else if (err.name === 'SyntaxError') {
       console.error('Error parsing JSON:', err.message);
+      event.reply('import-file-error', 'Error parsing JSON');
     } else {
       console.error('An unexpected error occurred:', err);
+      event.reply('import-file-error', err.message);
     }
-    // Optionally, you could send an error reply to the event
-    event.reply('import-file-error', err.message);
   }
 });
 
@@ -667,7 +681,7 @@ const createWindow = async () => {
     '.lead-dbs-programmer',
   );
   const jsonFilePath = path.join(hiddenDirPath, 'config.json');
-
+  console.log('Saved File', jsonFilePath);
   // Ensure the hidden directory exists
   const ensureDirectoryExists = (dirPath: string) => {
     if (!fs.existsSync(dirPath)) {
@@ -772,6 +786,7 @@ const createWindow = async () => {
         event.sender.send('json-saved', 'File saved successfully');
       }
     });
+    console.log('');
   });
 
   app.on('window-all-closed', function () {

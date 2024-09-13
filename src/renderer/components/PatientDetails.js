@@ -10,6 +10,8 @@ function PatientDetails({ directoryPath }) {
   const navigate = useNavigate(); // Initialize the navigate hook
 
   const [timeline, setTimeline] = useState(''); // For timeline selection
+  const [newTimeline, setNewTimeline] = useState(''); // To track user input for new timeline
+  const [timelines, setTimelines] = useState(['baseline', '6months', '12months']); // Predefined timelines
 
   useEffect(() => {
     // Listen for the selected folder path when a new one is selected
@@ -37,6 +39,16 @@ function PatientDetails({ directoryPath }) {
     }
   };
 
+  // Handle adding a new timeline
+  const handleAddTimeline = () => {
+    if (newTimeline && !timelines.includes(newTimeline)) {
+      setTimelines([...timelines, newTimeline]);
+      setNewTimeline(''); // Clear the input field after adding
+    } else {
+      alert('Timeline already exists or is empty');
+    }
+  };
+
   return (
     <div className="patient-details">
       <h1 className="patient-title">Patient Details</h1>
@@ -60,12 +72,26 @@ function PatientDetails({ directoryPath }) {
       <div className="timeline-selection">
         <label>Select Session Timeline:</label>
         <select value={timeline} onChange={(e) => setTimeline(e.target.value)}>
-          <option value="" disabled>Select timeline</option>
-          <option value="baseline">Baseline</option>
-          <option value="6months">6 Months</option>
-          <option value="12months">12 Months</option>
-          {/* Add more timeline options as needed */}
+          {timelines.map((t, index) => (
+            <option key={index} value={t}>
+              {t}
+            </option>
+          ))}
         </select>
+      </div>
+
+      {/* Add new timeline */}
+      <div className="add-timeline">
+        <input
+          className="timeline-input"
+          type="text"
+          placeholder="Add new timeline"
+          value={newTimeline}
+          onChange={(e) => setNewTimeline(e.target.value)}
+        />
+        <button className="add-timeline-button" onClick={handleAddTimeline}>
+          Add Timeline
+        </button>
       </div>
 
       {/* Back Button */}

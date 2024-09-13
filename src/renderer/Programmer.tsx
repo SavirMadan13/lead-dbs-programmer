@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import GroupArchitecture from './components/GroupArchitecture';
 
 function Programmer() {
-  let electrodeList: any[] = [];
+  const electrodeList: any[] = [];
   const [patientName, setPatientName] = useState('');
   const [patients, setPatients] = useState([]);
   const [patientStates, setPatientStates] = useState({});
@@ -15,8 +15,8 @@ function Programmer() {
 
   const location = useLocation();
   const { patient, timeline, directoryPath } = location.state || {};
-   // Access patient and timeline from state
-   console.log(location.state);
+  // Access patient and timeline from state
+  console.log(location.state);
   const navigate = useNavigate(); // Initialize the navigate hook
   // const { patient } = location.state || {}; // Retrieve patient data from navigation state
 
@@ -77,15 +77,24 @@ function Programmer() {
   };
 
   const handleIPG = (importedElectrode) => {
-    if (importedElectrode.includes('Boston')) {
+    if (
+      importedElectrode.includes('Boston') ||
+      importedElectrode.includes('boston')
+    ) {
       return 'Boston';
     }
-    if (importedElectrode.includes('Abbott')) {
+    if (
+      importedElectrode.includes('Abbott') ||
+      importedElectrode.includes('abbott')
+    ) {
       return 'Abbott';
     }
     if (
       importedElectrode === 'Medtronic 3387' ||
       importedElectrode === 'Medtronic 3389' ||
+      importedElectrode === 'medtronic_3387' ||
+      importedElectrode === 'medtronic_3389' ||
+      importedElectrode === 'medtronic_3391' ||
       importedElectrode === 'Medtronic 3391'
     ) {
       return 'Medtronic_Activa';
@@ -93,7 +102,21 @@ function Programmer() {
     return 'Medtronic_Percept';
   };
 
-  window.electron.ipcRenderer.sendMessage('import-file', ['ping']);
+  window.electron.ipcRenderer.sendMessage(
+    'import-file',
+    patient.id,
+    timeline,
+    directoryPath,
+  );
+
+  function generateUniqueID() {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // Adding 1 because months are zero-based
+    const day = currentDate.getDate().toString().padStart(2, '0');
+    const randomNums = Math.floor(Math.random() * 1000000); // Generate random 4-digit number
+    return `${year}${month}${day}${randomNums}`;
+  }
 
   const gatherImportedDataNew = (jsonData, outputIPG) => {
     console.log(jsonData);
@@ -107,8 +130,19 @@ function Programmer() {
     console.log('Imported Amplitude: ', jsonData.amplitude);
 
     for (let j = 1; j < 5; j++) {
-      newTotalAmplitude[j] = jsonData.amplitude[1][j - 1];
-      newTotalAmplitude[j + 4] = jsonData.amplitude[0][j - 1];
+      try {
+        newTotalAmplitude[j] = jsonData.amplitude[1][j - 1];
+        newTotalAmplitude[j + 4] = jsonData.amplitude[0][j - 1];
+      } catch {
+        console.log('');
+      }
+
+      try {
+        newTotalAmplitude[j] = jsonData.amplitude.leftAmplitude[j - 1];
+        newTotalAmplitude[j + 4] = jsonData.amplitude.rightAmplitude[j - 1];
+      } catch {
+        console.log('');
+      }
 
       console.log('newTotalAmplitude: ', newTotalAmplitude);
 
@@ -227,51 +261,81 @@ function Programmer() {
   };
 
   useEffect(() => {
-    console.log(window.electron.ipcRenderer);
+    // Ensure that the ipcRenderer is available
     if (window.electron && window.electron.ipcRenderer) {
-      window.electron.ipcRenderer.once('import-file', (arg) => {
+      const ipcRenderer = window.electron.ipcRenderer;
+
+      // Event listener for import-file-error
+      const handleImportFileError = (arg) => {
         try {
-          console.log('Received import-file event');
-          console.log('Import Data:', arg.patientname);
           setPatientName(patient.name);
-          console.log(arg);
-          electrodeList = arg.electrodeModel;
-          const outputElectrode = handleImportedElectrode(electrodeList);
-          const outputIPG = handleIPG(electrodeList);
-          console.log('Tester: ', outputIPG);
+          console.log('Not Found');
+          const outputElectrode = 'boston_vercise_directed';
+          const outputIPG = handleIPG(outputElectrode);
           setElectrodeMaster(outputElectrode);
           setIpgMaster(outputIPG);
-          setImportNewS(arg.S);
+          const S = {};
+          setImportNewS(S);
+          const tempLabel = generateUniqueID();
+          const tempPatients = [tempLabel];
 
-          const tempPatients = arg.labels;
-          console.log('TEMPPAtients', tempPatients);
-
+          const patientTmp = tempPatients[0];
           let initialStates;
+          const processedS = {
+            filteredQuantities: {},
+            filteredValues: {},
+            newTotalAmplitude: {},
+            outputVisModel: '3',
+            newAllVolAmpToggles: {},
+          };
+          console.log(S);
+          initialStates = {
+            [patientTmp]: {
+              ...initialState,
+              leftElectrode: outputElectrode,
+              rightElectrode: outputElectrode,
+              IPG: outputIPG,
+              allQuantities: processedS.filteredQuantities,
+              allSelectedValues: processedS.filteredValues,
+              allTotalAmplitudes: processedS.newTotalAmplitude,
+              visModel: processedS.outputVisModel,
+              allVolAmpToggles: processedS.newAllVolAmpToggles,
+            },
+          };
+          setPatientStates(initialStates);
+          setPatients(tempPatients);
+        } catch (error) {
+          console.error('Error processing import-file-error event:', error);
+        }
+      };
 
-          if (tempPatients.length === 1) {
-            const patient = tempPatients[0];
-            const electrodes = electrodeList[0];
-            console.log(arg.S);
-            // const processedS = arg.S
-            //   ? gatherImportedDataNew(arg.S)
-            //   : {
-            //       filteredQuantities: {},
-            //       filteredValues: {},
-            //       newTotalAmplitude: {},
-            //     };
-            const processedS =
-              Array.isArray(arg.S) && arg.S.length === 0
-                ? {
-                    filteredQuantities: {},
-                    filteredValues: {},
-                    newTotalAmplitude: {},
-                    outputVisModel: '3',
-                    newAllVolAmpToggles: {},
-                  }
-                : gatherImportedDataNew(arg.S, outputIPG);
-            console.log(arg.S);
+      // Event listener for import-file
+      const handleImportFile = (arg) => {
+        if (arg === 'File not found') {
+          try {
+            setPatientName(patient.name);
+            console.log('Not Found');
+            const outputElectrode = 'boston_vercise_directed';
+            const outputIPG = handleIPG(outputElectrode);
+            setElectrodeMaster(outputElectrode);
+            setIpgMaster(outputIPG);
+            const S = {};
+            setImportNewS(S);
+            const tempLabel = generateUniqueID();
+            const tempPatients = [tempLabel];
+
+            const patientTmp = tempPatients[0];
+            let initialStates;
+            const processedS = {
+              filteredQuantities: {},
+              filteredValues: {},
+              newTotalAmplitude: {},
+              outputVisModel: '3',
+              newAllVolAmpToggles: {},
+            };
+            console.log(S);
             initialStates = {
-              [patient]: {
+              [patientTmp]: {
                 ...initialState,
                 leftElectrode: outputElectrode,
                 rightElectrode: outputElectrode,
@@ -283,41 +347,95 @@ function Programmer() {
                 allVolAmpToggles: processedS.newAllVolAmpToggles,
               },
             };
-          } else {
-            initialStates = tempPatients.reduce((acc, patient, index) => {
-              console.log(`Processing patient ${index + 1}`);
-              const electrodes = electrodeList[index];
-              const processedS = arg.S[index]
-                ? gatherImportedDataNew(arg.S[index], outputIPG)
-                : {
-                    filteredQuantities: {},
-                    filteredValues: {},
-                    newTotalAmplitude: {},
-                    outputVisModel: '3',
-                    newAllVolAmpToggles: {},
-                  };
-              acc[patient] = {
-                ...initialState,
-                leftElectrode: outputElectrode,
-                rightElectrode: outputElectrode,
-                IPG: outputIPG,
-                allQuantities: processedS.filteredQuantities,
-                allSelectedValues: processedS.filteredValues,
-                allTotalAmplitudes: processedS.newTotalAmplitude,
-                visModel: processedS.outputVisModel,
-                allVolAmpToggles: processedS.newAllVolAmpToggles,
-              };
-              return acc;
-            }, {});
+            setPatientStates(initialStates);
+            setPatients(tempPatients);
+          } catch (error) {
+            console.error('Error processing import-file-error event:', error);
           }
+        } else {
+          try {
+            setPatientName(patient.name);
+            console.log(arg);
+            const { S } = arg;
+            const outputElectrode = S.elmodel[0];
+            const outputIPG = handleIPG(S.elmodel[0]);
+            console.log('Tester: ', outputIPG);
+            setElectrodeMaster(outputElectrode);
+            setIpgMaster(outputIPG);
+            setImportNewS(S);
 
-          console.log('Patients:', initialStates);
-          setPatientStates(initialStates);
-          setPatients(tempPatients);
-        } catch (error) {
-          console.error('Error processing import-file event:', error);
+            const tempPatients = [S.label];
+            console.log('TEMPPatients', tempPatients[0]);
+
+            let initialStates;
+
+            if (tempPatients.length === 1) {
+              const patientTmp = tempPatients[0];
+              const processedS =
+                Array.isArray(S) && S.length === 0
+                  ? {
+                      filteredQuantities: {},
+                      filteredValues: {},
+                      newTotalAmplitude: {},
+                      outputVisModel: '3',
+                      newAllVolAmpToggles: {},
+                    }
+                  : gatherImportedDataNew(S, outputIPG);
+              console.log(S);
+              initialStates = {
+                [patientTmp]: {
+                  ...initialState,
+                  leftElectrode: outputElectrode,
+                  rightElectrode: outputElectrode,
+                  IPG: outputIPG,
+                  allQuantities: processedS.filteredQuantities,
+                  allSelectedValues: processedS.filteredValues,
+                  allTotalAmplitudes: processedS.newTotalAmplitude,
+                  visModel: processedS.outputVisModel,
+                  allVolAmpToggles: processedS.newAllVolAmpToggles,
+                },
+              };
+            } else {
+              initialStates = tempPatients.reduce((acc, patient, index) => {
+                console.log(`Processing patient ${index + 1}`);
+                const electrodes = electrodeList[index];
+                const processedS = arg.S[index]
+                  ? gatherImportedDataNew(arg.S[index], outputIPG)
+                  : {
+                      filteredQuantities: {},
+                      filteredValues: {},
+                      newTotalAmplitude: {},
+                      outputVisModel: '3',
+                      newAllVolAmpToggles: {},
+                    };
+                acc[patient] = {
+                  ...initialState,
+                  leftElectrode: outputElectrode,
+                  rightElectrode: outputElectrode,
+                  IPG: outputIPG,
+                  allQuantities: processedS.filteredQuantities,
+                  allSelectedValues: processedS.filteredValues,
+                  allTotalAmplitudes: processedS.newTotalAmplitude,
+                  visModel: processedS.outputVisModel,
+                  allVolAmpToggles: processedS.newAllVolAmpToggles,
+                };
+                return acc;
+              }, {});
+            }
+
+            console.log('Patients:', initialStates);
+            setPatientStates(initialStates);
+            setPatients(tempPatients);
+          } catch (error) {
+            console.error('Error processing import-file event:', error);
+          }
         }
-      });
+      };
+
+      // Attach listeners using 'once' so that it only listens for the event once
+      // ipcRenderer.once('import-file-error', handleImportFileError);
+      ipcRenderer.once('import-file', handleImportFile);
+
     } else {
       console.error('ipcRenderer is not available');
     }
@@ -325,47 +443,126 @@ function Programmer() {
 
   // useEffect(() => {
   //   console.log(window.electron.ipcRenderer);
+  //   window.electron.ipcRenderer.once('import-file-error', (arg) => {
+  //     try {
+  //       setPatientName(patient.name);
+  //       console.log('Not Found');
+  //       const outputElectrode = 'boston_vercise_directed';
+  //       const outputIPG = handleIPG(outputElectrode);
+  //       setElectrodeMaster(outputElectrode);
+  //       setIpgMaster(outputIPG);
+  //       const S = {};
+  //       setImportNewS(S);
+  //       const tempLabel = generateUniqueID();
+  //       const tempPatients = [tempLabel];
+
+  //       const patientTmp = tempPatients[0];
+  //       let initialStates;
+  //       const processedS = {
+  //         filteredQuantities: {},
+  //         filteredValues: {},
+  //         newTotalAmplitude: {},
+  //         outputVisModel: '3',
+  //         newAllVolAmpToggles: {},
+  //       };
+  //       console.log(S);
+  //       initialStates = {
+  //         [patientTmp]: {
+  //           ...initialState,
+  //           leftElectrode: outputElectrode,
+  //           rightElectrode: outputElectrode,
+  //           IPG: outputIPG,
+  //           allQuantities: processedS.filteredQuantities,
+  //           allSelectedValues: processedS.filteredValues,
+  //           allTotalAmplitudes: processedS.newTotalAmplitude,
+  //           visModel: processedS.outputVisModel,
+  //           allVolAmpToggles: processedS.newAllVolAmpToggles,
+  //         },
+  //       };
+  //       setPatientStates(initialStates);
+  //       setPatients(tempPatients);
+  //     } catch (error) {
+  //       console.error('Error processing import-file event:', error);
+  //     }
+  //   });
+  //   console.log('Passed');
+  // }, []);
+
+  // useEffect(() => {
+  //   console.log(window.electron.ipcRenderer);
   //   if (window.electron && window.electron.ipcRenderer) {
   //     window.electron.ipcRenderer.once('import-file', (arg) => {
   //       try {
-  //         console.log('Received import-file event');
-  //         console.log('Import Data:', arg.patientname);
-  //         setPatientName(arg.patientname);
+  //         setPatientName(patient.name);
   //         console.log(arg);
-  //         // electrodeList = arg.electrodeModel;
-  //         electrodeList = arg.electrodeModel;
-  //         const outputElectrode = handleImportedElectrode(electrodeList);
-  //         const outputIPG = handleIPG(electrodeList);
+  //         const { S } = arg;
+  //         const outputElectrode = S.elmodel[0];
+  //         const outputIPG = handleIPG(S.elmodel[0]);
+  //         console.log('Tester: ', outputIPG);
   //         setElectrodeMaster(outputElectrode);
   //         setIpgMaster(outputIPG);
-  //         setImportNewS(arg.S);
-  //         const tempPatients = arg.labels;
-  //         const initialStates = tempPatients.reduce((acc, patient, index) => {
-  //           console.log(`Processing patient ${index + 1}`);
-  //           const electrodes = electrodeList[index];
-  //           console.log('Electrodes:', electrodes);
-  //           // const outputElectrode = handleImportedElectrode(electrodes);
-  //           // const outputIPG = handleIPG(electrodes);
-  //           console.log('ARG.S.Index: ', arg.S[index]);
-  //           const processedS = arg.S[index]
-  //             ? gatherImportedDataNew(arg.S[index])
-  //             : {
-  //                 filteredQuantities: {},
-  //                 filteredValues: {},
-  //                 newTotalAmplitude: {},
-  //               };
-  //           acc[patient] = {
-  //             ...initialState,
-  //             leftElectrode: outputElectrode,
-  //             rightElectrode: outputElectrode,
-  //             IPG: outputIPG,
-  //             allQuantities: processedS.filteredQuantities,
-  //             allSelectedValues: processedS.filteredValues,
-  //             allTotalAmplitudes: processedS.newTotalAmplitude,
+  //         setImportNewS(S);
+
+  //         const tempPatients = [S.label];
+  //         console.log('TEMPPAtients', tempPatients[0]);
+
+  //         let initialStates;
+
+  //         if (tempPatients.length === 1) {
+  //           const patientTmp = tempPatients[0];
+  //           const processedS =
+  //             Array.isArray(S) && S.length === 0
+  //               ? {
+  //                   filteredQuantities: {},
+  //                   filteredValues: {},
+  //                   newTotalAmplitude: {},
+  //                   outputVisModel: '3',
+  //                   newAllVolAmpToggles: {},
+  //                 }
+  //               : gatherImportedDataNew(S, outputIPG);
+  //           console.log(S);
+  //           initialStates = {
+  //             [patientTmp]: {
+  //               ...initialState,
+  //               leftElectrode: outputElectrode,
+  //               rightElectrode: outputElectrode,
+  //               IPG: outputIPG,
+  //               allQuantities: processedS.filteredQuantities,
+  //               allSelectedValues: processedS.filteredValues,
+  //               allTotalAmplitudes: processedS.newTotalAmplitude,
+  //               visModel: processedS.outputVisModel,
+  //               allVolAmpToggles: processedS.newAllVolAmpToggles,
+  //             },
   //           };
-  //           return acc;
-  //         }, {});
-  //         console.log('Patients:', tempPatients);
+  //         } else {
+  //           initialStates = tempPatients.reduce((acc, patient, index) => {
+  //             console.log(`Processing patient ${index + 1}`);
+  //             const electrodes = electrodeList[index];
+  //             const processedS = arg.S[index]
+  //               ? gatherImportedDataNew(arg.S[index], outputIPG)
+  //               : {
+  //                   filteredQuantities: {},
+  //                   filteredValues: {},
+  //                   newTotalAmplitude: {},
+  //                   outputVisModel: '3',
+  //                   newAllVolAmpToggles: {},
+  //                 };
+  //             acc[patient] = {
+  //               ...initialState,
+  //               leftElectrode: outputElectrode,
+  //               rightElectrode: outputElectrode,
+  //               IPG: outputIPG,
+  //               allQuantities: processedS.filteredQuantities,
+  //               allSelectedValues: processedS.filteredValues,
+  //               allTotalAmplitudes: processedS.newTotalAmplitude,
+  //               visModel: processedS.outputVisModel,
+  //               allVolAmpToggles: processedS.newAllVolAmpToggles,
+  //             };
+  //             return acc;
+  //           }, {});
+  //         }
+
+  //         console.log('Patients:', initialStates);
   //         setPatientStates(initialStates);
   //         setPatients(tempPatients);
   //       } catch (error) {
@@ -388,63 +585,9 @@ function Programmer() {
     }
   };
 
-  // const appContainerRef = useRef(null);
-
-  // useEffect(() => {
-  //   const handleResize = () => {
-  //     const width = window.innerWidth;
-  //     const height = window.innerHeight;
-
-  //     // Base dimensions that match your design
-  //     const baseWidth = 1100;
-  //     const baseHeight = 800;
-
-  //     // Calculate the scale factor to fit the current window size
-  //     const scaleX = width / baseWidth;
-  //     const scaleY = height / baseHeight;
-  //     const scale = Math.min(scaleX, scaleY);
-
-  //     // Apply the scale transform
-  //     appContainerRef.current.style.transform = `scale(${scale})`;
-  //   };
-
-  //   // Set up a resize observer to call handleResize on size changes
-  //   const resizeObserver = new ResizeObserver(handleResize);
-  //   resizeObserver.observe(document.body);
-
-  //   // Initial scale application
-  //   handleResize();
-
-  //   // Clean up on component unmount
-  //   return () => {
-  //     resizeObserver.disconnect();
-  //   };
-  // }, []);
-
   return (
     <div>
-      <div className="Navbar">
-        {/* <Navbar /> */}
-        {/* <Slider
-          value={zoomLevel}
-          onChange={handleZoomChange}
-          aria-label="Zoom Level"
-          step={1}
-          marks
-          min={-3}
-          max={1}
-          sx={{
-            '& .MuiSlider-mark': {
-              backgroundColor: 'black',
-              height: '10px',
-              width: '2px',
-            },
-          }}
-        /> */}
-      </div>
-      {/* {handleIPCInfo} */}
       <div
-        // style={{ textAlign: 'right', fontWeight: 'bold', fontSize: '16px', paddingRight: '100px'}}
         style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '20px' }}
       >
         Patient: {patientName}
@@ -467,7 +610,6 @@ function Programmer() {
       <button className="export-button" onClick={() => navigate(-1)}>
         Back to Patient Details
       </button>
-      {/* <PatientDatabase /> */}
     </div>
   );
 }

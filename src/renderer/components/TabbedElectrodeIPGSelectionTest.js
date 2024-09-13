@@ -1718,12 +1718,12 @@ function TabbedElectrodeIPGSelection({
       for (let j = 1; j < loopSize; j++) {
         zerosArr.push(0);
       }
-      if (data.S.activecontacts[i-1]) {
-        if (data.S.activecontacts[i-1] === null) {
-          data.S.activecontacts[i-1] = zerosArr;
+      if (data.S.activecontacts[i - 1]) {
+        if (data.S.activecontacts[i - 1] === null) {
+          data.S.activecontacts[i - 1] = zerosArr;
         }
       } else {
-        data.S.activecontacts[i-1] = zerosArr;
+        data.S.activecontacts[i - 1] = zerosArr;
       }
     }
 
@@ -1867,34 +1867,8 @@ function TabbedElectrodeIPGSelection({
 
   return (
     <div>
-      <div style={{ marginTop: '30px' }}></div>
-      {/* <div>
-        <h4>Contact Naming Convention</h4>
-        <ButtonGroup>
-          {namingConventionDef.map((name, idx) => (
-            <ToggleButton
-              key={idx}
-              id={`volAmp-${idx}`}
-              type="radio"
-              variant={getVariant(name.value)}
-              name="name"
-              value={name.value}
-              checked={namingConvention === name.value}
-              onChange={(e) => handleNamingConventionChange(e.currentTarget.value)}
-            >
-              {name.name}
-            </ToggleButton>
-          ))}
-        </ButtonGroup>
-      </div> */}
-      <div className="stimCloseContainer">
-        {/* <button className="export-button" onClick={sendDataToMain}>
-            Stimulate and Close
-          </button> */}
-        {/* <button className="export-button" onClick={quitApp}>
-            Close
-          </button> */}
-      </div>
+      <div style={{ marginTop: '30px' }} />
+      <div className="stimCloseContainer" />
       <Tabs className="tabs-container">
         <TabList className="tabs-container">
           <Tab onClick={() => handleTabChange('5')}>Right Hemisphere</Tab>
@@ -1917,25 +1891,7 @@ function TabbedElectrodeIPGSelection({
               </Tab>
             </TabList>
             {hemisphereData.right.map((tabState, index) => (
-              <TabPanel key={index} className="compact-tab-panel">
-                {/* <div className = "compact-input-container"> */}
-                {/* <h2>Unit:</h2> */}
-                {/* <select
-                  value={tabState.unit}
-                  onChange={(e) => handleUnitChange(e, index, 'right')}
-                >
-                  <option value="V">V</option>
-                  <option value="mA">mA</option>
-                </select>
-                <input
-                  // type="text"
-                  type="number"
-                  pattern="[0-9]+"
-                  value={tabState.value}
-                  onChange={(e) => handleValueChange(e, index, 'right')}
-                  placeholder={`Enter value in ${tabState.unit}`}
-                /> */}
-                {/* </div> */}
+              <TabPanel key={index}>
                 <div className="form-container">
                   {testElectrodeOptions[selectedElectrodeRight]}
                   <div className="electrode-label">
@@ -1946,10 +1902,8 @@ function TabbedElectrodeIPGSelection({
             ))}
           </Tabs>
         </TabPanel>
-
         <TabPanel>
           <Tabs>
-            {/* <Tabs onClick={handleChange}> */}
             <TabList>
               <Tab key="1" onClick={() => handleTabChange('1')}>
                 Program 1
@@ -1966,22 +1920,6 @@ function TabbedElectrodeIPGSelection({
             </TabList>
             {hemisphereData.left.map((tabState, index) => (
               <TabPanel key={index}>
-                {/* <h2>Unit:</h2>
-                <select
-                  value={tabState.unit}
-                  onChange={(e) => handleUnitChange(e, index, 'left')}
-                >
-                  <option value="V">V</option>
-                  <option value="mA">mA</option>
-                </select>
-
-                <h2>Value:</h2>
-                <input
-                  type="text"
-                  value={tabState.value}
-                  onChange={(e) => handleValueChange(e, index, 'left')}
-                  placeholder={`Enter value in ${tabState.unit}`}
-                /> */}
                 <div className="form-container">
                   {testElectrodeOptions[selectedElectrodeLeft]}
                   <div className="electrode-label">
@@ -1994,12 +1932,6 @@ function TabbedElectrodeIPGSelection({
         </TabPanel>
       </Tabs>
       <div className="export-button-container">
-        {/* <button
-          className="import-button"
-          onClick={() => fileInputRef.current.click()}
-        >
-          Import Data
-        </button> */}
         <input
           ref={fileInputRef}
           className="file-input"
@@ -2009,26 +1941,17 @@ function TabbedElectrodeIPGSelection({
           style={{ display: 'none' }}
           // Hide the input element
         />
-        {/* <button className="export-button" onClick={gatherExportedData2}>
-          Visualize
-        </button>
-        <button className="export-button" onClick={handleClick}>
-          Visualize Webserver
-        </button> */}
-        {/* <button onClick={handleIPGForOutput}>IPG Output</button> */}
-        {/* <button className="export-button" onClick={sendDataToMain}>
-          Stimulate
-        </button>
-        <button className="export-button" onClick={quitApp}>
-          Close
-        </button> */}
       </div>
       <div style={{ textAlign: 'center', paddingBottom: '35px' }}>
-        <button className="export-button-final-discard" onClick={closeFunction} style={{marginRight: '15px'}}>
-          Discard and Close
-        </button>
+        {/* <button
+          className="export-button-final-discard"
+          onClick={closeFunction}
+          style={{ marginRight: '15px' }}
+        >
+          Discard
+        </button> */}
         <button className="export-button-final" onClick={sendDataToMain}>
-          Stimulate and Close
+          Save
         </button>
       </div>
     </div>

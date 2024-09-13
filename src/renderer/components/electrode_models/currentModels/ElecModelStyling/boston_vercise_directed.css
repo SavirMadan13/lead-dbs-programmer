@@ -783,3 +783,37 @@ button:active {
 .search-field .MuiInputLabel-root.Mui-focused {
   color: #004085; /* Label color when focused */
 }
+
+/* Styling for the add-timeline section */
+.add-timeline {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+/* Input styling */
+.timeline-input {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 10px;
+  flex-grow: 1;
+}
+
+/* Button styling */
+.add-timeline-button {
+  padding: 10px 15px;
+  font-size: 16px;
+  background-color: #007bff; /* Bootstrap blue for a clean look */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-timeline-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
