@@ -1910,7 +1910,7 @@ function TabbedElectrodeIPGSelection({
               </Tab>
             </TabList>
             {hemisphereData.right.map((tabState, index) => (
-              <TabPanel key={index} className="compact-tab-panel">
+              <TabPanel key={index}>
                 {/* <div className = "compact-input-container"> */}
                 {/* <h2>Unit:</h2> */}
                 {/* <select
