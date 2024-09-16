@@ -250,7 +250,7 @@ export default function App() {
     }
 
     Object.keys(newAllVolAmpToggles).forEach((key) => {
-      if (newAllVolAmpToggles[key] === 1) {
+      if (newAllVolAmpToggles[key] === 'right') {
         setIpgMaster('Medtronic_Activa');
         return '';
       }
