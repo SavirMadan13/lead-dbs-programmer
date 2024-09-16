@@ -148,6 +148,20 @@ ipcMain.on('ipc-example', async (event, arg) => {
 //   }
 // });
 
+// Check if folder exists
+ipcMain.handle('check-folder-exists', (event, folderPath) => {
+  const fs = require('fs');
+  return new Promise((resolve) => {
+    fs.access(folderPath, fs.constants.F_OK, (err) => {
+      if (err) {
+        resolve(false); // Folder does not exist
+      } else {
+        resolve(true); // Folder exists
+      }
+    });
+  });
+});
+
 ipcMain.on('import-file', async (event, id, timeline, directoryPath) => {
   const fs = require('fs');
   try {
@@ -801,44 +815,56 @@ const createWindow = async () => {
     return null;
   };
 
-  // IPC to handle folder selection and save path
+  // Helper function to check if the folder has the Lead-DBS structure
+  const isLeadDBSFolder = (directoryPath) => {
+    const requiredFolders = ['derivatives/leaddbs', 'rawdata', 'sourcedata'];
+    return requiredFolders.every((folder) =>
+      fs.existsSync(path.join(directoryPath, folder)),
+    );
+  };
+
+  // Helper function to load patients from Lead-DBS folder structure
+  const loadLeadDBSPatients = (directoryPath) => {
+    const leadDBSPath = path.join(directoryPath, 'derivatives', 'leaddbs');
+    const patientFolders = fs.readdirSync(leadDBSPath);
+
+    const patients = patientFolders.map((folder) => {
+      const patientId = folder;
+      const patientFilePath = path.join(
+        leadDBSPath,
+        folder,
+        'patient_info.json',
+      ); // Assuming there’s a patient_info.json file in each folder
+      let patientData = null;
+
+      if (fs.existsSync(patientFilePath)) {
+        const patientFileContent = fs.readFileSync(patientFilePath, 'utf-8');
+        patientData = JSON.parse(patientFileContent);
+      }
+
+      return {
+        id: patientId,
+        ...patientData,
+      };
+    });
+
+    return patients;
+  };
+
   ipcMain.on('select-folder', async (event, directoryPath) => {
     if (directoryPath) {
-      console.log('IRECTORYPATH: ', directoryPath);
-      const filePath = path.join(directoryPath, 'dataset_description.json');
-      if (fs.existsSync(filePath)) {
-        fs.readFile(filePath, 'utf-8', (err, data) => {
-          if (err) {
-            console.error('Error reading JSON file:', err);
-            event.sender.send('file-read-error', 'Error reading JSON file');
-          } else {
-            try {
-              const patients = JSON.parse(data);
-              console.log('PATIENTS: ', patients);
-              event.sender.send('folder-selected', directoryPath, patients);
-              event.sender.send('file-read-success', patients);
-            } catch (error) {
-              console.error('Error parsing JSON file:', error);
-              event.sender.send('file-read-error', 'Error parsing JSON file');
-            }
-          }
-        });
+      console.log('DIRECTORYPATH: ', directoryPath);
+
+      // Check if the folder matches Lead-DBS structure
+      if (isLeadDBSFolder(directoryPath)) {
+        console.log('Lead-DBS folder detected');
+        const patients = loadLeadDBSPatients(directoryPath);
+        console.log('PATIENTS: ', patients);
+        event.sender.send('folder-selected', directoryPath, patients);
+        event.sender.send('file-read-success', patients);
       } else {
-        event.sender.send('folder-selected', directoryPath);
-      }
-    } else {
-      const result = await dialog.showOpenDialog({
-        properties: ['openDirectory'],
-      });
-
-      if (!result.canceled) {
-        const folderPath = result.filePaths[0];
-        const filePath = path.join(folderPath, 'dataset_description.json');
-
-        // Save the selected directory path
-        saveDirectoryPath(folderPath);
-
-        // Check if the JSON file exists in the selected folder
+        // Regular dataset_description.json loading if it's not Lead-DBS
+        const filePath = path.join(directoryPath, 'dataset_description.json');
         if (fs.existsSync(filePath)) {
           fs.readFile(filePath, 'utf-8', (err, data) => {
             if (err) {
@@ -848,7 +874,7 @@ const createWindow = async () => {
               try {
                 const patients = JSON.parse(data);
                 console.log('PATIENTS: ', patients);
-                event.sender.send('folder-selected', folderPath, patients);
+                event.sender.send('folder-selected', directoryPath, patients);
                 event.sender.send('file-read-success', patients);
               } catch (error) {
                 console.error('Error parsing JSON file:', error);
@@ -857,13 +883,124 @@ const createWindow = async () => {
             }
           });
         } else {
-          event.sender.send('folder-selected', folderPath);
+          event.sender.send('folder-selected', directoryPath);
+        }
+      }
+    } else {
+      const result = await dialog.showOpenDialog({
+        properties: ['openDirectory'],
+      });
+
+      if (!result.canceled) {
+        const folderPath = result.filePaths[0];
+        console.log('Selected folder: ', folderPath);
+
+        // Save the selected directory path
+        saveDirectoryPath(folderPath);
+
+        // Check if the folder matches Lead-DBS structure
+        if (isLeadDBSFolder(folderPath)) {
+          console.log('Lead-DBS folder detected');
+          const patients = loadLeadDBSPatients(folderPath);
+          console.log('PATIENTS: ', patients);
+          event.sender.send('folder-selected', folderPath, patients);
+          event.sender.send('file-read-success', patients);
+        } else {
+          // Regular dataset_description.json loading if it's not Lead-DBS
+          const filePath = path.join(folderPath, 'dataset_description.json');
+          if (fs.existsSync(filePath)) {
+            fs.readFile(filePath, 'utf-8', (err, data) => {
+              if (err) {
+                console.error('Error reading JSON file:', err);
+                event.sender.send('file-read-error', 'Error reading JSON file');
+              } else {
+                try {
+                  const patients = JSON.parse(data);
+                  console.log('PATIENTS: ', patients);
+                  event.sender.send('folder-selected', folderPath, patients);
+                  event.sender.send('file-read-success', patients);
+                } catch (error) {
+                  console.error('Error parsing JSON file:', error);
+                  event.sender.send(
+                    'file-read-error',
+                    'Error parsing JSON file',
+                  );
+                }
+              }
+            });
+          } else {
+            event.sender.send('folder-selected', folderPath);
+          }
         }
       } else {
         event.sender.send('folder-selected', null);
       }
     }
   });
+
+  // IPC to handle folder selection and save path - WORKS
+  // ipcMain.on('select-folder', async (event, directoryPath) => {
+  //   if (directoryPath) {
+  //     console.log('IRECTORYPATH: ', directoryPath);
+  //     const filePath = path.join(directoryPath, 'dataset_description.json');
+  //     if (fs.existsSync(filePath)) {
+  //       fs.readFile(filePath, 'utf-8', (err, data) => {
+  //         if (err) {
+  //           console.error('Error reading JSON file:', err);
+  //           event.sender.send('file-read-error', 'Error reading JSON file');
+  //         } else {
+  //           try {
+  //             const patients = JSON.parse(data);
+  //             console.log('PATIENTS: ', patients);
+  //             event.sender.send('folder-selected', directoryPath, patients);
+  //             event.sender.send('file-read-success', patients);
+  //           } catch (error) {
+  //             console.error('Error parsing JSON file:', error);
+  //             event.sender.send('file-read-error', 'Error parsing JSON file');
+  //           }
+  //         }
+  //       });
+  //     } else {
+  //       event.sender.send('folder-selected', directoryPath);
+  //     }
+  //   } else {
+  //     const result = await dialog.showOpenDialog({
+  //       properties: ['openDirectory'],
+  //     });
+
+  //     if (!result.canceled) {
+  //       const folderPath = result.filePaths[0];
+  //       const filePath = path.join(folderPath, 'dataset_description.json');
+
+  //       // Save the selected directory path
+  //       saveDirectoryPath(folderPath);
+
+  //       // Check if the JSON file exists in the selected folder
+  //       if (fs.existsSync(filePath)) {
+  //         fs.readFile(filePath, 'utf-8', (err, data) => {
+  //           if (err) {
+  //             console.error('Error reading JSON file:', err);
+  //             event.sender.send('file-read-error', 'Error reading JSON file');
+  //           } else {
+  //             try {
+  //               const patients = JSON.parse(data);
+  //               console.log('PATIENTS: ', patients);
+  //               event.sender.send('folder-selected', folderPath, patients);
+  //               event.sender.send('file-read-success', patients);
+  //             } catch (error) {
+  //               console.error('Error parsing JSON file:', error);
+  //               event.sender.send('file-read-error', 'Error parsing JSON file');
+  //             }
+  //           }
+  //         });
+  //       } else {
+  //         event.sender.send('folder-selected', folderPath);
+  //       }
+  //     } else {
+  //       event.sender.send('folder-selected', null);
+  //     }
+  //   }
+  // });
 
   // IPC to load the saved directory path when the app starts
   ipcMain.handle('get-saved-directory', () => {
