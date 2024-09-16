@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Form, Button, Table, Container } from 'react-bootstrap';
 import * as XLSX from 'xlsx';
@@ -9,6 +9,9 @@ import BoxPlotComponent from './BoxPlotComponent';
 import UPDRSAnalysisComponent from './UPDRSAnalysisComponent';
 
 function ClinicalScores() {
+  const location = useLocation();
+  const { patient, timeline, directoryPath } = location.state || {};
+  const navigate = useNavigate(); // Initialize the navigate hook
   const initialScores = {
     3.1: 0,
     3.2: 0,
@@ -45,9 +48,46 @@ function ClinicalScores() {
     3.18: 0,
   };
 
-  const [patients, setPatients] = useState([]);
-  const location = useLocation();
-  const navigate = useNavigate(); // Initialize the navigate hook
+  const [patients, setPatients] = useState([
+    {
+      id: patient.id,
+      baseline: { ...initialScores },
+      postop: { ...initialScores },
+    },
+  ]);
+
+  window.electron.ipcRenderer.sendMessage(
+    'import-file-clinical',
+    patient.id,
+    timeline,
+    directoryPath,
+  );
+
+  useEffect(() => {
+    // Ensure that the ipcRenderer is available
+    if (window.electron && window.electron.ipcRenderer) {
+      // Event listener for import-file
+      const handleImportFile = (arg) => {
+        const importedScores = arg;
+        if (importedScores === 'File not found') {
+          console.log('No File Found');
+        } else {
+          setPatients([
+            {
+              id: patient.id,
+              baseline: importedScores,
+              postop: { ...initialScores },
+            },
+          ]);
+        }
+      };
+
+      // Attach listeners using 'once' so that it only listens for the event once
+      window.electron.ipcRenderer.once('import-file-clinical', handleImportFile);
+    } else {
+      console.error('ipcRenderer is not available');
+    }
+  }, []);
 
   const addPatient = () => {
     setPatients([
@@ -299,11 +339,57 @@ function ClinicalScores() {
     setCurrentStage('analyze');
   };
 
+  const prepareDataForExport = () => {
+    const baselineScores = [];
+
+    Object.keys(selectedRows).forEach((rowIndex) => {
+      if (selectedRows[rowIndex]) {
+        const patient1 = patients[rowIndex];
+        // Sum all the baseline scores for this patient
+        const baselineSum = Object.values(patient1.baseline).reduce(
+          (sum, value) => sum + (value || 0),
+          0,
+        );
+
+        baselineScores.push(baselineSum);
+      }
+    });
+
+    console.log('Baseline: ', baselineScores);
+
+    // const tempBaselineValues = [
+    //   32, 45, 29, 50, 37, 41, 48, 42, 36, 44, 33, 40, 47, 39, 38, 43, 31, 49,
+    //   46, 46, 34,
+    // ];
+    // const tempPostopValues = [
+    //   28, 40, 25, 42, 34, 38, 44, 39, 32, 41, 29, 36, 42, 35, 34, 40, 27, 44,
+    //   41, 30,
+    // ];
+    setBaselineValues(baselineScores);
+  };
+
+  const sendDataToMain = () => {
+    console.log(patients[0].baseline);
+    window.electron.ipcRenderer.sendMessage(
+      'save-file-clinical',
+      patients[0].baseline,
+      location.state,
+    );
+  };
+
   return (
     <div>
       {currentStage === 'import' && (
         <div>
           {/* <h3 className="my-4">Import Data</h3> */}
+          <div
+            style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '20px' }}
+          >
+            Patient: {patient.name}
+          </div>
+          <div style={{ textAlign: 'center', fontSize: '20px' }}>
+            {timeline}
+          </div>
           <Container>
             <Button variant="primary" onClick={addPatient} className="mb-4">
               Add Patient
@@ -313,15 +399,15 @@ function ClinicalScores() {
               onClick={() => document.getElementById('baseline-upload').click()}
               className="mb-4 mx-2"
             >
-              Import Baseline Excel
+              Import Excel
             </Button>
-            <Button
+            {/* <Button
               variant="secondary"
               onClick={() => document.getElementById('postop-upload').click()}
               className="mb-4 mx-2"
             >
               Import Postoperative Excel
-            </Button>
+            </Button> */}
             <input
               id="baseline-upload"
               type="file"
@@ -336,26 +422,25 @@ function ClinicalScores() {
               accept=".xlsx"
               onChange={(e) => handleFileUpload(e, 'postop')}
             />
-            <Button
+            {/* <Button
               variant="success"
               // onClick={() => setCurrentStage('analyze')}
               onClick={analyzeSelectedRowsAndColumns}
               className="mb-4"
             >
               Proceed to Analysis
-            </Button>
+            </Button> */}
           </Container>
           <div>
-            <h4>Baseline Scores</h4>
+            <h4>Enter Scores</h4>
             {renderTable('baseline')}
-            <h4>Postoperative Scores</h4>
-            {renderTable('postop')}
+            {/* <h4>Postoperative Scores</h4>
+            {renderTable('postop')} */}
           </div>
         </div>
       )}
       {currentStage === 'analyze' && (
         <div>
-          {/* <h3 className="my-4">Analyze Data</h3> */}
           <Button variant="secondary" onClick={() => setCurrentStage('import')}>
             Go Back to Import
           </Button>
@@ -367,14 +452,6 @@ function ClinicalScores() {
                 width: '50%',
               }}
             >
-              {/* <PairedTTestComponent
-                baselineValues={baselineValues}
-                postopValues={postopValues}
-              />
-              <BoxPlotComponent
-                baselineValues={baselineValues}
-                postopValues={postopValues}
-              /> */}
               <UPDRSAnalysisComponent
                 baselineValues={baselineValues}
                 postopValues={postopValues}
@@ -384,7 +461,12 @@ function ClinicalScores() {
           )}
         </div>
       )}
-      <button className="export-button" onClick={() => navigate(-1)}>Back to Patient Details</button>
+      <button className="export-button" onClick={() => navigate(-1)}>
+        Back to Patient Details
+      </button>
+      <button className="export-button-final" onClick={sendDataToMain}>
+        Save Clinical Scores
+      </button>
     </div>
   );
 }

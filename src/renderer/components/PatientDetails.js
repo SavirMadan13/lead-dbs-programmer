@@ -9,9 +9,13 @@ function PatientDetails({ directoryPath }) {
   const { patients } = useContext(PatientContext); // Optional: Use context for patient data
   const navigate = useNavigate(); // Initialize the navigate hook
 
-  const [timeline, setTimeline] = useState(''); // For timeline selection
+  const [timeline, setTimeline] = useState('baseline'); // For timeline selection
   const [newTimeline, setNewTimeline] = useState(''); // To track user input for new timeline
-  const [timelines, setTimelines] = useState(['baseline', '6months', '12months']); // Predefined timelines
+  const [timelines, setTimelines] = useState([
+    'baseline',
+    '6months',
+    '12months',
+  ]); // Predefined timelines
 
   useEffect(() => {
     // Listen for the selected folder path when a new one is selected
@@ -33,7 +37,7 @@ function PatientDetails({ directoryPath }) {
   // Handles the navigation to the Clinical Scores page
   const handleNavigateToClinicalScores = () => {
     if (timeline) {
-      navigate('/clinical-scores', { state: { patient, timeline } });
+      navigate('/clinical-scores', { state: { patient, timeline, directoryPath } });
     } else {
       alert('Please select a timeline first');
     }

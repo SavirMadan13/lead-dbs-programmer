@@ -154,7 +154,10 @@ ipcMain.on('import-file', async (event, id, timeline, directoryPath) => {
     // Validate id, timeline, and directoryPath
     if (!id || !timeline || !directoryPath) {
       console.error('Missing patient ID, timeline, or directoryPath');
-      event.reply('import-file-error', 'Missing patient ID, timeline, or directoryPath');
+      event.reply(
+        'import-file-error',
+        'Missing patient ID, timeline, or directoryPath',
+      );
       return;
     }
 
@@ -194,6 +197,59 @@ ipcMain.on('import-file', async (event, id, timeline, directoryPath) => {
     }
   }
 });
+
+ipcMain.on(
+  'import-file-clinical',
+  async (event, id, timeline, directoryPath) => {
+    const fs = require('fs');
+    try {
+      // Validate id, timeline, and directoryPath
+      if (!id || !timeline || !directoryPath) {
+        console.error('Missing patient ID, timeline, or directoryPath');
+        event.reply(
+          'import-file-error',
+          'Missing patient ID, timeline, or directoryPath',
+        );
+        return;
+      }
+
+      // Construct the file path dynamically based on the directoryPath, patient id, and timeline
+      const patientDir = path.join(directoryPath, `sub-${id}`);
+      const sessionDir = path.join(patientDir, `ses-${timeline}`);
+      const fileName = `sub-${id}_ses-${timeline}_clinical.json`;
+      const filePath = path.join(sessionDir, fileName);
+
+      // Check if the file exists before trying to read it
+      if (!fs.existsSync(filePath)) {
+        console.error('File not found:', filePath);
+        event.reply('import-file-clinical', 'File not found');
+        return;
+      }
+
+      // Read the file
+      const fileData = fs.readFileSync(filePath);
+
+      // Parse the JSON data
+      const jsonData = JSON.parse(fileData);
+
+      // Log and send the data back to the renderer process
+      console.log(jsonData);
+      event.reply('import-file-clinical', jsonData);
+    } catch (err) {
+      // Handle specific errors
+      if (err.code === 'ENOENT') {
+        console.error('File not found:', filePath);
+        event.reply('import-file-error', 'File not found');
+      } else if (err.name === 'SyntaxError') {
+        console.error('Error parsing JSON:', err.message);
+        event.reply('import-file-error', 'Error parsing JSON');
+      } else {
+        console.error('An unexpected error occurred:', err);
+        event.reply('import-file-error', err.message);
+      }
+    }
+  },
+);
 
 ipcMain.on('import-previous-files', (event, fileID, importData) => {
   // console.log(fileID);
@@ -455,6 +511,46 @@ ipcMain.on('save-file', (event, file, data, historical) => {
 
     // Dynamically name the file based on patient and timeline
     const fileName = `sub-${patient.id}_ses-${timeline}_stim.json`;
+    const filePath = path.join(sessionDir, fileName);
+
+    // Write the data to the file
+    fs.writeFileSync(filePath, dataString);
+
+    // Send the file path back to the renderer process
+    event.reply('file-saved', filePath);
+
+    console.log(`Data saved successfully to ${filePath}`);
+  } catch (error) {
+    // Handle any errors in the saving process
+    console.error('Error writing to file:', error);
+    event.reply('file-save-error', error.message);
+  }
+});
+
+ipcMain.on('save-file-clinical', (event, data, historical) => {
+  const { patient, timeline, directoryPath } = historical;
+
+  if (!patient || !timeline || !directoryPath) {
+    console.error('Missing patient, timeline, or directoryPath');
+    return;
+  }
+
+  // Construct the proper folder structure based on the patient ID and timeline
+  const patientDir = path.join(directoryPath, `sub-${patient.id}`);
+  const sessionDir = path.join(patientDir, `ses-${timeline}`);
+
+  try {
+    // Ensure that the directories exist, if not, create them
+    if (!fs.existsSync(patientDir))
+      fs.mkdirSync(patientDir, { recursive: true });
+    if (!fs.existsSync(sessionDir))
+      fs.mkdirSync(sessionDir, { recursive: true });
+
+    // Convert the data to a string format (JSON)
+    const dataString = JSON.stringify(data, null, 2);
+
+    // Dynamically name the file based on patient and timeline
+    const fileName = `sub-${patient.id}_ses-${timeline}_clinical.json`;
     const filePath = path.join(sessionDir, fileName);
 
     // Write the data to the file
