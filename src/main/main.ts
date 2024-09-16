@@ -25,8 +25,10 @@ console.error = () => {};
 // const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
 // console.log(args);
 // const inputFilePath = args[0]; // Get the first argument
+// const inputFilePath =
+//   '/Users/savirmadan/Documents/Localization/Output/Patient0357Output/derivatives/leaddbs/sub-CbctDbs0357/stimulations/MNI152NLin2009bAsym/inputData.json';
 const inputFilePath =
-  '/Users/savirmadan/Documents/Localization/Output/Patient0357Output/derivatives/leaddbs/sub-CbctDbs0357/stimulations/MNI152NLin2009bAsym/inputData.json';
+  '/Users/savirmadan/Documents/inputData2.json';
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -109,42 +111,6 @@ ipcMain.on('ipc-example', async (event, arg) => {
 ipcMain.on('import-file', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `${pingPong}`;
   const fs = require('fs');
-  const currentDirectory = app.getAppPath();
-  const directories = currentDirectory.split('/');
-
-  // Initialize a variable to store the result
-  let result = '';
-
-  // Loop through the directories
-  for (const dir of directories) {
-    // Append each directory to the result
-    result += `${dir}/`;
-
-    // If the directory contains "lead-dbs-programmer", stop the loop
-    if (dir === 'programmer') {
-      break;
-    }
-  }
-
-  // const prefsFileName = 'Preferences.json';
-  // const prefsFilePath = path.join(result, prefsFileName);
-  // const k = fs.readFileSync(prefsFilePath);
-  // const prefsData = JSON.parse(k);
-  // const leadPath = prefsData.LeadDBS_Path;
-
-  // let normalLeadPath = leadPath.replace(/\\\//g, '/');
-  // let filePath = path.join(normalLeadPath, 'programmer/inputData.json');
-  // // const fileName = 'inputData.json';
-  // // const filePath = path.join(result, fileName);
-  // console.log(filePath);
-  // // const testFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/lead-dbs-programmer/inputData.json';
-  // const f = fs.readFileSync(filePath);
-  // const jsonData = JSON.parse(f);
-  // let stimPath = jsonData.stimDir;
-  // stimulationDirectory = stimPath.replace(/\\\//g, '/');
-  // patientID = jsonData.patientname;
-  // console.log('STIMDIREC; ', stimulationDirectory);
-  // event.reply('import-file', jsonData);
 
   try {
     // Normalize the lead path
@@ -158,14 +124,14 @@ ipcMain.on('import-file', async (event, arg) => {
 
     // Parse the JSON data
     const jsonData = JSON.parse(f);
-    console.log(jsonData);
-    // Extract and normalize the stimulation directory
-    const stimPath = jsonData.stimDir;
-    stimulationDirectory = stimPath.replace(/\\\//g, '/');
-    patientID = jsonData.patientname;
+    // console.log(jsonData);
+    // // Extract and normalize the stimulation directory
+    // const stimPath = jsonData.stimDir;
+    // stimulationDirectory = stimPath.replace(/\\\//g, '/');
+    // patientID = jsonData.patientname;
 
     // Log and send the data
-    console.log('STIMDIREC:', stimulationDirectory);
+    // console.log('STIMDIREC:', stimulationDirectory);
     event.reply('import-file', jsonData);
   } catch (err) {
     // Handle specific errors

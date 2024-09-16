@@ -158,7 +158,7 @@ function GroupArchitecture({
             ))}
           </Dropdown.Menu>
         </Dropdown>
-        <div style={{ maxWidth: '300px' }}>
+        {/* <div style={{ maxWidth: '300px' }}>
           <InputGroup className="mb-3">
             <Form.Control
               placeholder="Tab for auto ID"
@@ -175,7 +175,7 @@ function GroupArchitecture({
               Add
             </Button>
           </InputGroup>
-        </div>
+        </div> */}
       </div>
     );
   }
