@@ -1001,12 +1001,12 @@ function TabbedElectrodeIPGSelection({
       for (let j = 1; j < loopSize; j++) {
         zerosArr.push(0);
       }
-      if (data.S.activecontacts[i-1]) {
-        if (data.S.activecontacts[i-1] === null) {
-          data.S.activecontacts[i-1] = zerosArr;
+      if (data.S.activecontacts[i - 1]) {
+        if (data.S.activecontacts[i - 1] === null) {
+          data.S.activecontacts[i - 1] = zerosArr;
         }
       } else {
-        data.S.activecontacts[i-1] = zerosArr;
+        data.S.activecontacts[i - 1] = zerosArr;
       }
     }
 
@@ -1037,7 +1037,6 @@ function TabbedElectrodeIPGSelection({
   };
 
   const [responseData, setResponseData] = useState('');
-
 
   const sendDataToMain = () => {
     const outputData = gatherExportedData5();
@@ -1115,6 +1114,15 @@ function TabbedElectrodeIPGSelection({
     <div>
       <div style={{ marginTop: '30px' }} />
       <div className="stimCloseContainer" />
+      <div style={{ display: 'flex', justifyContent: 'right' }}>
+        <button
+          className="export-button-final-save"
+          onClick={saveQuantitiesandValues}
+          style={{ marginRight: '15px', marginBottom: '-40px' }}
+        >
+          Save
+        </button>
+      </div>
       <Tabs className="tabs-container">
         <TabList className="tabs-container">
           <Tab onClick={() => handleTabChange('5')}>Right Hemisphere</Tab>
@@ -1189,17 +1197,21 @@ function TabbedElectrodeIPGSelection({
           // Hide the input element
         />
       </div>
-      <div style={{ textAlign: 'center', paddingBottom: '35px' }}>
-        <button className="export-button-final-discard" onClick={closeFunction} style={{marginRight: '15px'}}>
+      {/* <div style={{ textAlign: 'center', paddingBottom: '35px' }}>
+        <button
+          className="export-button-final-discard"
+          onClick={closeFunction}
+          style={{ marginRight: '15px' }}
+        >
           Discard and Close
         </button>
         <button className="export-button-final" onClick={saveQuantitiesandValues} style={{marginRight: '15px'}}>
           Save
         </button>
-        {/* <button className="export-button-final-2" onClick={sendDataToMain}>
+        <button className="export-button-final-2" onClick={sendDataToMain}>
           Close
-        </button> */}
-      </div>
+        </button>
+      </div> */}
     </div>
   );
 }

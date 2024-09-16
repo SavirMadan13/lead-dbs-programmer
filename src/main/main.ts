@@ -22,13 +22,13 @@ console.log = () => {};
 console.warn = () => {};
 console.error = () => {};
 
-// const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
-// console.log(args);
-// const inputFilePath = args[0]; // Get the first argument
+const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
+console.log(args);
+const inputFilePath = args[0]; // Get the first argument
 // const inputFilePath =
 //   '/Users/savirmadan/Documents/Localization/Output/Patient0357Output/derivatives/leaddbs/sub-CbctDbs0357/stimulations/MNI152NLin2009bAsym/inputData.json';
-const inputFilePath =
-  '/Users/savirmadan/Documents/inputData2.json';
+// const inputFilePath =
+//   '/Users/savirmadan/Documents/inputData.json';
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -126,8 +126,8 @@ ipcMain.on('import-file', async (event, arg) => {
     const jsonData = JSON.parse(f);
     // console.log(jsonData);
     // // Extract and normalize the stimulation directory
-    // const stimPath = jsonData.stimDir;
-    // stimulationDirectory = stimPath.replace(/\\\//g, '/');
+    const stimPath = jsonData.stimDir;
+    stimulationDirectory = stimPath.replace(/\\\//g, '/');
     // patientID = jsonData.patientname;
 
     // Log and send the data
@@ -359,21 +359,7 @@ ipcMain.on('save-file', (event, file, data) => {
   // const currentDirectory = '/Users/savirmadan/Development/lead-dbs-programmer';
   console.log('FILE: ', file);
   const currentDirectory = app.getAppPath();
-  const directories = currentDirectory.split('/');
 
-  // Initialize a variable to store the result
-  let result = '';
-
-  // Loop through the directories
-  for (const dir of directories) {
-    // Append each directory to the result
-    result += `${dir}/`;
-
-    // If the directory contains "lead-dbs-programmer", stop the loop
-    if (dir === 'programmer') {
-      break;
-    }
-  }
   // console.log(currentDirectory + '/lead-dbs-programmer');
   if (currentDirectory) {
     // Convert data to string format

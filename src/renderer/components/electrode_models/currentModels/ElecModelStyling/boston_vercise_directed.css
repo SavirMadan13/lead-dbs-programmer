@@ -253,6 +253,16 @@
   font-size: 16px;
 }
 
+.export-button-final-save {
+  background-color: #169558;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
 .export-button-final-discard {
   background-color: rgba(230, 0, 0, 0.709);
   color: #fff;
@@ -675,4 +685,19 @@ h2 {
   /* margin-right: auto; */
   word-wrap: break-word; /* Ensure long words wrap properly */
   z-index: 20;
+}
+
+.sticky-buttons-container {
+  position: fixed;
+  top: 85%;
+  width: 80%;
+  margin-left: 13%;
+  display: flex;
+  justify-content: space-between;
+  transform: translateY(-50%);
+  pointer-events: none; /* This makes sure the container itself doesn't block clicks */
+}
+
+.sticky-button {
+  pointer-events: auto; /* This makes sure the buttons are clickable */
 }
