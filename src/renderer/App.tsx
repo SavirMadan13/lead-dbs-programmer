@@ -444,6 +444,10 @@ export default function App() {
     }
   };
 
+  const handleExport = () => {
+    console.log(patientStates);
+  }
+
   return (
     <div>
       <div className="Navbar">
@@ -468,6 +472,9 @@ export default function App() {
           />
         )}
       </div>
+      <Button style={{textAlign: 'right'}} onClick={handleExport}>
+        Close
+      </Button>
     </div>
   );
 }
