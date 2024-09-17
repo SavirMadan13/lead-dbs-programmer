@@ -824,11 +824,43 @@ const createWindow = async () => {
   };
 
   // Helper function to load patients from Lead-DBS folder structure
+  // const loadLeadDBSPatients = (directoryPath) => {
+  //   const leadDBSPath = path.join(directoryPath, 'derivatives', 'leaddbs');
+  //   const patientFolders = fs.readdirSync(leadDBSPath);
+
+  //   const patients = patientFolders.map((folder) => {
+  //     const patientId = folder;
+  //     const patientFilePath = path.join(
+  //       leadDBSPath,
+  //       folder,
+  //       'patient_info.json',
+  //     ); // Assuming there’s a patient_info.json file in each folder
+  //     let patientData = null;
+
+  //     if (fs.existsSync(patientFilePath)) {
+  //       const patientFileContent = fs.readFileSync(patientFilePath, 'utf-8');
+  //       patientData = JSON.parse(patientFileContent);
+  //     }
+
+  //     return {
+  //       id: patientId,
+  //       ...patientData,
+  //     };
+  //   });
+
+  //   return patients;
+  // };
+
   const loadLeadDBSPatients = (directoryPath) => {
     const leadDBSPath = path.join(directoryPath, 'derivatives', 'leaddbs');
     const patientFolders = fs.readdirSync(leadDBSPath);
 
-    const patients = patientFolders.map((folder) => {
+    // Filter out hidden files or folders (those starting with '.')
+    const filteredFolders = patientFolders.filter(
+      (folder) => !folder.startsWith('.'),
+    );
+
+    const patients = filteredFolders.map((folder) => {
       const patientId = folder;
       const patientFilePath = path.join(
         leadDBSPath,
@@ -851,6 +883,62 @@ const createWindow = async () => {
     return patients;
   };
 
+  // Define the handler for fetching timelines
+  // ipcMain.handle('get-timelines', async (event, directoryPath, patientId) => {
+  //   const patientFolder = path.join(directoryPath, `sub-${patientId}`);
+  //   try {
+  //     // Read the patient folder
+  //     const files = await fs.promises.readdir(patientFolder);
+
+  //     // Filter out directories that match the 'ses-' pattern
+  //     const timelines = files
+  //       .filter((file) => file.startsWith('ses-'))
+  //       .map((sessionFolder) => sessionFolder.replace('ses-', '')); // Remove 'ses-' prefix
+
+  //     return timelines; // Return the array of timeline strings
+  //   } catch (error) {
+  //     console.error(`Error reading patient folder ${patientFolder}:`, error);
+  //     throw new Error('Failed to retrieve timelines.');
+  //   }
+  // });
+
+  ipcMain.handle('get-timelines', async (event, directoryPath, patientId) => {
+    const patientFolder = path.join(directoryPath, `sub-${patientId}`);
+    try {
+      // Read the patient folder
+      const timelines = await fs.promises.readdir(patientFolder);
+
+      // Prepare data structure to hold timelines with stimulation and clinical information
+      const timelineData = await Promise.all(
+        timelines
+          .filter((file) => file.startsWith('ses-'))
+          .map(async (sessionFolder) => {
+            const sessionPath = path.join(patientFolder, sessionFolder);
+            const sessionFiles = await fs.promises.readdir(sessionPath);
+
+            // Check for the presence of clinical and stimulation JSON files
+            const hasClinical = sessionFiles.some((file) =>
+              file.includes('clinical.json'),
+            );
+            const hasStimulation = sessionFiles.some((file) =>
+              file.includes('stim.json'),
+            );
+
+            return {
+              timeline: sessionFolder.replace('ses-', ''), // Timeline name without 'ses-' prefix
+              hasClinical,
+              hasStimulation,
+            };
+          }),
+      );
+
+      return timelineData; // Return array with timelines and availability of clinical/stimulation data
+    } catch (error) {
+      console.error(`Error reading patient folder ${patientFolder}:`, error);
+      throw new Error('Failed to retrieve timelines.');
+    }
+  });
+
   ipcMain.on('select-folder', async (event, directoryPath) => {
     if (directoryPath) {
       console.log('DIRECTORYPATH: ', directoryPath);
@@ -864,7 +952,7 @@ const createWindow = async () => {
         event.sender.send('file-read-success', patients);
       } else {
         // Regular dataset_description.json loading if it's not Lead-DBS
-        const filePath = path.join(directoryPath, 'dataset_description.json');
+        const filePath = path.join(directoryPath, 'participants.json');
         if (fs.existsSync(filePath)) {
           fs.readFile(filePath, 'utf-8', (err, data) => {
             if (err) {
@@ -907,7 +995,7 @@ const createWindow = async () => {
           event.sender.send('file-read-success', patients);
         } else {
           // Regular dataset_description.json loading if it's not Lead-DBS
-          const filePath = path.join(folderPath, 'dataset_description.json');
+          const filePath = path.join(folderPath, 'participants.json');
           if (fs.existsSync(filePath)) {
             fs.readFile(filePath, 'utf-8', (err, data) => {
               if (err) {
@@ -1009,7 +1097,7 @@ const createWindow = async () => {
 
   // Handle writing the JSON file
   ipcMain.on('save-patients-json', (event, folderPath, patients) => {
-    const filePath = path.join(folderPath, 'dataset_description.json');
+    const filePath = path.join(folderPath, 'participants.json');
 
     fs.writeFile(filePath, JSON.stringify(patients, null, 2), (err) => {
       if (err) {

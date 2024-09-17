@@ -678,10 +678,17 @@ h2 {
   z-index: 20;
 }
 
-.patient-details {
+/* .patient-details {
   text-align: left;
   margin: 20px;
   font-family: Arial, sans-serif;
+} */
+
+.patient-details {
+  font-family: Arial, sans-serif;
+  width: 100%; /* Take up 80% of the screen width */
+  max-width: 1200px; /* Maximum width for larger screens */
+  margin: 0 auto; /* Center the component horizontally */
 }
 
 .patient-title {
@@ -746,11 +753,11 @@ button:active {
 .search-container {
   display: flex;
   /* justify-content: flex-end; */
-  margin: 20px;
+  /* margin: 20px; */
 }
 
 .search-field {
-  width: 200px; /* Adjust width to your needs */
+  width: 100px; /* Adjust width to your needs */
 }
 
 .search-field .MuiInputBase-root {
@@ -786,7 +793,7 @@ button:active {
 
 /* Styling for the add-timeline section */
 .add-timeline {
-  margin-top: 20px;
+  /* margin-top: 20px; */
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -794,8 +801,8 @@ button:active {
 
 /* Input styling */
 .timeline-input {
-  padding: 10px;
-  font-size: 16px;
+  padding: 5px;
+  font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 4px;
   margin-right: 10px;
@@ -804,9 +811,9 @@ button:active {
 
 /* Button styling */
 .add-timeline-button {
-  padding: 10px 15px;
-  font-size: 16px;
-  background-color: #007bff; /* Bootstrap blue for a clean look */
+  padding: 5px 10px;
+  font-size: 14px;
+  background-color: #007bff;
   color: white;
   border: none;
   border-radius: 4px;
@@ -816,4 +823,32 @@ button:active {
 
 .add-timeline-button:hover {
   background-color: #0056b3; /* Darker blue on hover */
+}
+
+.quick-add-timelines {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* margin-bottom: 20px; */
+}
+
+.quick-add-timelines div {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.timeline-button {
+  /* padding: 10px 15px; */
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff82;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.timeline-button:hover {
+  background-color: #0056b3;
 }
