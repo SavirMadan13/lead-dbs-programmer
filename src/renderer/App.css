@@ -117,3 +117,20 @@ a:hover {
   margin-top: 10px;
 }
 
+.settings-icon {
+  cursor: pointer; /* Hand cursor for clickable interaction */
+  font-size: 24px; /* Default size for the icon */
+  color: #6c757d; /* Initial color for the icon */
+  transition: color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+}
+
+.settings-icon:hover {
+  color: #007bff; /* Change color on hover (Bootstrap blue) */
+  transform: rotate(20deg); /* Add a slight rotation effect */
+}
+
+.settings-icon:active {
+  transform: rotate(0deg) scale(0.95); /* Scale down slightly on click */
+  color: #0056b3; /* Darker color on click */
+}
+
