@@ -85,10 +85,11 @@ function GroupArchitecture({
     setZoomLevel(newValue);
     window.electron.zoom.setZoomLevel(newValue);
   };
+  // Don't forget this
 
-  useEffect(() => {
-    window.electron.zoom.setZoomLevel(zoomLevel);
-  }, [zoomLevel]);
+  // useEffect(() => {
+  //   window.electron.zoom.setZoomLevel(zoomLevel);
+  // }, [zoomLevel]);
 
   const currentPatientState = selectedPatient
     ? patientStates[selectedPatient] || initialState

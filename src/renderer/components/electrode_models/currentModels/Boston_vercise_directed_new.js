@@ -46,6 +46,7 @@ import AssistedToggle from '../../AssistedToggle';
 import VolumeAmplitudeToggle from '../../VoltageAmplitudeToggle';
 import MAToggleSwitch from '../../MAToggleSwitch';
 import NewTripleToggle from '../../NewTripleToggle';
+import PlyViewer from '../../PlyViewer';
 
 function Boston_vercise_directed_new(props, ref) {
   const svgs = [
@@ -3232,6 +3233,10 @@ function Boston_vercise_directed_new(props, ref) {
     // this.props.onChange(value, animation);
     // this.setState({ switchPosition: value, animation });
   };
+  const [showViewer, setShowViewer] = useState(false);
+  const handleOpenViewer = () => {
+    setShowViewer(!showViewer);
+  };
 
   useEffect(() => {
     if (props.IPG === 'Abbott') {
@@ -3739,6 +3744,7 @@ function Boston_vercise_directed_new(props, ref) {
             <Button onClick={handleClearButton} className="button">
               Clear
             </Button>
+            <Button onClick={handleOpenViewer}>Open Viewer</Button>
           </ButtonGroup>
           {/* <NewTripleToggle /> */}
           {/* <button
@@ -3754,7 +3760,16 @@ function Boston_vercise_directed_new(props, ref) {
             Clear
           </button> */}
         </div>
+        {/* {showViewer && (
+          <PlyViewer quantities={quantities} values={selectedValues} />
+        )} */}
       </div>
+        {showViewer && (
+          <div style={{maxWidth: '100px'}}>
+                      <PlyViewer quantities={quantities} values={selectedValues} />
+
+            </div>
+        )}
     </div>
   );
 }

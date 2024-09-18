@@ -1170,6 +1170,20 @@ const createWindow = async () => {
     return loadDirectoryPath();
   });
 
+  // Viewer
+
+  ipcMain.on('load-ply-file', async (event, directoryPath) => {
+    const filePath = '/Volumes/Expansion/OLD/Output/Patient0117Output/derivatives/leaddbs/sub-CbctDbs0117/export/ply/combined_scene.ply';
+    console.log(filePath);
+    try {
+      const fileData = fs.readFileSync(filePath, 'utf8'); // read the PLY file
+      event.reply('load-ply-file', fileData); // send the file contents back to renderer process
+    } catch (error) {
+      console.error('Error loading PLY file:', error);
+      event.reply('load-ply-file-error', 'Failed to load PLY file'); // send error to renderer process
+    }
+  });
+
   // Handle writing the JSON file
   ipcMain.on('save-patients-json', (event, folderPath, patients) => {
     const filePath = path.join(folderPath, 'participants.json');

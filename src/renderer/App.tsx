@@ -1,3 +1,4 @@
+/* eslint-disable import/no-duplicates */
 // import { useState, useEffect } from 'react';
 // import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 // import './App.css'; // Ensure your styles are imported
@@ -112,6 +113,8 @@ import PatientDetails from './components/PatientDetails';
 import { PatientProvider } from './components/PatientContext';
 import Programmer from './Programmer';
 import ClinicalScores from './components/ClinicalScores';
+import PlyViewer from './components/PlyViewer';
+import PlyViewerWithVTA from './components/PlyViewerWithVTA';
 
 export default function App() {
   const [directoryPath, setDirectoryPath] = useState(null);
@@ -123,14 +126,24 @@ export default function App() {
   const selectFolder = () => {
     window.electron.ipcRenderer.sendMessage('select-folder', null); // Request folder selection
   };
+  window.electron.ipcRenderer.sendMessage('load-ply-file', null);
 
   // Function to check if the folder structure matches Lead-DBS
   const checkLeadDBSFolder = async (path) => {
     try {
       // Check for existence of required folders for Lead-DBS
-      const derivativesExists = await window.electron.ipcRenderer.invoke('check-folder-exists', `${path}/derivatives/leaddbs`);
-      const rawdataExists = await window.electron.ipcRenderer.invoke('check-folder-exists', `${path}/rawdata`);
-      const sourcedataExists = await window.electron.ipcRenderer.invoke('check-folder-exists', `${path}/sourcedata`);
+      const derivativesExists = await window.electron.ipcRenderer.invoke(
+        'check-folder-exists',
+        `${path}/derivatives/leaddbs`,
+      );
+      const rawdataExists = await window.electron.ipcRenderer.invoke(
+        'check-folder-exists',
+        `${path}/rawdata`,
+      );
+      const sourcedataExists = await window.electron.ipcRenderer.invoke(
+        'check-folder-exists',
+        `${path}/sourcedata`,
+      );
 
       // Set the state if all required folders are present
       if (derivativesExists && rawdataExists && sourcedataExists) {
@@ -158,7 +171,9 @@ export default function App() {
 
     // Load the saved directory path on initial load
     const loadSavedDirectory = async () => {
-      const savedPath = await window.electron.ipcRenderer.invoke('get-saved-directory');
+      const savedPath = await window.electron.ipcRenderer.invoke(
+        'get-saved-directory',
+      );
       if (savedPath) {
         setDirectoryPath(savedPath); // Set the saved folder path if it exists
         window.electron.ipcRenderer.sendMessage('select-folder', savedPath); // Request folder selection
@@ -215,7 +230,12 @@ export default function App() {
             />
             <Route
               path="/patient/:id"
-              element={<PatientDetails directoryPath={directoryPath} leadDBS={isLeadDBSFolder} />}
+              element={
+                <PatientDetails
+                  directoryPath={directoryPath}
+                  leadDBS={isLeadDBSFolder}
+                />
+              }
             />
             <Route path="/programmer" element={<Programmer />} />
             <Route
@@ -223,6 +243,15 @@ export default function App() {
               element={
                 <div style={{ maxWidth: '1000px' }}>
                   <ClinicalScores />
+                </div>
+              }
+            />
+            <Route
+              path="/viewer"
+              element={
+                <div style={{ maxWidth: '1000px' }}>
+                  {/* <PlyViewer /> */}
+                  <PlyViewer />
                 </div>
               }
             />
