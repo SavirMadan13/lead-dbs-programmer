@@ -1,4 +1,5 @@
-
+/* eslint-disable react/button-has-type */
+/* eslint-disable promise/always-return */
 import React, { useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
@@ -8,7 +9,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { PatientContext } from './PatientContext';
 
-function PatientDetails({ directoryPath }) {
+function PatientDetails({ directoryPath, leadDBS }) {
   const location = useLocation();
   const { patient } = location.state || {}; // Retrieve patient from state
   const { patients } = useContext(PatientContext); // Optional: Use context for patient data
@@ -41,10 +42,11 @@ function PatientDetails({ directoryPath }) {
     // Request timelines from main process
     if (directoryPath && patient) {
       window.electron.ipcRenderer
-        .invoke('get-timelines', directoryPath, patient.id)
+        .invoke('get-timelines', directoryPath, patient.id, leadDBS)
         .then((receivedTimelines) => {
-
-          const timelineNames = receivedTimelines.map(timelineData => timelineData.timeline);
+          const timelineNames = receivedTimelines.map(
+            (timelineData) => timelineData.timeline,
+          );
           setTimelines(timelineNames); // Set only the timeline names
           const items = receivedTimelines.map((timelineData, index) => ({
             id: `${timelineData.timeline}-${index}`,
@@ -53,15 +55,32 @@ function PatientDetails({ directoryPath }) {
               timelineData.hasStimulation && {
                 id: `${timelineData.timeline}-stim`,
                 label: 'Stimulation Parameters',
-                action: () => navigate('/programmer', { state: { patient, timeline: timelineData.timeline, directoryPath } }), // Define action
+                action: () =>
+                  navigate('/programmer', {
+                    state: {
+                      patient,
+                      timeline: timelineData.timeline,
+                      directoryPath,
+                      leadDBS,
+                    },
+                  }), // Define action
               },
               timelineData.hasClinical && {
                 id: `${timelineData.timeline}-clinical`,
                 label: 'Clinical Scores',
-                action: () => navigate('/clinical-scores', { state: { patient, timeline: timelineData.timeline, directoryPath } }), // Define action
+                action: () =>
+                  navigate('/clinical-scores', {
+                    state: {
+                      patient,
+                      timeline: timelineData.timeline,
+                      directoryPath,
+                      leadDBS,
+                    },
+                  }), // Define action
               },
             ].filter(Boolean),
           }));
+          console.log(leadDBS);
           setTreeData(items);
         })
         .catch((error) => {
@@ -72,7 +91,7 @@ function PatientDetails({ directoryPath }) {
 
   const handleNodeClick = (event, node) => {
     if (node?.action) {
-      node.action();  // Execute the action defined for the clicked node
+      node.action(); // Execute the action defined for the clicked node
     }
   };
 
@@ -96,7 +115,10 @@ function PatientDetails({ directoryPath }) {
     const newChild = {
       id: `${timelineLabel}-clinical`,
       label: 'Clinical Scores',
-      action: () => navigate('/clinical-scores', { state: { patient, timeline: timelineLabel, directoryPath } })
+      action: () =>
+        navigate('/clinical-scores', {
+          state: { patient, timeline: timelineLabel, directoryPath, leadDBS },
+        }),
     };
     addChildToTimeline(timelineLabel, newChild); // Add the Clinical Scores child to the specified timeline
   };
@@ -106,7 +128,10 @@ function PatientDetails({ directoryPath }) {
     const newChild = {
       id: `${timelineLabel}-stim`,
       label: 'Stimulation Parameters',
-      action: () => navigate('/programmer', { state: { patient, timeline: timelineLabel, directoryPath } })
+      action: () =>
+        navigate('/programmer', {
+          state: { patient, timeline: timelineLabel, directoryPath, leadDBS },
+        }),
     };
     addChildToTimeline(timelineLabel, newChild); // Add the Clinical Scores child to the specified timeline
   };
@@ -136,7 +161,9 @@ function PatientDetails({ directoryPath }) {
   // Handles the navigation to the Clinical Scores page
   const handleNavigateToClinicalScores = () => {
     if (timeline) {
-      navigate('/clinical-scores', { state: { patient, timeline, directoryPath } });
+      navigate('/clinical-scores', {
+        state: { patient, timeline, directoryPath },
+      });
     } else {
       alert('Please select a timeline first');
     }
@@ -164,24 +191,8 @@ function PatientDetails({ directoryPath }) {
     }
   };
 
-  // Function to render TreeItems for each timeline
-  // const renderTimelineTree = (timelineData, index) => {
-  //   const nodeId = timelineData.timeline || `timeline-${index}`; // Ensure unique id for each item
-
-  //   return (
-  //     <TreeItem key={nodeId} nodeId={nodeId} label={timelineData.timeline || `Timeline ${index + 1}`}>
-  //       {timelineData.hasStimulation && (
-  //         <TreeItem nodeId={`${nodeId}-stim`} label="Stimulation Parameters" />
-  //       )}
-  //       {timelineData.hasClinical && (
-  //         <TreeItem nodeId={`${nodeId}-clinical`} label="Clinical Scores" />
-  //       )}
-  //     </TreeItem>
-  //   );
-  // };
-
   const handleTreeClick = (event, nodeId) => {
-    console.log("Node clicked:", nodeId); // Perform actions based on the clicked node
+    console.log('Node clicked:', nodeId); // Perform actions based on the clicked node
   };
 
   // Helper function to find the item by ID
@@ -197,11 +208,8 @@ function PatientDetails({ directoryPath }) {
     return null;
   };
 
-
-
   const handleSelectionChange = (event, itemIds) => {
     setSelectedItems(itemIds);
-
 
     // Find the selected item in treeData and execute its action if it exists
     const selectedItem = findItemById(treeData, itemIds);
@@ -218,113 +226,6 @@ function PatientDetails({ directoryPath }) {
     }
   };
 
-  // return (
-  //   <div className="patient-details">
-  //     <h1 className="patient-title">Patient Details</h1>
-  //     <p className="patient-info">
-  //       <strong>ID:</strong> {patient.id}
-  //     </p>
-  //     <p className="patient-info">
-  //       <strong>Name:</strong> {patient.name}
-  //     </p>
-  //     <p className="patient-info">
-  //       <strong>Age:</strong> {patient.age}
-  //     </p>
-  //     <p className="patient-info">
-  //       <strong>Gender:</strong> {patient.gender}
-  //     </p>
-  //     <p className="patient-info">
-  //       <strong>Diagnosis:</strong> {patient.diagnosis}
-  //     </p>
-
-  //     {/* Timeline selection */}
-  //     {/* <div className="timeline-selection">
-  //       <label>Select Session Timeline:</label>
-  //       <select value={timeline} onChange={(e) => setTimeline(e.target.value)}>
-  //         {timelines.map((t, index) => (
-  //           <option key={index} value={t}>
-  //             {t}
-  //           </option>
-  //         ))}
-  //       </select>
-  //     </div> */}
-
-  //     {/* Quick Add Timeline Buttons */}
-  //     <RichTreeView
-  //       items={treeData}
-  //       defaultCollapseIcon={<ExpandMoreIcon />}
-  //       defaultExpandIcon={<ChevronRightIcon />}
-  //       // onClick={handleTreeClick}
-  //       // onClick={(event) => handleTreeClick(event, event.target.nodeId)} // Pass event to the function
-  //       onSelectedItemsChange={handleSelectionChange} // Listen for selection changes
-  //       selectedItems={selectedItems} // Control the selected items
-
-  //     />
-  //     <div className="quick-add-timelines">
-  //       <label>Quick Add Timelines:</label>
-  //       <div>
-  //         <button className="timeline-button" onClick={() => handleQuickAdd('baseline')}>Baseline</button>
-  //         <button className="timeline-button" onClick={() => handleQuickAdd('3months')}>3 Months</button>
-  //         <button className="timeline-button" onClick={() => handleQuickAdd('6months')}>6 Months</button>
-  //         <button className="timeline-button" onClick={() => handleQuickAdd('12months')}>12 Months</button>
-  //         <button className="timeline-button" onClick={() => handleQuickAdd('24months')}>24 Months</button>
-  //         <button className="timeline-button" onClick={() => handleQuickAdd('36months')}>36 Months</button>
-  //       </div>
-  //     </div>
-
-  //     {/* Add new timeline */}
-  //     <div className="add-timeline">
-  //       <input
-  //         className="timeline-input"
-  //         type="text"
-  //         placeholder="Add new session"
-  //         value={newTimeline}
-  //         onChange={(e) => setNewTimeline(e.target.value)}
-  //       />
-  //       <button className="add-timeline-button" onClick={handleAddTimeline}>
-  //         +
-  //       </button>
-  //     </div>
-
-  //     {/* Back Button */}
-  //     <button className="back-button" onClick={() => navigate('/')}>Back to Table</button>
-
-  //     {/* Navigate to Stimulation Parameters Page */}
-  //     {/* <button className="export-button" onClick={handleNavigateToStimulation}>
-  //       Stimulation Parameters
-  //     </button> */}
-  //     <button className="export-button" onClick={() => handleAddStimulationParameters(timeline)}>Add Stimulation Parameters</button>
-
-  //     {/* Navigate to Clinical Scores Page */}
-  //     {/* <button className="export-button" onClick={handleNavigateToClinicalScores}>
-  //       Clinical Scores
-  //     </button> */}
-  //     <button className="export-button" onClick={() => handleAddClinicalScores(timeline)}>Add Clinical Scores</button>
-
-  //     {/* Timeline TreeView */}
-  //     {/* <div className="timeline-treeview">
-  //       <h3>Session Timelines</h3>
-  //       <TreeView
-  //         defaultCollapseIcon={<ExpandMoreIcon />}
-  //         defaultExpandIcon={<ChevronRightIcon />}
-  //       >
-  //         {treeData.map((timelineData) => renderTimelineTree(timelineData))}
-  //       </TreeView>
-  //     </div> */}
-  //     {/* Render RichTreeView with the treeData */}
-  //     {/* <RichTreeView
-  //       items={treeData}
-  //       defaultCollapseIcon={<ExpandMoreIcon />}
-  //       defaultExpandIcon={<ChevronRightIcon />}
-  //       // onClick={handleTreeClick}
-  //       // onClick={(event) => handleTreeClick(event, event.target.nodeId)} // Pass event to the function
-  //       onSelectedItemsChange={handleSelectionChange} // Listen for selection changes
-  //       selectedItems={selectedItems} // Control the selected items
-
-  //     /> */}
-  //   </div>
-  // );
-
   return (
     <div className="patient-details">
       {/* Section Title */}
@@ -336,11 +237,21 @@ function PatientDetails({ directoryPath }) {
       {/* Patient Information Section */}
       <h2 className="section-title">Patient Information</h2>
       <div className="patient-info-container">
-        <p className="patient-info"><strong>ID:</strong> {patient.id}</p>
-        <p className="patient-info"><strong>Name:</strong> {patient.name}</p>
-        <p className="patient-info"><strong>Age:</strong> {patient.age}</p>
-        <p className="patient-info"><strong>Gender:</strong> {patient.gender}</p>
-        <p className="patient-info"><strong>Diagnosis:</strong> {patient.diagnosis}</p>
+        <p className="patient-info">
+          <strong>ID:</strong> {patient.id}
+        </p>
+        <p className="patient-info">
+          <strong>Name:</strong> {patient.name}
+        </p>
+        <p className="patient-info">
+          <strong>Age:</strong> {patient.age}
+        </p>
+        <p className="patient-info">
+          <strong>Gender:</strong> {patient.gender}
+        </p>
+        <p className="patient-info">
+          <strong>Diagnosis:</strong> {patient.diagnosis}
+        </p>
       </div>
 
       {/* Another Divider */}
@@ -355,22 +266,61 @@ function PatientDetails({ directoryPath }) {
         // onClick={(event) => handleTreeClick(event, event.target.nodeId)} // Pass event to the function
         onSelectedItemsChange={handleSelectionChange} // Listen for selection changes
         selectedItems={selectedItems} // Control the selected items
-
       />
       <div>
-        <button className="export-button" onClick={() => handleAddStimulationParameters(timeline)}>Add Stimulation Parameters</button>
-        <button className="export-button" onClick={() => handleAddClinicalScores(timeline)}>Add Clinical Scores</button>
+        <button
+          className="export-button"
+          onClick={() => handleAddStimulationParameters(timeline)}
+        >
+          Add Stimulation Parameters
+        </button>
+        <button
+          className="export-button"
+          onClick={() => handleAddClinicalScores(timeline)}
+        >
+          Add Clinical Scores
+        </button>
       </div>
       {/* Quick Add Timelines Section */}
       <h2 className="section-title">Quick Add Session</h2>
       <div className="quick-add-timelines">
         <div>
-          <button className="timeline-button" onClick={() => handleQuickAdd('baseline')}>Baseline</button>
-          <button className="timeline-button" onClick={() => handleQuickAdd('3months')}>3 Months</button>
-          <button className="timeline-button" onClick={() => handleQuickAdd('6months')}>6 Months</button>
-          <button className="timeline-button" onClick={() => handleQuickAdd('12months')}>12 Months</button>
-          <button className="timeline-button" onClick={() => handleQuickAdd('24months')}>24 Months</button>
-          <button className="timeline-button" onClick={() => handleQuickAdd('36months')}>36 Months</button>
+          <button
+            className="timeline-button"
+            onClick={() => handleQuickAdd('baseline')}
+          >
+            Baseline
+          </button>
+          <button
+            className="timeline-button"
+            onClick={() => handleQuickAdd('3months')}
+          >
+            3 Months
+          </button>
+          <button
+            className="timeline-button"
+            onClick={() => handleQuickAdd('6months')}
+          >
+            6 Months
+          </button>
+          <button
+            className="timeline-button"
+            onClick={() => handleQuickAdd('12months')}
+          >
+            12 Months
+          </button>
+          <button
+            className="timeline-button"
+            onClick={() => handleQuickAdd('24months')}
+          >
+            24 Months
+          </button>
+          <button
+            className="timeline-button"
+            onClick={() => handleQuickAdd('36months')}
+          >
+            36 Months
+          </button>
         </div>
       </div>
 
@@ -387,11 +337,15 @@ function PatientDetails({ directoryPath }) {
           value={newTimeline}
           onChange={(e) => setNewTimeline(e.target.value)}
         />
-        <button className="add-timeline-button" onClick={handleAddTimeline}>+</button>
+        <button className="add-timeline-button" onClick={handleAddTimeline}>
+          +
+        </button>
       </div>
 
       {/* Navigation Buttons */}
-      <button className="back-button" onClick={() => navigate('/')}>Back to Table</button>
+      <button className="back-button" onClick={() => navigate('/')}>
+        Back to Table
+      </button>
       {/* <button className="export-button" onClick={() => handleAddStimulationParameters(timeline)}>Add Stimulation Parameters</button>
       <button className="export-button" onClick={() => handleAddClinicalScores(timeline)}>Add Clinical Scores</button> */}
     </div>

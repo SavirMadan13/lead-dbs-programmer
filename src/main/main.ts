@@ -37,7 +37,7 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 let stimulationDirectory = '';
-let patientID = '';
+const patientID = '';
 
 const startServer = () => {
   // Start the Express server in a child process
@@ -162,55 +162,58 @@ ipcMain.handle('check-folder-exists', (event, folderPath) => {
   });
 });
 
-ipcMain.on('import-file', async (event, id, timeline, directoryPath) => {
-  const fs = require('fs');
-  try {
-    // Validate id, timeline, and directoryPath
-    if (!id || !timeline || !directoryPath) {
-      console.error('Missing patient ID, timeline, or directoryPath');
-      event.reply(
-        'import-file-error',
-        'Missing patient ID, timeline, or directoryPath',
-      );
-      return;
+ipcMain.on(
+  'import-file',
+  async (event, id, timeline, directoryPath, leadDBS) => {
+    const fs = require('fs');
+    try {
+      // Validate id, timeline, and directoryPath
+      if (!id || !timeline || !directoryPath) {
+        console.error('Missing patient ID, timeline, or directoryPath');
+        event.reply(
+          'import-file-error',
+          'Missing patient ID, timeline, or directoryPath',
+        );
+        return;
+      }
+
+      // Construct the file path dynamically based on the directoryPath, patient id, and timeline
+      const patientDir = path.join(directoryPath, `sub-${id}`);
+      const sessionDir = path.join(patientDir, `ses-${timeline}`);
+      const fileName = `sub-${id}_ses-${timeline}_stim.json`;
+      const filePath = path.join(sessionDir, fileName);
+
+      // Check if the file exists before trying to read it
+      if (!fs.existsSync(filePath)) {
+        console.error('File not found:', filePath);
+        event.reply('import-file', 'File not found');
+        return;
+      }
+
+      // Read the file
+      const fileData = fs.readFileSync(filePath);
+
+      // Parse the JSON data
+      const jsonData = JSON.parse(fileData);
+
+      // Log and send the data back to the renderer process
+      console.log(jsonData);
+      event.reply('import-file', jsonData);
+    } catch (err) {
+      // Handle specific errors
+      if (err.code === 'ENOENT') {
+        console.error('File not found:', filePath);
+        event.reply('import-file-error', 'File not found');
+      } else if (err.name === 'SyntaxError') {
+        console.error('Error parsing JSON:', err.message);
+        event.reply('import-file-error', 'Error parsing JSON');
+      } else {
+        console.error('An unexpected error occurred:', err);
+        event.reply('import-file-error', err.message);
+      }
     }
-
-    // Construct the file path dynamically based on the directoryPath, patient id, and timeline
-    const patientDir = path.join(directoryPath, `sub-${id}`);
-    const sessionDir = path.join(patientDir, `ses-${timeline}`);
-    const fileName = `sub-${id}_ses-${timeline}_stim.json`;
-    const filePath = path.join(sessionDir, fileName);
-
-    // Check if the file exists before trying to read it
-    if (!fs.existsSync(filePath)) {
-      console.error('File not found:', filePath);
-      event.reply('import-file', 'File not found');
-      return;
-    }
-
-    // Read the file
-    const fileData = fs.readFileSync(filePath);
-
-    // Parse the JSON data
-    const jsonData = JSON.parse(fileData);
-
-    // Log and send the data back to the renderer process
-    console.log(jsonData);
-    event.reply('import-file', jsonData);
-  } catch (err) {
-    // Handle specific errors
-    if (err.code === 'ENOENT') {
-      console.error('File not found:', filePath);
-      event.reply('import-file-error', 'File not found');
-    } else if (err.name === 'SyntaxError') {
-      console.error('Error parsing JSON:', err.message);
-      event.reply('import-file-error', 'Error parsing JSON');
-    } else {
-      console.error('An unexpected error occurred:', err);
-      event.reply('import-file-error', err.message);
-    }
-  }
-});
+  },
+);
 
 ipcMain.on(
   'import-file-clinical',
@@ -883,61 +886,133 @@ const createWindow = async () => {
     return patients;
   };
 
-  // Define the handler for fetching timelines
-  // ipcMain.handle('get-timelines', async (event, directoryPath, patientId) => {
-  //   const patientFolder = path.join(directoryPath, `sub-${patientId}`);
-  //   try {
-  //     // Read the patient folder
-  //     const files = await fs.promises.readdir(patientFolder);
+  // WORKS!
+  // ipcMain.handle(
+  //   'get-timelines',
+  //   async (event, directoryPath, patientId, leadDBS) => {
+  //     const patientFolder = path.join(directoryPath, `sub-${patientId}`);
+  //     try {
+  //       // Read the patient folder
+  //       const timelines = await fs.promises.readdir(patientFolder);
 
-  //     // Filter out directories that match the 'ses-' pattern
-  //     const timelines = files
-  //       .filter((file) => file.startsWith('ses-'))
-  //       .map((sessionFolder) => sessionFolder.replace('ses-', '')); // Remove 'ses-' prefix
+  //       // Prepare data structure to hold timelines with stimulation and clinical information
+  //       const timelineData = await Promise.all(
+  //         timelines
+  //           .filter((file) => file.startsWith('ses-'))
+  //           .map(async (sessionFolder) => {
+  //             const sessionPath = path.join(patientFolder, sessionFolder);
+  //             const sessionFiles = await fs.promises.readdir(sessionPath);
 
-  //     return timelines; // Return the array of timeline strings
-  //   } catch (error) {
-  //     console.error(`Error reading patient folder ${patientFolder}:`, error);
-  //     throw new Error('Failed to retrieve timelines.');
-  //   }
-  // });
+  //             // Check for the presence of clinical and stimulation JSON files
+  //             const hasClinical = sessionFiles.some((file) =>
+  //               file.includes('clinical.json'),
+  //             );
+  //             const hasStimulation = sessionFiles.some((file) =>
+  //               file.includes('stim.json'),
+  //             );
 
-  ipcMain.handle('get-timelines', async (event, directoryPath, patientId) => {
-    const patientFolder = path.join(directoryPath, `sub-${patientId}`);
-    try {
-      // Read the patient folder
-      const timelines = await fs.promises.readdir(patientFolder);
+  //             return {
+  //               timeline: sessionFolder.replace('ses-', ''), // Timeline name without 'ses-' prefix
+  //               hasClinical,
+  //               hasStimulation,
+  //             };
+  //           }),
+  //       );
 
-      // Prepare data structure to hold timelines with stimulation and clinical information
-      const timelineData = await Promise.all(
-        timelines
-          .filter((file) => file.startsWith('ses-'))
-          .map(async (sessionFolder) => {
-            const sessionPath = path.join(patientFolder, sessionFolder);
-            const sessionFiles = await fs.promises.readdir(sessionPath);
+  //       return timelineData; // Return array with timelines and availability of clinical/stimulation data
+  //     } catch (error) {
+  //       console.error(`Error reading patient folder ${patientFolder}:`, error);
+  //       throw new Error('Failed to retrieve timelines.');
+  //     }
+  //   },
+  // );
 
-            // Check for the presence of clinical and stimulation JSON files
+  ipcMain.handle(
+    'get-timelines',
+    async (event, directoryPath, patientId, leadDBS) => {
+      // Determine the path to the patient's folder based on leadDBS flag
+      const patientFolder = leadDBS
+        ? path.join(
+            directoryPath,
+            'derivatives',
+            'leaddbs',
+            `${patientId}`,
+            'stimulations',
+            'MNI152NLin2009bAsym',
+          )
+        : path.join(directoryPath, `sub-${patientId}`);
+      console.log('Patient Folder: ', patientFolder);
+      try {
+        // If leadDBS is false, the process remains as before
+        if (!leadDBS) {
+          // Read the patient folder
+          const timelines = await fs.promises.readdir(patientFolder);
+
+          // Prepare data structure to hold timelines with stimulation and clinical information
+          const timelineData = await Promise.all(
+            timelines
+              .filter((file) => file.startsWith('ses-'))
+              .map(async (sessionFolder) => {
+                const sessionPath = path.join(patientFolder, sessionFolder);
+                const sessionFiles = await fs.promises.readdir(sessionPath);
+
+                // Check for the presence of clinical and stimulation JSON files
+                const hasClinical = sessionFiles.some((file) =>
+                  file.includes('clinical.json'),
+                );
+                const hasStimulation = sessionFiles.some((file) =>
+                  file.includes('stim.json'),
+                );
+
+                return {
+                  timeline: sessionFolder.replace('ses-', ''), // Timeline name without 'ses-' prefix
+                  hasClinical,
+                  hasStimulation,
+                };
+              }),
+          );
+
+          return timelineData; // Return array with timelines and availability of clinical/stimulation data
+        }
+        // Logic for leadDBS = true (new logic to handle different folder structure)
+        let stimSubDirs = await fs.promises.readdir(patientFolder);
+        stimSubDirs = stimSubDirs.filter((dir) => dir !== '.DS_Store');
+        console.log('Stim Sub Dirs         ', stimSubDirs);
+        const timelineData = await Promise.all(
+          stimSubDirs.map(async (stimulationID) => {
+            const stimulationFilesPath = path.join(
+              patientFolder,
+              stimulationID,
+            );
+            console.log(stimulationFilesPath);
+            const sessionFiles =
+              await fs.promises.readdir(stimulationFilesPath);
+
+            // Check for the presence of the desired stimulation files
+            const hasStimulation = sessionFiles.some((file) =>
+              file.includes('desc-stimparameters.mat'),
+            );
+            console.log('Has Stim: ', hasStimulation);
+            // Assuming clinical data is in the same way as in the non-leadDBS case, adjust if needed
             const hasClinical = sessionFiles.some((file) =>
               file.includes('clinical.json'),
             );
-            const hasStimulation = sessionFiles.some((file) =>
-              file.includes('stim.json'),
-            );
 
             return {
-              timeline: sessionFolder.replace('ses-', ''), // Timeline name without 'ses-' prefix
+              timeline: stimulationID, // Use the stimulation ID as the timeline
               hasClinical,
               hasStimulation,
             };
           }),
-      );
+        );
 
-      return timelineData; // Return array with timelines and availability of clinical/stimulation data
-    } catch (error) {
-      console.error(`Error reading patient folder ${patientFolder}:`, error);
-      throw new Error('Failed to retrieve timelines.');
-    }
-  });
+        return timelineData; // Return array with timelines and availability of clinical/stimulation data
+      } catch (error) {
+        console.error(`Error reading patient folder ${patientFolder}:`, error);
+        throw new Error('Failed to retrieve timelines.');
+      }
+    },
+  );
 
   ipcMain.on('select-folder', async (event, directoryPath) => {
     if (directoryPath) {

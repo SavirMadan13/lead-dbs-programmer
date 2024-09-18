@@ -194,9 +194,9 @@ export default function App() {
               </p>
             )}
             {isLeadDBSFolder ? (
-              <p className="lead-dbs-status">This is a valid Lead-DBS folder.</p>
+              <p className="lead-dbs-status">This is a Lead-DBS folder.</p>
             ) : (
-              <p className="lead-dbs-status">This is not a valid Lead-DBS folder.</p>
+              <p className="lead-dbs-status">This is not a Lead-DBS folder.</p>
             )}
           </div>
         )}
@@ -215,7 +215,7 @@ export default function App() {
             />
             <Route
               path="/patient/:id"
-              element={<PatientDetails directoryPath={directoryPath} />}
+              element={<PatientDetails directoryPath={directoryPath} leadDBS={isLeadDBSFolder} />}
             />
             <Route path="/programmer" element={<Programmer />} />
             <Route

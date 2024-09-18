@@ -14,7 +14,7 @@ function Programmer() {
   const [ipgMaster, setIpgMaster] = useState('');
 
   const location = useLocation();
-  const { patient, timeline, directoryPath } = location.state || {};
+  const { patient, timeline, directoryPath, leadDBS } = location.state || {};
   // Access patient and timeline from state
   console.log(location.state);
   const navigate = useNavigate(); // Initialize the navigate hook
@@ -107,6 +107,7 @@ function Programmer() {
     patient.id,
     timeline,
     directoryPath,
+    leadDBS,
   );
 
   function generateUniqueID() {
@@ -607,9 +608,11 @@ function Programmer() {
           />
         )}
       </div>
+      <div style={{paddingLeft: '150px', marginTop: '-80px'}}>
       <button className="export-button" onClick={() => navigate(-1)}>
         Back to Patient Details
       </button>
+      </div>
     </div>
   );
 }
