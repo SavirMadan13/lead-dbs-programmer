@@ -2975,7 +2975,9 @@ function Boston_vercise_directed_new(props, ref) {
 
   let stimController = 0;
   // const [currentLabel, setCurrentLabel] = useState('mA');
-  const [currentLabel, setCurrentLabel] = useState(volAmpToggle === 'right' ? 'V' : 'mA');
+  const [currentLabel, setCurrentLabel] = useState(
+    volAmpToggle === 'right' ? 'V' : 'mA',
+  );
   // Generating here a more simple key code for the IPG that is selected
   const handleIPG = () => {
     if (props.IPG === 'Medtronic_Activa') {
@@ -3744,7 +3746,7 @@ function Boston_vercise_directed_new(props, ref) {
             <Button onClick={handleClearButton} className="button">
               Clear
             </Button>
-            <Button onClick={handleOpenViewer}>Open Viewer</Button>
+            <Button onClick={handleOpenViewer} className="button">Open Viewer</Button>
           </ButtonGroup>
           {/* <NewTripleToggle /> */}
           {/* <button
@@ -3764,12 +3766,11 @@ function Boston_vercise_directed_new(props, ref) {
           <PlyViewer quantities={quantities} values={selectedValues} />
         )} */}
       </div>
-        {showViewer && (
-          <div style={{maxWidth: '100px'}}>
-                      <PlyViewer quantities={quantities} values={selectedValues} />
-
-            </div>
-        )}
+      {showViewer && (
+        <div style={{ minWidth: '500px' }}>
+          <PlyViewer quantities={quantities} amplitude={totalAmplitude} />
+        </div>
+      )}
     </div>
   );
 }
