@@ -1,5 +1,5 @@
 {
-  "description": "A foundation for scalable desktop apps",
+  "description": "LeadDBSProgrammer",
   "keywords": [
     "electron",
     "boilerplate",
@@ -36,6 +36,7 @@
     "package:win": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --win --publish never && npm run build:dll",
     "package:linux": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --linux --publish never && npm run build:dll",
     "package:tar": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --linux --publish never && npm run build:dll && cd ./release/build && tar -zcvf ../LeadDbsProgrammer.tar.gz . && cd ../..",
+    "package:linux:x64": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --linux --x64 --publish never && npm run build:dll",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir release/app",
     "start": "npm run start:renderer",
     "start-server": "ts-node server.ts",
@@ -225,7 +226,8 @@
     },
     "linux": {
       "target": [
-        "dir"
+        "dir",
+        "zip"
       ],
       "category": "Development"
     },
@@ -257,6 +259,6 @@
     ],
     "logLevel": "quiet"
   },
-  "name": "leaddbs-stimcontroller",
+  "name": "LeadDBSProgrammer",
   "version": "1.0.0"
 }
