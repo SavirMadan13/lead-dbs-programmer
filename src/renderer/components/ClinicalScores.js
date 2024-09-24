@@ -12,41 +12,93 @@ function ClinicalScores() {
   const location = useLocation();
   const { patient, timeline, directoryPath } = location.state || {};
   const navigate = useNavigate(); // Initialize the navigate hook
+  // const initialScores = {
+  //   3.1: 0,
+  //   3.2: 0,
+  //   '3.3a': 0,
+  //   '3.3b': 0,
+  //   '3.3c': 0,
+  //   '3.3d': 0,
+  //   '3.3e': 0,
+  //   '3.4a': 0,
+  //   '3.4b': 0,
+  //   '3.5a': 0,
+  //   '3.5b': 0,
+  //   '3.6a': 0,
+  //   '3.6b': 0,
+  //   '3.7a': 0,
+  //   '3.7b': 0,
+  //   '3.8a': 0,
+  //   '3.8b': 0,
+  //   3.9: 0,
+  //   '3.10': 0,
+  //   3.11: 0,
+  //   3.12: 0,
+  //   3.13: 0,
+  //   3.14: 0,
+  //   '3.15a': 0,
+  //   '3.15b': 0,
+  //   '3.16a': 0,
+  //   '3.16b': 0,
+  //   '3.17a': 0,
+  //   '3.17b': 0,
+  //   '3.17c': 0,
+  //   '3.17d': 0,
+  //   '3.17e': 0,
+  //   3.18: 0,
+  // };
+
   const initialScores = {
-    3.1: 0,
-    3.2: 0,
-    '3.3a': 0,
-    '3.3b': 0,
-    '3.3c': 0,
-    '3.3d': 0,
-    '3.3e': 0,
-    '3.4a': 0,
-    '3.4b': 0,
-    '3.5a': 0,
-    '3.5b': 0,
-    '3.6a': 0,
-    '3.6b': 0,
-    '3.7a': 0,
-    '3.7b': 0,
-    '3.8a': 0,
-    '3.8b': 0,
-    3.9: 0,
-    '3.10': 0,
-    3.11: 0,
-    3.12: 0,
-    3.13: 0,
-    3.14: 0,
-    '3.15a': 0,
-    '3.15b': 0,
-    '3.16a': 0,
-    '3.16b': 0,
-    '3.17a': 0,
-    '3.17b': 0,
-    '3.17c': 0,
-    '3.17d': 0,
-    '3.17e': 0,
-    3.18: 0,
+    '3.1: Speech': 0,
+    '3.2: Facial expression': 0,
+    '3.3a: Rigidity- Neck': 0,
+    '3.3b: Rigidity- RUE': 0,
+    '3.3c: Rigidity- LUE': 0,
+    '3.3d: Rigidity- RLE': 0,
+    '3.3e: Rigidity- LLE': 0,
+    '3.4a: Finger tapping- Right hand': 0,
+    '3.4b: Finger tapping- Left hand': 0,
+    '3.5a: Hand movements- Right hand': 0,
+    '3.5b: Hand movements- Left hand': 0,
+    '3.6a: Pronation- supination movements- Right hand': 0,
+    '3.6b: Pronation- supination movements- Left hand': 0,
+    '3.7a: Toe tapping- Right foot': 0,
+    '3.7b: Toe tapping- Left foot': 0,
+    '3.8a: Leg agility- Right leg': 0,
+    '3.8b: Leg agility- Left leg': 0,
+    '3.9: Arising from chair': 0,
+    '3.10: Gait': 0,
+    '3.11: Freezing of gait': 0,
+    '3.12: Postural stability': 0,
+    '3.13: Posture': 0,
+    '3.14: Global spontaneity of movement': 0,
+    '3.15a: Postural tremor- Right hand': 0,
+    '3.15b: Postural tremor- Left hand': 0,
+    '3.16a: Kinetic tremor- Right hand': 0,
+    '3.16b: Kinetic tremor- Left hand': 0,
+    '3.17a: Rest tremor amplitude- RUE': 0,
+    '3.17b: Rest tremor amplitude- LUE': 0,
+    '3.17c: Rest tremor amplitude- RLE': 0,
+    '3.17d: Rest tremor amplitude- LLE': 0,
+    '3.17e: Rest tremor amplitue- Lip/jaw': 0,
+    '3.18: Constancy of rest tremor': 0,
   };
+
+  // Set how many columns you want per "wrapped" table row
+  const columnsPerRow = 7; // Change this number based on how wide you want each section
+
+  // Split the keys into chunks of 'columnsPerRow'
+  const chunkArray = (arr, size) => {
+    const result = [];
+    for (let i = 0; i < arr.length; i += size) {
+      result.push(arr.slice(i, i + size));
+    }
+    return result;
+  };
+
+  // Get chunks of headers (column titles) and data (table rows)
+  const keys = Object.keys(initialScores);
+  const headerChunks = chunkArray(keys, columnsPerRow);
 
   const [patients, setPatients] = useState([
     {
@@ -83,7 +135,10 @@ function ClinicalScores() {
       };
 
       // Attach listeners using 'once' so that it only listens for the event once
-      window.electron.ipcRenderer.once('import-file-clinical', handleImportFile);
+      window.electron.ipcRenderer.once(
+        'import-file-clinical',
+        handleImportFile,
+      );
     } else {
       console.error('ipcRenderer is not available');
     }
@@ -144,91 +199,57 @@ function ClinicalScores() {
 
     return (
       <div style={{ overflowX: 'auto', maxHeight: '700px' }}>
-        <Table striped bordered hover responsive style={{ maxWidth: '1000px' }}>
-          <thead>
-            <tr>
-              {/* <th> */}
-              <th
-                style={{
-                  position: 'sticky',
-                  top: 0,
-                  background: '#fff',
-                  zIndex: 1,
-                }}
-              >
-                <label className="custom-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={allSelected}
-                    onChange={toggleSelectAll}
-                  />
-                  <span className="checkmark" />
-                </label>
-              </th>
-              <th>Patient ID</th>
-              {Object.keys(initialScores).map((key, colIndex) => (
-                <th key={key} style={{ whiteSpace: 'wrap', minWidth: '80px' }}>
-                  {key}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {patients.map((patient, rowIndex) => (
-              <tr
-                key={rowIndex}
-                style={{
-                  backgroundColor: selectedRows[rowIndex] ? '#e6f7ff' : 'white',
-                }}
-              >
-                <td>
-                  <label className="custom-checkbox">
-                    <input
-                      type="checkbox"
-                      checked={!!selectedRows[rowIndex]}
-                      onChange={() => toggleRowSelection(rowIndex)}
-                    />
-                    <span className="checkmark" />
-                  </label>
-                </td>
-                <td>
-                  <Form.Control
-                    type="text"
-                    value={patient.id}
-                    onChange={(e) => updatePatientID(rowIndex, e.target.value)}
-                    style={{ width: 'auto' }}
-                  />
-                </td>
-                {Object.keys(initialScores).map((key, colIndex) => (
-                  <td
-                  // key={colIndex}
-                  // onMouseDown={() => handleMouseDown(rowIndex, colIndex)}
-                  // onMouseOver={() => handleMouseOver(rowIndex, colIndex)}
-                  // onMouseUp={handleMouseUp}
-                  // style={{
-                  //   backgroundColor: selectedCells[`${rowIndex}-${colIndex}`]
-                  //     ? '#D3D3D3'
-                  //     : 'white',
-                  // }}
-                  >
-                    <Form.Control
-                      type="number"
-                      value={patient[timePoint][key]}
-                      onChange={(e) =>
-                        updateScore(
-                          rowIndex,
-                          timePoint,
-                          key,
-                          parseInt(e.target.value, 10),
-                        )
-                      }
-                    />
-                  </td>
+        {headerChunks.map((headerChunk, chunkIndex) => (
+          <div key={chunkIndex} style={{ marginBottom: '20px' }}>
+            <Table striped bordered hover responsive>
+              <thead>
+                <tr>
+                  {/* <th>Patient ID</th> */}
+                  {headerChunk.map((key) => (
+                    <th
+                      key={key}
+                      style={{ whiteSpace: 'wrap', minWidth: '80px' }}
+                    >
+                      {key}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {patients.map((patient, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {/* <td>
+                      <Form.Control
+                        type="text"
+                        value={patient.id}
+                        onChange={(e) =>
+                          updatePatientID(rowIndex, e.target.value)
+                        }
+                        style={{ width: 'auto' }}
+                      />
+                    </td> */}
+                    {headerChunk.map((key, colIndex) => (
+                      <td key={key}>
+                        <Form.Control
+                          type="number"
+                          value={patient[timePoint][key]}
+                          onChange={(e) =>
+                            updateScore(
+                              rowIndex,
+                              timePoint,
+                              key,
+                              parseInt(e.target.value, 10),
+                            )
+                          }
+                        />
+                      </td>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+              </tbody>
+            </Table>
+          </div>
+        ))}
       </div>
     );
   };
@@ -382,11 +403,11 @@ function ClinicalScores() {
       {currentStage === 'import' && (
         <div>
           {/* <h3 className="my-4">Import Data</h3> */}
-          <div
+          {/* <div
             style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '20px' }}
           >
             Patient: {patient.name}
-          </div>
+          </div> */}
           <div style={{ textAlign: 'center', fontSize: '20px' }}>
             {timeline}
           </div>
