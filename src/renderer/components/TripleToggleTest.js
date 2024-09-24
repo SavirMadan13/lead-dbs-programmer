@@ -180,6 +180,8 @@ class TripleToggleTest extends React.Component {
             type="number"
             name="quantity"
             pattern="[0-9]+"
+            min="0"
+            // max="100"
             // value={quantity}
             // value={this.state.quantity}
             value={this.props.quantity}

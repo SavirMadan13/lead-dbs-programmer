@@ -1,0 +1,39 @@
+
+name: Build Electron App
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build the Electron app
+        run: npm run build
+
+      - name: Package Electron app
+        run: npm run package
+
+      - name: Upload the packaged app as a build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: electron-app
+          path: release/build/

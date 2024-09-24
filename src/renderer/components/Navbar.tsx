@@ -9,6 +9,8 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
+import StimulationSettings from './StimulationSettings';
+import AssistedToggle from './AssistedToggle';
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 // import { FaHamburger, FaSun, FaMoon } from 'react-icons/fa';
@@ -25,18 +27,15 @@ export default function Navbar() {
 
   const menuItems = (
     <>
-      <NavLink
+      {/* <NavLink
         to="/testing"
         style={{ textDecoration: 'none', color: 'inherit' }}
       >
         <IconButton>
           <Typography>Component Testing</Typography>
         </IconButton>
-      </NavLink>
-      <NavLink
-        to="/stimulation-settings"
-        style={{ textDecoration: 'none', color: 'inherit' }}
-      >
+      </NavLink> */}
+      {/* <NavLink to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
         <IconButton>
           <Typography>Setup</Typography>
         </IconButton>
@@ -48,15 +47,15 @@ export default function Navbar() {
         <IconButton>
           <Typography>Electrode Model</Typography>
         </IconButton>
-      </NavLink>
-      <NavLink
+      </NavLink> */}
+      {/* <NavLink
         to="/end-session"
         style={{ textDecoration: 'none', color: 'inherit' }}
       >
         <IconButton>
           <Typography>Finish Session</Typography>
         </IconButton>
-      </NavLink>
+      </NavLink> */}
       {/* {isDarkMode ? (
         <Button onClick={toggleTheme}>
           <FaSun style={{ color: 'yellow' }} />
@@ -73,9 +72,9 @@ export default function Navbar() {
     <AppBar position="fixed">
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Lead DBS Programmer
+          Lead-DBS Programmer
         </Typography>
-        {isMobile ? (
+        {/* {isMobile ? (
           <>
             <IconButton color="inherit" onClick={() => toggleDrawer(true)}>
               Button
@@ -92,8 +91,9 @@ export default function Navbar() {
           </>
         ) : (
           menuItems
-        )}
+        )} */}
       </Toolbar>
+      {/* <StimulationSettings /> */}
     </AppBar>
   );
 }

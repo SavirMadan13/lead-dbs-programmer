@@ -12,6 +12,11 @@ import checkNodeEnv from '../scripts/check-node-env';
 
 checkNodeEnv('development');
 
+console.log = () => {};
+console.error = () => {};
+console.warn = () => {};
+console.info = () => {};
+
 const dist = webpackPaths.dllPath;
 
 const configuration: webpack.Configuration = {

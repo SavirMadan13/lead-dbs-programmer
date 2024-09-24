@@ -1,4 +1,12 @@
-export const vectorMakeUp = (quantities, level, levelQuantities, vectorLevel, face, vecCoords, vectorDirection) => {
+export const vectorMakeUp = (
+  quantities,
+  level,
+  levelQuantities,
+  vectorLevel,
+  face,
+  vecCoords,
+  vectorDirection,
+) => {
   // Calculating the level
   const updatedQuantities = { ...quantities };
   // console.log(vectorLevel);
@@ -170,7 +178,20 @@ export const handleForwardButton = (
   // calculateQuantitiesWithDistribution();
 };
 
-export const handleBackButton = (calculateLevelTotals, facesVec, quantities, selectedValues, getOnFacesCount, vectorMakeUp, level, levelQuantities, face, getOnContacts, setSelectedValues, setQuantities) => {
+export const handleBackButton = (
+  calculateLevelTotals,
+  facesVec,
+  quantities,
+  selectedValues,
+  getOnFacesCount,
+  vectorMakeUp,
+  level,
+  levelQuantities,
+  face,
+  getOnContacts,
+  setSelectedValues,
+  setQuantities,
+) => {
   const updatedQuantities = { ...quantities };
   const updatedSelectedValues = { ...selectedValues };
   // getOnFacesCount();
@@ -218,7 +239,20 @@ export const handleBackButton = (calculateLevelTotals, facesVec, quantities, sel
   // calculateQuantitiesWithDistribution();
 };
 
-export const handleLeftButton = (calculateLevelTotals, facesVec, quantities, selectedValues, getOnFacesCount, vectorMakeUp, level, levelQuantities, face, getOnContacts, setSelectedValues, setQuantities) => {
+export const handleLeftButton = (
+  calculateLevelTotals,
+  facesVec,
+  quantities,
+  selectedValues,
+  getOnFacesCount,
+  vectorMakeUp,
+  level,
+  levelQuantities,
+  face,
+  getOnContacts,
+  setSelectedValues,
+  setQuantities,
+) => {
   const updatedQuantities = { ...quantities };
   const updatedSelectedValues = { ...selectedValues };
   // getOnFacesCount();
@@ -267,7 +301,20 @@ export const handleLeftButton = (calculateLevelTotals, facesVec, quantities, sel
   // calculateQuantitiesWithDistribution();
 };
 
-export const handleRightButton = (calculateLevelTotals, facesVec, quantities, selectedValues, getOnFacesCount, vectorMakeUp, level, levelQuantities, face, getOnContacts, setSelectedValues, setQuantities) => {
+export const handleRightButton = (
+  calculateLevelTotals,
+  facesVec,
+  quantities,
+  selectedValues,
+  getOnFacesCount,
+  vectorMakeUp,
+  level,
+  levelQuantities,
+  face,
+  getOnContacts,
+  setSelectedValues,
+  setQuantities,
+) => {
   const updatedQuantities = { ...quantities };
   const updatedSelectedValues = { ...selectedValues };
   // getOnFacesCount();
@@ -329,7 +376,20 @@ export function segmentedLevel(aLevel, level) {
   return false;
 }
 
-export const handleSplitEvenButton = (vectorLevel, vecCoords, vectorDirection, facesVec, quantities, selectedValues, level, levelQuantities, face, getOnContacts, setSelectedValues, setQuantities) => {
+export const handleSplitEvenButton = (
+  vectorLevel,
+  vecCoords,
+  vectorDirection,
+  facesVec,
+  quantities,
+  selectedValues,
+  level,
+  levelQuantities,
+  face,
+  getOnContacts,
+  setSelectedValues,
+  setQuantities,
+) => {
   const updatedQuantities = { ...quantities };
   const updatedSelectedValues = { ...selectedValues };
   // getOnFacesCount();
@@ -397,4 +457,297 @@ export const handleSplitEvenButton = (vectorLevel, vecCoords, vectorDirection, f
   // checkQuantitiesAndValues();
   // roundToHundred();
   // calculateQuantitiesWithDistribution();
+};
+
+const calculateQuantitiesForTwo = () => {
+  // Calculate the quantity increment for 'center' and 'right' values
+  // This is effectively the number of TripleToggle components that have a value of 'center'
+  let total = 0;
+  if (percAmpToggle === 'left') {
+    total = 100;
+  } else if (percAmpToggle === 'right') {
+    total = totalAmplitude;
+  }
+  const centerCount = Object.values(selectedValues).filter(
+    (value) => value === 'center',
+  ).length;
+  let centerQuantityIncrement = centerCount > 0 ? total / centerCount : 0;
+  // THis is effectively the number of TripleToggle components that have a value of 'right'
+  const rightCount = Object.values(selectedValues).filter(
+    (value) => value === 'right',
+  ).length;
+  let rightQuantityIncrement = rightCount > 0 ? total / rightCount : 0;
+
+  // This finds the difference between
+  if (lastChangedInstance.value === 'center') {
+    centerQuantityIncrement =
+      centerCount > 0 ? (100 - lastChangedInstance.animation) / centerCount : 0;
+  } else if (lastChangedInstance.value === 'right') {
+    rightQuantityIncrement =
+      rightCount > 0 ? (100 - lastChangedInstance.animation) / rightCount : 0;
+  } else if (lastChangedInstance.value === 'left') {
+    centerQuantityIncrement = centerCount > 0 ? 100 / centerCount : 0;
+    rightQuantityIncrement = rightCount > 0 ? 100 / rightCount : 0;
+  }
+
+  Object.keys(selectedValues).forEach((key) => {
+    const value = selectedValues[key];
+    // if (key !== lastChangedInstance.key) {
+    if (value === 'left') {
+      quantities[value] = 0;
+    } else if (value === 'center') {
+      quantities[value] = centerQuantityIncrement;
+    } else if (value === 'right') {
+      quantities[value] = rightQuantityIncrement;
+    }
+    // } else if (key === lastChangedInstance.key) {
+    //   quantities[value] = lastChangedInstance.quantity;
+    // }
+  });
+
+  return quantities;
+};
+
+const calculateQuantitiesWithDistribution = () => {
+  // Calculate the quantity increment for 'center' and 'right' values
+  let total = 0;
+  if (percAmpToggle === 'left') {
+    total = 100;
+  } else if (percAmpToggle === 'right') {
+    total = totalAmplitude;
+  }
+  console.log('total: ', total);
+  const centerCount = Object.values(selectedValues).filter(
+    (value) => value === 'center',
+  ).length;
+  const centerQuantityIncrement = centerCount > 0 ? total / centerCount : 0;
+  // console.log('CenterCount: ', centerCount);
+
+  const rightCount = Object.values(selectedValues).filter(
+    (value) => value === 'right',
+  ).length;
+  const rightQuantityIncrement = rightCount > 0 ? total / rightCount : 0;
+
+  const updatedQuantities = { ...quantities }; // Create a copy of the quantities object
+
+  // Update the quantities based on selected values
+  Object.keys(selectedValues).forEach((key) => {
+    const value = selectedValues[key];
+    // console.log("key="+key + ", value=" + value);
+    if (value === 'left') {
+      updatedQuantities[key] = 0;
+    } else if (value === 'center') {
+      console.log('CENTER: ', centerQuantityIncrement);
+      updatedQuantities[key] = centerQuantityIncrement;
+      console.log('updated: ', updatedQuantities);
+    } else if (value === 'right') {
+      updatedQuantities[key] = rightQuantityIncrement;
+    }
+    // updatedQuantities[key] = 20;
+  });
+
+  // console.log(quantities);
+  setQuantities(updatedQuantities);
+  // setSelectedValues(selectedValue);
+
+  console.log(quantities);
+  // Update the state with the new quantities
+};
+
+const roundToHundred = () => {
+  // Initialize sum variables
+  let totalCenterSum = 0;
+  let totalRightSum = 0;
+  const roundUpdatedQuantities = { ...quantities };
+
+  let total = 0;
+  if (percAmpToggle === 'left') {
+    total = 100;
+  } else if (percAmpToggle === 'right') {
+    total = totalAmplitude;
+  }
+
+  // Calculate the sums for 'center' and 'right' values
+  Object.keys(selectedValues).forEach((key) => {
+    const value = selectedValues[key];
+    if (value === 'center') {
+      totalCenterSum += parseFloat(roundUpdatedQuantities[key]);
+      console.log('CenterSum: ', totalCenterSum);
+    } else if (value === 'right') {
+      totalRightSum += parseFloat(roundUpdatedQuantities[key]);
+      console.log('RightSum: ', totalRightSum);
+    }
+  });
+
+  // Calculate the quantity increments
+  const centerCount = Object.values(selectedValues).filter(
+    (value) => value === 'center',
+  ).length;
+  const centerQuantityIncrement = (total - totalCenterSum) / centerCount;
+  console.log('Center increment:', centerQuantityIncrement);
+
+  const rightCount = Object.values(selectedValues).filter(
+    (value) => value === 'right',
+  ).length;
+  const rightQuantityIncrement = (total - totalRightSum) / rightCount;
+
+  // const updatedQuantities = { ...quantities }; // Create a copy of the quantities object
+
+  // Update the quantities based on selected values
+  Object.keys(selectedValues).forEach((key) => {
+    const value = selectedValues[key];
+    if (value === 'left') {
+      roundUpdatedQuantities[key] = 0;
+    } else if (value === 'center') {
+      roundUpdatedQuantities[key] =
+        parseFloat(roundUpdatedQuantities[key]) + centerQuantityIncrement;
+    } else if (value === 'right') {
+      roundUpdatedQuantities[key] =
+        parseFloat(roundUpdatedQuantities[key]) + rightQuantityIncrement;
+    }
+  });
+  setQuantities(roundUpdatedQuantities); // Update the state with the new quantities
+  console.log(roundUpdatedQuantities);
+};
+
+const newRoundToHundred = () => {
+  // Initialize sum variables
+  let totalCenterSum = 0;
+  let totalRightSum = 0;
+  const roundUpdatedQuantities = { ...quantities };
+
+  let total = 0;
+  if (percAmpToggle === 'left') {
+    total = 100;
+  } else if (percAmpToggle === 'right') {
+    total = totalAmplitude;
+  }
+
+  // Calculate the sums for 'center' and 'right' values
+  Object.keys(selectedValues).forEach((key) => {
+    const value = selectedValues[key];
+    if (value === 'center') {
+      totalCenterSum += parseFloat(roundUpdatedQuantities[key]);
+      console.log('CenterSum: ', totalCenterSum);
+    } else if (value === 'right') {
+      totalRightSum += parseFloat(roundUpdatedQuantities[key]);
+      console.log('RightSum: ', totalRightSum);
+    }
+  });
+
+  // Calculate the quantity increments
+  const centerCount = Object.values(selectedValues).filter(
+    (value) => value === 'center',
+  ).length;
+  const centerQuantityIncrement = (total - totalCenterSum) / centerCount;
+  console.log('Center increment:', centerQuantityIncrement);
+
+  const rightCount = Object.values(selectedValues).filter(
+    (value) => value === 'right',
+  ).length;
+  const rightQuantityIncrement = (total - totalRightSum) / rightCount;
+
+  // const updatedQuantities = { ...quantities }; // Create a copy of the quantities object
+
+  // Update the quantities based on selected values
+  Object.keys(selectedValues).forEach((key) => {
+    const value = selectedValues[key];
+    if (value === 'left') {
+      roundUpdatedQuantities[key] = 0;
+    } else if (value === 'center') {
+      roundUpdatedQuantities[key] =
+        parseFloat(roundUpdatedQuantities[key]) + centerQuantityIncrement;
+    } else if (value === 'right') {
+      roundUpdatedQuantities[key] =
+        parseFloat(roundUpdatedQuantities[key]) + rightQuantityIncrement;
+    }
+  });
+  return roundUpdatedQuantities;
+  // console.log(roundUpdatedQuantities);
+};
+
+function checkQuantitiesAndValues(quantity, value) {
+  const updatedQuantities = { ...quantity };
+  const updatedSelectedValues = { ...value };
+  Object.keys(updatedQuantities).forEach((key) => {
+    if (updatedQuantities[key] <= 0) {
+      updatedSelectedValues[key] = 'left';
+    }
+    if (updatedSelectedValues[key] === 'left') {
+      updatedQuantities[key] = 0;
+    }
+  });
+  setQuantities(updatedQuantities);
+  setSelectedValues(updatedSelectedValues);
+}
+
+const vectorMakeUpAmplitude = () => {
+  // Calculating the level
+  const updatedQuantities = { ...quantities };
+  // console.log(vectorLevel);
+  Object.keys(level).forEach((key) => {
+    levelQuantities[level[key]] = 0;
+  });
+  Object.keys(level).forEach((key) => {
+    levelQuantities[level[key]] =
+      parseFloat(levelQuantities[level[key]]) +
+      parseFloat(updatedQuantities[key]);
+    // console.log(levelQuantities);
+  });
+  Object.keys(levelQuantities).forEach((levelQuantity) => {
+    // console.log(vectorLevel);
+    if (levelQuantity !== 0) {
+      vectorLevel =
+        parseFloat(vectorLevel) +
+        parseFloat(
+          (levelQuantity * parseFloat(levelQuantities[levelQuantity])) /
+            totalAmplitude,
+        ); // levelQuantity here is the actual level, and then levelQuantities[levelQuantity] is the total quantity at that level
+    }
+  });
+  console.log('VectorLevel: ', vectorLevel);
+  console.log('LevelQuantities: ', levelQuantities);
+
+  // Calculating the direction
+  const faceTotals = {};
+  // We want to get the faceTotals
+  // Start by initializing the faceTotals variables
+  Object.keys(face).forEach((key) => {
+    faceTotals[face[key]] = 0;
+  });
+  // console.log(faceTotals);
+  Object.keys(face).forEach((key) => {
+    faceTotals[face[key]] =
+      parseFloat(faceTotals[face[key]]) + parseFloat(updatedQuantities[key]);
+  });
+  // console.log(faceTotals);
+  // Coordinates for each
+  let aVec = [0, 0];
+  let bVec = [0, 0];
+  let cVec = [0, 0];
+  const cos60 = Math.cos((60 * Math.PI) / 180);
+  const cos30 = Math.cos((30 * Math.PI) / 180);
+  const sin60 = Math.sin((60 * Math.PI) / 180);
+  const sin30 = Math.sin((30 * Math.PI) / 180);
+  Object.keys(faceTotals).forEach((key) => {
+    if (key === 'left') {
+      cVec = [
+        parseFloat(-faceTotals[key]) / 2,
+        parseFloat(-faceTotals[key]) * cos30,
+      ];
+    } else if (key === 'center') {
+      aVec = [faceTotals[key], 0];
+    } else if (key === 'right') {
+      bVec = [
+        parseFloat(-faceTotals[key]) / 2,
+        parseFloat(faceTotals[key]) * sin60,
+      ];
+    }
+  });
+  for (let i = 0; i < aVec.length; i++) {
+    vecCoords[i] = aVec[i] + bVec[i] + cVec[i];
+  }
+  vectorDirection = (Math.atan(vecCoords[1] / vecCoords[0]) * 180) / Math.PI;
+  console.log('VecCoords', vecCoords);
+  console.log(bVec);
 };

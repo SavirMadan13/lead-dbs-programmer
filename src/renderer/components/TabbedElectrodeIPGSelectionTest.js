@@ -1,6 +1,11 @@
+/* eslint-disable react/button-has-type */
+/* eslint-disable react/jsx-pascal-case */
+/* eslint-disable camelcase */
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import ToggleButton from 'react-bootstrap/ToggleButton';
 import 'react-tabs/style/react-tabs.css';
 import './TabbedElectrodeIPGSelection.css';
 import BostonCartesia from './electrode_models/BostonCartesia';
@@ -14,6 +19,20 @@ import MedtronicB33005 from './electrode_models/MedtronicB33005';
 import BostonScientificVercise from './electrode_models/BostonScientificVercise';
 import BostonScientificCartesiaHX from './electrode_models/BostonScientificCartesiaHX';
 import BostonScientificCartesiaX from './electrode_models/BostonScientificCartesiaX';
+import Boston_vercise_directed from './electrode_models/currentModels/Boston_vercise_directed';
+import Boston_vercise from './electrode_models/currentModels/Boston_vercise';
+import Medtronic_3389 from './electrode_models/currentModels/Medtronic_3389';
+import Medtronic_3387 from './electrode_models/currentModels/Medtronic_3387';
+import Medtronic_3391 from './electrode_models/currentModels/Medtronic_3391';
+import Medtronic_B33005 from './electrode_models/currentModels/Medtronic_B33005';
+import Medtronic_B33015 from './electrode_models/currentModels/Medtronic_B33015';
+import Abbott_activetip_2mm from './electrode_models/currentModels/Abbott_activetip_2mm';
+import Abbott_activetip_3mm from './electrode_models/currentModels/Abbott_activetip_3mm';
+import Abbott_directed_6172 from './electrode_models/currentModels/Abbott_directed_6172';
+import Abbott_directed_6173 from './electrode_models/currentModels/Abbott_directed_6173';
+import Boston_vercise_cartesia_HX from './electrode_models/currentModels/Boston_vercise_cartesia_HX';
+import Boston_vercise_cartesia_X from './electrode_models/currentModels/Boston_vercise_cartesia_X';
+import Boston_vercise_directed_new from './electrode_models/currentModels/Boston_vercise_directed_new';
 
 function TabbedElectrodeIPGSelection({
   IPG,
@@ -33,6 +52,19 @@ function TabbedElectrodeIPGSelection({
   setVisModel,
   sessionTitle,
   setSessionTitle,
+  allTogglePositions,
+  setAllTogglePositions,
+  allPercAmpToggles,
+  setAllPercAmpToggles,
+  allVolAmpToggles,
+  setAllVolAmpToggles,
+  filePath,
+  setFilePath,
+  matImportFile,
+  stimChanged,
+  setStimChanged,
+  namingConvention,
+  selectedPatient,
 }) {
   const testElectrodeRef = React.createRef();
   // const [selectedElectrode, setSelectedElectrode] = useState('');
@@ -61,10 +93,10 @@ function TabbedElectrodeIPGSelection({
   //   setSelectedElectrode(event.target.value);
   // };
 
-  const [key, setKey] = useState('1');
-
+  const [key, setKey] = useState('5');
+  // const [namingConvention, setNamingConvention] = useState('clinical');
   const fileInputRef = useRef(null);
-
+  const [visualizationModel, setVisualizationModel] = useState('3');
   // const [allQuantities, setAllQuantities] = useState({});
   // const [allSelectedValues, setAllSelectedValues] = useState({});
 
@@ -73,17 +105,39 @@ function TabbedElectrodeIPGSelection({
   //   setKey(Tabs.key);
   // };
 
+  // const getVariant = (value) => {
+  //   return 'outline-secondary';
+  // };
+
+  // const namingConventionDef = [
+  //   { name: 'clinical', value: 'clinical' },
+  //   { name: 'lead-dbs', value: 'lead-dbs' },
+  // ];
+
+  // const handleNamingConventionChange = (newConvention) => {
+  //   setNamingConvention(newConvention);
+  // };
+
+  useEffect(() => {
+    if (stimChanged) {
+      // Reset states or do necessary updates on stimChanged
+      console.log('Stim changed, re-rendering...');
+      setStimChanged(false); // Reset stimChanged if it’s a one-time trigger
+    }
+  }, [stimChanged, setStimChanged]);
+
   const handleTabChange = (k) => {
     // console.log("new key=" + k + ", old key="+key + ","+ JSON.stringify(testElectrodeRef.current.getCartesiaData()));
     // console.log("new key=" + k + ", old key="+key + ", old data="+ JSON.stringify(testElectrodeRef.current.getStateQuantities()));
     // localStorage.setItem(key, testElectrodeRef.current.getStateData());
     // setAllQuantities({key: testElectrodeRef.current.getStateData()});
-
+    console.log('testElectrodeRef: ', testElectrodeRef.current);
     const updatedAllQuantities = {
       ...allQuantities,
       [key]: testElectrodeRef.current.getStateQuantities(),
     };
     setAllQuantities(updatedAllQuantities);
+    console.log('updatedquantities: ', updatedAllQuantities);
 
     const updatedAllSelectedValues = {
       ...allSelectedValues,
@@ -108,12 +162,37 @@ function TabbedElectrodeIPGSelection({
       [key]: testElectrodeRef.current.getStateVisModel(),
     };
     setVisModel(updatedVisModel);
+    console.log('updatedVIsMOdel: ', updatedVisModel);
+    const tempModel = testElectrodeRef.current.getStateVisModel();
+    setVisualizationModel(tempModel);
+    setVisModel(tempModel);
 
     const updatedSessionTitle = {
       ...sessionTitle,
       [key]: testElectrodeRef.current.getStateSessionTitle(),
     };
     setSessionTitle(updatedSessionTitle);
+
+    const updatedAllTogglePositions = {
+      ...allTogglePositions,
+      [key]: testElectrodeRef.current.getStateTogglePosition(),
+    };
+    setAllTogglePositions(updatedAllTogglePositions);
+    console.log('Alltogglepositions', allTogglePositions);
+
+    const updatedAllPercAmpTogglePositions = {
+      ...allPercAmpToggles,
+      [key]: testElectrodeRef.current.getStatePercAmpToggle(),
+    };
+    setAllPercAmpToggles(updatedAllPercAmpTogglePositions);
+
+    const updatedAllVolAmpTogglePositions = {
+      ...allVolAmpToggles,
+      [key]: testElectrodeRef.current.getStateVolAmpToggle(),
+    };
+    setAllVolAmpToggles(updatedAllVolAmpTogglePositions);
+    // const updatedIPGforOutput = testElectrodeRef.current.getOutputIPG();
+    // setOutputIPG(updatedIPGforOutput);
     // console.log(sessionTitle[1]);
 
     // setAllQuantities[key] = testElectrodeRef.current.getStateData();
@@ -167,7 +246,41 @@ function TabbedElectrodeIPGSelection({
     }
 
     sessionTitle[key] = testElectrodeRef.current.getStateSessionTitle();
+    allTogglePositions[key] = testElectrodeRef.current.getStateTogglePosition();
     // }
+  };
+
+  const convertElectrode = (electrode) => {
+    switch (electrode) {
+      case 'boston_vercise_directed':
+        return 'Boston Scientific Vercise Directed';
+      case 'medtronic_3389':
+        return 'Medtronic 3389';
+      case 'medtronic_3387':
+        return 'Medtronic 3387';
+      case 'medtronic_3391':
+        return 'Medtronic 3391';
+      case 'medtronic_b33005':
+        return 'Medtronic B33005';
+      case 'medtronic_b33015':
+        return 'Medtronic B33015';
+      case 'boston_scientific_vercise':
+        return 'Boston Scientific Vercise';
+      case 'boston_scientific_vercise_cartesia_hx':
+        return 'Boston Scientific Vercise Cartesia HX';
+      case 'boston_scientific_vercise_cartesia_x':
+        return 'Boston Scientific Vercise Cartesia X';
+      case 'abott_activetip_2mm':
+        return 'Abbott ActiveTip (6146-6149)';
+      case 'abbott_activetip_3mm':
+        return 'Abbott ActiveTip (6142-6145)';
+      case 'abott_directed_6172':
+        return 'Abbott Directed 6172 (short)';
+      case 'abott_directed_6173':
+        return 'Abbott Directed 6173 (long)';
+      default:
+        return '';
+    }
   };
 
   const testElectrodeOptions = {
@@ -291,6 +404,267 @@ function TabbedElectrodeIPGSelection({
         selectedValues={allSelectedValues[key]}
       />
     ),
+    // boston_vercise_directed: (
+    //   <Boston_vercise_directed
+    //     ref={testElectrodeRef}
+    //     key={key}
+    //     name={key}
+    //     allQuantities={allQuantities}
+    //     quantities={allQuantities[key]}
+    //     selectedValues={allSelectedValues[key]}
+    //     IPG={IPG}
+    //     totalAmplitude={allTotalAmplitudes[key]}
+    //     parameters={allStimulationParameters[key]}
+    //     visModel={visModel[1]}
+    //     sessionTitle={sessionTitle[1]}
+    //     togglePosition={allTogglePositions[key]}
+    //     percAmpToggle={allPercAmpToggles[key]}
+    //     volAmpToggle={allVolAmpToggles[key]}
+    //     // stimChanged={stimChanged}
+    //     // setStimChanged={setStimChanged}
+    //     // outputIPG={outputIPG}
+    //   />
+    // ),
+    boston_vercise_directed: (
+      <Boston_vercise_directed_new
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        allQuantities={allQuantities}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        // visModel={visModel[1]}
+        visModel={visModel}
+        sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
+        adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
+        // stimChanged={stimChanged}
+        // setStimChanged={setStimChanged}
+        // outputIPG={outputIPG}
+      />
+    ),
+    boston_vercise_cartesia_hx: (
+      <Boston_vercise_cartesia_HX
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel}
+        sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
+      />
+    ),
+    boston_vercise_cartesia_x: (
+      <Boston_vercise_cartesia_X
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel}
+        sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
+      />
+    ),
+    boston_vercise: (
+      <Boston_vercise
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel}
+        sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
+      />
+    ),
+    medtronic_3389: (
+      <Medtronic_3389
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel}
+        sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
+      />
+    ),
+    medtronic_3387: (
+      <Medtronic_3387
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel}
+        sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
+      />
+    ),
+    medtronic_3391: (
+      <Medtronic_3391
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel}
+        sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
+      />
+    ),
+    medtronic_b33005: (
+      <Medtronic_B33005
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel}
+        sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
+      />
+    ),
+    medtronic_b33015: (
+      <Medtronic_B33015
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel}
+        sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
+      />
+    ),
+    abbott_activetip_2mm: (
+      <Abbott_activetip_2mm
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        allQuantities={allQuantities}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel}
+        sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
+      />
+    ),
+    abbott_activetip_3mm: (
+      <Abbott_activetip_3mm
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        allQuantities={allQuantities}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel}
+        sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
+      />
+    ),
+    abbott_directed_6172: (
+      <Abbott_directed_6172
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel}
+        sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
+      />
+    ),
+    abbott_directed_6173: (
+      <Abbott_directed_6173
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        visModel={visModel}
+        sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
+      />
+    ),
   };
 
   const [importedData, setImportedData] = useState(null);
@@ -303,6 +677,108 @@ function TabbedElectrodeIPGSelection({
     exportAmplitudeList.shift();
     return exportAmplitudeList;
   }
+
+  const calculatePercentageFromAmplitude = (quantities, totalAmplitude) => {
+    const updatedQuantities = { ...quantities };
+    Object.keys(updatedQuantities).forEach((element) => {
+      updatedQuantities[element] =
+        (parseFloat(updatedQuantities[element]) * 100) / totalAmplitude;
+    });
+    console.log(updatedQuantities);
+    return updatedQuantities;
+  };
+
+  const calculateVoltageFromAmplitude = (quantities) => {
+    const updatedQuantities = { ...quantities };
+    Object.keys(updatedQuantities).forEach((element) => {
+      if (quantities[element] !== 0) {
+        updatedQuantities[element] = 100;
+      }
+    });
+    return updatedQuantities;
+  };
+
+  // const handleTogglePositions = () => {
+  //   let outputQuantities = {};
+  //   console.log(allQuantities);
+  //   console.log(allTotalAmplitudes);
+  //   Object.keys(allQuantities).forEach((quantity) => {
+  //     if (allTogglePositions[quantity] === 'mA') {
+  //       console.log('quantity: ', allTogglePositions);
+  //       outputQuantities = calculatePercentageFromAmplitude(
+  //         allQuantities[quantity],
+  //         parseFloat(allTotalAmplitudes[quantity]),
+  //       );
+  //       const updatedQuantities = {
+  //         ...allQuantities,
+  //         [key]: outputQuantities,
+  //       };
+  //       // console.log('updaredQuantities: ', updatedQuantities);
+  //       outputQuantities = updatedQuantities;
+  //     } else if (allTogglePositions[quantity] === 'V') {
+  //       outputQuantities = calculateVoltageFromAmplitude(
+  //         allQuantities[quantity],
+  //       );
+  //       const updatedQuantities = {
+  //         ...allQuantities,
+  //         [key]: outputQuantities,
+  //       };
+  //       outputQuantities = updatedQuantities;
+  //     } else {
+  //       outputQuantities[quantity] = allQuantities[quantity];
+  //     }
+  //     // return '';
+  //   });
+  //   // console.log(updatedQuantities);
+  //   return outputQuantities;
+  // };
+
+  const handleTogglePositions = () => {
+    let outputQuantities = {};
+    console.log(allQuantities);
+    console.log(allTotalAmplitudes);
+    const updatedQuantities = { ...allQuantities };
+    Object.keys(allTogglePositions).forEach((position) => {
+      if (allTogglePositions[position] === 'mA') {
+        console.log('position', position);
+        console.log('quantity: ', allTogglePositions);
+        console.log(allTotalAmplitudes[position]);
+        console.log(allQuantities[position]);
+        outputQuantities = calculatePercentageFromAmplitude(
+          allQuantities[position],
+          parseFloat(allTotalAmplitudes[position]),
+        );
+        // const updatedQuantities = {
+        //   ...allQuantities,
+        //   [position]: outputQuantities,
+        // };
+        updatedQuantities[position] = outputQuantities;
+        console.log('updaredQuantities: ', updatedQuantities);
+        outputQuantities = updatedQuantities;
+      } else if (allTogglePositions[position] === 'V') {
+        outputQuantities = calculateVoltageFromAmplitude(
+          allQuantities[position],
+        );
+        // const updatedQuantities = {
+        //   ...allQuantities,
+        //   [position]: outputQuantities,
+        // };
+        updatedQuantities[position] = outputQuantities;
+        outputQuantities = updatedQuantities;
+      } else {
+        outputQuantities[position] = allQuantities[position];
+      }
+      // return '';
+    });
+    // console.log(updatedQuantities);
+    return outputQuantities;
+  };
+
+  // const handleIPGForOutput = () => {
+  //   if (IPG = 'Boston') {
+  //     if (handlePercAmp)
+  //   }
+  // }
 
   function handleFileChange(event) {
     const file = event.target.files[0];
@@ -347,6 +823,10 @@ function TabbedElectrodeIPGSelection({
     a.download = 'exportedData.json';
     a.click();
     window.URL.revokeObjectURL(url);
+  };
+
+  const handleIPGForOutput = () => {
+    console.log(percAmpToggl);
   };
 
   const translatePolarity = (sideValue) => {
@@ -459,7 +939,7 @@ function TabbedElectrodeIPGSelection({
         data.S[dynamicKey2].frequency = parseFloat(
           allStimulationParameters[j].parameter2,
         );
-        data.S[dynamicKey2].pulsewidth = parseFloat(
+        data.S[dynamicKey2].pulseWidth = parseFloat(
           allStimulationParameters[j].parameter1,
         );
         data.S[dynamicKey2].va = 2;
@@ -484,7 +964,7 @@ function TabbedElectrodeIPGSelection({
         };
         data.S[dynamicKey2].amp = 0;
         data.S[dynamicKey2].frequency = 0;
-        data.S[dynamicKey2].pulsewidth = 0;
+        data.S[dynamicKey2].pulseWidth = 0;
         data.S[dynamicKey2].va = 2;
       }
     }
@@ -519,7 +999,7 @@ function TabbedElectrodeIPGSelection({
         data.S[dynamicKey2].frequency = parseFloat(
           allStimulationParameters[j + 4].parameter2,
         );
-        data.S[dynamicKey2].pulsewidth = parseFloat(
+        data.S[dynamicKey2].pulseWidth = parseFloat(
           allStimulationParameters[j + 4].parameter1,
         );
         data.S[dynamicKey2].va = 2;
@@ -543,7 +1023,7 @@ function TabbedElectrodeIPGSelection({
         };
         data.S[dynamicKey2].amp = 0;
         data.S[dynamicKey2].frequency = 0;
-        data.S[dynamicKey2].pulsewidth = 0;
+        data.S[dynamicKey2].pulseWidth = 0;
         data.S[dynamicKey2].va = 2;
       }
     }
@@ -729,7 +1209,7 @@ function TabbedElectrodeIPGSelection({
         data.S.activecontacts[j] = activeContacts(allSelectedValues[j]);
       } else {
         for (let i = 1; i < 9; i++) {
-          console.log('j: ', dynamicKey2);
+          // console.log('j: ', dynamicKey2);
           let dynamicKey = `k${i + 7}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: 0,
@@ -811,9 +1291,12 @@ function TabbedElectrodeIPGSelection({
   const gatherExportedData4 = () => {
     // handleFileChange('1');
     saveQuantitiesandValues();
+    let updatedOutputQuantity = {};
+    updatedOutputQuantity = handleTogglePositions();
+    console.log('Updated output quantity: ', updatedOutputQuantity);
     // parseAllVariables();
     const exportAmplitudeData = handleExportAmplitude(allTotalAmplitudes);
-    console.log(exportAmplitudeData);
+    // console.log(exportAmplitudeData);
     const leftHemiArr = [];
     const rightHemiArr = [];
     const data = {
@@ -840,10 +1323,10 @@ function TabbedElectrodeIPGSelection({
     };
 
     data.S.elmodel = [selectedElectrodeLeft, selectedElectrodeRight];
-    console.log('length', Object.keys(allQuantities[1]));
+    // console.log('length', Object.keys(allQuantities[1]));
 
     const loopSize = Object.keys(allQuantities[1]).length;
-    console.log('loopSize: ', loopSize);
+    // console.log('loopSize: ', loopSize);
     // data.S.label = 'Num1';
     const activeArray = [];
     const leftAmpArray = [];
@@ -876,7 +1359,7 @@ function TabbedElectrodeIPGSelection({
         data.S[dynamicKey2].frequency = parseFloat(
           allStimulationParameters[j].parameter2,
         );
-        data.S[dynamicKey2].pulsewidth = parseFloat(
+        data.S[dynamicKey2].pulseWidth = parseFloat(
           allStimulationParameters[j].parameter1,
         );
         data.S[dynamicKey2].va = 2;
@@ -901,7 +1384,7 @@ function TabbedElectrodeIPGSelection({
         };
         data.S[dynamicKey2].amp = 0;
         data.S[dynamicKey2].frequency = 0;
-        data.S[dynamicKey2].pulsewidth = 0;
+        data.S[dynamicKey2].pulseWidth = 0;
         data.S[dynamicKey2].va = 2;
       }
     }
@@ -936,7 +1419,7 @@ function TabbedElectrodeIPGSelection({
         data.S[dynamicKey2].frequency = parseFloat(
           allStimulationParameters[j + 4].parameter2,
         );
-        data.S[dynamicKey2].pulsewidth = parseFloat(
+        data.S[dynamicKey2].pulseWidth = parseFloat(
           allStimulationParameters[j + 4].parameter1,
         );
         data.S[dynamicKey2].va = 2;
@@ -960,7 +1443,7 @@ function TabbedElectrodeIPGSelection({
         };
         data.S[dynamicKey2].amp = 0;
         data.S[dynamicKey2].frequency = 0;
-        data.S[dynamicKey2].pulsewidth = 0;
+        data.S[dynamicKey2].pulseWidth = 0;
         data.S[dynamicKey2].va = 2;
       }
     }
@@ -994,8 +1477,22 @@ function TabbedElectrodeIPGSelection({
     data.S.active = [leftLength, rightLength];
     // data.S.activecontacts = activeContacts(allSelectedValues[1]);
 
+    for (let i = 1; i < 9; i++) {
+      const zerosArr = [];
+      for (let j = 1; j < loopSize; j++) {
+        zerosArr.push(0);
+      }
+      if (data.S.activecontacts[i]) {
+        if (data.S.activecontacts[i] === null) {
+          data.S.activecontacts[i] = zerosArr;
+        }
+      } else {
+        data.S.activecontacts[i] = zerosArr;
+      }
+    }
+
     let exportVisModel = '';
-    console.log(visModel[1]);
+    // console.log(visModel[1]);
     if (visModel[1] === '1') {
       console.log('here');
       exportVisModel = 'Dembek 2017';
@@ -1010,9 +1507,248 @@ function TabbedElectrodeIPGSelection({
     } else if (visModel[1] === '6') {
       exportVisModel = 'OSS-DBS (Butenko 2020)';
     }
-    console.log('export vis model', exportVisModel);
+    // console.log('export vis model', exportVisModel);
     data.S.model = exportVisModel;
 
+    return data;
+  };
+
+  const gatherExportedData5 = () => {
+    // handleFileChange('1');
+    saveQuantitiesandValues();
+    let updatedOutputQuantity = {};
+    updatedOutputQuantity = handleTogglePositions();
+    console.log('Updated output quantity: ', updatedOutputQuantity);
+    // parseAllVariables();
+    const exportAmplitudeData = handleExportAmplitude(allTotalAmplitudes);
+    // console.log(exportAmplitudeData);
+    const leftHemiArr = [];
+    const rightHemiArr = [];
+    const data = {
+      S: {
+        label: selectedPatient,
+        Rs1: {},
+        Rs2: {},
+        Rs3: {},
+        Rs4: {},
+        Ls1: {},
+        Ls2: {},
+        Ls3: {},
+        Ls4: {},
+        active: {},
+        model: '',
+        monopolarmodel: 0,
+        amplitude: {},
+        activecontacts: [],
+        template: 'warp',
+        sources: {},
+        elmodel: {},
+        ipg: IPG,
+      },
+    };
+
+    data.S.elmodel = [selectedElectrodeLeft, selectedElectrodeRight];
+    const programs = Object.keys(allQuantities);
+    const firstProgram = programs[0];
+    console.log('Programs: ', programs);
+    console.log('length', programs[0]);
+
+    const loopSize = Object.keys(allQuantities[firstProgram]).length;
+    // console.log('loopSize: ', loopSize);
+    // data.S.label = 'Num1';
+    const activeArray = [];
+    const leftAmpArray = [];
+
+    for (let j = 1; j < 5; j++) {
+      let dynamicKey2 = `Ls${j}`;
+      if (allSelectedValues[j] && updatedOutputQuantity[j]) {
+        // Need to change the i = 9 to number of electrodes to accomodate for 16 contact electrodes
+        for (let i = 1; i < loopSize; i++) {
+          let polarity = 0;
+          if (allSelectedValues[j][i] === 'left') {
+            polarity = 0;
+          } else if (allSelectedValues[j][i] === 'center') {
+            polarity = 1;
+          } else if (allSelectedValues[j][i] === 'right') {
+            polarity = 2;
+          }
+          let dynamicKey = `k${i + loopSize - 2}`;
+          data.S[dynamicKey2][dynamicKey] = {
+            perc: parseFloat(updatedOutputQuantity[j][i]),
+            pol: polarity,
+            imp: 1,
+          };
+        }
+        data.S[dynamicKey2].case = {
+          perc: parseFloat(updatedOutputQuantity[j][0]),
+          pol: translatePolarity(allSelectedValues[j][0]),
+        };
+        data.S[dynamicKey2].amp = parseFloat(allTotalAmplitudes[j]);
+        // data.S[dynamicKey2].frequency = parseFloat(
+        //   allStimulationParameters[j].parameter2,
+        // );
+        // data.S[dynamicKey2].pulseWidth = parseFloat(
+        //   allStimulationParameters[j].parameter1,
+        // );
+        data.S[dynamicKey2].va = 2;
+        if (allPercAmpToggles[j] === 'V') {
+          data.S[dynamicKey2].va = 1;
+        }
+        activeArray.push(j);
+        leftAmpArray[j] = parseFloat(allTotalAmplitudes[j]);
+        // console.log(activeContacts(allSelectedValues[j]));
+        leftHemiArr[j - 1] = activeContacts(allSelectedValues[j]);
+        data.S.activecontacts[j - 1] = activeContacts(allSelectedValues[j]);
+        // console.log(data.S.activecontacts);
+      } else {
+        for (let i = 1; i < loopSize; i++) {
+          let dynamicKey = `k${i + loopSize - 2}`;
+          data.S[dynamicKey2][dynamicKey] = {
+            perc: 0,
+            pol: 0,
+            imp: 1,
+          };
+        }
+        data.S[dynamicKey2].case = {
+          perc: 0,
+          pol: 0,
+        };
+        data.S[dynamicKey2].amp = 0;
+        data.S[dynamicKey2].frequency = 0;
+        data.S[dynamicKey2].pulseWidth = 0;
+        data.S[dynamicKey2].va = 0;
+      }
+    }
+    const leftLength = activeArray.length;
+    const newActiveArray = [];
+    const rightAmpArray = [];
+
+    for (let j = 1; j < 5; j++) {
+      let dynamicKey2 = `Rs${j}`;
+      if (allSelectedValues[j + 4] && updatedOutputQuantity[j + 4]) {
+        for (let i = 1; i < loopSize; i++) {
+          let polarity = 0;
+          if (allSelectedValues[j + 4][i] === 'left') {
+            polarity = 0;
+          } else if (allSelectedValues[j + 4][i] === 'center') {
+            polarity = 1;
+          } else if (allSelectedValues[j + 4][i] === 'right') {
+            polarity = 2;
+          }
+          let dynamicKey = `k${i - 1}`;
+          data.S[dynamicKey2][dynamicKey] = {
+            perc: parseFloat(updatedOutputQuantity[j + 4][i]),
+            pol: polarity,
+            imp: 1,
+          };
+        }
+        data.S[dynamicKey2].case = {
+          perc: parseFloat(updatedOutputQuantity[j + 4][0]),
+          pol: translatePolarity(allSelectedValues[j + 4][0]),
+        };
+        data.S[dynamicKey2].amp = parseFloat(allTotalAmplitudes[j + 4]);
+        // data.S[dynamicKey2].frequency = parseFloat(
+        //   allStimulationParameters[j + 4].parameter2,
+        // );
+        // data.S[dynamicKey2].pulseWidth = parseFloat(
+        //   allStimulationParameters[j + 4].parameter1,
+        // );
+        data.S[dynamicKey2].va = 2;
+        if (allPercAmpToggles[j + 4] === 'V') {
+          data.S[dynamicKey2].va = 1;
+        }
+        activeArray.push(j + 4);
+        newActiveArray.push(j);
+        console.log('All Selected Values: ', j);
+        // rightHemiArr[j - 1] = activeContacts(allSelectedValues[j]);
+        data.S.activecontacts[j + 3] = activeContacts(allSelectedValues[j + 4]);
+        // rightAmpArray[j + 4] = parseFloat(allTotalAmplitudes[j + 4]);
+      } else {
+        for (let i = 1; i < loopSize; i++) {
+          let dynamicKey = `k${i - 1}`;
+          data.S[dynamicKey2][dynamicKey] = {
+            perc: 0,
+            pol: 0,
+            imp: 1,
+          };
+        }
+        data.S[dynamicKey2].case = {
+          perc: 0,
+          pol: 0,
+        };
+        data.S[dynamicKey2].amp = 0;
+        data.S[dynamicKey2].frequency = 0;
+        data.S[dynamicKey2].pulseWidth = 0;
+        data.S[dynamicKey2].va = 0;
+      }
+    }
+    // data.S.activecontacts.push(rightHemiArr);
+    // data.S.activecontacts.push(leftHemiArr);
+    // const totalAmpArray = leftAmpArray.push(rightAmpArray);
+    // data.S.amplitude{1} = leftAmpArray;
+    // data.S.amplitude{2} = rightAmpArray;
+    const leftAmplitude = [];
+    const rightAmplitude = [];
+    for (let i = 1; i < 5; i++) {
+      if (allTotalAmplitudes[i]) {
+        leftAmplitude.push(parseFloat(allTotalAmplitudes[i]));
+      } else {
+        leftAmplitude.push(0);
+      }
+    }
+    for (let i = 5; i < 9; i++) {
+      if (allTotalAmplitudes[i]) {
+        rightAmplitude.push(parseFloat(allTotalAmplitudes[i]));
+      } else {
+        rightAmplitude.push(0);
+      }
+    }
+    data.S.amplitude = { rightAmplitude, leftAmplitude };
+    // data.S.amplitude = exportAmplitudeData;
+    // console.log(exportAmplitudeData);
+    const sourcesArray = activeArray;
+    const rightLength = newActiveArray.length;
+    data.S.sources = sourcesArray;
+    data.S.active = [leftLength, rightLength];
+    // data.S.activecontacts = activeContacts(allSelectedValues[1]);
+
+    for (let i = 1; i < 9; i++) {
+      const zerosArr = [];
+      for (let j = 1; j < loopSize; j++) {
+        zerosArr.push(0);
+      }
+      if (data.S.activecontacts[i-1]) {
+        if (data.S.activecontacts[i-1] === null) {
+          data.S.activecontacts[i-1] = zerosArr;
+        }
+      } else {
+        data.S.activecontacts[i-1] = zerosArr;
+      }
+    }
+
+    let exportVisModel = '';
+    // visModel[1] = visModel;
+    // console.log(visModel[1]);
+    if (visModel === '1') {
+      console.log('here');
+      exportVisModel = 'Dembek 2017';
+    } else if (visModel === '2') {
+      exportVisModel = 'Fastfield (Baniasadi 2020)';
+    } else if (visModel === '3') {
+      exportVisModel = 'SimBio/FieldTrip (see Horn 2017)';
+    } else if (visModel === '4') {
+      exportVisModel = 'Kuncel 2008';
+    } else if (visModel === '5') {
+      exportVisModel = 'Maedler 2012';
+    } else if (visModel === '6') {
+      exportVisModel = 'OSS-DBS (Butenko 2020)';
+    }
+    // console.log('export vis model', exportVisModel);
+    data.S.model = exportVisModel;
+    // if (Array.isArray(data.S.activecontacts) && data.S.activecontacts.length > 0 && data.S.activecontacts[0] === undefined) {
+    //   data.S.activecontacts.shift();
+    // }
+    console.log(data.S.activecontacts);
     return data;
   };
 
@@ -1037,8 +1773,9 @@ function TabbedElectrodeIPGSelection({
   };
 
   const sendDataToMain = () => {
-    const outputData = gatherExportedData4();
-    window.electron.ipcRenderer.sendMessage('save-file', outputData);
+    const outputData = gatherExportedData5();
+    console.log('OUTPUTDATA: ', outputData);
+    window.electron.ipcRenderer.sendMessage('save-file', filePath, outputData);
     window.electron.ipcRenderer.sendMessage('close-window');
     // window.electron.ipcRenderer.sendMessage('close-window');
 
@@ -1046,6 +1783,15 @@ function TabbedElectrodeIPGSelection({
     window.electron.ipcRenderer.on('window-closed', (event, arg) => {
       console.log(arg); // Prints "Window closed" if received from the main process
     });
+  };
+
+  const closeFunction = () => {
+    window.electron.ipcRenderer.sendMessage('close-window-new');
+  };
+
+  const quitApp = () => {
+    // window.electron.ipcRenderer.sendMessage('set-status');
+    window.electron.ipcRenderer.sendMessage('close-window');
   };
 
   const gatherImportedData = (jsonData) => {
@@ -1090,9 +1836,23 @@ function TabbedElectrodeIPGSelection({
     if (importedData) {
       gatherImportedData(importedData);
     }
-    handleTabChange('1');
+    // handleTabChange('1');
+    console.log('Tabbed all quantities: ', allQuantities);
+    if (stimChanged) {
+      handleTabChange(key);
+      setStimChanged(false);
+    }
   }, [importedData]);
 
+  // useEffect(() => {
+  //   if (stimChanged) {
+  //     console.log('STIMCHANGED: ', stimChanged);
+  //     console.log('Tabbed all quantities: ', allQuantities);
+  //     handleTabChange(key);
+  //     // setAllQuantities(allQuantities);
+  //     setStimChanged(false);
+  //   }
+  // });
   // const data = 'hello';
   // function handleMatlabConnectivity() {
   //   window.electron.ipcRenderer.send('trigger-matlab-action', data);
@@ -1100,11 +1860,86 @@ function TabbedElectrodeIPGSelection({
 
   return (
     <div>
+      <div style={{ marginTop: '30px' }}></div>
+      {/* <div>
+        <h4>Contact Naming Convention</h4>
+        <ButtonGroup>
+          {namingConventionDef.map((name, idx) => (
+            <ToggleButton
+              key={idx}
+              id={`volAmp-${idx}`}
+              type="radio"
+              variant={getVariant(name.value)}
+              name="name"
+              value={name.value}
+              checked={namingConvention === name.value}
+              onChange={(e) => handleNamingConventionChange(e.currentTarget.value)}
+            >
+              {name.name}
+            </ToggleButton>
+          ))}
+        </ButtonGroup>
+      </div> */}
+      <div className="stimCloseContainer">
+        {/* <button className="export-button" onClick={sendDataToMain}>
+            Stimulate and Close
+          </button> */}
+        {/* <button className="export-button" onClick={quitApp}>
+            Close
+          </button> */}
+      </div>
       <Tabs className="tabs-container">
         <TabList className="tabs-container">
-          <Tab onClick={() => handleTabChange('1')}>Left Hemisphere</Tab>
           <Tab onClick={() => handleTabChange('5')}>Right Hemisphere</Tab>
+          <Tab onClick={() => handleTabChange('1')}>Left Hemisphere</Tab>
         </TabList>
+        <TabPanel>
+          <Tabs>
+            <TabList>
+              <Tab key="5" onClick={() => handleTabChange('5')}>
+                Program 1
+              </Tab>
+              <Tab key="6" onClick={() => handleTabChange('6')}>
+                Program 2
+              </Tab>
+              <Tab key="7" onClick={() => handleTabChange('7')}>
+                Program 3
+              </Tab>
+              <Tab key="8" onClick={() => handleTabChange('8')}>
+                Program 4
+              </Tab>
+            </TabList>
+            {hemisphereData.right.map((tabState, index) => (
+              <TabPanel key={index}>
+                {/* <div className = "compact-input-container"> */}
+                {/* <h2>Unit:</h2> */}
+                {/* <select
+                  value={tabState.unit}
+                  onChange={(e) => handleUnitChange(e, index, 'right')}
+                >
+                  <option value="V">V</option>
+                  <option value="mA">mA</option>
+                </select>
+                <input
+                  // type="text"
+                  type="number"
+                  pattern="[0-9]+"
+                  value={tabState.value}
+                  onChange={(e) => handleValueChange(e, index, 'right')}
+                  placeholder={`Enter value in ${tabState.unit}`}
+                /> */}
+                {/* </div> */}
+                <div className="form-container">
+                  {testElectrodeOptions[selectedElectrodeRight]}
+                  <div className="electrode-label">
+                    {convertElectrode(selectedElectrodeRight)}
+                  </div>
+                </div>
+              </TabPanel>
+            ))}
+          </Tabs>
+        </TabPanel>
+
         <TabPanel>
           <Tabs>
             {/* <Tabs onClick={handleChange}> */}
@@ -1142,50 +1977,9 @@ function TabbedElectrodeIPGSelection({
                 /> */}
                 <div className="form-container">
                   {testElectrodeOptions[selectedElectrodeLeft]}
-                </div>
-              </TabPanel>
-            ))}
-          </Tabs>
-        </TabPanel>
-
-        <TabPanel>
-          <Tabs>
-            <TabList>
-              <Tab key="5" onClick={() => handleTabChange('5')}>
-                Program 1
-              </Tab>
-              <Tab key="6" onClick={() => handleTabChange('6')}>
-                Program 2
-              </Tab>
-              <Tab key="7" onClick={() => handleTabChange('7')}>
-                Program 3
-              </Tab>
-              <Tab key="8" onClick={() => handleTabChange('8')}>
-                Program 4
-              </Tab>
-            </TabList>
-            {hemisphereData.right.map((tabState, index) => (
-              <TabPanel key={index} className="compact-tab-panel">
-                {/* <div className = "compact-input-container"> */}
-                {/* <h2>Unit:</h2> */}
-                {/* <select
-                  value={tabState.unit}
-                  onChange={(e) => handleUnitChange(e, index, 'right')}
-                >
-                  <option value="V">V</option>
-                  <option value="mA">mA</option>
-                </select>
-                <input
-                  // type="text"
-                  type="number"
-                  pattern="[0-9]+"
-                  value={tabState.value}
-                  onChange={(e) => handleValueChange(e, index, 'right')}
-                  placeholder={`Enter value in ${tabState.unit}`}
-                /> */}
-                {/* </div> */}
-                <div className="form-container">
-                  {testElectrodeOptions[selectedElectrodeRight]}
+                  <div className="electrode-label">
+                    {convertElectrode(selectedElectrodeLeft)}
+                  </div>
                 </div>
               </TabPanel>
             ))}
@@ -1205,16 +1999,29 @@ function TabbedElectrodeIPGSelection({
           type="file"
           accept=".json"
           onChange={handleFileChange}
-          style={{ display: 'none' }} // Hide the input element
+          style={{ display: 'none' }}
+          // Hide the input element
         />
-        <button className="export-button" onClick={gatherExportedData2}>
+        {/* <button className="export-button" onClick={gatherExportedData2}>
           Visualize
         </button>
         <button className="export-button" onClick={handleClick}>
           Visualize Webserver
+        </button> */}
+        {/* <button onClick={handleIPGForOutput}>IPG Output</button> */}
+        {/* <button className="export-button" onClick={sendDataToMain}>
+          Stimulate
         </button>
-        <button className="export-button" onClick={sendDataToMain}>
-          Visualize File
+        <button className="export-button" onClick={quitApp}>
+          Close
+        </button> */}
+      </div>
+      <div style={{ textAlign: 'center', paddingBottom: '35px' }}>
+        <button className="export-button-final-discard" onClick={closeFunction} style={{marginRight: '15px'}}>
+          Discard and Close
+        </button>
+        <button className="export-button-final" onClick={sendDataToMain}>
+          Stimulate and Close
         </button>
       </div>
     </div>
