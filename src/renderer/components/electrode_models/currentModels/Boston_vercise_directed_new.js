@@ -3768,7 +3768,11 @@ function Boston_vercise_directed_new(props, ref) {
       </div>
       {showViewer && (
         <div style={{ minWidth: '500px' }}>
-          <PlyViewer quantities={quantities} amplitude={totalAmplitude} />
+          <PlyViewer
+            quantities={quantities}
+            amplitude={totalAmplitude}
+            side={props.name}
+          />
         </div>
       )}
     </div>

@@ -268,6 +268,24 @@ ipcMain.on(
   },
 );
 
+ipcMain.on('import-ply-file', (event, side) => {
+  const fs = require('fs');
+  let elecFilePath = '';
+  const structureFilePath =
+    '/Volumes/Expansion/OLD/Output/Patient0316Output/derivatives/leaddbs/sub-CbctDbs0316/export/ply/anatomy.ply';
+  if (side < 5) {
+    elecFilePath =
+      '/Volumes/Expansion/OLD/Output/Patient0316Output/derivatives/leaddbs/sub-CbctDbs0316/export/ply/left_electrode.ply';
+  } else {
+    elecFilePath =
+      '/Volumes/Expansion/OLD/Output/Patient0316Output/derivatives/leaddbs/sub-CbctDbs0316/export/ply/right_electrode.ply';
+  }
+
+  const elecData = fs.readFileSync(elecFilePath);
+  const structureData = fs.readFileSync(structureFilePath);
+  event.reply('import-ply-file', elecData, structureData);
+});
+
 ipcMain.on('import-previous-files', (event, fileID, importData) => {
   // console.log(fileID);
   // const masterImportData = importData.priorStims;
@@ -1173,7 +1191,8 @@ const createWindow = async () => {
   // Viewer
 
   ipcMain.on('load-ply-file', async (event, directoryPath) => {
-    const filePath = '/Volumes/Expansion/OLD/Output/Patient0117Output/derivatives/leaddbs/sub-CbctDbs0117/export/ply/combined_scene.ply';
+    const filePath =
+      '/Volumes/Expansion/OLD/Output/Patient0117Output/derivatives/leaddbs/sub-CbctDbs0117/export/ply/combined_scene.ply';
     console.log(filePath);
     try {
       const fileData = fs.readFileSync(filePath, 'utf8'); // read the PLY file
