@@ -21,7 +21,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '20
 
       - name: Install dependencies
         run: npm install
@@ -35,5 +35,5 @@ jobs:
       - name: Upload the packaged app as a build artifact
         uses: actions/upload-artifact@v2
         with:
-          name: electron-app
+          name: LeadDBSProgrammer
           path: release/build/
