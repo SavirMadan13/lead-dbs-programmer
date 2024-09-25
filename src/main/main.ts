@@ -1,3 +1,4 @@
+/* eslint-disable func-names */
 /* eslint global-require: off, no-console: off, promise/always-return: off */
 
 /**
@@ -39,33 +40,33 @@ let mainWindow: BrowserWindow | null = null;
 let stimulationDirectory = '';
 const patientID = '';
 
-const startServer = () => {
-  // Start the Express server in a child process
-  const serverProcess = childProcess.spawn('node', ['dist/server.js'], {
-    cwd: path.join(__dirname, '../'), // Adjust the path as needed
-    stdio: 'inherit',
-  });
+// const startServer = () => {
+//   // Start the Express server in a child process
+//   const serverProcess = childProcess.spawn('node', ['dist/server.js'], {
+//     cwd: path.join(__dirname, '../'), // Adjust the path as needed
+//     stdio: 'inherit',
+//   });
 
-  serverProcess.on('error', (err) => {
-    console.error('Failed to start server:', err);
-  });
+//   serverProcess.on('error', (err) => {
+//     console.error('Failed to start server:', err);
+//   });
 
-  serverProcess.on('exit', (code, signal) => {
-    console.log('Server process exited with code:', code);
-  });
+//   serverProcess.on('exit', (code, signal) => {
+//     console.log('Server process exited with code:', code);
+//   });
 
-  return serverProcess;
-};
+//   return serverProcess;
+// };
 
-app
-  .whenReady()
-  .then(() => {
-    // Start Express server
-    const serverProcess = startServer();
+// app
+//   .whenReady()
+//   .then(() => {
+//     // Start Express server
+//     const serverProcess = startServer();
 
-    // Create window and other initialization code...
-  })
-  .catch(console.error);
+//     // Create window and other initialization code...
+//   })
+//   .catch(console.error);
 
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;

@@ -251,7 +251,6 @@ export default function App() {
               element={
                 <div style={{ maxWidth: '1000px' }}>
                   {/* <PlyViewer /> */}
-                  <PlyViewer />
                 </div>
               }
             />
