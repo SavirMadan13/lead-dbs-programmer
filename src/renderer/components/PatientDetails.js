@@ -281,9 +281,9 @@ function PatientDetails({ directoryPath, leadDBS }) {
           Add Clinical Scores
         </button>
       </div>
-      <button className="back-button" onClick={() => navigate('/viewer')}>
+      {/* <button className="back-button" onClick={() => navigate('/viewer')}>
           Go To Viewer
-        </button>
+        </button> */}
 
       {/* Quick Add Timelines Section */}
       <h2 className="section-title">Quick Add Session</h2>
