@@ -2,14 +2,14 @@
 import React, { useState, useEffect } from 'react';
 // import './App.css';
 
-import Dropdown from 'react-bootstrap/dropdown';
+// import Dropdown from 'react-bootstrap/dropdown';
 import { Slider } from '@mui/material';
 import TabbedElectrodeIPGSelectionTest from './TabbedElectrodeIPGSelectionTest';
 // import Navbar from './components/Navbar';
 // import Navbar from 'react-bootstrap/Navbar'
 import StimulationSettings from './StimulationSettings';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { ButtonGroup, Button } from 'react-bootstrap';
+import { ButtonGroup, Button, Dropdown } from 'react-bootstrap';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
 import { render } from '@testing-library/react';
