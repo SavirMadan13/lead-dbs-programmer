@@ -605,7 +605,7 @@ function PatientDatabase({ key, directoryPath }) {
       </Typography>
 
       {/* Search Bar */}
-      <div className="search-container" style={{ textAlign: 'right' }}>
+      <div className="search-container" style={{ textAlign: 'right', marginLeft: '30px' }}>
         <TextField
           label="Search"
           variant="outlined"
@@ -628,6 +628,7 @@ function PatientDatabase({ key, directoryPath }) {
             padding: '10px 20px',
             marginBottom: '20px',
             width: '150px',
+            marginLeft: '30px',
           }}
         >
           Add Patient
