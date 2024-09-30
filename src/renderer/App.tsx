@@ -115,6 +115,7 @@ import Programmer from './Programmer';
 import ClinicalScores from './components/ClinicalScores';
 import PlyViewer from './components/PlyViewer';
 import PlyViewerWithVTA from './components/PlyViewerWithVTA';
+import CustomTable from './components/CustomTable';
 
 export default function App() {
   const [directoryPath, setDirectoryPath] = useState(null);
@@ -251,6 +252,15 @@ export default function App() {
               element={
                 <div style={{ maxWidth: '1000px' }}>
                   {/* <PlyViewer /> */}
+                </div>
+              }
+            />
+            <Route
+              path="/custom-table"
+              element={
+                <div style={{ maxWidth: '1000px' }}>
+                  {/* <PlyViewer /> */}
+                  <CustomTable />
                 </div>
               }
             />

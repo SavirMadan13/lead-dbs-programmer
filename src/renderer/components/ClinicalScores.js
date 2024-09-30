@@ -488,6 +488,9 @@ function ClinicalScores() {
       <button className="export-button-final" onClick={sendDataToMain}>
         Save Clinical Scores
       </button>
+      {/* <button onClick={() => navigate('/custom-table')}>
+        Add custom table
+      </button> */}
     </div>
   );
 }

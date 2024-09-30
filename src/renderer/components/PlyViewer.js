@@ -638,7 +638,7 @@ function PlyViewer({ quantities, amplitude, side }) {
       )}
       <div>
         <Tabs
-          defaultActiveKey="profile"
+          defaultActiveKey="tremor"
           id="uncontrolled-tab-example"
           className="mb-3"
         >
@@ -651,12 +651,12 @@ function PlyViewer({ quantities, amplitude, side }) {
               ))}
             </select>
           </Tab>
-          <Tab eventKey="profile" title="Profile">
-            Tab content for Profile
+          <Tab eventKey="PD" title="PD">
+            Hotspots for PD
           </Tab>
-          <Tab eventKey="contact" title="Contact" disabled>
+          {/* <Tab eventKey="contact" title="Contact" disabled>
             Tab content for Contact
-          </Tab>
+          </Tab> */}
         </Tabs>
       </div>
       <div ref={mountRef} style={viewerStyle} />
