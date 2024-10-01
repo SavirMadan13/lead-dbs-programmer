@@ -1191,16 +1191,34 @@ const createWindow = async () => {
 
   // Viewer
 
-  ipcMain.on('load-ply-file', async (event, directoryPath) => {
+  // ipcMain.on('load-ply-file', async (event, directoryPath) => {
+  //   const filePath =
+  //     '/Users/savirmadan/Desktop/right_electrode.ply';
+  //   console.log(filePath);
+  //   try {
+  //     const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
+  //     return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
+  //   } catch (error) {
+  //     console.error('Error loading PLY file:', error);
+  //     event.reply('load-ply-file-error', 'Failed to load PLY file'); // send error to renderer process
+  //   }
+  // });
+
+  ipcMain.handle('load-ply-file', async (event, directoryPath) => {
     const filePath =
-      '/Volumes/Expansion/OLD/Output/Patient0117Output/derivatives/leaddbs/sub-CbctDbs0117/export/ply/combined_scene.ply';
+    '/Volumes/Expansion/OLD/Output/Patient0316Output/derivatives/leaddbs/sub-CbctDbs0316/export/ply/combined_scene.ply';
     console.log(filePath);
+    const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
+    return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
+  });
+
+  ipcMain.handle('load-ply-file-2', async (event, filePath) => {
     try {
-      const fileData = fs.readFileSync(filePath, 'utf8'); // read the PLY file
-      event.reply('load-ply-file', fileData); // send the file contents back to renderer process
+      const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
+      return fileData.buffer; // Return as ArrayBuffer
     } catch (error) {
-      console.error('Error loading PLY file:', error);
-      event.reply('load-ply-file-error', 'Failed to load PLY file'); // send error to renderer process
+      console.error('Error reading file:', error);
+      return null;
     }
   });
 

@@ -117,7 +117,7 @@
     "react-plotly.js": "^2.6.0",
     "react-router-dom": "^6.16.0",
     "react-tabs": "^6.0.2",
-    "three": "^0.168.0",
+    "three": "^0.169.0",
     "three-stdlib": "^2.33.0",
     "xlsx": "^0.18.5"
   },

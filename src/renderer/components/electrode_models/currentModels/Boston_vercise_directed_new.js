@@ -3746,7 +3746,9 @@ function Boston_vercise_directed_new(props, ref) {
             <Button onClick={handleClearButton} className="button">
               Clear
             </Button>
-            <Button onClick={handleOpenViewer} className="button">Open Viewer</Button>
+            <Button onClick={handleOpenViewer} className="button">
+              Open Viewer
+            </Button>
           </ButtonGroup>
           {/* <NewTripleToggle /> */}
           {/* <button
@@ -3766,8 +3768,30 @@ function Boston_vercise_directed_new(props, ref) {
           <PlyViewer quantities={quantities} values={selectedValues} />
         )} */}
       </div>
-      {showViewer && (
+      {/* {showViewer && (
         <div style={{ minWidth: '500px' }}>
+          <PlyViewer
+            quantities={quantities}
+            amplitude={totalAmplitude}
+            side={props.name}
+          />
+        </div>
+      )} */}
+      {showViewer && (
+        <div
+          style={{
+            width: '1000px', // Makes the container flexible in size
+            margin: '20px auto', // Centers the div and adds spacing around it
+            padding: '15px', // Adds internal spacing
+            border: '2px solid #ccc', // Adds a subtle border
+            borderRadius: '10px', // Rounds the corners
+            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // Adds shadow for depth
+            backgroundColor: '#f9f9f9', // Soft background color
+            display: 'flex', // Flex layout for responsive adjustments
+            justifyContent: 'center', // Centers content inside the div
+            alignItems: 'center', // Vertically aligns content in the middle
+          }}
+        >
           <PlyViewer
             quantities={quantities}
             amplitude={totalAmplitude}
