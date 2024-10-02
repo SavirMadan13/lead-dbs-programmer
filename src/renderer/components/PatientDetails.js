@@ -8,6 +8,8 @@ import { RichTreeView } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { PatientContext } from './PatientContext';
+// import NiivueViewer from './NiivueViewer';
+// import NiftiViewer from './NiftiViewer';
 
 function PatientDetails({ directoryPath, leadDBS }) {
   const location = useLocation();
@@ -226,6 +228,8 @@ function PatientDetails({ directoryPath, leadDBS }) {
     }
   };
 
+  const [niiVue, setNiiVue] = useState(false);
+
   return (
     <div className="patient-details">
       {/* Section Title */}
@@ -350,6 +354,12 @@ function PatientDetails({ directoryPath, leadDBS }) {
       <button className="back-button" onClick={() => navigate('/')}>
         Back to Table
       </button>
+      <button onClick={() => setNiiVue(!niiVue)}>Show NiivueViewer</button>
+      {/* {niiVue && (
+        <div>
+          <NiftiViewer />
+        </div>
+      )} */}
       {/* <button className="export-button" onClick={() => handleAddStimulationParameters(timeline)}>Add Stimulation Parameters</button>
       <button className="export-button" onClick={() => handleAddClinicalScores(timeline)}>Add Clinical Scores</button> */}
     </div>

@@ -110,6 +110,7 @@
     "express": "^4.18.2",
     "html2pdf.js": "^0.10.1",
     "nifti-reader-js": "^0.6.8",
+    "niivue-react": "github:niivue/niivue-react",
     "react": "^18.2.0",
     "react-bootstrap": "^2.9.2",
     "react-dom": "^18.2.0",
@@ -119,6 +120,7 @@
     "react-tabs": "^6.0.2",
     "three": "^0.169.0",
     "three-stdlib": "^2.33.0",
+    "use-immer": "^0.10.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

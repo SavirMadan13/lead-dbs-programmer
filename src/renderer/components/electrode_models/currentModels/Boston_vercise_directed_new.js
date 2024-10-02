@@ -3747,7 +3747,7 @@ function Boston_vercise_directed_new(props, ref) {
               Clear
             </Button>
             <Button onClick={handleOpenViewer} className="button">
-              Open Viewer
+              {showViewer ? 'Close Viewer' : 'Open Viewer'}
             </Button>
           </ButtonGroup>
           {/* <NewTripleToggle /> */}
