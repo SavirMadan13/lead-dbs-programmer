@@ -412,9 +412,9 @@ function ClinicalScores() {
             {timeline}
           </div>
           <Container>
-            <Button variant="primary" onClick={addPatient} className="mb-4">
+            {/* <Button variant="primary" onClick={addPatient} className="mb-4">
               Add Patient
-            </Button>
+            </Button> */}
             <Button
               variant="secondary"
               onClick={() => document.getElementById('baseline-upload').click()}

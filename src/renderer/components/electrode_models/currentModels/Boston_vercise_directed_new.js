@@ -47,6 +47,7 @@ import VolumeAmplitudeToggle from '../../VoltageAmplitudeToggle';
 import MAToggleSwitch from '../../MAToggleSwitch';
 import NewTripleToggle from '../../NewTripleToggle';
 import PlyViewer from '../../PlyViewer';
+import { PartyMode } from '@mui/icons-material';
 
 function Boston_vercise_directed_new(props, ref) {
   const svgs = [
@@ -3240,6 +3241,74 @@ function Boston_vercise_directed_new(props, ref) {
     setShowViewer(!showViewer);
   };
 
+  // Trying out input parameters
+  const [paramInput, setParamInput] = useState('');
+
+  // Helper function to get contacts for a given level
+  function getContactsForLevel(level, activeLetters) {
+    const contactMap = {
+      0: { a: 1 }, // Contacts at level 1
+      1: { a: 2, b: 3, c: 4 }, // Contacts at level 2
+      2: { a: 5, b: 6, c: 7 },
+      3: { a: 8 },        // Contacts at level 3 (only a and b here)
+    };
+
+    const fullRange = Object.values(contactMap[level]);
+
+    // If no active letters (e.g., "1-"), return the full range of contacts for the level
+    if (!activeLetters || activeLetters === 'abc') {
+      return fullRange;
+    }
+
+    // Otherwise, return only the contacts specified by the letters (e.g., "ac")
+    return activeLetters.split('').map(letter => contactMap[level][letter]);
+  }
+
+
+  // Function to parse input string and update quantities and selectedValues arrays
+  const parseInput = (input) => {
+    // Initialize arrays for quantities and selectedValues
+    const updatedQuantities = { ...quantities };
+    const updatedSelectedValues = { ...selectedValues };
+    // Split the input by '/'
+
+    for (let i = 0; i < 9; i++) {
+      updatedQuantities[i] = 0;
+      updatedSelectedValues[i] = 'left';
+    }
+
+    const parts = input.split('/');
+
+    parts.forEach((part) => {
+      part = part.trim();
+      console.log(part);
+      if (part.match(/[1-3][a-c]*-/)) {
+        // Extract the contact level and the active contacts (e.g., "1ac-")
+        const contactLevel = parseInt(part[0]); // The first character is the level number
+        const activeLetters = part.slice(1, -1); // Get the letters (if any), skipping the last '-'
+
+        const contactRange = getContactsForLevel(contactLevel, activeLetters);
+        const numActiveContacts = contactRange.length;
+
+        // Set quantities evenly distributed among active contacts and set polarity
+        contactRange.forEach((contact) => {
+          updatedQuantities[contact] = 100 / numActiveContacts; // Even distribution for active contacts
+          updatedSelectedValues[contact] = 'center'; // '-' corresponds to 'center'
+        });
+      } else if (part.includes('C+')) {
+        // C+ refers to contact[0] with polarity 'right' and 100%
+        updatedQuantities[0] = 100; // 100% for C
+        updatedSelectedValues[0] = 'right'; // '+' corresponds to 'right'
+      }
+    });
+    setQuantities(updatedQuantities);
+    setSelectedValues(updatedSelectedValues);
+  };
+
+  const handleInputParamButton = () => {
+    const parsedResult = parseInput(paramInput);
+  };
+
   useEffect(() => {
     if (props.IPG === 'Abbott') {
       // const newQuantities = { ...quantities };
@@ -3283,6 +3352,7 @@ function Boston_vercise_directed_new(props, ref) {
     semiAssist,
     handleActivaVoltage,
   ]);
+
   /// //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   return (
@@ -3750,6 +3820,20 @@ function Boston_vercise_directed_new(props, ref) {
               {showViewer ? 'Close Viewer' : 'Open Viewer'}
             </Button>
           </ButtonGroup>
+          <Form>
+            <Form.Group>
+              {/* <Form.Label>Enter DBS Parameters (e.g., "2- / C+")</Form.Label> */}
+              <Form.Control
+                type="text"
+                placeholder="Enter parameters"
+                value={paramInput}
+                onChange={(e) => setParamInput(e.target.value)}
+              />
+            </Form.Group>
+            <Button variant="primary" onClick={handleInputParamButton}>
+              Submit
+            </Button>
+          </Form>
           {/* <NewTripleToggle /> */}
           {/* <button
             onClick={calculateQuantitiesWithDistribution}

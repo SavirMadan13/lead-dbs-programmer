@@ -4,9 +4,8 @@ import * as THREE from 'three';
 import { PLYLoader, OrbitControls } from 'three-stdlib';
 import * as nifti from 'nifti-reader-js'; // Correctly importing the nifti module
 import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
-import Tab from 'react-bootstrap/Tab';
-import Tabs from 'react-bootstrap/Tabs';
-import Form from 'react-bootstrap/Form';
+import { Tabs, Tab, Collapse, Button, Form } from 'react-bootstrap';
+import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings icon
 
 function PlyViewer({ quantities, amplitude, side }) {
   const [plyFile, setPlyFile] = useState(null);
@@ -21,6 +20,7 @@ function PlyViewer({ quantities, amplitude, side }) {
   const [meshProperties, setMeshProperties] = useState({}); // State for each mesh's properties like visibility and opacity
   const rendererRef = useRef(null); // To store the renderer reference
   const cameraRef = useRef(null); // To store the camera reference
+  const [open, setOpen] = useState(false);
 
   // Thresholding/Modification stuff
 
@@ -692,83 +692,91 @@ function PlyViewer({ quantities, amplitude, side }) {
       <div style={viewerContainerStyle}>
         <div ref={mountRef} />
 
-        <Tabs
-          defaultActiveKey="atlases"
-          id="mesh-controls-tab"
-          className="mb-3"
+        <Button
+          variant="outline-secondary"
+          onClick={() => setOpen(!open)}
+          aria-controls="tabs-collapse"
+          aria-expanded={open}
+          style={{ marginBottom: '10px' }}
         >
-          <Tab eventKey="meshes" title="Meshes">
-            <div style={controlPanelStyle}>
-              {meshes.map((mesh, index) => (
-                <div key={mesh.name} style={meshControlStyle}>
-                  <h5 style={meshNameStyle}>{mesh.name}</h5>
-                  <h3 style={{ fontSize: '12px' }}>Visibility</h3>
-                  <Form.Check
-                    type="switch"
-                    // label="Visible"
-                    checked={meshProperties[mesh.name]?.visible}
-                    onChange={() => handleVisibilityChange(mesh.name)}
-                  />
-                  {/* <Form.Label>Opacity</Form.Label> */}
-                  <h3 style={{ fontSize: '12px' }}>Opacity</h3>
-                  <Form.Range
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    value={meshProperties[mesh.name]?.opacity || 0.8}
-                    onChange={(e) =>
-                      handleOpacityChange(mesh.name, parseFloat(e.target.value))
-                    }
-                    style={{ width: '150px' }} // Adjust the width to your preference
-                  />
-                  {/* <h3 style={{ fontSize: '12px' }}>Thresholding</h3>
-                  <Form.Range
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    value={meshProperties[mesh.name]?.opacity || 0.8}
-                    onChange={(e) =>
-                      handleThresholdChange(mesh.name, parseFloat(e.target.value))
-                    }
-                    style={{ width: '150px' }} // Adjust the width to your preference
-                  /> */}
+          <SettingsIcon />
+        </Button>
+
+        <Collapse in={open}>
+          <div id="tabs-collapse">
+            <Tabs
+              defaultActiveKey="meshes"
+              id="mesh-controls-tab"
+              className="mb-3"
+            >
+              {/* Tab for Meshes */}
+              <Tab eventKey="meshes" title="Meshes">
+                <div style={controlPanelStyle}>
+                  {meshes.map((mesh, index) => (
+                    <div key={mesh.name} style={meshControlStyle}>
+                      <h5 style={meshNameStyle}>{mesh.name}</h5>
+                      <h3 style={{ fontSize: '12px' }}>Visibility</h3>
+                      <Form.Check
+                        type="switch"
+                        checked={meshProperties[mesh.name]?.visible}
+                        onChange={() => handleVisibilityChange(mesh.name)}
+                      />
+                      <h3 style={{ fontSize: '12px' }}>Opacity</h3>
+                      <Form.Range
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        value={meshProperties[mesh.name]?.opacity || 0.8}
+                        onChange={(e) =>
+                          handleOpacityChange(
+                            mesh.name,
+                            parseFloat(e.target.value),
+                          )
+                        }
+                        style={{ width: '150px' }}
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </Tab>
-          <Tab eventKey="atlases" title="Atlases">
-            <div style={controlPanelStyle2}>
-              <select onChange={handleFileChange} multiple>
-                {plyFiles.map((file, index) => (
-                  <option key={index} value={index}>
-                    {file.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </Tab>
-          <Tab eventKey="sweetspots" title="Sweetspots">
-            <Tabs defaultActiveKey="overview" id="nested-tabs-inside">
-              <Tab eventKey="tremor" title="Tremor">
+              </Tab>
+
+              {/* Tab for Atlases */}
+              <Tab eventKey="atlases" title="Atlases">
                 <div style={controlPanelStyle2}>
-                  <h4>Overview</h4>
-                  <select onChange={handleTremorChange} multiple>
-                    {tremorData.map((tremor, index) => (
+                  <select onChange={handleFileChange} multiple>
+                    {plyFiles.map((file, index) => (
                       <option key={index} value={index}>
-                        {tremor.name}
+                        {file.name}
                       </option>
                     ))}
                   </select>
                 </div>
               </Tab>
-              <Tab eventKey="pd" title="PD">
-                <div style={controlPanelStyle2}>
-                  <h4>Coordinates</h4>
-                </div>
+
+              {/* Tab for Sweetspots with nested tabs */}
+              <Tab eventKey="sweetspots" title="Sweetspots">
+                <Tabs defaultActiveKey="tremor" id="nested-tabs-inside">
+                  <Tab eventKey="tremor" title="Tremor">
+                    <div style={controlPanelStyle2}>
+                      <select onChange={handleTremorChange} multiple>
+                        {tremorData.map((tremor, index) => (
+                          <option key={index} value={index}>
+                            {tremor.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </Tab>
+                  <Tab eventKey="pd" title="PD">
+                    <div style={controlPanelStyle2}>
+                      <h4>Coordinates...</h4>
+                    </div>
+                  </Tab>
+                </Tabs>
               </Tab>
             </Tabs>
-          </Tab>
-        </Tabs>
+          </div>
+        </Collapse>
       </div>
     </div>
   );
