@@ -48,6 +48,9 @@ import MAToggleSwitch from '../../MAToggleSwitch';
 import NewTripleToggle from '../../NewTripleToggle';
 import PlyViewer from '../../PlyViewer';
 import { PartyMode } from '@mui/icons-material';
+import IconButton from '@mui/material/IconButton';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { Tooltip as MuiTooltip } from '@mui/material';
 
 function Boston_vercise_directed_new(props, ref) {
   const svgs = [
@@ -3250,7 +3253,7 @@ function Boston_vercise_directed_new(props, ref) {
       0: { a: 1 }, // Contacts at level 1
       1: { a: 2, b: 3, c: 4 }, // Contacts at level 2
       2: { a: 5, b: 6, c: 7 },
-      3: { a: 8 },        // Contacts at level 3 (only a and b here)
+      3: { a: 8 }, // Contacts at level 3 (only a and b here)
     };
 
     const fullRange = Object.values(contactMap[level]);
@@ -3261,9 +3264,8 @@ function Boston_vercise_directed_new(props, ref) {
     }
 
     // Otherwise, return only the contacts specified by the letters (e.g., "ac")
-    return activeLetters.split('').map(letter => contactMap[level][letter]);
+    return activeLetters.split('').map((letter) => contactMap[level][letter]);
   }
-
 
   // Function to parse input string and update quantities and selectedValues arrays
   const parseInput = (input) => {
@@ -3272,41 +3274,156 @@ function Boston_vercise_directed_new(props, ref) {
     const updatedSelectedValues = { ...selectedValues };
     // Split the input by '/'
 
-    for (let i = 0; i < 9; i++) {
-      updatedQuantities[i] = 0;
-      updatedSelectedValues[i] = 'left';
-    }
+    Object.keys(updatedQuantities).forEach((key) => {
+      updatedQuantities[key] = 0;
+      updatedSelectedValues[key] = 'left';
+    });
 
+    let activePlusContacts = []; // Array to store all active '+' contacts
+    let activeMinusContacts = []; // Array to store all active '-' contacts
+    let totalPlusContacts = 0; // Counter for total '+' contacts
+    let totalMinusContacts = 0; // Counter for total '-' contacts
+
+    // Split the input by '/'
     const parts = input.split('/');
 
     parts.forEach((part) => {
       part = part.trim();
-      console.log(part);
-      if (part.match(/[1-3][a-c]*-/)) {
-        // Extract the contact level and the active contacts (e.g., "1ac-")
+
+      if (part.match(/[0-3][a-c]*[+-]/)) {
+        // Extract the contact level, active letters, and polarity (e.g., "1ac-")
         const contactLevel = parseInt(part[0]); // The first character is the level number
-        const activeLetters = part.slice(1, -1); // Get the letters (if any), skipping the last '-'
+        const activeLetters = part.slice(1, -1); // Get the letters (if any), skipping the last '+/-'
+        const polarity = part.slice(-1); // '+' or '-'
 
         const contactRange = getContactsForLevel(contactLevel, activeLetters);
-        const numActiveContacts = contactRange.length;
 
-        // Set quantities evenly distributed among active contacts and set polarity
-        contactRange.forEach((contact) => {
-          updatedQuantities[contact] = 100 / numActiveContacts; // Even distribution for active contacts
-          updatedSelectedValues[contact] = 'center'; // '-' corresponds to 'center'
-        });
+        // Add to the appropriate contact array based on polarity
+        if (polarity === '+') {
+          activePlusContacts = [...activePlusContacts, ...contactRange];
+          totalPlusContacts += contactRange.length;
+        } else if (polarity === '-') {
+          activeMinusContacts = [...activeMinusContacts, ...contactRange];
+          totalMinusContacts += contactRange.length;
+        }
       } else if (part.includes('C+')) {
-        // C+ refers to contact[0] with polarity 'right' and 100%
-        updatedQuantities[0] = 100; // 100% for C
-        updatedSelectedValues[0] = 'right'; // '+' corresponds to 'right'
+        // Handle C+ (contact[0] with polarity 'right')
+        activePlusContacts.push(0);
+        totalPlusContacts++;
+      } else if (part.includes('C-')) {
+        // Handle C- (contact[0] with polarity 'center')
+        activeMinusContacts.push(0);
+        totalMinusContacts++;
       }
     });
+
+    // Set quantities and selectedValues for '+' contacts
+    const plusEvenSplit = 100 / totalPlusContacts;
+    activePlusContacts.forEach((contact) => {
+      updatedQuantities[contact] = plusEvenSplit;
+      updatedSelectedValues[contact] = 'right'; // '+' corresponds to 'right'
+    });
+
+    // Set quantities and selectedValues for '-' contacts
+    const minusEvenSplit = 100 / totalMinusContacts;
+    activeMinusContacts.forEach((contact) => {
+      updatedQuantities[contact] = minusEvenSplit;
+      updatedSelectedValues[contact] = 'center'; // '-' corresponds to 'center'
+    });
+
+    // Split the input by ';' to separate the amplitude part
+    const [contactPart, amplitudePart] = input.split(';');
+    // Process amplitude part (2mA)
+    if (amplitudePart) {
+      const amplitudeMatch = amplitudePart.match(/(\d+\.?\d*)mA/);
+      if (amplitudeMatch) {
+        setTotalAmplitude(parseFloat(amplitudeMatch[1]));
+      }
+    }
+    // Update the state with the new values
     setQuantities(updatedQuantities);
     setSelectedValues(updatedSelectedValues);
   };
 
   const handleInputParamButton = () => {
     const parsedResult = parseInput(paramInput);
+  };
+
+  const [exportedText, setExportedText] = useState('');
+
+  const reverseParse = () => {
+    let result = [];
+
+    // Function to convert contacts at a specific contactLevel into the appropriate letter(s)
+    const getContactLetters = (contacts, contactLevel) => {
+      const contactMap = {
+        0: { 1: '' }, // Contacts at level 1
+        1: { 2: 'a', 3: 'b', 4: 'c' }, // Contacts at level 2
+        2: { 5: 'a', 6: 'b', 7: 'c' },
+        3: { 8: '' }, // Contacts at level 3 (only a and b here)
+      };
+      return contacts
+        .map((contact) => contactMap[contactLevel][contact])
+        .join('');
+    };
+
+    // Process each contact level (1-3) and contacts
+    for (let contactLevel = 0; contactLevel <= 3; contactLevel++) {
+      let activePlusContacts = [];
+      let activeMinusContacts = [];
+
+      // Get contacts at the current contactLevel
+      const contactRange = {
+        0: [1],
+        1: [2, 3, 4],
+        2: [5, 6, 7],
+        3: [8],
+      }[contactLevel];
+
+      contactRange.forEach((contact) => {
+        if (quantities[contact] > 0) {
+          if (selectedValues[contact] === 'right') {
+            activePlusContacts.push(contact);
+          } else if (selectedValues[contact] === 'center') {
+            activeMinusContacts.push(contact);
+          }
+        }
+      });
+
+      // Construct text for '+' polarity
+      if (activePlusContacts.length > 0) {
+        let letters = getContactLetters(activePlusContacts, contactLevel);
+        result.push(`${contactLevel}${letters}+`);
+      }
+
+      // Construct text for '-' polarity
+      if (activeMinusContacts.length > 0) {
+        let letters = getContactLetters(activeMinusContacts, contactLevel);
+        result.push(`${contactLevel}${letters}-`);
+      }
+    }
+
+    // Handle 'C' (contact 0)
+    if (quantities[0] > 0) {
+      if (selectedValues[0] === 'right') {
+        result.push('C+');
+      } else if (selectedValues[0] === 'center') {
+        result.push('C-');
+      }
+    }
+
+    // Add the amplitude at the end
+    if (totalAmplitude > 0) {
+      result.push(`${totalAmplitude}mA`);
+    }
+    const textoutput = result.join(' / ');
+    setExportedText(textoutput);
+    // return result.join(' / ');
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(exportedText);
+    // alert('Copied to clipboard!');
   };
 
   useEffect(() => {
@@ -3820,20 +3937,62 @@ function Boston_vercise_directed_new(props, ref) {
               {showViewer ? 'Close Viewer' : 'Open Viewer'}
             </Button>
           </ButtonGroup>
-          <Form>
-            <Form.Group>
-              {/* <Form.Label>Enter DBS Parameters (e.g., "2- / C+")</Form.Label> */}
+          <Form className="mb-4">
+            <Form.Group controlId="dbsParameters">
+              <Form.Label className="font-weight-bold">
+                DBS Parameters
+              </Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter parameters"
+                placeholder='e.g., "2- / C+; 2mA"'
                 value={paramInput}
                 onChange={(e) => setParamInput(e.target.value)}
+                className="mb-3"
+                style={{ borderRadius: '10px', padding: '10px' }}
               />
             </Form.Group>
-            <Button variant="primary" onClick={handleInputParamButton}>
-              Submit
+            <Button
+              variant="primary"
+              onClick={handleInputParamButton}
+              className="mr-2"
+              style={{ padding: '10px 20px', borderRadius: '10px' }}
+            >
+              Enter
             </Button>
           </Form>
+          <Button
+            variant="outline-secondary"
+            onClick={reverseParse}
+            style={{ padding: '10px 20px', borderRadius: '10px' }}
+          >
+            Export to Text
+          </Button>
+          <div
+            className="exported-text mt-4 position-relative"
+            style={{
+              backgroundColor: '#f8f9fa',
+              padding: '15px',
+              borderRadius: '10px',
+              border: '1px solid #ced4da',
+              whiteSpace: 'pre-wrap',
+              position: 'relative',
+            }}
+          >
+            {exportedText}
+            <MuiTooltip title="Copy to clipboard" placement="top">
+              <IconButton
+                onClick={copyToClipboard}
+                // style={{
+                //   position: 'absolute',
+                //   top: '10px',
+                //   right: '10px',
+                // }}
+                aria-label="copy"
+              >
+                <ContentCopyIcon />
+              </IconButton>
+            </MuiTooltip>
+          </div>
           {/* <NewTripleToggle /> */}
           {/* <button
             onClick={calculateQuantitiesWithDistribution}
