@@ -939,7 +939,7 @@ app
 
 ipcMain.on('zoom-level-changed', (event, zoomLevel) => {
   if (mainWindow) {
-    const newWidth = 1100 * (1 + zoomLevel * 0.14); // Adjust the scale factor as needed
+    const newWidth = 1100 * (1 + zoomLevel * 0.12); // Adjust the scale factor as needed
     const newHeight = 1100 * (1 + zoomLevel * 0.1); // Adjust the scale factor as needed
     mainWindow.setSize(newWidth, newHeight);
   }
