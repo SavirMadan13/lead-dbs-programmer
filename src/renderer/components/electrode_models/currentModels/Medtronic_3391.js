@@ -46,6 +46,11 @@ import AssistedToggle from '../../AssistedToggle';
 import VolumeAmplitudeToggle from '../../VoltageAmplitudeToggle';
 import MAToggleSwitch from '../../MAToggleSwitch';
 import NewTripleToggle from '../../NewTripleToggle';
+import PlyViewer from '../../PlyViewer';
+import { PartyMode } from '@mui/icons-material';
+import IconButton from '@mui/material/IconButton';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { Tooltip as MuiTooltip } from '@mui/material';
 
 function Medtronic_3391(props, ref) {
   const svgs = [
@@ -291,6 +296,11 @@ function Medtronic_3391(props, ref) {
       // console.log(levelQuantities);
     });
     return levelTotals;
+  };
+
+  const [showViewer, setShowViewer] = useState(false);
+  const handleOpenViewer = () => {
+    setShowViewer(!showViewer);
   };
 
   const calculateQuantitiesForTwo = () => {
@@ -2936,9 +2946,7 @@ function Medtronic_3391(props, ref) {
 
   let stimController = 0;
   // const [currentLabel, setCurrentLabel] = useState('mA');
-  const [currentLabel, setCurrentLabel] = useState(
-    volAmpToggle === 'right' ? 'V' : 'mA',
-  );
+  const [currentLabel, setCurrentLabel] = useState(volAmpToggle === 'right' ? 'V' : 'mA');
   // Generating here a more simple key code for the IPG that is selected
   const handleIPG = () => {
     if (props.IPG === 'Medtronic_Activa') {
@@ -3454,27 +3462,6 @@ function Medtronic_3391(props, ref) {
             </ButtonGroup>
           </div>
         )}
-        {/* <div className="button-container">
-          <ButtonGroup>
-            {radios.map((radio, idx) => (
-              <ToggleButton
-                key={idx}
-                id={`radio-${idx}`}
-                type="radio"
-                variant={idx % 2 ? 'outline-success' : 'outline-danger'}
-                name="radio"
-                value={radio.value}
-                checked={radioValue === radio.value}
-                onChange={(e) =>
-                  handleSteeringModeChange(e.currentTarget.value)
-                }
-                // onChange={(e) => setRadioValue(e.currentTarget.value)}
-              >
-                {radio.name}
-              </ToggleButton>
-            ))}
-          </ButtonGroup>
-        </div> */}
       </div>
       <div className="container2">
         <div className="IPG">
@@ -3648,6 +3635,9 @@ function Medtronic_3391(props, ref) {
             <Button onClick={handleClearButton} className="button">
               Clear
             </Button>
+            <Button onClick={handleOpenViewer} className="button">
+              {showViewer ? 'Close Viewer' : 'Open Viewer'}
+            </Button>
           </ButtonGroup>
           {/* <NewTripleToggle /> */}
           {/* <button
@@ -3664,6 +3654,30 @@ function Medtronic_3391(props, ref) {
           </button> */}
         </div>
       </div>
+      {showViewer && (
+        <div
+          style={{
+            width: '1000px', // Makes the container flexible in size
+            margin: '20px auto', // Centers the div and adds spacing around it
+            padding: '15px', // Adds internal spacing
+            border: '2px solid #ccc', // Adds a subtle border
+            borderRadius: '10px', // Rounds the corners
+            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // Adds shadow for depth
+            backgroundColor: '#f9f9f9', // Soft background color
+            display: 'flex', // Flex layout for responsive adjustments
+            justifyContent: 'center', // Centers content inside the div
+            alignItems: 'center', // Vertically aligns content in the middle
+          }}
+        >
+          <PlyViewer
+            quantities={quantities}
+            amplitude={totalAmplitude}
+            side={props.name}
+            historical={props.historical}
+            togglePosition={percAmpToggle}
+          />
+        </div>
+      )}
     </div>
   );
 }

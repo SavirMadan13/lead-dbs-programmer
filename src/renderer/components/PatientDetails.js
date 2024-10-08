@@ -354,7 +354,7 @@ function PatientDetails({ directoryPath, leadDBS }) {
       <button className="back-button" onClick={() => navigate('/')}>
         Back to Table
       </button>
-      <button onClick={() => setNiiVue(!niiVue)}>Show NiivueViewer</button>
+      {/* <button onClick={() => setNiiVue(!niiVue)}>Show NiivueViewer</button> */}
       {/* {niiVue && (
         <div>
           <NiftiViewer />

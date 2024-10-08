@@ -3239,7 +3239,7 @@ function Boston_vercise_directed_new(props, ref) {
     // this.props.onChange(value, animation);
     // this.setState({ switchPosition: value, animation });
   };
-  const [showViewer, setShowViewer] = useState(false);
+  const [showViewer, setShowViewer] = useState(true);
   const handleOpenViewer = () => {
     setShowViewer(!showViewer);
   };
@@ -3993,52 +3993,29 @@ function Boston_vercise_directed_new(props, ref) {
               </IconButton>
             </MuiTooltip>
           </div>
-          {/* <NewTripleToggle /> */}
-          {/* <button
-            onClick={calculateQuantitiesWithDistribution}
-            className="button"
-          >
-            Split Even
-          </button>
-          <button onClick={roundToHundred} className="button">
-            Refactor
-          </button>
-          <button onClick={handleClearButton} className="button">
-            Clear
-          </button> */}
         </div>
-        {/* {showViewer && (
-          <PlyViewer quantities={quantities} values={selectedValues} />
-        )} */}
       </div>
-      {/* {showViewer && (
-        <div style={{ minWidth: '500px' }}>
-          <PlyViewer
-            quantities={quantities}
-            amplitude={totalAmplitude}
-            side={props.name}
-          />
-        </div>
-      )} */}
       {showViewer && (
         <div
           style={{
-            width: '1000px', // Makes the container flexible in size
-            margin: '20px auto', // Centers the div and adds spacing around it
-            padding: '15px', // Adds internal spacing
-            border: '2px solid #ccc', // Adds a subtle border
-            borderRadius: '10px', // Rounds the corners
-            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // Adds shadow for depth
-            backgroundColor: '#f9f9f9', // Soft background color
-            display: 'flex', // Flex layout for responsive adjustments
-            justifyContent: 'center', // Centers content inside the div
-            alignItems: 'center', // Vertically aligns content in the middle
+            width: '1000px',
+            margin: '20px auto',
+            padding: '15px',
+            border: '2px solid #ccc',
+            borderRadius: '10px',
+            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+            backgroundColor: '#f9f9f9',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
           <PlyViewer
             quantities={quantities}
             amplitude={totalAmplitude}
             side={props.name}
+            historical={props.historical}
+            togglePosition={percAmpToggle}
           />
         </div>
       )}

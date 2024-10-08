@@ -102,6 +102,26 @@ function Programmer() {
     return 'Medtronic_Percept';
   };
 
+  // const [baseElec, setBaseElec] = useState(null);
+
+  // useEffect(() => {
+  //   const loadPlyFile = async () => {
+  //     try {
+  //       const fileData = await window.electron.ipcRenderer.invoke(
+  //         'load-vis-coords',
+  //         location.state,
+  //       );
+  //       // setPlyFile(fileData);
+  //       console.log(fileData.elmodel);
+  //       setBaseElec(fileData.elmodel);
+  //     } catch (error) {
+  //       console.error('Error loading PLY file:', error);
+  //     }
+  //   };
+
+  //   loadPlyFile(); // Call the async function
+  // }, []);
+
   window.electron.ipcRenderer.sendMessage(
     'import-file',
     patient.id,
@@ -109,6 +129,19 @@ function Programmer() {
     directoryPath,
     leadDBS,
   );
+
+  // This effect will run once `baseElec` is set
+  // useEffect(() => {
+  //   if (baseElec) { // Only send message if baseElec is not null
+  //     window.electron.ipcRenderer.sendMessage(
+  //       'import-file',
+  //       patient.id,
+  //       timeline,
+  //       directoryPath,
+  //       leadDBS,
+  //     );
+  //   }
+  // }, [baseElec]); // Runs whenever baseElec changes
 
   function generateUniqueID() {
     const currentDate = new Date();
@@ -312,12 +345,22 @@ function Programmer() {
 
       // Event listener for import-file
       const handleImportFile = (arg) => {
-        if (arg === 'File not found') {
+        console.log(arg);
+        if (arg === 'File not found' || arg.directionality) {
           try {
             setPatientName(patient.name);
             console.log('Not Found');
-            const outputElectrode = 'boston_vercise_directed';
+            let outputElectrode = handleImportedElectrode(arg.elmodel);
+            // while (!baseElec) {
+            //   // Waiting for baseElec to exist
+            // }
+            // console.log(baseElec);
+            // if (baseElec) {
+            //   outputElectrode = handleImportedElectrode(baseElec);
+            //   console.log(outputElectrode);
+            // }
             const outputIPG = handleIPG(outputElectrode);
+            console.log(outputIPG);
             setElectrodeMaster(outputElectrode);
             setIpgMaster(outputIPG);
             const S = {};
@@ -441,7 +484,6 @@ function Programmer() {
       console.error('ipcRenderer is not available');
     }
   }, []);
-
 
   const [zoomLevel, setZoomLevel] = useState(-3);
 

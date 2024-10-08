@@ -10,7 +10,7 @@ import UPDRSAnalysisComponent from './UPDRSAnalysisComponent';
 
 function ClinicalScores() {
   const location = useLocation();
-  const { patient, timeline, directoryPath } = location.state || {};
+  const { patient, timeline, directoryPath, leadDBS } = location.state || {};
   const navigate = useNavigate(); // Initialize the navigate hook
   // const initialScores = {
   //   3.1: 0,
@@ -113,6 +113,7 @@ function ClinicalScores() {
     patient.id,
     timeline,
     directoryPath,
+    leadDBS,
   );
 
   useEffect(() => {

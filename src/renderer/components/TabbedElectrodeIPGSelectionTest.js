@@ -445,6 +445,7 @@ function TabbedElectrodeIPGSelection({
         volAmpToggle={allVolAmpToggles[key]}
         contactNaming={namingConvention}
         adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
+        historical={historical}
         // stimChanged={stimChanged}
         // setStimChanged={setStimChanged}
         // outputIPG={outputIPG}
@@ -500,6 +501,7 @@ function TabbedElectrodeIPGSelection({
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
         contactNaming={namingConvention}
+        historical={historical}
       />
     ),
     medtronic_3389: (
@@ -518,6 +520,7 @@ function TabbedElectrodeIPGSelection({
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
         contactNaming={namingConvention}
+        historical={historical}
       />
     ),
     medtronic_3387: (
@@ -536,6 +539,7 @@ function TabbedElectrodeIPGSelection({
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
         contactNaming={namingConvention}
+        historical={historical}
       />
     ),
     medtronic_3391: (
@@ -554,6 +558,7 @@ function TabbedElectrodeIPGSelection({
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
         contactNaming={namingConvention}
+        historical={historical}
       />
     ),
     medtronic_b33005: (
@@ -572,6 +577,7 @@ function TabbedElectrodeIPGSelection({
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
         contactNaming={namingConvention}
+        historical={historical}
       />
     ),
     medtronic_b33015: (
@@ -590,6 +596,7 @@ function TabbedElectrodeIPGSelection({
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
         contactNaming={namingConvention}
+        historical={historical}
       />
     ),
     abbott_activetip_2mm: (
@@ -609,6 +616,7 @@ function TabbedElectrodeIPGSelection({
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
         contactNaming={namingConvention}
+        historical={historical}
       />
     ),
     abbott_activetip_3mm: (
@@ -628,6 +636,7 @@ function TabbedElectrodeIPGSelection({
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
         contactNaming={namingConvention}
+        historical={historical}
       />
     ),
     abbott_directed_6172: (
@@ -646,6 +655,7 @@ function TabbedElectrodeIPGSelection({
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
         contactNaming={namingConvention}
+        historical={historical}
       />
     ),
     abbott_directed_6173: (
@@ -664,6 +674,7 @@ function TabbedElectrodeIPGSelection({
         percAmpToggle={allPercAmpToggles[key]}
         volAmpToggle={allVolAmpToggles[key]}
         contactNaming={namingConvention}
+        historical={historical}
       />
     ),
   };

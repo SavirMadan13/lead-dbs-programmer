@@ -7,7 +7,13 @@ import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directe
 import { Tabs, Tab, Collapse, Button, Form } from 'react-bootstrap';
 import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings icon
 
-function PlyViewer({ quantities, amplitude, side }) {
+function PlyViewer({
+  quantities,
+  amplitude,
+  side,
+  historical,
+  togglePosition,
+}) {
   const [plyFile, setPlyFile] = useState(null);
   const mountRef = useRef(null);
   const sphereRef = useRef(null); // Ref for the sphere to update position dynamically
@@ -21,6 +27,8 @@ function PlyViewer({ quantities, amplitude, side }) {
   const rendererRef = useRef(null); // To store the renderer reference
   const cameraRef = useRef(null); // To store the camera reference
   const [open, setOpen] = useState(false);
+  const [recoData, setRecoData] = useState(null);
+  const [elecCoords, setElecCoords] = useState(null);
 
   // Thresholding/Modification stuff
 
@@ -29,7 +37,7 @@ function PlyViewer({ quantities, amplitude, side }) {
       try {
         const fileData = await window.electron.ipcRenderer.invoke(
           'load-ply-file',
-          'selectedPath',
+          historical,
         );
         // setPlyFile(fileData);
         const loader = new PLYLoader();
@@ -58,7 +66,7 @@ function PlyViewer({ quantities, amplitude, side }) {
       try {
         const fileData = await window.electron.ipcRenderer.invoke(
           'load-ply-file-anatomy',
-          'selectedPath',
+          historical,
         );
         // setPlyFile(fileData);
         const loader = new PLYLoader();
@@ -74,6 +82,24 @@ function PlyViewer({ quantities, amplitude, side }) {
         });
         // eslint-disable-next-line no-use-before-define
         addMeshToScene('Anatomy', geometry, material);
+      } catch (error) {
+        console.error('Error loading PLY file:', error);
+      }
+    };
+
+    loadPlyFile(); // Call the async function
+  }, []);
+
+  useEffect(() => {
+    const loadPlyFile = async () => {
+      try {
+        const fileData = await window.electron.ipcRenderer.invoke(
+          'load-vis-coords',
+          historical,
+        );
+        // setPlyFile(fileData);
+        console.log(fileData.markers.head1);
+        setRecoData(fileData);
       } catch (error) {
         console.error('Error loading PLY file:', error);
       }
@@ -108,38 +134,7 @@ function PlyViewer({ quantities, amplitude, side }) {
     { name: 'Middlebrooks et al', coords: [-15.5, -15.5, 0.5] },
   ];
 
-  // const [plyFiles, setPlyFiles] = useState([
-  //   // List of PLY file paths
-  //   '/Users/savirmadan/Downloads/DBS_Targets_Horn_2017.ply',
-  //   '/Users/savirmadan/Downloads/STN Sweetspots (Dembek 2019).ply',
-  //   '/Users/savirmadan/Downloads/OCD Response Tract Atlas (Li 2020).ply',
-  //   '/Users/savirmadan/Downloads/Thalamic Connectivity Atlas (Horn 2016).ply',
-  // ]);
-
   const [plyFiles, setPlyFiles] = useState([]); // Store both names and paths
-
-  // UseEffect to retrieve PLY file paths on component mount
-  // useEffect(() => {
-  //   // Request the PLY file paths from the main process
-  //   window.electron.ipcRenderer.sendMessage('get-ply-files');
-
-  //   // Handle the response from the main process
-  //   window.electron.ipcRenderer.on('ply-files-result', (event, files) => {
-  //     // Store both the file name and the full path in the state
-  //     console.log(files);
-  //     const fileData = files.map(file => ({
-  //       name: file.fileName.split('/').pop(),  // Extract the atlas name from the path
-  //       path: file.filePath                    // Store the full path
-  //     }));
-  //     console.log('File Data: ', fileData);
-  //     setPlyFiles(fileData);
-  //   });
-
-  //   // Handle errors (optional)
-  //   window.electron.ipcRenderer.on('ply-files-error', (event, errorMessage) => {
-  //     console.error('Error fetching PLY files:', errorMessage);
-  //   });
-  // }, []);  // Empty dependency array ensures this runs only on mount
 
   useEffect(() => {
     const fetchPlyFiles = async () => {
@@ -217,27 +212,6 @@ function PlyViewer({ quantities, amplitude, side }) {
       console.error('Error loading PLY file:', error);
     }
   };
-
-  // const handleFileChange = async (event) => {
-  //   const selectedPath = event.target.value;
-  //   const loader = new PLYLoader();
-  //   // Load and parse the PLY file
-  //   const fileData = await window.electron.ipcRenderer.invoke(
-  //     'load-ply-file-2',
-  //     selectedPath,
-  //   );
-  //   const geometry = loader.parse(fileData);
-  //   const material = new THREE.MeshStandardMaterial({
-  //     vertexColors: geometry.hasAttribute('color'),
-  //     flatShading: true,
-  //     metalness: 0.1,
-  //     roughness: 0.5,
-  //     transparent: true,
-  //     opacity: 0.8,
-  //   });
-  //   // Add the mesh to the scene
-  //   addMeshToScene(selectedPath, geometry, material);
-  // };
 
   const handleVisibilityChange = (meshName) => {
     setMeshProperties((prevProps) => ({
@@ -381,56 +355,41 @@ function PlyViewer({ quantities, amplitude, side }) {
     },
   });
 
+  // Note: This is electrode model specific
   const contactDirections = {
     1: { x: 0, y: 0, z: 0 }, // Example directional adjustment for contact 1
     2: { x: 1, y: 0, z: 0 }, // Contact 2 adjustment
-    3: { x: -0.5, y: -0.7, z: 0 }, // Contact 3 adjustment
-    4: { x: -0.5, y: 0.7, z: 0 }, // Contact 4 adjustment
+    3: { x: -0.5, y: -0.86, z: 0 }, // Contact 3 adjustment
+    4: { x: -0.5, y: 0.86, z: 0 }, // Contact 4 adjustment
     5: { x: 1, y: 0, z: 0 }, // Contact 5 adjustment
-    6: { x: -0.5, y: -0.7, z: 0 }, // Contact 6 adjustment
-    7: { x: -0.5, y: 0.7, z: 0 }, // Contact 7 adjustment
+    6: { x: -0.5, y: -0.86, z: 0 }, // Contact 6 adjustment
+    7: { x: -0.5, y: 0.86, z: 0 }, // Contact 7 adjustment
     8: { x: 0, y: 0, z: 0 }, // Contact 8 adjustment
   };
 
+  // const contactDirections = {
+  //   1: { x: 0, y: 0, z: 0 }, // Example directional adjustment for contact 1
+  //   2: { x: -0.17, y: 0.98, z: 0 }, // Contact 2 adjustment
+  //   3: { x: -0.76, y: -0.64, z: 0 }, // Contact 3 adjustment
+  //   4: { x: 0.93, y: -0.34, z: 0 }, // Contact 4 adjustment
+  //   5: { x: -0.34, y: 0.94, z: 0 }, // Contact 5 adjustment
+  //   6: { x: -0.76, y: -0.64, z: 0 }, // Contact 6 adjustment
+  //   7: { x: 0.93, y: -0.34, z: 0 }, // Contact 7 adjustment
+  //   8: { x: 0, y: 0, z: 0 }, // Contact 8 adjustment
+  // };
+
+  // const contactDirections = {
+  //   1: { x: 0, y: 0, z: 0 }, // Example directional adjustment for contact 1
+  //   2: { x: 0.94, y: 0.34, z: 0 }, // Contact 2 adjustment
+  //   3: { x: -0.76, y: 0.64, z: 0 }, // Contact 3 adjustment
+  //   4: { x: -0.17, y: -0.34, z: 0 }, // Contact 4 adjustment
+  //   5: { x: 0.94, y: 0.34, z: 0 }, // Contact 5 adjustment
+  //   6: { x: -0.76, y: 0.64, z: 0 }, // Contact 6 adjustment
+  //   7: { x: -0.17, y: -0.34, z: 0 }, // Contact 7 adjustment
+  //   8: { x: 0, y: 0, z: 0 }, // Contact 8 adjustment
+  // };
+
   const VTASpheresRef = useRef(null); // Store references to each sphere for updating later
-
-  const calculateVectorLevel = () => {
-    const keyLevels = {
-      1: 1,
-      2: 2,
-      3: 2,
-      4: 2,
-      5: 3,
-      6: 3,
-      7: 3,
-      8: 4,
-    };
-
-    let totalQuantity = 0;
-    let weightedSum = 0;
-    // console.log(Object.keys(quantities));
-
-    Object.keys(quantities).forEach((key) => {
-      if (key === '0') {
-        return;
-      }
-      const level = keyLevels[key];
-      const quantity = parseFloat(quantities[key]);
-
-      // Check if quantity is a valid number
-      if (!isNaN(quantity)) {
-        totalQuantity += quantity;
-        weightedSum += level * quantity;
-      }
-    });
-
-    // Avoid division by zero
-    if (totalQuantity === 0) {
-      return 0; // Return a default vector level (0) if no valid quantities are found
-    }
-
-    return weightedSum / totalQuantity; // Return the average vector level
-  };
 
   const clearAllSpheres = () => {
     // Traverse through all spheres and remove them
@@ -450,9 +409,19 @@ function PlyViewer({ quantities, amplitude, side }) {
     // });
   };
 
+  const calculatePercentageFromAmplitude = () => {
+    const updatedQuantities = { ...quantities };
+    Object.keys(updatedQuantities).forEach((key) => {
+      updatedQuantities[key] = (updatedQuantities[key] * 100) / amplitude;
+    });
+    return updatedQuantities;
+  };
+
   const updateSpherePosition = () => {
     const scene = sceneRef.current;
     if (!scene) return;
+    if (!recoData) return;
+    console.log(recoData);
     clearAllSpheres();
     const keyLevels = {
       1: 1,
@@ -464,9 +433,26 @@ function PlyViewer({ quantities, amplitude, side }) {
       7: 3,
       8: 4,
     };
+    let rotationAngle = 0;
+    if (side < 5) {
+      rotationAngle = recoData.directionality.roll_out_left - 60;
+    } else {
+      rotationAngle = recoData.directionality.roll_out_right - 120;
+    }
+    const rotationQuaternion = new THREE.Quaternion();
+    rotationQuaternion.setFromAxisAngle(
+      new THREE.Vector3(0, 0, 1),
+      THREE.MathUtils.degToRad(rotationAngle),
+    ); // Z-axis rotation
+
     // Loop through all contact directions to handle adding and updating spheres
     Object.keys(contactDirections).forEach((contactId) => {
-      const contactQuantity = parseFloat(quantities[contactId]);
+      console.log(togglePosition);
+      let contactQuantity = parseFloat(quantities[contactId]);
+      if (togglePosition === 'center') {
+        const newQuantities = calculatePercentageFromAmplitude();
+        contactQuantity = parseFloat(newQuantities[contactId]);
+      }
 
       // If contactQuantity is greater than 0, add or update the sphere
       if (contactQuantity > 0) {
@@ -480,23 +466,60 @@ function PlyViewer({ quantities, amplitude, side }) {
         let startCoords = [];
         let targetCoords = [];
         if (side < 5) {
-          startCoords = new THREE.Vector3(25.15, -8.62, -6.9);
-          targetCoords = new THREE.Vector3(25.743, -6.5955, -0.4235);
+          const { head2: headMarkers, tail2: tailMarkers } = recoData.markers;
+          startCoords = new THREE.Vector3(...headMarkers);
+          targetCoords = new THREE.Vector3(...tailMarkers);
         } else {
-          startCoords = new THREE.Vector3(-24.28, -12.7068, -8.09);
-          targetCoords = new THREE.Vector3(-24.91, -9.66, -2.09);
+          const { head1: headMarkers, tail1: tailMarkers } = recoData.markers;
+          startCoords = new THREE.Vector3(...headMarkers);
+          targetCoords = new THREE.Vector3(...tailMarkers);
         }
+
+        // Calculate the direction of the electrode
+        const direction = new THREE.Vector3()
+          .subVectors(targetCoords, startCoords)
+          .normalize();
+
+        // Create an orthogonal basis for the electrode
+        const up = new THREE.Vector3(0, 0, 1); // Assuming 'up' is along the global Z-axis
+        const right = new THREE.Vector3()
+          .crossVectors(direction, up)
+          .normalize();
+        const forward = new THREE.Vector3()
+          .crossVectors(right, direction)
+          .normalize();
 
         // Linearly interpolate between startCoords and targetCoords based on normalizedLevel
         const newPosition = startCoords
           .clone()
           .lerp(targetCoords, normalizedLevel);
 
-        // Adjust position based on direction offset
-        const directionOffset = contactDirections[contactId];
-        newPosition.x += 1.3 * directionOffset.x;
-        newPosition.y += 1.3 * directionOffset.y;
-        newPosition.z += 1.3 * directionOffset.z;
+        // Get the direction adjustment for the contact
+        // const directionOffset = contactDirections[contactId];
+
+        // Get the direction offset for the contact
+        const directionOffset = new THREE.Vector3(
+          contactDirections[contactId].x,
+          contactDirections[contactId].y,
+          contactDirections[contactId].z,
+        );
+
+        // Apply the rotation to the directionOffset using the quaternion
+        directionOffset.applyQuaternion(rotationQuaternion);
+
+        // Apply the direction offset to the newPosition relative to the electrode’s orientation
+        newPosition.x +=
+          right.x * directionOffset.x +
+          forward.x * directionOffset.y +
+          direction.x * directionOffset.z;
+        newPosition.y +=
+          right.y * directionOffset.x +
+          forward.y * directionOffset.y +
+          direction.y * directionOffset.z;
+        newPosition.z +=
+          right.z * directionOffset.x +
+          forward.z * directionOffset.y +
+          direction.z * directionOffset.z;
 
         // Calculate amplitude based on contactQuantity
         const contactAmplitude = (contactQuantity / 100) * amplitude;
@@ -507,7 +530,7 @@ function PlyViewer({ quantities, amplitude, side }) {
           32,
           32,
         );
-        // const material = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.8 });
+
         const material = new THREE.MeshStandardMaterial({
           color: 0xff0000, // Set the base color to red
           transparent: true, // Make the material transparent
@@ -515,6 +538,16 @@ function PlyViewer({ quantities, amplitude, side }) {
           roughness: 0.4, // Control the surface roughness (0 = smooth, 1 = rough)
           metalness: 0.1, // Control the metallic appearance (0 = non-metal, 1 = fully metallic)
           flatShading: false, // Enable smooth shading for better visual quality
+          // Emissive properties
+          emissive: 0xff0000, // Red glow
+          emissiveIntensity: 0.2, // Controls the intensity of the emissive glow
+          // Clearcoat for glossy surface
+          // clearcoat: 1.0, // Max clearcoat effect
+          // Specular highlights
+          specular: 0xffffff, // White specular highlights
+          shininess: 15, // Sharpness of specular highlights
+          // Wireframe mode for structural view
+          wireframe: false, // Turn on wireframe if needed
         });
         const sphere = new THREE.Mesh(geometry, material);
 
@@ -552,7 +585,20 @@ function PlyViewer({ quantities, amplitude, side }) {
       const scene = new THREE.Scene();
       sceneRef.current = scene; // Save scene reference
       scene.background = new THREE.Color(0xffffff); // White background
-      const camera = new THREE.PerspectiveCamera(75, 0.5, 0.1, 1000); // 1 is the aspect ratio (square)
+
+      // Create an OrthographicCamera
+      const aspect = 300 / 600;
+      const frustumSize = 100; // Adjust this value to control zoom
+      const camera = new THREE.OrthographicCamera(
+        (frustumSize * aspect) / -2, // left
+        (frustumSize * aspect) / 2, // right
+        frustumSize / 2, // top
+        frustumSize / -2, // bottom
+        0.1, // near plane
+        1000, // far plane
+      );
+
+      // const camera = new THREE.PerspectiveCamera(75, 0.5, 0.1, 1000); // 1 is the aspect ratio (square)
       const renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(300, 600); // Set smaller size
       mountRef.current.appendChild(renderer.domElement);
@@ -613,9 +659,18 @@ function PlyViewer({ quantities, amplitude, side }) {
       controlsRef.current = controls;
 
       camera.position.set(0, 0, 60); // Zoomed out to start
+      camera.lookAt(0, 0, 0); // Ensure the camera is looking at the scene origin
 
+      // const onWindowResize = () => {
+      //   camera.aspect = window.innerWidth / window.innerHeight;
+      //   camera.updateProjectionMatrix();
+      //   renderer.setSize(window.innerWidth, window.innerHeight);
+      // };
       const onWindowResize = () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.left = (frustumSize * aspect) / -2;
+        camera.right = (frustumSize * aspect) / 2;
+        camera.top = frustumSize / 2;
+        camera.bottom = frustumSize / -2;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
       };
@@ -675,6 +730,54 @@ function PlyViewer({ quantities, amplitude, side }) {
 
   const [zoomLevel, setZoomLevel] = useState(-3);
 
+  // Function to change the camera angle
+  const changeCameraAngle = () => {
+    const camera = cameraRef.current;
+    let startCoords = [];
+    let targetCoords = [];
+    if (side < 5) {
+      const { head2: headMarkers, tail2: tailMarkers } = recoData.markers;
+      startCoords = new THREE.Vector3(...headMarkers);
+      targetCoords = new THREE.Vector3(...tailMarkers);
+    } else {
+      const { head1: headMarkers, tail1: tailMarkers } = recoData.markers;
+      startCoords = new THREE.Vector3(...headMarkers);
+      targetCoords = new THREE.Vector3(...tailMarkers);
+    }
+    if (camera) {
+      // Calculate the direction vector by subtracting startCoords from endCoords
+      const directionVector = new THREE.Vector3(
+        targetCoords.x - startCoords.x,
+        targetCoords.y - startCoords.y,
+        targetCoords.z - startCoords.z,
+      );
+
+      // Normalize the direction vector
+      directionVector.normalize();
+
+      // Position the camera above the vector (for example, along the z-axis)
+      const cameraDistance = 50; // Distance from the vector
+      const cameraPosition = new THREE.Vector3(
+        startCoords.x + cameraDistance * directionVector.x,
+        startCoords.y + cameraDistance * directionVector.y,
+        startCoords.z + cameraDistance * directionVector.z, // Move up along z-axis for 'above' view
+      );
+
+      // Set the camera position
+      camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+
+      // Make the camera look along the vector
+      camera.lookAt(
+        (startCoords.x + targetCoords.x) / 2, // Midpoint of the vector
+        (startCoords.y + targetCoords.y) / 2,
+        (startCoords.z + targetCoords.z) / 2,
+      );
+
+      // Update the camera projection matrix
+      camera.updateProjectionMatrix();
+    }
+  };
+
   // Don't forget this
 
   useEffect(() => {
@@ -691,7 +794,7 @@ function PlyViewer({ quantities, amplitude, side }) {
       )} */}
       <div style={viewerContainerStyle}>
         <div ref={mountRef} />
-
+        <Button onClick={changeCameraAngle}>View from top</Button>
         <Button
           variant="outline-secondary"
           onClick={() => setOpen(!open)}
