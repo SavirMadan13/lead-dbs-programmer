@@ -3426,6 +3426,14 @@ function Boston_vercise_directed_new(props, ref) {
     // alert('Copied to clipboard!');
   };
 
+  // useEffect(() => {
+  //   if (showViewer) {
+  //     window.electron.zoom.setZoomLevel(-4);
+  //   } else {
+  //     window.electron.zoom.setZoomLevel(-3);
+  //   }
+  // }, [showViewer]);
+
   useEffect(() => {
     if (props.IPG === 'Abbott') {
       // const newQuantities = { ...quantities };
@@ -4016,6 +4024,7 @@ function Boston_vercise_directed_new(props, ref) {
             side={props.name}
             historical={props.historical}
             togglePosition={percAmpToggle}
+            tab={props.key}
           />
         </div>
       )}

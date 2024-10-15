@@ -189,6 +189,12 @@ export default function App() {
     };
   }, []);
 
+  const [zoomLevel, setZoomLevel] = useState(-3);
+
+  useEffect(() => {
+    window.electron.zoom.setZoomLevel(zoomLevel);
+  }, [zoomLevel]);
+
   return (
     <div>
       <div className="Navbar">

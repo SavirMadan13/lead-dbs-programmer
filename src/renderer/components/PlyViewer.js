@@ -13,6 +13,7 @@ function PlyViewer({
   side,
   historical,
   togglePosition,
+  tab,
 }) {
   const [plyFile, setPlyFile] = useState(null);
   const mountRef = useRef(null);
@@ -33,6 +34,7 @@ function PlyViewer({
   // Thresholding/Modification stuff
 
   useEffect(() => {
+    // This loads in the combined electrodes for the selected patient
     const loadPlyFile = async () => {
       try {
         const fileData = await window.electron.ipcRenderer.invoke(
@@ -62,6 +64,7 @@ function PlyViewer({
   }, []);
 
   useEffect(() => {
+    // This loads the anatomy.ply scene
     const loadPlyFile = async () => {
       try {
         const fileData = await window.electron.ipcRenderer.invoke(
@@ -137,6 +140,7 @@ function PlyViewer({
   const [plyFiles, setPlyFiles] = useState([]); // Store both names and paths
 
   useEffect(() => {
+    // Gathers atlases
     const fetchPlyFiles = async () => {
       try {
         // Request the PLY file paths from the main process using invoke/handle
@@ -155,6 +159,27 @@ function PlyViewer({
 
     fetchPlyFiles();
   }, []); // Empty dependency array ensures this runs only on mount
+
+  const [priorStims, setPriorStims] = useState(null);
+
+  useEffect(() => {
+    // Gathers other stimulations from the database
+    const fetchPlyFiles = async () => {
+      try {
+        // Request the PLY file paths from the main process using invoke/handle
+        const files = await window.electron.ipcRenderer.invoke(
+          'get-ply-files-database',
+        );
+        console.log(files);
+        setPriorStims(files);
+      } catch (error) {
+        console.error('Error fetching PLY files:', error);
+      }
+    };
+
+    fetchPlyFiles();
+  }, []); // Empty dependency array ensures this runs only on mount
+
   const [selectedFilePath, setSelectedFilePath] = useState(''); // Selected file path
 
   const addMeshToScene = (name, geometry, material, position) => {
@@ -354,41 +379,40 @@ function PlyViewer({
       reader.readAsArrayBuffer(file);
     },
   });
-
-  // Note: This is electrode model specific
-  const contactDirections = {
-    1: { x: 0, y: 0, z: 0 }, // Example directional adjustment for contact 1
-    2: { x: 1, y: 0, z: 0 }, // Contact 2 adjustment
-    3: { x: -0.5, y: -0.86, z: 0 }, // Contact 3 adjustment
-    4: { x: -0.5, y: 0.86, z: 0 }, // Contact 4 adjustment
-    5: { x: 1, y: 0, z: 0 }, // Contact 5 adjustment
-    6: { x: -0.5, y: -0.86, z: 0 }, // Contact 6 adjustment
-    7: { x: -0.5, y: 0.86, z: 0 }, // Contact 7 adjustment
-    8: { x: 0, y: 0, z: 0 }, // Contact 8 adjustment
+  let contactDirections = {
+    1: { x: 0, y: 0, z: 0 },
+    2: { x: 0, y: 0, z: 0 },
+    3: { x: 0, y: 0, z: 0 },
+    4: { x: 0, y: 0, z: 0 },
   };
-
-  // const contactDirections = {
-  //   1: { x: 0, y: 0, z: 0 }, // Example directional adjustment for contact 1
-  //   2: { x: -0.17, y: 0.98, z: 0 }, // Contact 2 adjustment
-  //   3: { x: -0.76, y: -0.64, z: 0 }, // Contact 3 adjustment
-  //   4: { x: 0.93, y: -0.34, z: 0 }, // Contact 4 adjustment
-  //   5: { x: -0.34, y: 0.94, z: 0 }, // Contact 5 adjustment
-  //   6: { x: -0.76, y: -0.64, z: 0 }, // Contact 6 adjustment
-  //   7: { x: 0.93, y: -0.34, z: 0 }, // Contact 7 adjustment
-  //   8: { x: 0, y: 0, z: 0 }, // Contact 8 adjustment
-  // };
-
-  // const contactDirections = {
-  //   1: { x: 0, y: 0, z: 0 }, // Example directional adjustment for contact 1
-  //   2: { x: 0.94, y: 0.34, z: 0 }, // Contact 2 adjustment
-  //   3: { x: -0.76, y: 0.64, z: 0 }, // Contact 3 adjustment
-  //   4: { x: -0.17, y: -0.34, z: 0 }, // Contact 4 adjustment
-  //   5: { x: 0.94, y: 0.34, z: 0 }, // Contact 5 adjustment
-  //   6: { x: -0.76, y: 0.64, z: 0 }, // Contact 6 adjustment
-  //   7: { x: -0.17, y: -0.34, z: 0 }, // Contact 7 adjustment
-  //   8: { x: 0, y: 0, z: 0 }, // Contact 8 adjustment
-  // };
-
+  let keyLevels = {
+    1: 1,
+    2: 2,
+    3: 3,
+    4: 4,
+  };
+  if (Object.keys(quantities).length > 6) {
+    contactDirections = {
+      1: { x: 0, y: 0, z: 0 }, // Example directional adjustment for contact 1
+      2: { x: 1, y: 0, z: 0 }, // Contact 2 adjustment
+      3: { x: -0.5, y: -0.86, z: 0 }, // Contact 3 adjustment
+      4: { x: -0.5, y: 0.86, z: 0 }, // Contact 4 adjustment
+      5: { x: 1, y: 0, z: 0 }, // Contact 5 adjustment
+      6: { x: -0.5, y: -0.86, z: 0 }, // Contact 6 adjustment
+      7: { x: -0.5, y: 0.86, z: 0 }, // Contact 7 adjustment
+      8: { x: 0, y: 0, z: 0 }, // Contact 8 adjustment
+    };
+    keyLevels = {
+      1: 1,
+      2: 2,
+      3: 2,
+      4: 2,
+      5: 3,
+      6: 3,
+      7: 3,
+      8: 4,
+    };
+  }
   const VTASpheresRef = useRef(null); // Store references to each sphere for updating later
 
   const clearAllSpheres = () => {
@@ -409,6 +433,365 @@ function PlyViewer({
     // });
   };
 
+  const handleIPG = (importedElectrode) => {
+    if (
+      importedElectrode.includes('Boston') ||
+      importedElectrode.includes('boston')
+    ) {
+      return 'Boston';
+    }
+    if (
+      importedElectrode.includes('Abbott') ||
+      importedElectrode.includes('abbott')
+    ) {
+      return 'Abbott';
+    }
+    if (
+      importedElectrode === 'Medtronic 3387' ||
+      importedElectrode === 'Medtronic 3389' ||
+      importedElectrode === 'medtronic_3387' ||
+      importedElectrode === 'medtronic_3389' ||
+      importedElectrode === 'medtronic_3391' ||
+      importedElectrode === 'Medtronic 3391'
+    ) {
+      return 'Medtronic_Activa';
+    }
+    return 'Medtronic_Percept';
+  };
+
+  const handleImportedElectrode = (importedElectrode) => {
+    switch (importedElectrode) {
+      case 'Boston Scientific Vercise Directed':
+        return 'boston_vercise_directed';
+      case 'Medtronic 3389':
+        return 'medtronic_3389';
+      case 'Medtronic 3387':
+        return 'medtronic_3387';
+      case 'Medtronic 3391':
+        return 'medtronic_3391';
+      case 'Medtronic B33005':
+        return 'medtronic_b33005';
+      case 'Medtronic B33015':
+        return 'medtronic_b33015';
+      case 'Boston Scientific Vercise':
+        return 'boston_scientific_vercise';
+      case 'Boston Scientific Vercise Cartesia HX':
+        return 'boston_scientific_vercise_cartesia_hx';
+      case 'Boston Scientific Vercise Cartesia X':
+        return 'boston_scientific_vercise_cartesia_x';
+      case 'Abbott ActiveTip (6146-6149)':
+        return 'abott_activetip_2mm';
+      case 'Abbott ActiveTip (6142-6145)':
+        return 'abbott_activetip_3mm';
+      case 'Abbott Directed 6172 (short)':
+        return 'abott_directed_6172';
+      case 'Abbott Directed 6173 (long)':
+        return 'abott_directed_6173';
+      default:
+        return '';
+    }
+  };
+
+  const gatherImportedDataNew = (jsonData, outputIPG) => {
+    console.log(jsonData);
+
+    const newQuantities = {};
+    const newSelectedValues = {};
+    const newTotalAmplitude = {};
+    const newAllQuantities = {};
+    const newAllVolAmpToggles = {};
+
+    console.log('Imported Amplitude: ', jsonData.amplitude);
+
+    for (let j = 1; j < 5; j++) {
+      try {
+        newTotalAmplitude[j] = jsonData.amplitude[1][j - 1];
+        newTotalAmplitude[j + 4] = jsonData.amplitude[0][j - 1];
+      } catch {
+        console.log('');
+      }
+
+      try {
+        newTotalAmplitude[j] = jsonData.amplitude.leftAmplitude[j - 1];
+        newTotalAmplitude[j + 4] = jsonData.amplitude.rightAmplitude[j - 1];
+      } catch {
+        console.log('');
+      }
+
+      console.log('newTotalAmplitude: ', newTotalAmplitude);
+
+      const dynamicKey2 = `Ls${j}`;
+      const dynamicKey3 = `Rs${j}`;
+      if (jsonData[dynamicKey2].va === 2) {
+        newAllVolAmpToggles[j] = 'center';
+      } else if (jsonData[dynamicKey2].va === 1) {
+        newAllVolAmpToggles[j] = 'right';
+      }
+
+      if (jsonData[dynamicKey3].va === 2) {
+        newAllVolAmpToggles[j + 4] = 'center';
+      } else if (jsonData[dynamicKey3].va === 1) {
+        newAllVolAmpToggles[j + 4] = 'right';
+      }
+
+      for (let i = 0; i < 9; i++) {
+        const dynamicKey = `k${i + 7}`;
+        const dynamicKey1 = `k${i}`;
+
+        if (jsonData[dynamicKey2] && jsonData[dynamicKey2][dynamicKey]) {
+          newQuantities[j] = newQuantities[j] || {};
+          newQuantities[j][i] = parseFloat(
+            jsonData[dynamicKey2][dynamicKey].perc,
+          );
+          newQuantities[j][0] = parseFloat(jsonData[dynamicKey2].case.perc);
+
+          const { pol } = jsonData[dynamicKey2][dynamicKey];
+          newSelectedValues[j] = newSelectedValues[j] || {};
+          newSelectedValues[j][i] =
+            pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
+
+          const casePol = jsonData[dynamicKey2].case.pol;
+          newSelectedValues[j][0] =
+            casePol === 0 ? 'left' : casePol === 1 ? 'center' : 'right';
+        }
+
+        if (jsonData[dynamicKey3] && jsonData[dynamicKey3][dynamicKey1]) {
+          newQuantities[j + 4] = newQuantities[j + 4] || {};
+          newQuantities[j + 4][i + 1] = parseFloat(
+            jsonData[dynamicKey3][dynamicKey1].perc,
+          );
+          newQuantities[j + 4][0] = parseFloat(jsonData[dynamicKey3].case.perc);
+
+          const { pol } = jsonData[dynamicKey3][dynamicKey1];
+          newSelectedValues[j + 4] = newSelectedValues[j + 4] || {};
+          newSelectedValues[j + 4][i + 1] =
+            pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
+
+          const casePol = jsonData[dynamicKey3].case.pol;
+          newSelectedValues[j + 4][0] =
+            casePol === 0 ? 'left' : casePol === 1 ? 'center' : 'right';
+        }
+      }
+
+      newAllQuantities[j] = newQuantities[j];
+      newAllQuantities[j + 4] = newQuantities[j + 4];
+    }
+
+    const filteredValues = Object.keys(newSelectedValues)
+      .filter((key) => Object.keys(newSelectedValues[key]).length > 0)
+      .reduce((obj, key) => {
+        obj[key] = newSelectedValues[key];
+        return obj;
+      }, {});
+
+    const filteredQuantities = Object.keys(newQuantities)
+      .filter((key) => Object.keys(newQuantities[key]).length > 0)
+      .reduce((obj, key) => {
+        obj[key] = newQuantities[key];
+        return obj;
+      }, {});
+
+    console.log('TEST!L: ', outputIPG);
+    if (outputIPG.includes('Medtronic')) {
+      Object.keys(filteredQuantities).forEach((key) => {
+        console.log('Test: ', filteredQuantities[key]);
+        Object.keys(filteredQuantities[key]).forEach((key2) => {
+          filteredQuantities[key][key2] =
+            (filteredQuantities[key][key2] / 100) * newTotalAmplitude[key];
+        });
+      });
+    }
+
+
+    return {
+      filteredQuantities,
+      filteredValues,
+      newTotalAmplitude,
+    };
+
+    // Need to add some type of filtering here that detects whether it is Medtronic Activa, and then needs to put just mA values, not %
+  };
+
+  const addPreviousVTA = (reconstruction, stimulationParameters) => {
+    const { S } = stimulationParameters;
+    console.log(S);
+    // const outputElectrode = S.elmodel;
+    const outputIPG = S.ipg;
+    const processedData = gatherImportedDataNew(S, outputIPG);
+
+    let rotationAngle = 0;
+    if (side < 5 && Object.keys(quantities).length > 6) {
+      rotationAngle = reconstruction.directionality.roll_out_left - 60;
+    } else {
+      rotationAngle = reconstruction.directionality.roll_out_right - 120;
+    }
+    const rotationQuaternion = new THREE.Quaternion();
+    rotationQuaternion.setFromAxisAngle(
+      new THREE.Vector3(0, 0, 1),
+      THREE.MathUtils.degToRad(rotationAngle),
+    ); // Z-axis rotation
+
+    // Loop through all contact directions to handle adding and updating spheres
+    Object.keys(contactDirections).forEach((contactId) => {
+      console.log(togglePosition);
+      let contactQuantity = parseFloat(quantities[contactId]);
+      if (togglePosition === 'center') {
+        const newQuantities = processedData.filteredQuantities[1];
+        console.log(newQuantities);
+        const newAmplitude = processedData.newTotalAmplitude;
+        contactQuantity = parseFloat(newQuantities[contactId]);
+      }
+
+      // If contactQuantity is greater than 0, add or update the sphere
+      if (contactQuantity > 0) {
+        // Check if the sphere already exists in VTASpheresRef
+        // if (!VTASpheresRef[contactId]) {
+        // Calculate position and amplitude
+        console.log('PLYViewer', quantities, keyLevels, contactDirections);
+        const vectorLevel = keyLevels[contactId];
+        const clampedLevel = Math.min(Math.max(vectorLevel, 1), 4);
+        const normalizedLevel = (clampedLevel - 1) / (4 - 1);
+
+        let startCoords = [];
+        let targetCoords = [];
+        if (side < 5) {
+          const { head2: headMarkers, tail2: tailMarkers } = reconstruction.markers;
+          startCoords = new THREE.Vector3(...headMarkers);
+          targetCoords = new THREE.Vector3(...tailMarkers);
+        } else {
+          const { head1: headMarkers, tail1: tailMarkers } = reconstruction.markers;
+          startCoords = new THREE.Vector3(...headMarkers);
+          targetCoords = new THREE.Vector3(...tailMarkers);
+        }
+
+        // Calculate the direction of the electrode
+        const direction = new THREE.Vector3()
+          .subVectors(targetCoords, startCoords)
+          .normalize();
+
+        // Create an orthogonal basis for the electrode
+        const up = new THREE.Vector3(0, 0, 1); // Assuming 'up' is along the global Z-axis
+        const right = new THREE.Vector3()
+          .crossVectors(direction, up)
+          .normalize();
+        const forward = new THREE.Vector3()
+          .crossVectors(right, direction)
+          .normalize();
+
+        // Linearly interpolate between startCoords and targetCoords based on normalizedLevel
+        const newPosition = startCoords
+          .clone()
+          .lerp(targetCoords, normalizedLevel);
+
+        // Get the direction adjustment for the contact
+        // const directionOffset = contactDirections[contactId];
+
+        // Get the direction offset for the contact
+        const directionOffset = new THREE.Vector3(
+          contactDirections[contactId].x,
+          contactDirections[contactId].y,
+          contactDirections[contactId].z,
+        );
+
+        // Apply the rotation to the directionOffset using the quaternion
+        directionOffset.applyQuaternion(rotationQuaternion);
+
+        // Apply the direction offset to the newPosition relative to the electrode’s orientation
+        newPosition.x +=
+          right.x * directionOffset.x +
+          forward.x * directionOffset.y +
+          direction.x * directionOffset.z;
+        newPosition.y +=
+          right.y * directionOffset.x +
+          forward.y * directionOffset.y +
+          direction.y * directionOffset.z;
+        newPosition.z +=
+          right.z * directionOffset.x +
+          forward.z * directionOffset.y +
+          direction.z * directionOffset.z;
+
+        // Calculate amplitude based on contactQuantity
+        const contactAmplitude = (contactQuantity / 100) * amplitude;
+
+        // Create a new sphere
+        const sphereGeo = new THREE.SphereGeometry(
+          Math.sqrt((contactAmplitude - 0.1) / 0.22),
+          32,
+          32,
+        );
+
+        const sphereMat = new THREE.MeshStandardMaterial({
+          color: 'blue', // Set the base color to red
+          transparent: true, // Make the material transparent
+          opacity: 0.8, // Set opacity to 80%
+          roughness: 0.4, // Control the surface roughness (0 = smooth, 1 = rough)
+          metalness: 0.1, // Control the metallic appearance (0 = non-metal, 1 = fully metallic)
+          flatShading: false, // Enable smooth shading for better visual quality
+          // Emissive properties
+          emissive: 0xff0000, // Red glow
+          emissiveIntensity: 0.2, // Controls the intensity of the emissive glow
+          // Clearcoat for glossy surface
+          // clearcoat: 1.0, // Max clearcoat effect
+          // Specular highlights
+          // Wireframe mode for structural view
+          wireframe: false, // Turn on wireframe if needed
+        });
+        const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+
+        // Set the position of the sphere
+        sphere.position.set(newPosition.x, newPosition.y, newPosition.z);
+        // sphere.name = `contact_${contactId}`; // Name the sphere to track it
+        addMeshToScene('Imported Electrode', sphereGeo, sphereMat, [newPosition.x, newPosition.y, newPosition.z]);
+        // }
+      }
+    });
+  };
+
+  const handlePriorStimChange = async (event) => {
+    const selectedValue = event.target.value;
+    console.log('Selected Value: ', selectedValue.split('-'));
+    const splitValues = selectedValue.split('-');
+    const selectedPatientID = splitValues[0];
+    const selectedSession = splitValues[1];
+    console.log(selectedPatientID);
+    const electrodeLoader = new PLYLoader();
+    const anatomyLoader = new PLYLoader();
+
+    try {
+      // Load and parse the PLY file from Electron's IPC
+      const fileData = await window.electron.ipcRenderer.invoke(
+        'load-ply-file-database',
+        selectedPatientID,
+        selectedSession,
+      );
+      const electrodeGeometry = electrodeLoader.parse(
+        fileData.combinedElectrodesPly,
+      );
+      const anatomyGeometry = anatomyLoader.parse(fileData.anatomyPly);
+      // Create a material for the mesh
+      const material = new THREE.MeshStandardMaterial({
+        // vertexColors: electrodeGeometry.hasAttribute('color'),
+        color: new THREE.Color(0.1, 0.5, 0.8),
+        flatShading: true,
+        metalness: 0.1,
+        roughness: 0.5,
+        transparent: true,
+        opacity: 0.8,
+      });
+
+      // Add the mesh to the scene
+      addMeshToScene(
+        `${selectedPatientID}-electrodes`,
+        electrodeGeometry,
+        material,
+      );
+      addPreviousVTA(fileData.reconstructionData, fileData.stimulationParameters);
+      // addMeshToScene(`${selectedPatientID}-electrodes`)
+    } catch (error) {
+      console.error('Error loading PLY file:', error);
+    }
+  };
+
   const calculatePercentageFromAmplitude = () => {
     const updatedQuantities = { ...quantities };
     Object.keys(updatedQuantities).forEach((key) => {
@@ -423,18 +806,9 @@ function PlyViewer({
     if (!recoData) return;
     console.log(recoData);
     clearAllSpheres();
-    const keyLevels = {
-      1: 1,
-      2: 2,
-      3: 2,
-      4: 2,
-      5: 3,
-      6: 3,
-      7: 3,
-      8: 4,
-    };
+
     let rotationAngle = 0;
-    if (side < 5) {
+    if (side < 5 && Object.keys(quantities).length > 6) {
       rotationAngle = recoData.directionality.roll_out_left - 60;
     } else {
       rotationAngle = recoData.directionality.roll_out_right - 120;
@@ -459,6 +833,7 @@ function PlyViewer({
         // Check if the sphere already exists in VTASpheresRef
         // if (!VTASpheresRef[contactId]) {
         // Calculate position and amplitude
+        console.log('PLYViewer', quantities, keyLevels, contactDirections);
         const vectorLevel = keyLevels[contactId];
         const clampedLevel = Math.min(Math.max(vectorLevel, 1), 4);
         const normalizedLevel = (clampedLevel - 1) / (4 - 1);
@@ -794,7 +1169,7 @@ function PlyViewer({
       )} */}
       <div style={viewerContainerStyle}>
         <div ref={mountRef} />
-        <Button onClick={changeCameraAngle}>View from top</Button>
+        {/* <Button onClick={changeCameraAngle}>View from top</Button> */}
         <Button
           variant="outline-secondary"
           onClick={() => setOpen(!open)}
@@ -852,6 +1227,27 @@ function PlyViewer({
                         {file.name}
                       </option>
                     ))}
+                  </select>
+                </div>
+              </Tab>
+              <Tab eventKey="priorStims" title="Patient Database">
+                <div style={controlPanelStyle2}>
+                  <select onChange={handlePriorStimChange} multiple>
+                    {priorStims &&
+                      Object.keys(priorStims).map((patientId, index) => (
+                        <optgroup key={index} label={patientId}>
+                          {priorStims[patientId].map(
+                            (session, sessionIndex) => (
+                              <option
+                                key={`${patientId}-${sessionIndex}`}
+                                value={`${patientId}-${session}`}
+                              >
+                                {session}
+                              </option>
+                            ),
+                          )}
+                        </optgroup>
+                      ))}
                   </select>
                 </div>
               </Tab>

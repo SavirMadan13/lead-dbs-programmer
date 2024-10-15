@@ -39,6 +39,7 @@ class AppUpdater {
 let mainWindow: BrowserWindow | null = null;
 let stimulationDirectory = '';
 const patientID = '';
+let patientMasterData = {};
 
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
@@ -94,7 +95,12 @@ ipcMain.on(
       let filePath = path.join(sessionDir, fileName);
 
       if (leadDBS) {
-        const newDirectoryPath = path.join(directoryPath, 'derivatives/leaddbs', id, 'clinical');
+        const newDirectoryPath = path.join(
+          directoryPath,
+          'derivatives/leaddbs',
+          id,
+          'clinical',
+        );
         patientDir = path.join(newDirectoryPath);
         sessionDir = path.join(patientDir, `ses-${timeline}`);
         fileName = `${id}_ses-${timeline}_stimparameters.json`;
@@ -104,9 +110,21 @@ ipcMain.on(
       // Check if the file exists before trying to read it
       if (!fs.existsSync(filePath)) {
         if (leadDBS) {
-          filePath = path.join(directoryPath, 'derivatives/leaddbs', id, 'clinical', `${id}_desc-reconstruction.json`);
+          filePath = path.join(
+            directoryPath,
+            'derivatives/leaddbs',
+            id,
+            'clinical',
+            `${id}_desc-reconstruction.json`,
+          );
           const fileData = fs.readFileSync(filePath, 'utf8'); // Read the PLY file as binary
           const jsonData = JSON.parse(fileData); // Parse the string into a JSON object
+          if (!patientMasterData[id]) {
+            patientMasterData[id] = {}; // Initialize the object
+          }
+          // Now you can assign stimData to the id
+          patientMasterData[id].stimData = fileData;
+          console.log('Reached: ', patientMasterData);
           event.reply('import-file', jsonData);
           return;
         }
@@ -158,7 +176,12 @@ ipcMain.on(
       let patientDir = path.join(directoryPath, `sub-${id}`);
       let fileName = `sub-${id}_ses-${timeline}_clinical.json`;
       if (leadDBS) {
-        patientDir = path.join(directoryPath, 'derivatives/leaddbs', id, 'clinical');
+        patientDir = path.join(
+          directoryPath,
+          'derivatives/leaddbs',
+          id,
+          'clinical',
+        );
         fileName = `${id}_ses-${timeline}_clinical.json`;
       }
 
@@ -316,7 +339,12 @@ ipcMain.on('save-file', (event, file, data, historical) => {
   let sessionDir = path.join(patientDir, `ses-${timeline}`);
 
   if (leadDBS) {
-    const newDirectoryPath = path.join(directoryPath, 'derivatives/leaddbs', patient.id, 'clinical');
+    const newDirectoryPath = path.join(
+      directoryPath,
+      'derivatives/leaddbs',
+      patient.id,
+      'clinical',
+    );
     patientDir = path.join(newDirectoryPath);
     sessionDir = path.join(patientDir, `ses-${timeline}`);
   }
@@ -802,6 +830,11 @@ const createWindow = async () => {
   //   },
   // );
 
+  const handleMasterDataFill = (directoryPath, patients) => {
+    console.log('Handle Master Data Fill', directoryPath, patients);
+    console.log('done');
+  };
+
   ipcMain.on('select-folder', async (event, directoryPath) => {
     if (directoryPath) {
       console.log('DIRECTORYPATH: ', directoryPath);
@@ -809,7 +842,10 @@ const createWindow = async () => {
       // Check if the folder matches Lead-DBS structure
       if (isLeadDBSFolder(directoryPath)) {
         console.log('Lead-DBS folder detected');
-        const participantsFilePath = path.join(directoryPath, 'participants.json');
+        const participantsFilePath = path.join(
+          directoryPath,
+          'participants.json',
+        );
         if (fs.existsSync(participantsFilePath)) {
           fs.readFile(participantsFilePath, 'utf-8', (err, data) => {
             if (err) {
@@ -820,6 +856,7 @@ const createWindow = async () => {
                 const patients = JSON.parse(data);
                 console.log('PATIENTS: ', patients);
                 event.sender.send('folder-selected', directoryPath, patients);
+                handleMasterDataFill(directoryPath, patients);
                 event.sender.send('file-read-success', patients);
               } catch (error) {
                 console.error('Error parsing JSON file:', error);
@@ -911,11 +948,11 @@ const createWindow = async () => {
   // Function to read JSON from the provided path
   function readJSON(filePath) {
     try {
-      const data = fs.readFileSync(filePath, 'utf8');  // Synchronous file read
-      return JSON.parse(data);  // Parse and return the JSON data
+      const data = fs.readFileSync(filePath, 'utf8'); // Synchronous file read
+      return JSON.parse(data); // Parse and return the JSON data
     } catch (error) {
       console.error(`Error reading JSON file from ${filePath}:`, error);
-      return null;  // Return null or handle the error accordingly
+      return null; // Return null or handle the error accordingly
     }
   }
 
@@ -981,6 +1018,51 @@ const createWindow = async () => {
     return plyFiles;
   };
 
+  const gatherPlyFilesDatabase = () => {
+    const jsonData2 = readJSON(jsonFilePath);
+    const { directoryPath } = jsonData2;
+
+    // Step 2: Read the dataset description file to get Lead_Path
+    console.log('Directory Path: ', directoryPath);
+    // const datasetDescriptionPath = path.join(
+    //   directoryPath,
+    //   'dataset_description.json',
+    // );
+    // const datasetDescription = readJSON(datasetDescriptionPath);
+    // const leadPath = datasetDescription[0].Lead_Path;
+    // console.log('Lead Path: ', leadPath);
+    const masterDataFile = path.join(directoryPath, 'dataset_master.json');
+    const jsonData = readJSON(masterDataFile);
+    const result = {};
+
+    // Iterate over each subject (sub_X)
+    Object.keys(jsonData).forEach((subId) => {
+      const { clinicalData } = jsonData[subId];
+      if (clinicalData) {
+        // Iterate over each session in clinicalData
+        Object.keys(clinicalData).forEach((sessionKey) => {
+          const sessionFiles = clinicalData[sessionKey];
+
+          // Check if the session contains an array of files
+          if (Array.isArray(sessionFiles)) {
+            sessionFiles.forEach((filePath) => {
+              // Check if the file is a stimparameters file
+              if (filePath.includes('stimparameters.json')) {
+                // Add the subId and session to the result
+                if (!result[subId]) {
+                  result[subId] = [];
+                }
+                result[subId].push(sessionKey);
+              }
+            });
+          }
+        });
+      }
+    });
+
+    return result;
+  };
+
   // IPC Handler to gather PLY files when a request is received
   // ipcMain.on('get-ply-files', async (event) => {
   //   try {
@@ -1021,7 +1103,18 @@ const createWindow = async () => {
 
   ipcMain.handle('get-ply-files', async (event) => {
     try {
-      const plyFiles = gatherPlyFiles();  // Your function for gathering files
+      const plyFiles = gatherPlyFiles(); // Your function for gathering files
+      return plyFiles;
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('get-ply-files-database', async (event) => {
+    try {
+      const plyFiles = gatherPlyFilesDatabase();
+      console.log('Dataset Master: ', plyFiles); // Your function for gathering files
       return plyFiles;
     } catch (error) {
       console.error('Error:', error);
@@ -1036,7 +1129,12 @@ const createWindow = async () => {
   ipcMain.handle('load-ply-file', async (event, historical) => {
     const { patient, timeline, directoryPath, leadDBS } = historical;
     if (leadDBS) {
-      const filePath = path.join(directoryPath, 'derivatives/leaddbs', patient.id, 'export/ply/combined_electrodes.ply');
+      const filePath = path.join(
+        directoryPath,
+        'derivatives/leaddbs',
+        patient.id,
+        'export/ply/combined_electrodes.ply',
+      );
       const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
       return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
     }
@@ -1050,7 +1148,12 @@ const createWindow = async () => {
   ipcMain.handle('load-ply-file-anatomy', async (event, historical) => {
     const { patient, timeline, directoryPath, leadDBS } = historical;
     if (leadDBS) {
-      const filePath = path.join(directoryPath, 'derivatives/leaddbs', patient.id, 'export/ply/anatomy.ply');
+      const filePath = path.join(
+        directoryPath,
+        'derivatives/leaddbs',
+        patient.id,
+        'export/ply/anatomy.ply',
+      );
       const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
       return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
     }
@@ -1064,7 +1167,13 @@ const createWindow = async () => {
   ipcMain.handle('load-vis-coords', async (event, historical) => {
     const { patient, timeline, directoryPath, leadDBS } = historical;
     if (leadDBS) {
-      const filePath = path.join(directoryPath, 'derivatives/leaddbs', patient.id, 'clinical', `${patient.id}_desc-reconstruction.json`);
+      const filePath = path.join(
+        directoryPath,
+        'derivatives/leaddbs',
+        patient.id,
+        'clinical',
+        `${patient.id}_desc-reconstruction.json`,
+      );
       const fileData = fs.readFileSync(filePath, 'utf8'); // Read the PLY file as binary
       const jsonData = JSON.parse(fileData); // Parse the string into a JSON object
       return jsonData; // Return as ArrayBuffer // send the file contents back to renderer process
@@ -1085,6 +1194,90 @@ const createWindow = async () => {
       return null;
     }
   });
+
+  ipcMain.handle(
+    'load-ply-file-database',
+    async (event, patientID, sessionID) => {
+      const jsonData2 = readJSON(jsonFilePath);
+      const { directoryPath } = jsonData2;
+      const masterDataFile = path.join(directoryPath, 'dataset_master.json');
+      const jsonData = readJSON(masterDataFile);
+
+      try {
+        // Check if the patientID exists in the master dataset
+        if (!jsonData[patientID]) {
+          throw new Error(`Patient ID ${patientID} not found in dataset.`);
+        }
+
+        // Retrieve the patient's exportData (where PLY files are located)
+        const { exportData } = jsonData[patientID];
+        const { clinicalData } = jsonData[patientID];
+
+        if (!exportData) {
+          throw new Error(`No export data found for Patient ID ${patientID}.`);
+        }
+
+        // Define a session-based PLY file retrieval (you can modify this depending on session logic)
+        let plyFilePath = null;
+
+        // Get the paths to anatomyPly and combinedElectrodesPly
+        let anatomyPlyPath = exportData.anatomyPly;
+        let combinedElectrodesPlyPath = exportData.combinedElectrodesPly;
+        let clinicalReconstructionPath = clinicalData.reconstructionJson;
+        let stimulationParametersPath = null;
+
+        // Check for the provided sessionID and set the stimulation parameters path
+        if (clinicalData[sessionID]) {
+          const sessionData = clinicalData[sessionID];
+          stimulationParametersPath = sessionData.find((filePath) =>
+            filePath.includes('stimparameters.json'),
+          );
+        } else {
+          throw new Error(
+            `Session ID ${sessionID} not found for Patient ID ${patientID}.`,
+          );
+        }
+
+        if (!stimulationParametersPath) {
+          throw new Error(
+            `No stimulation parameters file found for Patient ID ${patientID} in session ${sessionID}.`,
+          );
+        }
+
+        if (!anatomyPlyPath || !combinedElectrodesPlyPath) {
+          throw new Error(
+            `One or more PLY files not found for Patient ID ${patientID}.`,
+          );
+        }
+        anatomyPlyPath.replace(/\\\//g, '');
+        combinedElectrodesPlyPath.replace(/\\\//g, '');
+        clinicalReconstructionPath.replace(/\\\//g, '');
+        stimulationParametersPath = stimulationParametersPath.replace(/\\\//g, '');
+        // Read both PLY files as binary
+        const anatomyPlyData = fs.readFileSync(anatomyPlyPath);
+        const combinedElectrodesPlyData = fs.readFileSync(
+          combinedElectrodesPlyPath,
+        );
+        const clinicalReconstructionData = fs.readFileSync(
+          clinicalReconstructionPath,
+          'utf8',
+        );
+        const clinicalDataOutput = JSON.parse(clinicalReconstructionData);
+        const stimulationParametersData = fs.readFileSync(stimulationParametersPath, 'utf8');
+        const jsonData3 = JSON.parse(stimulationParametersData); // Parse the string into a JSON object
+        // Return both files as buffers in an object
+        return {
+          anatomyPly: anatomyPlyData.buffer,
+          combinedElectrodesPly: combinedElectrodesPlyData.buffer,
+          reconstructionData: clinicalDataOutput,
+          stimulationParameters: jsonData3,
+        };
+      } catch (error) {
+        console.error('Error loading PLY file:', error);
+        return null; // Return null if an error occurs
+      }
+    },
+  );
 
   // Handle writing the JSON file
   ipcMain.on('save-patients-json', (event, folderPath, patients) => {

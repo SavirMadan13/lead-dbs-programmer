@@ -197,10 +197,6 @@ function Medtronic_3387(props, ref) {
       2: 'left',
       3: 'left',
       4: 'left',
-      5: 'left',
-      6: 'left',
-      7: 'left',
-      8: 'left',
       // Initialize other images here
     },
   );
@@ -211,10 +207,6 @@ function Medtronic_3387(props, ref) {
     2: null,
     3: null,
     4: null,
-    5: null,
-    6: null,
-    7: null,
-    8: null,
   });
 
   const newInitialQuantities =
@@ -225,10 +217,6 @@ function Medtronic_3387(props, ref) {
           2: 0,
           3: 0,
           4: 0,
-          5: 0,
-          6: 0,
-          7: 0,
-          8: 0,
         }
       : {
           0: 0,
@@ -236,10 +224,6 @@ function Medtronic_3387(props, ref) {
           2: 0,
           3: 0,
           4: 0,
-          5: 0,
-          6: 0,
-          7: 0,
-          8: 0,
         };
 
   const [quantities, setQuantities] = useState(
