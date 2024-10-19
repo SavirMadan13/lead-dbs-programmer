@@ -52,65 +52,226 @@ import IconButton from '@mui/material/IconButton';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { Tooltip as MuiTooltip } from '@mui/material';
 
-function Medtronic_B33005(props, ref) {
-  const svgs = [
+function Generic_elmodel(props, ref) {
+  console.log(props);
+  const { elspec } = props;
+  const parseEtageidx = (etageidx) => {
+    return etageidx.map((levelStr) => {
+      if (levelStr.includes(':')) {
+        const [start, end] = levelStr.split(':').map(Number);
+        return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+      }
+      return [Number(levelStr)];
+    });
+  };
+  const newLevel = {
+    0: 0,
+  };
+  const newFace = {
+    0: '',
+  };
+  const newLevelArray = {};
+  // Helper function to determine the face direction based on shared levels and isdirected property
+  // const determineFace = (isdirected, contactIndex, sharedLevel) => {
+  //   Object.keys(sharedLevel).forEach((key) => {
+  //     newLevel[sharedLevel[key]] = sharedLevel[key];
+  //   });
+  //   if (!isdirected) return 'all';
+  //   if (sharedLevel.length === 1) return 'all';
+  //   // If directed and the contact is within a shared level
+  //   const relativeIndex = sharedLevel.indexOf(contactIndex + 1);
+  //   console.log('Relative Index: ', relativeIndex);
+  //   if (relativeIndex === -1) return 'all';
+
+  //   // Determine the face based on the relative index in the shared level
+  //   return relativeIndex % 3 === 0
+  //     ? 'center'
+  //     : relativeIndex % 3 === 1
+  //     ? 'left'
+  //     : 'right';
+  // };
+  // Parse the etageidx to get levels
+  let parsedEtageidx = [];
+  if (elspec.isdirected === 1) {
+    parsedEtageidx = parseEtageidx(elspec.etageidx);
+  } else {
+    for (let i = 0; i < elspec.numel; i++) {
+      parsedEtageidx.push([i + 1]);
+    }
+  }
+  Object.keys(parsedEtageidx).forEach((key) => {
+    if (parsedEtageidx[key].length === 1) {
+      newFace[parsedEtageidx[key]] = 'all';
+    } else {
+      const levelArrayKey = parseFloat(key) + 1;
+      newLevelArray[levelArrayKey] = parsedEtageidx[key];
+      Object.keys(parsedEtageidx[key]).forEach((subKey) => {
+        console.log('Subkey: ', subKey);
+        console.log('Index: ', parsedEtageidx[key]);
+        if (subKey === '0') {
+          console.log('Index: ', parsedEtageidx[key][subKey]);
+          newFace[parsedEtageidx[key][subKey]] = 'center';
+        } else if (subKey === '1') {
+          newFace[parsedEtageidx[key][subKey]] = 'left';
+        } else {
+          newFace[parsedEtageidx[key][subKey]] = 'right';
+        }
+      });
+    }
+  });
+  console.log('New Level Array: ', newLevelArray);
+  // const determineFace = (contactNum) => {
+  //   Object.keys(newFace).forEach((key) => {
+
+  //   })
+  //   return 'all';
+  // };
+  console.log('Parsed: ', parsedEtageidx);
+  // Generate Contact components based on parsed etageidx
+  const centerColumn = [
     <HeadTop key="headTop" />,
     <Contact key="headBottom" fill="transparent" />,
-    <Contact key="8" level="4" />,
-    <Contact key="5" level="3" face="center" />,
-    <Contact key="2" level="2" face="center" />,
-    <Contact key="1" level="2" face="center" />,
-    <Tail key="tail" fill="transparent" />,
   ];
+  const rightColumn = [];
+  const leftColumn = [];
+  Object.keys(parsedEtageidx)
+    .reverse()
+    .forEach((key) => {
+      const levelIndex = key;
+      const sharedLevel = parsedEtageidx[key];
+      console.log('Level index: ', levelIndex);
+      console.log('Shared level: ', sharedLevel);
+      sharedLevel.forEach((contactNum) => {
+        console.log('Contact num: ', contactNum);
+        // const face = determineFace(
+        //   elspec.isdirected,
+        //   contactNum,
+        //   sharedLevel,
+        // );
+        const face = newFace[contactNum];
+        newLevel[contactNum] = parseFloat(levelIndex) + 1;
+        if (face === 'center' || face === 'all') {
+          if (elspec.tipiscontact === 1 && contactNum === 1) {
+            console.log(elspec.tipiscontact);
+            centerColumn.push(
+              <Tail
+                key={contactNum}
+                level={levelIndex + 1}
+                // face={face}
+                // fill="transparent"
+              />,
+            );
+          } else {
+            centerColumn.push(
+              <Contact
+                key={contactNum}
+                level={levelIndex + 1}
+                // face={face}
+                // fill="transparent"
+              />,
+            );
+          }
+        } else if (face === 'right') {
+          leftColumn.push(
+            <Contact
+              key={contactNum}
+              level={levelIndex + 1}
+              // face={face}
+              // fill="transparent"
+            />,
+          );
+        } else {
+          rightColumn.push(
+            <Contact
+              key={contactNum}
+              level={levelIndex + 1}
+              // face={face}
+              // fill="transparent"
+            />,
+          );
+        }
+      });
+    });
+  if (elspec.tipiscontact === 0) {
+    centerColumn.push(
+      <Tail
+        key="tail"
+        // face={face}
+        fill="transparent"
+      />,
+    );
+  }
+  // parsedEtageidx.forEach((sharedLevel, levelIndex) => {
+  //   console.log('Shared Level : ', sharedLevel);
+  //   console.log('Level index: ', levelIndex);
+  //   sharedLevel.forEach((contactNum) => {
+  //     const face = determineFace(
+  //       elspec.isdirected,
+  //       contactNum - 1,
+  //       sharedLevel,
+  //     );
+  //     contactElements.push(
+  //       <Contact
+  //         key={contactNum}
+  //         level={levelIndex + 1}
+  //         face={face}
+  //         fill="transparent"
+  //       />,
+  //     );
+  //   });
+  // });
+  console.log('New Level: ', newLevel);
+  console.log('New Center Column: ', centerColumn);
+  console.log('New Face: ', newFace);
+  // const svgs = [
+  //   <HeadTop key="headTop" />,
+  //   <Contact key="headBottom" fill="transparent" />,
+  //   <Contact key="8" level="4" />,
+  //   <Contact key="5" level="3" face="center" />,
+  //   <Contact key="2" level="2" face="center" />,
+  //   <Tail key="1" level="1" />,
+  // ];
+  const svgs = centerColumn;
 
   const ipgs = [<IPG key="0" />];
 
-  const leftContacts = [
-    <Contact key="7" level="3" face="right" />,
-    <Contact key="4" level="2" face="right" />,
-  ];
+  // const leftContacts = [
+  //   <Contact key="7" level="3" face="right" />,
+  //   <Contact key="4" level="2" face="right" />,
+  // ];
+  const leftContacts = leftColumn;
 
-  const rightContacts = [
-    <Contact key="6" level="3" face="left" />,
-    <Contact key="3" level="2" face="left" />,
-  ];
+  // const rightContacts = [
+  //   <Contact key="6" level="3" face="left" />,
+  //   <Contact key="3" level="2" face="left" />,
+  // ];
+  const rightContacts = rightColumn;
 
-  const level = {
-    0: 0,
-    1: 1,
-    2: 2,
-    3: 2,
-    4: 2,
-    5: 3,
-    6: 3,
-    7: 3,
-    8: 4,
-  };
-
-  const levelArray = { 2: [2, 3, 4], 3: [5, 6, 7] };
-
-  const face = {
-    0: '',
-    1: 'all',
-    2: 'center',
-    3: 'left',
-    4: 'right',
-    5: 'center',
-    6: 'left',
-    7: 'right',
-    8: 'all',
-  };
-
-  // const names = {
-  //   0: IPG,
+  // const level = {
+  //   0: 0,
   //   1: 1,
   //   2: 2,
-  //   3: 3,
-  //   4: 4,
-  //   5: 5,
-  //   6: 6,
-  //   7: 7,
-  //   8: 8,
+  //   3: 2,
+  //   4: 2,
+  //   5: 3,
+  //   6: 3,
+  //   7: 3,
+  //   8: 4,
+  // };
+  const level = newLevel;
+  const levelArray = newLevelArray;
+  // const levelArray = { 2: [2, 3, 4], 3: [5, 6, 7] };
+  const face = newFace;
+  // const face = {
+  //   0: '',
+  //   1: 'all',
+  //   2: 'center',
+  //   3: 'left',
+  //   4: 'right',
+  //   5: 'center',
+  //   6: 'left',
+  //   7: 'right',
+  //   8: 'all',
   // };
 
   const [names, setNames] = useState({
@@ -131,26 +292,26 @@ function Medtronic_B33005(props, ref) {
       if (props.name < 5) {
         newNames = {
           0: IPG,
-          1: '0',
-          2: '1A',
-          3: '1B',
-          4: '1C',
-          5: '2A',
-          6: '2B',
-          7: '2C',
-          8: '3',
+          1: '1',
+          2: '2',
+          3: '3',
+          4: '4',
+          5: '5',
+          6: '6',
+          7: '7',
+          8: '8',
         };
       } else {
         newNames = {
           0: IPG,
-          1: '0',
-          2: '1A',
-          3: '1B',
-          4: '1C',
-          5: '2A',
-          6: '2B',
-          7: '2C',
-          8: '3',
+          1: '1',
+          2: '2',
+          3: '3',
+          4: '4',
+          5: '5',
+          6: '6',
+          7: '7',
+          8: '8',
         };
       }
     } else {
@@ -308,7 +469,7 @@ function Medtronic_B33005(props, ref) {
     },
   );
 
-  const [visModel, setVisModel] = useState(props.visModel || '6');
+  const [visModel, setVisModel] = useState(props.visModel || '3');
 
   const [sessionTitle, setSessionTitle] = useState(props.sessionTitle || '');
 
@@ -2946,11 +3107,6 @@ function Medtronic_B33005(props, ref) {
     setQuantities(updatedQuantities);
   };
 
-  const [showViewer, setShowViewer] = useState(true);
-  const handleOpenViewer = () => {
-    setShowViewer(!showViewer);
-  };
-
   const handleActivaAmplitude = () => {
     const updatedQuantities = { ...quantities };
     const updatedSelectedValues = { ...selectedValues };
@@ -3245,6 +3401,200 @@ function Medtronic_B33005(props, ref) {
     // this.props.onChange(value, animation);
     // this.setState({ switchPosition: value, animation });
   };
+  const [showViewer, setShowViewer] = useState(true);
+  const handleOpenViewer = () => {
+    setShowViewer(!showViewer);
+  };
+
+  // Trying out input parameters
+  const [paramInput, setParamInput] = useState('');
+
+  // Helper function to get contacts for a given level
+  function getContactsForLevel(level, activeLetters) {
+    const contactMap = {
+      0: { a: 1 }, // Contacts at level 1
+      1: { a: 2, b: 3, c: 4 }, // Contacts at level 2
+      2: { a: 5, b: 6, c: 7 },
+      3: { a: 8 }, // Contacts at level 3 (only a and b here)
+    };
+
+    const fullRange = Object.values(contactMap[level]);
+
+    // If no active letters (e.g., "1-"), return the full range of contacts for the level
+    if (!activeLetters || activeLetters === 'abc') {
+      return fullRange;
+    }
+
+    // Otherwise, return only the contacts specified by the letters (e.g., "ac")
+    return activeLetters.split('').map((letter) => contactMap[level][letter]);
+  }
+
+  // Function to parse input string and update quantities and selectedValues arrays
+  const parseInput = (input) => {
+    // Initialize arrays for quantities and selectedValues
+    const updatedQuantities = { ...quantities };
+    const updatedSelectedValues = { ...selectedValues };
+    // Split the input by '/'
+
+    Object.keys(updatedQuantities).forEach((key) => {
+      updatedQuantities[key] = 0;
+      updatedSelectedValues[key] = 'left';
+    });
+
+    let activePlusContacts = []; // Array to store all active '+' contacts
+    let activeMinusContacts = []; // Array to store all active '-' contacts
+    let totalPlusContacts = 0; // Counter for total '+' contacts
+    let totalMinusContacts = 0; // Counter for total '-' contacts
+
+    // Split the input by '/'
+    const parts = input.split('/');
+
+    parts.forEach((part) => {
+      part = part.trim();
+
+      if (part.match(/[0-3][a-c]*[+-]/)) {
+        // Extract the contact level, active letters, and polarity (e.g., "1ac-")
+        const contactLevel = parseInt(part[0]); // The first character is the level number
+        const activeLetters = part.slice(1, -1); // Get the letters (if any), skipping the last '+/-'
+        const polarity = part.slice(-1); // '+' or '-'
+
+        const contactRange = getContactsForLevel(contactLevel, activeLetters);
+
+        // Add to the appropriate contact array based on polarity
+        if (polarity === '+') {
+          activePlusContacts = [...activePlusContacts, ...contactRange];
+          totalPlusContacts += contactRange.length;
+        } else if (polarity === '-') {
+          activeMinusContacts = [...activeMinusContacts, ...contactRange];
+          totalMinusContacts += contactRange.length;
+        }
+      } else if (part.includes('C+')) {
+        // Handle C+ (contact[0] with polarity 'right')
+        activePlusContacts.push(0);
+        totalPlusContacts++;
+      } else if (part.includes('C-')) {
+        // Handle C- (contact[0] with polarity 'center')
+        activeMinusContacts.push(0);
+        totalMinusContacts++;
+      }
+    });
+
+    // Set quantities and selectedValues for '+' contacts
+    const plusEvenSplit = 100 / totalPlusContacts;
+    activePlusContacts.forEach((contact) => {
+      updatedQuantities[contact] = plusEvenSplit;
+      updatedSelectedValues[contact] = 'right'; // '+' corresponds to 'right'
+    });
+
+    // Set quantities and selectedValues for '-' contacts
+    const minusEvenSplit = 100 / totalMinusContacts;
+    activeMinusContacts.forEach((contact) => {
+      updatedQuantities[contact] = minusEvenSplit;
+      updatedSelectedValues[contact] = 'center'; // '-' corresponds to 'center'
+    });
+
+    // Split the input by ';' to separate the amplitude part
+    const [contactPart, amplitudePart] = input.split(';');
+    // Process amplitude part (2mA)
+    if (amplitudePart) {
+      const amplitudeMatch = amplitudePart.match(/(\d+\.?\d*)mA/);
+      if (amplitudeMatch) {
+        setTotalAmplitude(parseFloat(amplitudeMatch[1]));
+      }
+    }
+    // Update the state with the new values
+    setQuantities(updatedQuantities);
+    setSelectedValues(updatedSelectedValues);
+  };
+
+  const handleInputParamButton = () => {
+    const parsedResult = parseInput(paramInput);
+  };
+
+  const [exportedText, setExportedText] = useState('');
+
+  const reverseParse = () => {
+    const result = [];
+
+    // Function to convert contacts at a specific contactLevel into the appropriate letter(s)
+    const getContactLetters = (contacts, contactLevel) => {
+      const contactMap = {
+        0: { 1: '' }, // Contacts at level 1
+        1: { 2: 'a', 3: 'b', 4: 'c' }, // Contacts at level 2
+        2: { 5: 'a', 6: 'b', 7: 'c' },
+        3: { 8: '' }, // Contacts at level 3 (only a and b here)
+      };
+      return contacts
+        .map((contact) => contactMap[contactLevel][contact])
+        .join('');
+    };
+
+    // Process each contact level (1-3) and contacts
+    for (let contactLevel = 0; contactLevel <= 3; contactLevel++) {
+      const activePlusContacts = [];
+      const activeMinusContacts = [];
+
+      // Get contacts at the current contactLevel
+      const contactRange = {
+        0: [1],
+        1: [2, 3, 4],
+        2: [5, 6, 7],
+        3: [8],
+      }[contactLevel];
+
+      contactRange.forEach((contact) => {
+        if (quantities[contact] > 0) {
+          if (selectedValues[contact] === 'right') {
+            activePlusContacts.push(contact);
+          } else if (selectedValues[contact] === 'center') {
+            activeMinusContacts.push(contact);
+          }
+        }
+      });
+
+      // Construct text for '+' polarity
+      if (activePlusContacts.length > 0) {
+        const letters = getContactLetters(activePlusContacts, contactLevel);
+        result.push(`${contactLevel}${letters}+`);
+      }
+
+      // Construct text for '-' polarity
+      if (activeMinusContacts.length > 0) {
+        const letters = getContactLetters(activeMinusContacts, contactLevel);
+        result.push(`${contactLevel}${letters}-`);
+      }
+    }
+
+    // Handle 'C' (contact 0)
+    if (quantities[0] > 0) {
+      if (selectedValues[0] === 'right') {
+        result.push('C+');
+      } else if (selectedValues[0] === 'center') {
+        result.push('C-');
+      }
+    }
+
+    // Add the amplitude at the end
+    if (totalAmplitude > 0) {
+      result.push(`${totalAmplitude}mA`);
+    }
+    const textoutput = result.join(' / ');
+    setExportedText(textoutput);
+    // return result.join(' / ');
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(exportedText);
+    // alert('Copied to clipboard!');
+  };
+
+  // useEffect(() => {
+  //   if (showViewer) {
+  //     window.electron.zoom.setZoomLevel(-4);
+  //   } else {
+  //     window.electron.zoom.setZoomLevel(-3);
+  //   }
+  // }, [showViewer]);
 
   useEffect(() => {
     if (props.IPG === 'Abbott') {
@@ -3255,7 +3605,7 @@ function Medtronic_B33005(props, ref) {
       semiAssist();
     }
     if (currentLabel === 'V' && props.IPG === 'Medtronic_Activa') {
-      console.log('here');
+      // console.log('here');
       handleActivaVoltage();
     }
 
@@ -3281,6 +3631,7 @@ function Medtronic_B33005(props, ref) {
     // }
     // assist();
   }, [
+    currentLabel,
     props.IPG,
     radioValue,
     outputTogglePosition,
@@ -3288,6 +3639,7 @@ function Medtronic_B33005(props, ref) {
     semiAssist,
     handleActivaVoltage,
   ]);
+
   /// //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   return (
@@ -3480,27 +3832,29 @@ function Medtronic_B33005(props, ref) {
             label="hz"
           /> */}
         </div>
-        <div className="button-container">
-          <ButtonGroup>
-            {radios.map((radio, idx) => (
-              <ToggleButton
-                key={idx}
-                id={`radio-${idx}`}
-                type="radio"
-                variant={idx % 2 ? 'outline-success' : 'outline-danger'}
-                name="radio"
-                value={radio.value}
-                checked={radioValue === radio.value}
-                onChange={(e) =>
-                  handleSteeringModeChange(e.currentTarget.value)
-                }
-                // onChange={(e) => setRadioValue(e.currentTarget.value)}
-              >
-                {radio.name}
-              </ToggleButton>
-            ))}
-          </ButtonGroup>
-        </div>
+        {(props.IPG === 'Boston' || props.IPG === 'Medtronic_Percept') && (
+          <div className="button-container">
+            <ButtonGroup>
+              {radios.map((radio, idx) => (
+                <ToggleButton
+                  key={idx}
+                  id={`radio-${idx}`}
+                  type="radio"
+                  variant={idx % 2 ? 'outline-success' : 'outline-danger'}
+                  name="radio"
+                  value={radio.value}
+                  checked={radioValue === radio.value}
+                  onChange={(e) =>
+                    handleSteeringModeChange(e.currentTarget.value)
+                  }
+                  // onChange={(e) => setRadioValue(e.currentTarget.value)}
+                >
+                  {radio.name}
+                </ToggleButton>
+              ))}
+            </ButtonGroup>
+          </div>
+        )}
       </div>
       <div className="container2">
         <div className="IPG">
@@ -3749,60 +4103,81 @@ function Medtronic_B33005(props, ref) {
             <Button onClick={handleClearButton} className="button">
               Clear
             </Button>
-            {/* <Button onClick={handleOpenViewer} className="button">
+            <Button onClick={handleOpenViewer} className="button">
               {showViewer ? 'Close Viewer' : 'Open Viewer'}
-            </Button> */}
+            </Button>
           </ButtonGroup>
-          {/* <NewTripleToggle /> */}
-          {/* <button
-            onClick={calculateQuantitiesWithDistribution}
-            className="button"
+          <Form className="mb-4">
+            <Form.Group controlId="dbsParameters">
+              <Form.Label className="font-weight-bold">
+                DBS Parameters
+              </Form.Label>
+              <Form.Control
+                type="text"
+                placeholder='e.g., "2- / C+; 2mA"'
+                value={paramInput}
+                onChange={(e) => setParamInput(e.target.value)}
+                className="mb-3"
+                style={{ borderRadius: '10px', padding: '10px' }}
+              />
+            </Form.Group>
+            <Button
+              variant="primary"
+              onClick={handleInputParamButton}
+              className="mr-2"
+              style={{ padding: '10px 20px', borderRadius: '10px' }}
+            >
+              Enter
+            </Button>
+          </Form>
+          <Button
+            variant="outline-secondary"
+            onClick={reverseParse}
+            style={{ padding: '10px 20px', borderRadius: '10px' }}
           >
-            Split Even
-          </button>
-          <button onClick={roundToHundred} className="button">
-            Refactor
-          </button>
-          <button onClick={handleClearButton} className="button">
-            Clear
-          </button> */}
+            Export to Text
+          </Button>
+          <div
+            className="exported-text mt-4 position-relative"
+            style={{
+              backgroundColor: '#f8f9fa',
+              padding: '15px',
+              borderRadius: '10px',
+              border: '1px solid #ced4da',
+              whiteSpace: 'pre-wrap',
+              position: 'relative',
+            }}
+          >
+            {exportedText}
+            <MuiTooltip title="Copy to clipboard" placement="top">
+              <IconButton
+                onClick={copyToClipboard}
+                // style={{
+                //   position: 'absolute',
+                //   top: '10px',
+                //   right: '10px',
+                // }}
+                aria-label="copy"
+              >
+                <ContentCopyIcon />
+              </IconButton>
+            </MuiTooltip>
+          </div>
         </div>
       </div>
-      <div
-        style={{
-          width: '1000px', // Makes the container flexible in size
-          margin: '20px auto', // Centers the div and adds spacing around it
-          padding: '15px', // Adds internal spacing
-          border: '2px solid #ccc', // Adds a subtle border
-          borderRadius: '10px', // Rounds the corners
-          boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // Adds shadow for depth
-          backgroundColor: '#f9f9f9', // Soft background color
-          display: 'flex', // Flex layout for responsive adjustments
-          justifyContent: 'center', // Centers content inside the div
-          alignItems: 'center', // Vertically aligns content in the middle
-        }}
-      >
-        <PlyViewer
-          quantities={quantities}
-          amplitude={totalAmplitude}
-          side={props.name}
-          historical={props.historical}
-          togglePosition={percAmpToggle}
-        />
-      </div>
-      {/* {showViewer && (
+      {showViewer && (
         <div
           style={{
-            width: '1000px', // Makes the container flexible in size
-            margin: '20px auto', // Centers the div and adds spacing around it
-            padding: '15px', // Adds internal spacing
-            border: '2px solid #ccc', // Adds a subtle border
-            borderRadius: '10px', // Rounds the corners
-            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // Adds shadow for depth
-            backgroundColor: '#f9f9f9', // Soft background color
-            display: 'flex', // Flex layout for responsive adjustments
-            justifyContent: 'center', // Centers content inside the div
-            alignItems: 'center', // Vertically aligns content in the middle
+            width: '1000px',
+            margin: '20px auto',
+            padding: '15px',
+            border: '2px solid #ccc',
+            borderRadius: '10px',
+            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+            backgroundColor: '#f9f9f9',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
           <PlyViewer
@@ -3811,11 +4186,12 @@ function Medtronic_B33005(props, ref) {
             side={props.name}
             historical={props.historical}
             togglePosition={percAmpToggle}
+            tab={props.key}
           />
         </div>
-      )} */}
+      )}
     </div>
   );
 }
 
-export default forwardRef(Medtronic_B33005);
+export default forwardRef(Generic_elmodel);

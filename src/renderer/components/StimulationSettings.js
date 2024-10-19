@@ -11,6 +11,7 @@ import ToggleButton from 'react-bootstrap/ToggleButton';
 import { Dropdown } from 'react-bootstrap';
 import TabbedElectrodeIPGSelectionTest from './TabbedElectrodeIPGSelectionTest';
 import BostonCartesiaTest from './electrode_models/BostonCartesiaTest';
+import electrodeModels from './electrodeModels.json';
 
 function StimulationSettings({
   rightElectrode,
@@ -641,6 +642,14 @@ function StimulationSettings({
     setRenderKey(renderKey + 1);
   };
 
+  const formatElectrodeName = (name) => {
+    // Replace underscores with spaces and capitalize each word
+    return name
+      .split('_')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
   return (
     <div>
       <div className="stimulationSettingsContainer">
@@ -656,7 +665,7 @@ function StimulationSettings({
               onChange={(e) => handleLeftElectrodeChange(e)}
               // disabled
             >
-              <option value="">None</option>
+              {/* <option value="">None</option>
               <option value="abbott_activetip_2mm">
                 Abbott ActiveTip (2mm)
               </option>
@@ -680,6 +689,12 @@ function StimulationSettings({
               <option value="medtronic_3391">Medtronic 3391</option>
               <option value="medtronic_b33005">Medtronic B33005</option>
               <option value="medtronic_b33015">Medtronic B33015</option>
+              <option value="generic_elmodel">Generic</option> */}
+              {Object.keys(electrodeModels).map((key) => (
+                <option key={key} value={key}>
+                  {formatElectrodeName(key)}
+                </option>
+              ))}
             </select>
             <div />
             <h2 style={{ fontSize: 16 }}>Right Electrode</h2>
@@ -687,7 +702,7 @@ function StimulationSettings({
               value={rightElectrode}
               onChange={(e) => handleRightElectrodeChange(e)}
             >
-              <option value="">None</option>
+              {/* <option value="">None</option>
               <option value="abbott_activetip_2mm">
                 Abbott ActiveTip (2mm)
               </option>
@@ -711,6 +726,12 @@ function StimulationSettings({
               <option value="medtronic_3391">Medtronic 3391</option>
               <option value="medtronic_b33005">Medtronic B33005</option>
               <option value="medtronic_b33015">Medtronic B33015</option>
+              <option value="generic_elmodel">Generic</option> */}
+              {Object.keys(electrodeModels).map((key) => (
+                <option key={key} value={key}>
+                  {formatElectrodeName(key)}
+                </option>
+              ))}
             </select>
             <div />
             <h2 style={{ fontSize: 16 }}>IPG</h2>
@@ -729,7 +750,9 @@ function StimulationSettings({
         <div
           style={{ paddingBottom: '20px', float: 'right', marginRight: '20px' }}
         >
-          <h4 style={{fontSize: '16px', marginBottom: '2px'}}>Contact Naming</h4>
+          <h4 style={{ fontSize: '16px', marginBottom: '2px' }}>
+            Contact Naming
+          </h4>
           <ButtonGroup>
             {namingConventionDef.map((name, idx) => (
               <ToggleButton

@@ -33,6 +33,8 @@ import Abbott_directed_6173 from './electrode_models/currentModels/Abbott_direct
 import Boston_vercise_cartesia_HX from './electrode_models/currentModels/Boston_vercise_cartesia_HX';
 import Boston_vercise_cartesia_X from './electrode_models/currentModels/Boston_vercise_cartesia_X';
 import Boston_vercise_directed_new from './electrode_models/currentModels/Boston_vercise_directed_new';
+import electrodeModels from './electrodeModels.json';
+import Generic_elmodel from './electrode_models/currentModels/Generic_elmodel';
 
 function TabbedElectrodeIPGSelection({
   IPG,
@@ -93,7 +95,8 @@ function TabbedElectrodeIPGSelection({
   // const handleElectrodeChange = (event) => {
   //   setSelectedElectrode(event.target.value);
   // };
-
+  console.log('Electrode models: ', electrodeModels);
+  console.log('Selected electrode', selectedElectrodeLeft);
   const [key, setKey] = useState('5');
   // const [namingConvention, setNamingConvention] = useState('clinical');
   const fileInputRef = useRef(null);
@@ -675,6 +678,32 @@ function TabbedElectrodeIPGSelection({
         volAmpToggle={allVolAmpToggles[key]}
         contactNaming={namingConvention}
         historical={historical}
+      />
+    ),
+    generic_elmodel: (
+      <Generic_elmodel
+        ref={testElectrodeRef}
+        key={key}
+        name={key}
+        allQuantities={allQuantities}
+        quantities={allQuantities[key]}
+        selectedValues={allSelectedValues[key]}
+        IPG={IPG}
+        totalAmplitude={allTotalAmplitudes[key]}
+        parameters={allStimulationParameters[key]}
+        // visModel={visModel[1]}
+        visModel={visModel}
+        sessionTitle={sessionTitle[1]}
+        togglePosition={allTogglePositions[key]}
+        percAmpToggle={allPercAmpToggles[key]}
+        volAmpToggle={allVolAmpToggles[key]}
+        contactNaming={namingConvention}
+        adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
+        historical={historical}
+        elspec={electrodeModels.boston_vercise_directed}
+        // stimChanged={stimChanged}
+        // setStimChanged={setStimChanged}
+        // outputIPG={outputIPG}
       />
     ),
   };
@@ -1904,7 +1933,31 @@ function TabbedElectrodeIPGSelection({
             {hemisphereData.right.map((tabState, index) => (
               <TabPanel key={index}>
                 <div className="form-container">
-                  {testElectrodeOptions[selectedElectrodeRight]}
+                  {/* {testElectrodeOptions[selectedElectrodeRight]} */}
+                  <Generic_elmodel
+                    ref={testElectrodeRef}
+                    key={key}
+                    name={key}
+                    allQuantities={allQuantities}
+                    quantities={allQuantities[key]}
+                    selectedValues={allSelectedValues[key]}
+                    IPG={IPG}
+                    totalAmplitude={allTotalAmplitudes[key]}
+                    parameters={allStimulationParameters[key]}
+                    // visModel={visModel[1]}
+                    visModel={visModel}
+                    sessionTitle={sessionTitle[1]}
+                    togglePosition={allTogglePositions[key]}
+                    percAmpToggle={allPercAmpToggles[key]}
+                    volAmpToggle={allVolAmpToggles[key]}
+                    contactNaming={namingConvention}
+                    adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
+                    historical={historical}
+                    elspec={electrodeModels[selectedElectrodeRight]}
+                    // stimChanged={stimChanged}
+                    // setStimChanged={setStimChanged}
+                    // outputIPG={outputIPG}
+                  />
                   <div className="electrode-label">
                     {convertElectrode(selectedElectrodeRight)}
                   </div>
@@ -1932,7 +1985,31 @@ function TabbedElectrodeIPGSelection({
             {hemisphereData.left.map((tabState, index) => (
               <TabPanel key={index}>
                 <div className="form-container">
-                  {testElectrodeOptions[selectedElectrodeLeft]}
+                  {/* {testElectrodeOptions[selectedElectrodeLeft]} */}
+                  <Generic_elmodel
+                    ref={testElectrodeRef}
+                    key={key}
+                    name={key}
+                    allQuantities={allQuantities}
+                    quantities={allQuantities[key]}
+                    selectedValues={allSelectedValues[key]}
+                    IPG={IPG}
+                    totalAmplitude={allTotalAmplitudes[key]}
+                    parameters={allStimulationParameters[key]}
+                    // visModel={visModel[1]}
+                    visModel={visModel}
+                    sessionTitle={sessionTitle[1]}
+                    togglePosition={allTogglePositions[key]}
+                    percAmpToggle={allPercAmpToggles[key]}
+                    volAmpToggle={allVolAmpToggles[key]}
+                    contactNaming={namingConvention}
+                    adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
+                    historical={historical}
+                    elspec={electrodeModels[selectedElectrodeLeft]}
+                    // stimChanged={stimChanged}
+                    // setStimChanged={setStimChanged}
+                    // outputIPG={outputIPG}
+                  />
                   <div className="electrode-label">
                     {convertElectrode(selectedElectrodeLeft)}
                   </div>
