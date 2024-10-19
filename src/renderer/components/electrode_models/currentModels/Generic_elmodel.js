@@ -288,57 +288,129 @@ function Generic_elmodel(props, ref) {
 
   useEffect(() => {
     let newNames = [];
-    if (props.contactNaming === 'clinical') {
-      if (props.name < 5) {
-        newNames = {
-          0: IPG,
-          1: '1',
-          2: '2',
-          3: '3',
-          4: '4',
-          5: '5',
-          6: '6',
-          7: '7',
-          8: '8',
-        };
+    if (elspec.numel === 4) {
+      if (props.contactNaming === 'clinical') {
+        if (props.name < 5) {
+          newNames = {
+            0: IPG,
+            1: '1',
+            2: '2',
+            3: '3',
+            4: '4',
+          };
+        } else {
+          newNames = {
+            0: IPG,
+            1: '1',
+            2: '2',
+            3: '3',
+            4: '4',
+          };
+        }
       } else {
-        newNames = {
-          0: IPG,
-          1: '1',
-          2: '2',
-          3: '3',
-          4: '4',
-          5: '5',
-          6: '6',
-          7: '7',
-          8: '8',
-        };
+        if (props.name < 5) {
+          newNames = {
+            0: IPG,
+            1: 'k8',
+            2: 'k9',
+            3: 'k10',
+            4: 'k11',
+          };
+        } else {
+          newNames = {
+            0: IPG,
+            1: 'k0',
+            2: 'k1',
+            3: 'k2',
+            4: 'k3',
+          };
+        }
+      }
+    } else if (elspec.numel === 8 && elspec.isdirected === 1) {
+      if (props.contactNaming === 'clinical') {
+        if (props.name < 5) {
+          newNames = {
+            0: IPG,
+            1: '1',
+            2: '2A',
+            3: '2B',
+            4: '2C',
+            5: '3A',
+            6: '3B',
+            7: '3C',
+            8: '4',
+          };
+        } else {
+          newNames = {
+            0: IPG,
+            1: '1',
+            2: '2A',
+            3: '2B',
+            4: '2C',
+            5: '3A',
+            6: '3B',
+            7: '3C',
+            8: '4',
+          };
+        }
+      } else {
+        if (props.name < 5) {
+          newNames = {
+            0: IPG,
+            1: 'k8',
+            2: 'k9',
+            3: 'k10',
+            4: 'k11',
+            5: 'k12',
+            6: 'k13',
+            7: 'k14',
+            8: 'k15',
+          };
+        } else {
+          newNames = {
+            0: IPG,
+            1: 'k0',
+            2: 'k1',
+            3: 'k2',
+            4: 'k3',
+            5: 'k4',
+            6: 'k5',
+            7: 'k6',
+            8: 'k7',
+          };
+        }
       }
     } else {
-      if (props.name < 5) {
-        newNames = {
-          0: IPG,
-          1: 'k9',
-          2: 'k10',
-          3: 'k11',
-          4: 'k12',
-          5: 'k13',
-          6: 'k14',
-          7: 'k15',
-          8: 'k16',
-        };
+      if (props.contactNaming === 'clinical') {
+        for (let i = 0; i < elspec.numel; i++) {
+          newNames[i + 1] = i + 1;
+        }
       } else {
-        newNames = {
-          0: IPG,
-          1: 'k1',
-          2: 'k2',
-          3: 'k3',
-          4: 'k4',
-          5: 'k5',
-          6: 'k6',
-          7: 'k7',
-          8: 'k8',
-        };
+        if (props.name < 5) {
+          newNames = {
+            0: IPG,
+            1: 'k9',
+            2: 'k10',
+            3: 'k11',
+            4: 'k12',
+            5: 'k13',
+            6: 'k14',
+            7: 'k15',
+            8: 'k16',
+          };
+        } else {
+          newNames = {
+            0: IPG,
+            1: 'k1',
+            2: 'k2',
+            3: 'k3',
+            4: 'k4',
+            5: 'k5',
+            6: 'k6',
+            7: 'k7',
+            8: 'k8',
+          };
+        }
       }
     }
 
@@ -390,57 +462,24 @@ function Generic_elmodel(props, ref) {
     props.totalAmplitude || 0,
   );
 
-  const [selectedValues, setSelectedValues] = useState(
-    props.selectedValues || {
-      0: 'right',
-      1: 'left',
-      2: 'left',
-      3: 'left',
-      4: 'left',
-      5: 'left',
-      6: 'left',
-      7: 'left',
-      8: 'left',
-      // Initialize other images here
-    },
-  );
+  const initialSelectedValues = {0: 'right'};
+  const initialQuantityBoston = {0: 100};
+  const initialQuantity = {0: 0};
+  const initialAnimation = {0: null};
+  for (let i = 0; i < elspec.numel; i++) {
+    initialSelectedValues[i + 1] = 'left';
+    initialQuantityBoston[i + 1] = 0;
+    initialQuantity[i + 1] = 0;
+    initialAnimation[i + 1] = null;
+  }
 
-  const [animation, setAnimation] = useState({
-    0: null,
-    1: null,
-    2: null,
-    3: null,
-    4: null,
-    5: null,
-    6: null,
-    7: null,
-    8: null,
-  });
+  const [selectedValues, setSelectedValues] = useState(
+    props.selectedValues || initialSelectedValues);
+
+  const [animation, setAnimation] = useState(initialAnimation);
 
   const newInitialQuantities =
-    props.IPG === 'Boston'
-      ? {
-          0: 100,
-          1: 0,
-          2: 0,
-          3: 0,
-          4: 0,
-          5: 0,
-          6: 0,
-          7: 0,
-          8: 0,
-        }
-      : {
-          0: 0,
-          1: 0,
-          2: 0,
-          3: 0,
-          4: 0,
-          5: 0,
-          6: 0,
-          7: 0,
-          8: 0,
-        };
+    props.IPG === 'Boston' ? initialQuantityBoston : initialQuantity;
 
   const [quantities, setQuantities] = useState(
     props.quantities || newInitialQuantities,

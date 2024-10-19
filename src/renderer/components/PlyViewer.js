@@ -1033,8 +1033,14 @@ function PlyViewer({
       controls.zoomSpeed = 0.5;
       controlsRef.current = controls;
 
-      camera.position.set(0, 0, 60); // Zoomed out to start
-      camera.lookAt(0, 0, 0); // Ensure the camera is looking at the scene origin
+      camera.position.set(0, -50, 60); // Zoomed out to start
+      // camera.lookAt(0, 0, 0); // Ensure the camera is looking at the scene origin
+      if (side < 5) {
+        camera.lookAt(0, 100, 0); // Ensure the camera is looking at the scene origin
+      } else {
+        camera.lookAt(0, 0, 0); // Ensure the camera is looking at the scene origin
+
+      }
 
       // const onWindowResize = () => {
       //   camera.aspect = window.innerWidth / window.innerHeight;
