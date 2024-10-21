@@ -26,7 +26,7 @@ function GroupArchitecture({
   historical,
 }) {
   const [selectedPatient, setSelectedPatient] = useState(null);
-
+  console.log(electrodeList);
   // State for each patient
   const initialState = {
     IPG: '',

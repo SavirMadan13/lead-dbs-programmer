@@ -4,6 +4,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+// import {Tab, Tabs} from 'react-bootstrap';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import 'react-tabs/style/react-tabs.css';
@@ -274,13 +275,13 @@ function TabbedElectrodeIPGSelection({
         return 'Boston Scientific Vercise Cartesia HX';
       case 'boston_scientific_vercise_cartesia_x':
         return 'Boston Scientific Vercise Cartesia X';
-      case 'abott_activetip_2mm':
+      case 'abbott_activetip_2mm':
         return 'Abbott ActiveTip (6146-6149)';
       case 'abbott_activetip_3mm':
         return 'Abbott ActiveTip (6142-6145)';
-      case 'abott_directed_6172':
+      case 'abbott_directed_05':
         return 'Abbott Directed 6172 (short)';
-      case 'abott_directed_6173':
+      case 'abbott_directed_15':
         return 'Abbott Directed 6173 (long)';
       default:
         return '';
@@ -1909,13 +1910,21 @@ function TabbedElectrodeIPGSelection({
     <div>
       <div style={{ marginTop: '30px' }} />
       <div className="stimCloseContainer" />
-      <Tabs className="tabs-container">
-        <TabList className="tabs-container">
+      <Tabs
+        defaultActiveKey="profile"
+        id="uncontrolled-tab-example"
+        className="mb-3"
+      >
+        <TabList className="mb-3">
           <Tab onClick={() => handleTabChange('5')}>Right Hemisphere</Tab>
           <Tab onClick={() => handleTabChange('1')}>Left Hemisphere</Tab>
         </TabList>
         <TabPanel>
-          <Tabs>
+          <Tabs
+            defaultActiveKey="profile"
+            id="uncontrolled-tab-example"
+            className="mb-3"
+          >
             <TabList>
               <Tab key="5" onClick={() => handleTabChange('5')}>
                 Program 1
@@ -1967,7 +1976,11 @@ function TabbedElectrodeIPGSelection({
           </Tabs>
         </TabPanel>
         <TabPanel>
-          <Tabs>
+          <Tabs
+            defaultActiveKey="profile"
+            id="uncontrolled-tab-example"
+            className="mb-3"
+          >
             <TabList>
               <Tab key="1" onClick={() => handleTabChange('1')}>
                 Program 1
@@ -2043,6 +2056,121 @@ function TabbedElectrodeIPGSelection({
         </button>
       </div>
     </div>
+    // <div>
+    //   <div style={{ marginTop: '30px' }} />
+    //   <div className="stimCloseContainer" />
+    //   <Tabs
+    //     defaultActiveKey="rightHemisphere"
+    //     // id="uncontrolled-tab-example"
+    //     className="mb-3"
+    //     onSelect={handleTabChange}
+    //   >
+    //     <Tab eventKey="rightHemisphere" title="Right Hemisphere">
+    //       <Tabs
+    //         defaultActiveKey="program1"
+    //         id="right-programs"
+    //         className="mb-3"
+    //         onSelect={handleTabChange}
+    //       >
+    //         {['5', '6', '7', '8'].map((programKey, index) => (
+    //           <Tab
+    //             eventKey={`program${index + 1}`}
+    //             title={`Program ${index + 1}`}
+    //             key={programKey}
+    //           >
+    //             <div className="form-container">
+    //               {/* Replace Generic_elmodel with your component and relevant props */}
+    //               <Generic_elmodel
+    //                 ref={testElectrodeRef}
+    //                 key={programKey}
+    //                 name={programKey}
+    //                 allQuantities={allQuantities}
+    //                 quantities={allQuantities[programKey]}
+    //                 selectedValues={allSelectedValues[programKey]}
+    //                 IPG={IPG}
+    //                 totalAmplitude={allTotalAmplitudes[programKey]}
+    //                 parameters={allStimulationParameters[programKey]}
+    //                 visModel={visModel}
+    //                 sessionTitle={sessionTitle[1]}
+    //                 togglePosition={allTogglePositions[programKey]}
+    //                 percAmpToggle={allPercAmpToggles[programKey]}
+    //                 volAmpToggle={allVolAmpToggles[programKey]}
+    //                 contactNaming={namingConvention}
+    //                 adornment={
+    //                   allVolAmpToggles[programKey] === 'right' ? 'V' : 'mA'
+    //                 }
+    //                 historical={historical}
+    //                 elspec={electrodeModels[selectedElectrodeRight]}
+    //               />
+    //               <div className="electrode-label">
+    //                 {convertElectrode(selectedElectrodeRight)}
+    //               </div>
+    //             </div>
+    //           </Tab>
+    //         ))}
+    //       </Tabs>
+    //     </Tab>
+    //     <Tab eventKey="leftHemisphere" title="Left Hemisphere">
+    //       <Tabs
+    //         defaultActiveKey="program1"
+    //         id="left-programs"
+    //         className="mb-3"
+    //         onSelect={handleTabChange}
+    //       >
+    //         {['1', '2', '3', '4'].map((programKey, index) => (
+    //           <Tab
+    //             eventKey={`program${index + 1}`}
+    //             title={`Program ${index + 1}`}
+    //             key={programKey}
+    //           >
+    //             <div className="form-container">
+    //               <Generic_elmodel
+    //                 ref={testElectrodeRef}
+    //                 key={programKey}
+    //                 name={programKey}
+    //                 allQuantities={allQuantities}
+    //                 quantities={allQuantities[programKey]}
+    //                 selectedValues={allSelectedValues[programKey]}
+    //                 IPG={IPG}
+    //                 totalAmplitude={allTotalAmplitudes[programKey]}
+    //                 parameters={allStimulationParameters[programKey]}
+    //                 visModel={visModel}
+    //                 sessionTitle={sessionTitle[1]}
+    //                 togglePosition={allTogglePositions[programKey]}
+    //                 percAmpToggle={allPercAmpToggles[programKey]}
+    //                 volAmpToggle={allVolAmpToggles[programKey]}
+    //                 contactNaming={namingConvention}
+    //                 adornment={
+    //                   allVolAmpToggles[programKey] === 'right' ? 'V' : 'mA'
+    //                 }
+    //                 historical={historical}
+    //                 elspec={electrodeModels[selectedElectrodeLeft]}
+    //               />
+    //               <div className="electrode-label">
+    //                 {convertElectrode(selectedElectrodeLeft)}
+    //               </div>
+    //             </div>
+    //           </Tab>
+    //         ))}
+    //       </Tabs>
+    //     </Tab>
+    //   </Tabs>
+    //   <div className="export-button-container">
+    //     <input
+    //       ref={fileInputRef}
+    //       className="file-input"
+    //       type="file"
+    //       accept=".json"
+    //       onChange={handleFileChange}
+    //       style={{ display: 'none' }}
+    //     />
+    //   </div>
+    //   <div style={{ textAlign: 'center', paddingBottom: '35px' }}>
+    //     <button className="export-button-final" onClick={sendDataToMain}>
+    //       Save
+    //     </button>
+    //   </div>
+    // </div>
   );
 }
 

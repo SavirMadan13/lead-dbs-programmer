@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { PLYLoader, OrbitControls } from 'three-stdlib';
 import * as nifti from 'nifti-reader-js'; // Correctly importing the nifti module
 import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
-import { Tabs, Tab, Collapse, Button, Form } from 'react-bootstrap';
+import { Tabs, Tab, Collapse, Button, Form, Modal } from 'react-bootstrap';
 import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings icon
 
 function PlyViewer({
@@ -17,8 +17,10 @@ function PlyViewer({
 }) {
   const [plyFile, setPlyFile] = useState(null);
   const mountRef = useRef(null);
+  const secondaryMountRef = useRef(null); // Ref for the secondary view
   const sphereRef = useRef(null); // Ref for the sphere to update position dynamically
   const controlsRef = useRef(null); // Ref for the OrbitControls
+  const secondaryControlsRef = useRef(null); // Ref for the OrbitControls
   const [selectedTremor, setSelectedTremor] = useState([]); // Array to store selected tremor items
   const sphereRefs = useRef([]); // Refs for all spheres
   const sceneRef = useRef(null);
@@ -26,7 +28,9 @@ function PlyViewer({
   const [meshes, setMeshes] = useState([]); // State to track meshes in the scene
   const [meshProperties, setMeshProperties] = useState({}); // State for each mesh's properties like visibility and opacity
   const rendererRef = useRef(null); // To store the renderer reference
+  const secondaryRendererRef = useRef(null);
   const cameraRef = useRef(null); // To store the camera reference
+  const secondaryCameraRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [recoData, setRecoData] = useState(null);
   const [elecCoords, setElecCoords] = useState(null);
@@ -116,7 +120,9 @@ function PlyViewer({
   const [meshOpacity, setMeshOpacity] = useState({});
   const [threshold, setThreshold] = useState(0.5); // Example thresholding value
 
-  const tremorData = [
+  const [newTremor, setNewTremor] = useState({ name: '', coords: [0, 0, 0] });
+  const [showModal, setShowModal] = useState(false);
+  const [tremorData, setTremorData] = useState([
     { name: 'Papavassilliou et al', coords: [-14.5, -17.7, -2.8] },
     { name: 'Hamel et al', coords: [-13.79, -18.04, -1.06] },
     { name: 'Herzog et al', coords: [-14.04, -16.66, -2.92] },
@@ -135,7 +141,29 @@ function PlyViewer({
     { name: 'Elias et al', coords: [-17.3, -13.9, 4.2] },
     { name: 'Tsuboi et al2', coords: [-15.0, -17.0, 1.0] },
     { name: 'Middlebrooks et al', coords: [-15.5, -15.5, 0.5] },
-  ];
+  ]);
+
+  // Handle input change for new tremor data
+  const handleNewTremorChange = (e) => {
+    const { name, value } = e.target;
+    setNewTremor((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // Function to add new tremor data
+  const addNewTremor = () => {
+    const { name, coords } = newTremor;
+    if (name && coords.length === 3) {
+      setTremorData((prevData) => [
+        ...prevData,
+        { name, coords: coords.map(Number) },
+      ]);
+      // Reset the form
+      setNewTremor({ name: '', coords: [0, 0, 0] });
+    }
+  };
 
   const [plyFiles, setPlyFiles] = useState([]); // Store both names and paths
 
@@ -480,13 +508,13 @@ function PlyViewer({
       case 'Boston Scientific Vercise Cartesia X':
         return 'boston_scientific_vercise_cartesia_x';
       case 'Abbott ActiveTip (6146-6149)':
-        return 'abott_activetip_2mm';
+        return 'abbott_activetip_2mm';
       case 'Abbott ActiveTip (6142-6145)':
         return 'abbott_activetip_3mm';
       case 'Abbott Directed 6172 (short)':
-        return 'abott_directed_6172';
+        return 'abbott_directed_05';
       case 'Abbott Directed 6173 (long)':
-        return 'abott_directed_6173';
+        return 'abbott_directed_15';
       default:
         return '';
     }
@@ -602,7 +630,6 @@ function PlyViewer({
       });
     }
 
-
     return {
       filteredQuantities,
       filteredValues,
@@ -612,9 +639,14 @@ function PlyViewer({
     // Need to add some type of filtering here that detects whether it is Medtronic Activa, and then needs to put just mA values, not %
   };
 
-  const addPreviousVTA = (reconstruction, stimulationParameters) => {
+  const addPreviousVTA = (
+    reconstruction,
+    stimulationParameters,
+    selectedPatientID,
+    selectedSession,
+  ) => {
     const { S } = stimulationParameters;
-    console.log(S);
+    console.log(reconstruction);
     // const outputElectrode = S.elmodel;
     const outputIPG = S.ipg;
     const processedData = gatherImportedDataNew(S, outputIPG);
@@ -630,15 +662,17 @@ function PlyViewer({
       new THREE.Vector3(0, 0, 1),
       THREE.MathUtils.degToRad(rotationAngle),
     ); // Z-axis rotation
-
+    console.log(togglePosition);
     // Loop through all contact directions to handle adding and updating spheres
     Object.keys(contactDirections).forEach((contactId) => {
       console.log(togglePosition);
       let contactQuantity = parseFloat(quantities[contactId]);
+      let newAmplitude = amplitude;
       if (togglePosition === 'center') {
         const newQuantities = processedData.filteredQuantities[1];
         console.log(newQuantities);
-        const newAmplitude = processedData.newTotalAmplitude;
+        newAmplitude = processedData.newTotalAmplitude[1];
+        console.log(newAmplitude);
         contactQuantity = parseFloat(newQuantities[contactId]);
       }
 
@@ -655,11 +689,13 @@ function PlyViewer({
         let startCoords = [];
         let targetCoords = [];
         if (side < 5) {
-          const { head2: headMarkers, tail2: tailMarkers } = reconstruction.markers;
+          const { head2: headMarkers, tail2: tailMarkers } =
+            reconstruction.markers;
           startCoords = new THREE.Vector3(...headMarkers);
           targetCoords = new THREE.Vector3(...tailMarkers);
         } else {
-          const { head1: headMarkers, tail1: tailMarkers } = reconstruction.markers;
+          const { head1: headMarkers, tail1: tailMarkers } =
+            reconstruction.markers;
           startCoords = new THREE.Vector3(...headMarkers);
           targetCoords = new THREE.Vector3(...tailMarkers);
         }
@@ -711,7 +747,7 @@ function PlyViewer({
           direction.z * directionOffset.z;
 
         // Calculate amplitude based on contactQuantity
-        const contactAmplitude = (contactQuantity / 100) * amplitude;
+        const contactAmplitude = (contactQuantity / 100) * newAmplitude;
 
         // Create a new sphere
         const sphereGeo = new THREE.SphereGeometry(
@@ -741,7 +777,12 @@ function PlyViewer({
         // Set the position of the sphere
         sphere.position.set(newPosition.x, newPosition.y, newPosition.z);
         // sphere.name = `contact_${contactId}`; // Name the sphere to track it
-        addMeshToScene('Imported Electrode', sphereGeo, sphereMat, [newPosition.x, newPosition.y, newPosition.z]);
+        addMeshToScene(
+          `${selectedPatientID}_${selectedSession}_VTA`,
+          sphereGeo,
+          sphereMat,
+          [newPosition.x, newPosition.y, newPosition.z],
+        );
         // }
       }
     });
@@ -785,7 +826,12 @@ function PlyViewer({
         electrodeGeometry,
         material,
       );
-      addPreviousVTA(fileData.reconstructionData, fileData.stimulationParameters);
+      addPreviousVTA(
+        fileData.reconstructionData,
+        fileData.stimulationParameters,
+        selectedPatientID,
+        selectedSession,
+      );
       // addMeshToScene(`${selectedPatientID}-electrodes`)
     } catch (error) {
       console.error('Error loading PLY file:', error);
@@ -954,8 +1000,142 @@ function PlyViewer({
     });
   };
 
+  const logCameraSettings = () => {
+    console.log(recoData);
+    if (cameraRef.current) {
+      console.log('Camera Settings:');
+      console.log('Position:', cameraRef.current.position);
+      console.log('Rotation:', cameraRef.current.rotation);
+      console.log('Zoom:', cameraRef.current.zoom);
+      console.log('FOV:', cameraRef.current.fov);
+      console.log('Near:', cameraRef.current.near);
+      console.log('Far:', cameraRef.current.far);
+    } else {
+      console.log('Camera not initialized.');
+    }
+  };
+  // Vis main view
+  // useEffect(() => {
+  //   if (mountRef.current) {
+  //     // Initialize scene, camera, and renderer only once
+  //     const scene = new THREE.Scene();
+  //     sceneRef.current = scene; // Save scene reference
+  //     scene.background = new THREE.Color(0xffffff); // White background
+
+  //     // Create an OrthographicCamera
+  //     const aspect = 300 / 600;
+  //     const frustumSize = 100; // Adjust this value to control zoom
+  //     const camera = new THREE.OrthographicCamera(
+  //       (frustumSize * aspect) / -2, // left
+  //       (frustumSize * aspect) / 2, // right
+  //       frustumSize / 2, // top
+  //       frustumSize / -2, // bottom
+  //       0.1, // near plane
+  //       1000, // far plane
+  //     );
+
+  //     // const camera = new THREE.PerspectiveCamera(75, 0.5, 0.1, 1000); // 1 is the aspect ratio (square)
+  //     const renderer = new THREE.WebGLRenderer({ antialias: true });
+  //     renderer.setSize(300, 600); // Set smaller size
+  //     mountRef.current.appendChild(renderer.domElement);
+
+  //     const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+  //     scene.add(ambientLight);
+
+  //     // if (side < 5) {
+  //     //   // Create a clipping plane that only renders objects with x > 0
+  //     //   const clipPlane = new THREE.Plane(new THREE.Vector3(1, 0, 0), 0); // Vector3(-1, 0, 0) means we're clipping based on the x axis
+
+  //     //   // Enable the clipping planes in the renderer
+  //     //   renderer.localClippingEnabled = true;
+
+  //     //   // Apply the clipping plane to the entire scene
+  //     //   renderer.clippingPlanes = [clipPlane];
+  //     // } else {
+  //     //   // Create a clipping plane that only renders objects with x > 0
+  //     //   const clipPlane = new THREE.Plane(new THREE.Vector3(-1, 0, 0), 0); // Vector3(-1, 0, 0) means we're clipping based on the x axis
+
+  //     //   // Enable the clipping planes in the renderer
+  //     //   renderer.localClippingEnabled = true;
+
+  //     //   // Apply the clipping plane to the entire scene
+  //     //   renderer.clippingPlanes = [clipPlane];
+  //     // }
+
+  //     const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  //     directionalLight.position.set(5, 5, 5).normalize();
+  //     scene.add(directionalLight);
+
+  //     // const loader = new PLYLoader();
+  //     // const geometry = loader.parse(plyFile);
+  //     // // const material = new THREE.MeshStandardMaterial({
+  //     // //   vertexColors: geometry.hasAttribute('color'),
+  //     // //   flatShading: true,
+  //     // // });
+
+  //     // const material = new THREE.MeshStandardMaterial({
+  //     //   vertexColors: geometry.hasAttribute('color'),
+  //     //   flatShading: true,
+  //     //   metalness: 0.1, // More reflective
+  //     //   roughness: 0.5, // Shinier surface
+  //     //   transparent: true, // Enable transparency
+  //     //   opacity: 0.8, // Set opacity to 60%
+  //     // });
+
+  //     // geometry.computeVertexNormals();
+  //     // const mesh = new THREE.Mesh(geometry, material);
+  //     // scene.add(mesh);
+
+  //     // OrbitControls setup (only initialize once)
+  //     const controls = new OrbitControls(camera, renderer.domElement);
+  //     controls.enableDamping = true;
+  //     controls.dampingFactor = 0.1;
+  //     controls.rotateSpeed = 0.8;
+  //     controls.zoomSpeed = 0.5;
+  //     controlsRef.current = controls;
+
+  //     camera.position.set(0, -50, 60); // Zoomed out to start
+  //     // camera.lookAt(0, 0, 0); // Ensure the camera is looking at the scene origin
+  //     if (side < 5) {
+  //       camera.lookAt(0, 100, 0); // Ensure the camera is looking at the scene origin
+  //     } else {
+  //       camera.lookAt(0, 0, 0); // Ensure the camera is looking at the scene origin
+  //     }
+
+  //     // const onWindowResize = () => {
+  //     //   camera.aspect = window.innerWidth / window.innerHeight;
+  //     //   camera.updateProjectionMatrix();
+  //     //   renderer.setSize(window.innerWidth, window.innerHeight);
+  //     // };
+  //     const onWindowResize = () => {
+  //       camera.left = (frustumSize * aspect) / -2;
+  //       camera.right = (frustumSize * aspect) / 2;
+  //       camera.top = frustumSize / 2;
+  //       camera.bottom = frustumSize / -2;
+  //       camera.updateProjectionMatrix();
+  //       renderer.setSize(window.innerWidth, window.innerHeight);
+  //     };
+  //     window.addEventListener('resize', onWindowResize);
+
+  //     rendererRef.current = renderer;
+  //     cameraRef.current = camera;
+
+  //     const animate = () => {
+  //       requestAnimationFrame(animate);
+  //       controls.update(); // Update OrbitControls
+  //       renderer.render(sceneRef.current, camera);
+  //     };
+  //     animate();
+
+  //     return () => {
+  //       window.removeEventListener('resize', onWindowResize);
+  //       renderer.dispose();
+  //     };
+  //   }
+  // }, [plyFile]);
+
   useEffect(() => {
-    if (mountRef.current) {
+    if (mountRef.current && secondaryMountRef.current) {
       // Initialize scene, camera, and renderer only once
       const scene = new THREE.Scene();
       sceneRef.current = scene; // Save scene reference
@@ -973,57 +1153,37 @@ function PlyViewer({
         1000, // far plane
       );
 
+      // Secondary Camera Setup
+      const secondaryWidth = 300;
+      const secondaryHeight = 150; // Adjust height as needed
+      const aspectSecondary = secondaryWidth / secondaryHeight;
+      const secondaryFrustumHeight = frustumSize / 2; // Set a smaller height for the secondary view
+      const secondaryCamera = new THREE.OrthographicCamera(
+        (secondaryFrustumHeight * aspectSecondary) / -2,
+        (secondaryFrustumHeight * aspectSecondary) / 2,
+        secondaryFrustumHeight / 2,
+        secondaryFrustumHeight / -2,
+        0.1,
+        1000,
+      );
+      secondaryCamera.position.set(50, 50, 100);
+      secondaryCamera.lookAt(0, 0, 0);
+
       // const camera = new THREE.PerspectiveCamera(75, 0.5, 0.1, 1000); // 1 is the aspect ratio (square)
       const renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(300, 600); // Set smaller size
       mountRef.current.appendChild(renderer.domElement);
 
+      const secondaryRenderer = new THREE.WebGLRenderer({ antialias: true });
+      secondaryRenderer.setSize(300, 150);
+      secondaryMountRef.current.appendChild(secondaryRenderer.domElement);
+
       const ambientLight = new THREE.AmbientLight(0xffffff, 1);
       scene.add(ambientLight);
-
-      // if (side < 5) {
-      //   // Create a clipping plane that only renders objects with x > 0
-      //   const clipPlane = new THREE.Plane(new THREE.Vector3(1, 0, 0), 0); // Vector3(-1, 0, 0) means we're clipping based on the x axis
-
-      //   // Enable the clipping planes in the renderer
-      //   renderer.localClippingEnabled = true;
-
-      //   // Apply the clipping plane to the entire scene
-      //   renderer.clippingPlanes = [clipPlane];
-      // } else {
-      //   // Create a clipping plane that only renders objects with x > 0
-      //   const clipPlane = new THREE.Plane(new THREE.Vector3(-1, 0, 0), 0); // Vector3(-1, 0, 0) means we're clipping based on the x axis
-
-      //   // Enable the clipping planes in the renderer
-      //   renderer.localClippingEnabled = true;
-
-      //   // Apply the clipping plane to the entire scene
-      //   renderer.clippingPlanes = [clipPlane];
-      // }
 
       const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
       directionalLight.position.set(5, 5, 5).normalize();
       scene.add(directionalLight);
-
-      // const loader = new PLYLoader();
-      // const geometry = loader.parse(plyFile);
-      // // const material = new THREE.MeshStandardMaterial({
-      // //   vertexColors: geometry.hasAttribute('color'),
-      // //   flatShading: true,
-      // // });
-
-      // const material = new THREE.MeshStandardMaterial({
-      //   vertexColors: geometry.hasAttribute('color'),
-      //   flatShading: true,
-      //   metalness: 0.1, // More reflective
-      //   roughness: 0.5, // Shinier surface
-      //   transparent: true, // Enable transparency
-      //   opacity: 0.8, // Set opacity to 60%
-      // });
-
-      // geometry.computeVertexNormals();
-      // const mesh = new THREE.Mesh(geometry, material);
-      // scene.add(mesh);
 
       // OrbitControls setup (only initialize once)
       const controls = new OrbitControls(camera, renderer.domElement);
@@ -1033,13 +1193,21 @@ function PlyViewer({
       controls.zoomSpeed = 0.5;
       controlsRef.current = controls;
 
+      const secondaryControls = new OrbitControls(secondaryCamera, secondaryRenderer.domElement);
+      secondaryControls.enableDamping = true;
+      secondaryControls.dampingFactor = 0.1;
+      secondaryControls.rotateSpeed = 0.8;
+      secondaryControls.zoomSpeed = 0.5;
+      secondaryControls.current = secondaryControls;
+
+      secondaryControlsRef.current = controls;
+
       camera.position.set(0, -50, 60); // Zoomed out to start
       // camera.lookAt(0, 0, 0); // Ensure the camera is looking at the scene origin
       if (side < 5) {
         camera.lookAt(0, 100, 0); // Ensure the camera is looking at the scene origin
       } else {
         camera.lookAt(0, 0, 0); // Ensure the camera is looking at the scene origin
-
       }
 
       // const onWindowResize = () => {
@@ -1058,12 +1226,15 @@ function PlyViewer({
       window.addEventListener('resize', onWindowResize);
 
       rendererRef.current = renderer;
+      secondaryCameraRef.current = secondaryCamera;
+      secondaryRendererRef.current = secondaryRenderer;
       cameraRef.current = camera;
 
       const animate = () => {
         requestAnimationFrame(animate);
         controls.update(); // Update OrbitControls
         renderer.render(sceneRef.current, camera);
+        secondaryRenderer.render(scene, secondaryCamera);
       };
       animate();
 
@@ -1113,7 +1284,7 @@ function PlyViewer({
 
   // Function to change the camera angle
   const changeCameraAngle = () => {
-    const camera = cameraRef.current;
+    const camera = secondaryCameraRef.current;
     let startCoords = [];
     let targetCoords = [];
     if (side < 5) {
@@ -1125,6 +1296,7 @@ function PlyViewer({
       startCoords = new THREE.Vector3(...headMarkers);
       targetCoords = new THREE.Vector3(...tailMarkers);
     }
+
     if (camera) {
       // Calculate the direction vector by subtracting startCoords from endCoords
       const directionVector = new THREE.Vector3(
@@ -1138,32 +1310,61 @@ function PlyViewer({
 
       // Position the camera above the vector (for example, along the z-axis)
       const cameraDistance = 50; // Distance from the vector
-      const cameraPosition = new THREE.Vector3(
-        startCoords.x + cameraDistance * directionVector.x,
-        startCoords.y + cameraDistance * directionVector.y,
-        startCoords.z + cameraDistance * directionVector.z, // Move up along z-axis for 'above' view
+      const cameraPosition = new THREE.Vector3();
+      cameraPosition
+        .copy(startCoords)
+        .addScaledVector(directionVector, cameraDistance);
+      const v = directionVector;
+      const yaw = Math.atan2(v.x, v.z);
+      const pitch = Math.atan2(v.y, v.z);
+      const roll = 0;
+      const newSwitchedPosition = new THREE.Vector3(
+        cameraPosition.y,
+        cameraPosition.x,
+        cameraPosition.z,
       );
+      // camera.position.copy(newSwitchedPosition); // Move the camera to the calculated point
+      // camera.rotation.set(yaw, pitch, roll, 'XYZ'); // Set the camera rotations
+      // camera.zoom = 2;
+      // camera.updateProjectionMatrix();
 
-      // Set the camera position
-      camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+      // const cameraPosition = new THREE.Vector3(
+      //   startCoords.x + cameraDistance * directionVector.x,
+      //   startCoords.y + cameraDistance * directionVector.y,
+      //   startCoords.z + cameraDistance * directionVector.z, // Move up along z-axis for 'above' view
+      // );
 
-      // Make the camera look along the vector
-      camera.lookAt(
-        (startCoords.x + targetCoords.x) / 2, // Midpoint of the vector
-        (startCoords.y + targetCoords.y) / 2,
-        (startCoords.z + targetCoords.z) / 2,
-      );
+      // // Set the camera position
+      // camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
-      // Update the camera projection matrix
-      camera.updateProjectionMatrix();
+      // // Make the camera look along the vector
+      // camera.lookAt(
+      //   (startCoords.x + targetCoords.x) / 2, // Midpoint of the vector
+      //   (startCoords.y + targetCoords.y) / 2,
+      //   (startCoords.z + targetCoords.z) / 2,
+      // );
+
+      // // Update the camera projection matrix
+      // camera.updateProjectionMatrix();
     }
   };
+
+  useEffect(() => {
+    if (recoData) {
+      changeCameraAngle();
+    }
+  }, [recoData]);
+
+  // useEffect(() => {
+  //   // Example: Resize window to 1024x768 on component load
+  //   window.electron.ipcRenderer.sendMessage('resize-window', 1024, 768);
+  // }, []);
 
   // Don't forget this
 
   useEffect(() => {
-    window.electron.zoom.setZoomLevel(zoomLevel);
-  }, [zoomLevel]);
+    window.electron.zoom.setZoomLevel(-3);
+  }, []);
 
   return (
     <div>
@@ -1174,8 +1375,12 @@ function PlyViewer({
         </div>
       )} */}
       <div style={viewerContainerStyle}>
-        <div ref={mountRef} />
+        {/* <div ref={mountRef} /> */}
         {/* <Button onClick={changeCameraAngle}>View from top</Button> */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div ref={mountRef} />
+          <div ref={secondaryMountRef} />
+        </div>
         <Button
           variant="outline-secondary"
           onClick={() => setOpen(!open)}
@@ -1185,6 +1390,8 @@ function PlyViewer({
         >
           <SettingsIcon />
         </Button>
+        <button onClick={logCameraSettings}>Log Camera Settings</button>
+        <button onClick={changeCameraAngle}>Change Camera</button>
 
         <Collapse in={open}>
           <div id="tabs-collapse">
@@ -1270,6 +1477,92 @@ function PlyViewer({
                           </option>
                         ))}
                       </select>
+                      <Button
+                        variant="primary"
+                        onClick={() => setShowModal(true)}
+                      >
+                        Add Coordinates
+                      </Button>
+                      <Modal
+                        show={showModal}
+                        onHide={() => setShowModal(false)}
+                      >
+                        <Modal.Header closeButton>
+                          <Modal.Title>Add New Coordinates</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                          <input
+                            type="text"
+                            name="name"
+                            placeholder="Name"
+                            value={newTremor.name}
+                            onChange={handleNewTremorChange}
+                            className="form-control"
+                          />
+                          <input
+                            type="number"
+                            name="coords"
+                            placeholder="X"
+                            value={newTremor.coords[0]}
+                            onChange={(e) =>
+                              setNewTremor({
+                                ...newTremor,
+                                coords: [
+                                  e.target.value,
+                                  newTremor.coords[1],
+                                  newTremor.coords[2],
+                                ],
+                              })
+                            }
+                            className="form-control mt-2"
+                          />
+                          <input
+                            type="number"
+                            name="coords"
+                            placeholder="Y"
+                            value={newTremor.coords[1]}
+                            onChange={(e) =>
+                              setNewTremor({
+                                ...newTremor,
+                                coords: [
+                                  newTremor.coords[0],
+                                  e.target.value,
+                                  newTremor.coords[2],
+                                ],
+                              })
+                            }
+                            className="form-control mt-2"
+                          />
+                          <input
+                            type="number"
+                            name="coords"
+                            placeholder="Z"
+                            value={newTremor.coords[2]}
+                            onChange={(e) =>
+                              setNewTremor({
+                                ...newTremor,
+                                coords: [
+                                  newTremor.coords[0],
+                                  newTremor.coords[1],
+                                  e.target.value,
+                                ],
+                              })
+                            }
+                            className="form-control mt-2"
+                          />
+                        </Modal.Body>
+                        <Modal.Footer>
+                          <Button
+                            variant="secondary"
+                            onClick={() => setShowModal(false)}
+                          >
+                            Close
+                          </Button>
+                          <Button variant="primary" onClick={addNewTremor}>
+                            Add
+                          </Button>
+                        </Modal.Footer>
+                      </Modal>
                     </div>
                   </Tab>
                   <Tab eventKey="pd" title="PD">

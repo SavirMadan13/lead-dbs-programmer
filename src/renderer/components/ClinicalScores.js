@@ -12,43 +12,23 @@ function ClinicalScores() {
   const location = useLocation();
   const { patient, timeline, directoryPath, leadDBS } = location.state || {};
   const navigate = useNavigate(); // Initialize the navigate hook
-  // const initialScores = {
-  //   3.1: 0,
-  //   3.2: 0,
-  //   '3.3a': 0,
-  //   '3.3b': 0,
-  //   '3.3c': 0,
-  //   '3.3d': 0,
-  //   '3.3e': 0,
-  //   '3.4a': 0,
-  //   '3.4b': 0,
-  //   '3.5a': 0,
-  //   '3.5b': 0,
-  //   '3.6a': 0,
-  //   '3.6b': 0,
-  //   '3.7a': 0,
-  //   '3.7b': 0,
-  //   '3.8a': 0,
-  //   '3.8b': 0,
-  //   3.9: 0,
-  //   '3.10': 0,
-  //   3.11: 0,
-  //   3.12: 0,
-  //   3.13: 0,
-  //   3.14: 0,
-  //   '3.15a': 0,
-  //   '3.15b': 0,
-  //   '3.16a': 0,
-  //   '3.16b': 0,
-  //   '3.17a': 0,
-  //   '3.17b': 0,
-  //   '3.17c': 0,
-  //   '3.17d': 0,
-  //   '3.17e': 0,
-  //   3.18: 0,
-  // };
 
-  const initialScores = {
+  const [scoreTypes, setScoreTypes] = useState(['UPDRS', 'Y-BOCS']);
+  const [selectedScoreType, setSelectedScoreType] = useState('UPDRS');
+  const YBOCS = {
+    'Time occupied by obsessive thoughts': 0,
+    'Interference due to obsessive thoughts': 0,
+    'Distress associated with obsessive thoughts': 0,
+    'Resistance against obsessions': 0,
+    'Degree of control over obsessive thoughts': 0,
+    'Time spent performing compulsive behaviors': 0,
+    'Interference due to compulsive behaviors': 0,
+    'Distress associated with compulsive behavior': 0,
+    'Resistance against compulsions': 0,
+    'Degree of control over compulsive behavior': 0,
+  };
+
+  const UPDRS = {
     '3.1: Speech': 0,
     '3.2: Facial expression': 0,
     '3.3a: Rigidity- Neck': 0,
@@ -82,6 +62,16 @@ function ClinicalScores() {
     '3.17d: Rest tremor amplitude- LLE': 0,
     '3.17e: Rest tremor amplitue- Lip/jaw': 0,
     '3.18: Constancy of rest tremor': 0,
+  };
+  const [initialScores, setInitialScores] = useState(UPDRS);
+
+  const handleScoreChange = (score) => {
+    if (score === 'UPDRS') {
+      setInitialScores(UPDRS);
+    } else if (score === 'Y-BOCS') {
+      setInitialScores(YBOCS);
+    }
+    setSelectedScoreType(score);
   };
 
   // Set how many columns you want per "wrapped" table row
@@ -346,15 +336,6 @@ function ClinicalScores() {
 
     console.log('Baseline: ', baselineScores);
     console.log('Postop: ', postopScores);
-
-    // const tempBaselineValues = [
-    //   32, 45, 29, 50, 37, 41, 48, 42, 36, 44, 33, 40, 47, 39, 38, 43, 31, 49,
-    //   46, 46, 34,
-    // ];
-    // const tempPostopValues = [
-    //   28, 40, 25, 42, 34, 38, 44, 39, 32, 41, 29, 36, 42, 35, 34, 40, 27, 44,
-    //   41, 30,
-    // ];
     setBaselineValues(baselineScores);
     setPostopValues(postopScores);
     setShowGraph(true);
@@ -378,15 +359,6 @@ function ClinicalScores() {
     });
 
     console.log('Baseline: ', baselineScores);
-
-    // const tempBaselineValues = [
-    //   32, 45, 29, 50, 37, 41, 48, 42, 36, 44, 33, 40, 47, 39, 38, 43, 31, 49,
-    //   46, 46, 34,
-    // ];
-    // const tempPostopValues = [
-    //   28, 40, 25, 42, 34, 38, 44, 39, 32, 41, 29, 36, 42, 35, 34, 40, 27, 44,
-    //   41, 30,
-    // ];
     setBaselineValues(baselineScores);
   };
 
@@ -416,6 +388,17 @@ function ClinicalScores() {
             {/* <Button variant="primary" onClick={addPatient} className="mb-4">
               Add Patient
             </Button> */}
+            <h4>Choose Score Type</h4>
+            <Form.Select
+              value={selectedScoreType}
+              onChange={(e) => handleScoreChange(e.target.value)}
+            >
+              {scoreTypes.map((type, index) => (
+                <option key={index} value={type}>
+                  {type}
+                </option>
+              ))}
+            </Form.Select>
             <Button
               variant="secondary"
               onClick={() => document.getElementById('baseline-upload').click()}

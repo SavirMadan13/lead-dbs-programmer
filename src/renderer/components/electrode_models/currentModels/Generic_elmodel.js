@@ -1850,153 +1850,6 @@ function Generic_elmodel(props, ref) {
     checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
   };
 
-  // const newHandleUpButtonAmplitude = () => {
-  //   vectorMakeUpAmplitude();
-  //   const updatedQuantities = { ...quantities };
-  //   const updatedSelectedValues = { ...selectedValues };
-  //   const levelIncrement = 0.1;
-  //   const previousLevel = Math.floor(vectorLevel);
-  //   vectorLevel += levelIncrement;
-  //   const currentLevel = Math.floor(vectorLevel);
-  //   console.log('currentLevel: ', currentLevel);
-  //   console.log('previousLevel: ', previousLevel);
-  //   const levelBelow =
-  //     currentLevel !== previousLevel ? previousLevel : Math.floor(vectorLevel);
-  //   // const levelBelow = Math.floor(vectorLevel);
-  //   // const levelAbove = Math.ceil(vectorLevel);
-  //   const levelAbove = levelBelow + 1;
-  //   console.log('Level Below', levelBelow);
-  //   console.log('level Above', levelAbove);
-  //   const percDiff = vectorLevel - levelBelow;
-  //   const levelBelowQuantityTotal = totalAmplitude * (1 - percDiff);
-  //   const levelAboveQuantityTotal = totalAmplitude - levelBelowQuantityTotal;
-  //   // Want to figure out how many contacts are "on" at a level
-  //   // const levelBelowCount = 0;
-  //   // const levelAboveCount = 0;
-  //   // Object.keys(selectedValues).forEach((key) => {
-  //   //   if ((level[key] === levelBelow) && (selectedValues[key] !== 'left')) {
-  //   //     levelBelowCount += 1;
-  //   //   }
-  //   //   if ((level[key] === levelAbove) && (selectedValues[key] !== )) {
-
-  //   //   }
-  //   // });
-  //   const onContacts = getOnContacts(levelBelow);
-  //   const numOnContacts = getOnContacts(levelBelow).length;
-  //   const aboveOnContacts = getOnContacts(levelAbove);
-  //   const numAboveOnContacts = aboveOnContacts.length;
-  //   console.log('On Contacts', onContacts);
-  //   Object.keys(level).forEach((key) => {
-  //     // dealing with level below
-  //     // vectorMakeUp();
-  //     if (level[key] === levelBelow) {
-  //       if (face[key] === 'all') {
-  //         updatedQuantities[key] = levelBelowQuantityTotal;
-  //       } else if (
-  //         face[key] !== 'all' &&
-  //         numOnContacts !== 0 &&
-  //         updatedQuantities[key] !== 0
-  //       ) {
-  //         // for (let i = 0; i < numOnContacts; i++) {
-  //         //   console.log('numOnContactsQuantities', key);
-  //         //   if (key === onContacts[i]) {
-  //         //     console.log('numOnContactsQuantities', updatedQuantities[onContacts[i]]);
-  //         //     updatedQuantities[onContacts[i]] =
-  //         //     // levelBelowQuantityTotal / parseFloat(numOnContacts);
-  //         //     // console.log('numOnContacts: ', numOnContacts);
-  //         //     // console.log('numOnContactsQuantities', updatedQuantities[onContacts[i]]);
-  //         //     parseFloat(updatedQuantities[onContacts[i]]) -
-  //         //     (100 * levelIncrement) / numOnContacts;
-  //         //   }
-  //         // }
-  //         // checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
-  //         Object.keys(onContacts).forEach((contact) => {
-  //           console.log('key: ', key);
-  //           if (parseFloat(key) === onContacts[contact]) {
-  //             // console.log('madeItHere');
-  //             updatedQuantities[key] =
-  //               parseFloat(updatedQuantities[key]) -
-  //               (totalAmplitude * levelIncrement) / numOnContacts;
-  //           }
-  //         });
-  //       }
-  //       // if (levelBelowQuantityTotal === 0) {
-  //       //   updatedSelectedValues[key] = 'left';
-  //       // }
-  //     }
-  //     if (level[key] === levelAbove) {
-  //       if (face[key] !== 'all') {
-  //         if (segmentedContact(levelBelow)) {
-  //           Object.keys(onContacts).forEach((contact) => {
-  //             if (face[key] === face[onContacts[contact]]) {
-  //               updatedQuantities[key] =
-  //                 parseFloat(updatedQuantities[key]) +
-  //                 (totalAmplitude * levelIncrement) / numOnContacts;
-  //               updatedSelectedValues[key] =
-  //                 updatedSelectedValues[onContacts[contact]];
-  //             }
-  //           });
-  //         } else {
-  //           let levelBelowKey = 0;
-  //           Object.keys(level).forEach((keys) => {
-  //             if (level[keys] === levelBelow) {
-  //               levelBelowKey = keys;
-  //             }
-  //           });
-  //           updatedQuantities[key] =
-  //             parseFloat(updatedQuantities[key]) +
-  //             (totalAmplitude * levelIncrement) / 3;
-  //           updatedSelectedValues[key] = updatedSelectedValues[levelBelowKey];
-  //         }
-  //       }
-  //       if (face[key] === 'all') {
-  //         updatedQuantities[key] = levelAboveQuantityTotal;
-  //         updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
-  //       }
-  //       // if (face[key] !== 'all') {
-  //       //   for (let i = 0; i < numAboveOnContacts; i++) {
-  //       //     if (face[key] === face[aboveOnContacts[i]]) {
-  //       //       updatedQuantities[key] =
-  //       //         levelAboveQuantityTotal / numAboveOnContacts;
-  //       //       console.log('UpdatedQuantities: ', updatedQuantities);
-  //       //       if (updatedQuantities[key] !== 0) {
-  //       //         updatedSelectedValues[key] =
-  //       //           updatedSelectedValues[aboveOnContacts[i]];
-  //       //       }
-  //       //     }
-  //       //   }
-  //       //   setSelectedValues(updatedSelectedValues);
-  //       //   setQuantities(updatedQuantities);
-  //       //   const newaboveOnContacts = getOnContacts(levelAbove);
-  //       //   const newnumAboveOnContacts = newaboveOnContacts.length;
-  //       //   if (newnumAboveOnContacts === 0) {
-  //       //     console.log('hello');
-  //       //     updatedQuantities[key] = levelAboveQuantityTotal / 3;
-  //       //     updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
-  //       //     // if (updatedQuantities[key] !== 0) {
-  //       //     //   updatedSelectedValues[key] = updatedSelectedValues[aboveOnContacts[0]];
-  //       //     // }
-  //       //   }
-  //       // } else if (face[key] === 'all') {
-  //       //   updatedQuantities[key] = levelAboveQuantityTotal;
-  //       //   if (updatedQuantities[key] !== 0) {
-  //       //     updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
-  //       //   }
-  //       // }
-  //     }
-  //   });
-  //   // Object.keys(updatedQuantities).forEach((key) => {
-  //   //   if (level[key] !== levelAbove || levelBelow) {
-  //   //     updatedQuantities[key] = 0;
-  //   //     updatedSelectedValues[key] = 'left';
-  //   //   }
-  //   // });
-  //   setSelectedValues(updatedSelectedValues);
-  //   easyRoundUp(updatedQuantities);
-  //   setQuantities(updatedQuantities);
-  //   checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
-  // };
-
   function roundAllocDown(
     beforeLevel,
     nextLevel,
@@ -2294,102 +2147,6 @@ function Generic_elmodel(props, ref) {
     setQuantities(updatedQuantities);
     checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
   };
-
-  // const newHandleDownButtonAmplitude = () => {
-  //   vectorMakeUpAmplitude();
-  //   const updatedQuantities = { ...quantities };
-  //   const updatedSelectedValues = { ...selectedValues };
-  //   checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
-  //   const levelIncrement = 0.1;
-  //   const previousLevel = Math.ceil(vectorLevel);
-  //   vectorLevel -= levelIncrement;
-  //   const currentLevel = Math.ceil(vectorLevel);
-  //   console.log('currentLevel: ', currentLevel);
-  //   console.log('previousLevel: ', previousLevel);
-  //   const levelAbove =
-  //     currentLevel !== previousLevel ? previousLevel : Math.ceil(vectorLevel);
-  //   // const levelBelow = Math.floor(vectorLevel);
-  //   // const levelAbove = Math.ceil(vectorLevel);
-  //   const levelBelow = levelAbove - 1;
-  //   console.log('Level Below', levelBelow);
-  //   console.log('level Above', levelAbove);
-  //   const percDiff = Math.abs(vectorLevel - levelAbove);
-  //   const levelAboveQuantityTotal = totalAmplitude * (1 - percDiff);
-  //   const levelBelowQuantityTotal = totalAmplitude - levelAboveQuantityTotal;
-  //   const onContacts = getOnContacts(levelBelow);
-  //   const numOnContacts = getOnContacts(levelBelow).length;
-  //   const aboveOnContacts = getOnContacts(levelAbove);
-  //   const numAboveOnContacts = aboveOnContacts.length;
-  //   console.log('On Contacts', aboveOnContacts);
-  //   Object.keys(level)
-  //     .reverse()
-  //     .forEach((key) => {
-  //       // dealing with level above, the one that is passing current
-  //       // vectorMakeUp();
-  //       if (level[key] === levelAbove) {
-  //         if (face[key] === 'all') {
-  //           updatedQuantities[key] = levelAboveQuantityTotal;
-  //         } else if (
-  //           face[key] !== 'all' &&
-  //           numAboveOnContacts !== 0 &&
-  //           updatedQuantities[key] !== 0
-  //         ) {
-  //           Object.keys(aboveOnContacts).forEach((contact) => {
-  //             if (parseFloat(key) === aboveOnContacts[contact]) {
-  //               updatedQuantities[key] =
-  //                 parseFloat(updatedQuantities[key]) -
-  //                 (totalAmplitude * levelIncrement) / numAboveOnContacts;
-  //             }
-  //           });
-  //         }
-  //         // if (levelBelowQuantityTotal === 0) {
-  //         //   updatedSelectedValues[key] = 'left';
-  //         // }
-  //       }
-  //       if (level[key] === levelBelow) {
-  //         if (face[key] !== 'all') {
-  //           if (segmentedLevel(levelAbove)) {
-  //             // console.log(levelAbove);
-  //             console.log('Madeit: ', levelAbove);
-  //             Object.keys(aboveOnContacts).forEach((contact) => {
-  //               if (face[key] === face[aboveOnContacts[contact]]) {
-  //                 updatedQuantities[key] =
-  //                   parseFloat(updatedQuantities[key]) +
-  //                   (totalAmplitude * levelIncrement) / numAboveOnContacts;
-  //                 updatedSelectedValues[key] =
-  //                   updatedSelectedValues[aboveOnContacts[contact]];
-  //               }
-  //             });
-  //           } else {
-  //             console.log('Made it');
-  //             let levelAboveKey = 0;
-  //             Object.keys(level).forEach((keys) => {
-  //               if (level[keys] === levelAbove) {
-  //                 levelAboveKey = keys;
-  //               }
-  //             });
-  //             updatedSelectedValues[key] = updatedSelectedValues[levelAboveKey];
-  //             updatedQuantities[key] =
-  //               parseFloat(updatedQuantities[key]) +
-  //               (totalAmplitude * levelIncrement) / 3;
-  //           }
-  //         } else if (face[key] === 'all') {
-  //           updatedQuantities[key] = levelBelowQuantityTotal;
-  //           updatedSelectedValues[key] =
-  //             updatedSelectedValues[aboveOnContacts[0]];
-  //         }
-  //       }
-  //     });
-  //   // Object.keys(updatedQuantities).forEach((key) => {
-  //   //   if (level[key] !== levelAbove || levelBelow) {
-  //   //     updatedQuantities[key] = 0;
-  //   //     updatedSelectedValues[key] = 'left';
-  //   //   }
-  //   // });
-  //   setSelectedValues(updatedSelectedValues);
-  //   setQuantities(updatedQuantities);
-  //   checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
-  // };
 
   let facesVec = [];
 
@@ -2844,34 +2601,6 @@ function Generic_elmodel(props, ref) {
     selectedValues,
     totalAmplitude,
   ]);
-
-  // const semiAssist = () => {
-  //   const updatedQuantities = { ...quantities };
-  //   let total = totalAmplitude;
-  //   if (props.IPG === 'Boston') {
-  //     if (percAmpToggle === 'left') {
-  //       total = 100;
-  //     }
-  //   }
-  //   if (props.IPG === 'Research') {
-  //     if (researchToggle === 'left') {
-  //       total = 100;
-  //     }
-  //   }
-  //   // const updatedSelectedValues = { ...selectedValues };
-  //   let count = 0;
-  //   const lastKey = [];
-  //   Object.keys(updatedQuantities).forEach((key) => {
-  //     if (key !== 0 && selectedValues[key] === 'center') {
-  //       count += 1;
-  //       lastKey.push(key);
-  //     }
-  //   });
-  //   if (count === 1) {
-  //     updatedQuantities[lastKey[0]] = total;
-  //   }
-  //   setQuantities(updatedQuantities);
-  // };
 
   function assist() {
     isAssisted = !isAssisted;
@@ -3648,27 +3377,6 @@ function Generic_elmodel(props, ref) {
       handleActivaVoltage();
     }
 
-    // if (radioValue === '2' && props.IPG === 'Boston' && percAmpToggle === 'left') {
-    //   // assistedMode();
-    //   calculateQuantitiesWithDistribution();
-    // } else if (
-    //   radioValue === '2' &&
-    //   (outputTogglePosition === 'mA' || outputTogglePosition === 'V')
-    // ) {
-    //   calculateQuantitiesWithDistributionAbbott();
-    // }
-    // if (props.stimChanged) {
-    //   setQuantities(props.allQuantities(props.key));
-    //   props.setStimChanged(false);
-    // }
-    // if (props.IPG === 'Medtronic_Activa') {
-    //   if (volAmpToggle === 'left') {
-    //     handleActivaAmplitude();
-    //   } else if (volAmpToggle === 'right') {
-    //     handleActivaVoltage();
-    //   }
-    // }
-    // assist();
   }, [
     currentLabel,
     props.IPG,
@@ -3684,14 +3392,6 @@ function Generic_elmodel(props, ref) {
   return (
     <div className="container">
       <div className="">
-        {/* <Form.Group className="mb-3">
-          <Form.Control
-            type="email"
-            placeholder="Enter session ID"
-            value={sessionTitle}
-            onChange={handleTitleChange}
-          />
-        </Form.Group> */}
         <div className="button-container">
           <Form.Select
             aria-label="Default select example"
@@ -3728,12 +3428,6 @@ function Generic_elmodel(props, ref) {
                 ))}
               </ButtonGroup>
             )}
-            {/* {props.IPG === 'Medtronic_Activa' && (
-            <VolumeAmplitudeToggle
-              value={volAmpToggle}
-              onChange={(value) => handleVolAmpToggleChange(value)}
-            />
-          )} */}
             {props.IPG === 'Medtronic_Activa' && (
               <ButtonGroup className="button-group">
                 {volAmpDef.map((volAmp, idx) => (
@@ -3806,36 +3500,7 @@ function Generic_elmodel(props, ref) {
             <span className="input-adornment">{currentLabel}</span>
           </div>
         </div>
-        {/* <div className="button-container">
-          <label className="puls-label">Total Amplitude</label>
-          <input
-            className="new-quantity-input"
-            type="number"
-            name="quantity"
-            pattern="[0-9]+"
-            value={totalAmplitude}
-            onChange={handleTotalAmplitudeChange}
-          />
-        </div> */}
         <div className="button-container">
-          {/* <label className="puls-label">Pulsewidth (us):</label>
-          <input
-            className="new-quantity-input"
-            type="number"
-            name="quantity"
-            pattern="[0-9]+"
-            value={parameters.parameter1}
-            onChange={handleParameterChange('parameter1')}
-          />
-          <label className="puls-label">Frequency (Hz):</label>
-          <input
-            className="new-quantity-input"
-            type="number"
-            name="quantity"
-            pattern="[0-9]+"
-            value={parameters.parameter2}
-            onChange={handleParameterChange('parameter2')}
-          /> */}
           <div className="input-wrapper">
             <input
               className="param-input"
@@ -3858,18 +3523,6 @@ function Generic_elmodel(props, ref) {
             />
             <span className="input-adornment">hz</span>
           </div>
-          {/* <QuantityInput2
-            value={parameters.parameter1}
-            onChange={handleParameterChange('parameter1')}
-            min={0}
-            label="us"
-          /> */}
-          {/* <QuantityInput2
-            value={parameters.parameter2}
-            onChange={handleParameterChange('parameter2')}
-            min={0}
-            label="hz"
-          /> */}
         </div>
         {(props.IPG === 'Boston' || props.IPG === 'Medtronic_Percept') && (
           <div className="button-container">
@@ -3886,7 +3539,6 @@ function Generic_elmodel(props, ref) {
                   onChange={(e) =>
                     handleSteeringModeChange(e.currentTarget.value)
                   }
-                  // onChange={(e) => setRadioValue(e.currentTarget.value)}
                 >
                   {radio.name}
                 </ToggleButton>
@@ -3911,7 +3563,6 @@ function Generic_elmodel(props, ref) {
                       value={selectedValues[ipg.key]}
                       switchPosition={selectedValues[ipg.key]}
                       animation={animation[ipg.key]}
-                      // quantity={quantities[selectedValues[ipg.key]]} // Pass the quantity prop
                       quantity={quantities[ipg.key]}
                       onChange={(value, anime) =>
                         handleTripleToggleChange(value, anime, ipg.key)
@@ -3919,31 +3570,10 @@ function Generic_elmodel(props, ref) {
                       onQuantityChange={(value, anime, quantity) =>
                         handleQuantityChange(quantity, ipg.key)
                       }
-                      // onQuantityChange={(value, animation, quantity) =>
-                      //   handleQuantityChange(
-                      //     value,
-                      //     animation,
-                      //     quantity,
-                      //     ipg.key,
-                      //   )
-                      // }
                     />
-                    {/* <NewTripleToggle
-                      key={ipg.key}
-                      switchPosition={selectedValues[ipg.key]}
-                      animation={animation[ipg.key]}
-                      quantity={quantities[ipg.key]}
-                      onChange={(value, anime) =>
-                        handleTripleToggleChange(value, anime, ipg.key)
-                      }
-                      onQuantityChange={(quantity) =>
-                        handleQuantityChange(quantity, ipg.key)
-                      }
-                    /> */}
                   </div>
                 )}
               </div>
-              {/* <p className="image-key">{ipg.key}</p> */}
             </div>
           ))}
         </div>
@@ -3962,8 +3592,7 @@ function Generic_elmodel(props, ref) {
                       value={selectedValues[Lcon.key]}
                       switchPosition={selectedValues[Lcon.key]}
                       animation={animation[Lcon.key]}
-                      // quantity={quantities[selectedValues[Lcon.key]]} // Pass the quantity prop
-                      quantity={quantities[Lcon.key]} // Pass the quantity prop
+                      quantity={quantities[Lcon.key]}
                       onChange={(value, anime) =>
                         handleTripleToggleChange(value, anime, Lcon.key)
                       }
@@ -3976,7 +3605,6 @@ function Generic_elmodel(props, ref) {
                   </div>
                 )}
               </div>
-              {/* <p className="image-key">{Lcon.key}</p> */}
               <p className="image-name-boston" style={{ color: 'white' }}>
                 {names[Lcon.key]}
               </p>
@@ -4002,9 +3630,7 @@ function Generic_elmodel(props, ref) {
                     value={selectedValues[svg.key]}
                     switchPosition={selectedValues[svg.key]}
                     animation={animation[svg.key]}
-                    // quantity={quantities[selectedValues[svg.key]]} // Pass the quantity prop
                     quantity={quantities[svg.key]}
-                    // quantity={100}
                     onChange={(value, anime) =>
                       handleTripleToggleChange(value, anime, svg.key)
                     }
@@ -4013,24 +3639,10 @@ function Generic_elmodel(props, ref) {
                     }
                     level={svg.level}
                     face={svg.face}
-                    // onQuantityChange={(value, animation, quantity) =>
-                    //   handleQuantityChange(value, animation, quantity, svg.key)
-                    // }
                   />
-                  {/* <NewTripleToggle
-                    key={svg.key}
-                    quantity={quantities[svg.key]}
-                    onChange={(value, anime) =>
-                      handleTripleToggleChange(value, anime, svg.key)
-                    }
-                    onQuantityChange={(quantity) =>
-                      handleQuantityChange(quantity, svg.key)
-                    }
-                  /> */}
                 </div>
               )}
             </div>
-            {/* <p className="image-key">{svg.key}</p> */}
             <p className="image-name-boston" style={{ color: 'white' }}>
               {names[svg.key]}
             </p>
@@ -4052,7 +3664,6 @@ function Generic_elmodel(props, ref) {
                     value={selectedValues[rCon.key]}
                     switchPosition={selectedValues[rCon.key]}
                     animation={animation[rCon.key]}
-                    // quantity={quantities[selectedValues[rCon.key]]} // Pass the quantity prop
                     quantity={quantities[rCon.key]}
                     onChange={(value, anime) =>
                       handleTripleToggleChange(value, anime, rCon.key)
@@ -4062,14 +3673,10 @@ function Generic_elmodel(props, ref) {
                     }
                     level={rCon.level}
                     face={rCon.face}
-                    // onQuantityChange={(value, animation, quantity) =>
-                    //   handleQuantityChange(value, animation, quantity, rCon.key)
-                    // }
                   />
                 </div>
               )}
             </div>
-            {/* <p className="image-key">{rCon.key}</p> */}
             <p className="image-name-boston" style={{ color: 'white' }}>
               {names[rCon.key]}
             </p>
@@ -4081,7 +3688,6 @@ function Generic_elmodel(props, ref) {
         {radioValue === '2' &&
           (stimController === 0 || stimController === 3) && (
             <div className="button-container">
-              {/* <h2 style={{color: 'black'}}>Steering</h2> */}
               <span style={{ color: 'black' }}>Steering</span>
               <ButtonGroup horizontal>
                 <Button onClick={handlePercAmpChangeUp}>↑</Button>
@@ -4110,18 +3716,7 @@ function Generic_elmodel(props, ref) {
             <RightButton className="svgButtons" onClick={handleLeftButton} />
           </div>
         )}
-        {/* <div className="steering-container-special-buttons">
-          <SplitEvenButton
-            className="svgButtons"
-            onClick={handleSplitEvenButton}
-          />
-          <ForwardButton className="svgButtons" onClick={handleForwardButton} />
-          <BackButton className="svgButtons" onClick={handleBackButton} />
-          <LeftButton className="svgButtons" onClick={handleRightButton} />
-          <RightButton className="svgButtons" onClick={handleLeftButton} />
-        </div> */}
         <div style={{ textAlign: 'center' }}>
-          {/* {outputTogglePosition} */}
           <ButtonGroup vertical>
             <Button
               onClick={calculateQuantitiesWithDistribution}
@@ -4191,11 +3786,6 @@ function Generic_elmodel(props, ref) {
             <MuiTooltip title="Copy to clipboard" placement="top">
               <IconButton
                 onClick={copyToClipboard}
-                // style={{
-                //   position: 'absolute',
-                //   top: '10px',
-                //   right: '10px',
-                // }}
                 aria-label="copy"
               >
                 <ContentCopyIcon />

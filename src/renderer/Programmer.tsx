@@ -68,9 +68,9 @@ function Programmer() {
       case 'Abbott ActiveTip (6142-6145)':
         return 'abbott_activetip_3mm';
       case 'Abbott Directed 6172 (short)':
-        return 'abott_directed_6172';
+        return 'abbott_directed_05';
       case 'Abbott Directed 6173 (long)':
-        return 'abott_directed_6173';
+        return 'abott_directed_15';
       default:
         return '';
     }
@@ -350,7 +350,12 @@ function Programmer() {
           try {
             setPatientName(patient.name);
             console.log('Not Found');
-            let outputElectrode = handleImportedElectrode(arg.elmodel);
+            let outputElectrode = 'boston_vercise_directed';
+            try {
+              outputElectrode = handleImportedElectrode(arg.elmodel);
+            } catch (err) {
+              console.log(err);
+            }
             // while (!baseElec) {
             //   // Waiting for baseElec to exist
             // }

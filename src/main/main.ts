@@ -1343,3 +1343,23 @@ ipcMain.on('zoom-level-changed', (event, zoomLevel) => {
     mainWindow.setSize(newWidth, newHeight);
   }
 });
+
+// Listen for resize requests
+ipcMain.on('resize-window', (event, width, height) => {
+  // Resize the window based on the received width and height
+  if (width && height) {
+    mainWindow.setSize(width, height);
+  }
+});
+
+ipcMain.on('resize-window-2', (event, width, height) => {
+  // Optionally set a minimum or maximum size
+  const minWidth = 800; // minimum width
+  const minHeight = 600; // minimum height
+
+  // Adjust the window size dynamically
+  const newWidth = Math.max(width, minWidth);
+  const newHeight = Math.max(height, minHeight);
+
+  mainWindow.setSize(newWidth, newHeight);
+});

@@ -424,12 +424,13 @@ h2 {
 
 .input-wrapper input {
   padding-left: 20px; /* Adjust based on adornment width */
+  font-size: 22px;
 }
 
 .input-wrapper .input-adornment {
   position: absolute;
-  top: 50%;
-  right: 35px;
+  top: 60%;
+  right: 45px;
   transform: translateY(-50%);
   pointer-events: none;
   /* color: #888; */
@@ -1066,4 +1067,129 @@ button:active {
     width: 100%;
     margin-top: 10px;
   }
+}
+
+.parameter-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  /* background-color: #f9f9f9; */
+  /* border-radius: 8px; */
+  /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
+}
+
+.parameter-input-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.parameter-input {
+  width: 100px;
+  padding: 8px 12px;
+  font-size: 14px;
+  /* border: 1px solid #ddd; */
+  border-radius: 6px;
+  /* box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); */
+  transition: border-color 0.3s ease;
+}
+
+.parameter-input:focus {
+  border-color: #6c63ff; /* Accent color on focus */
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2); /* Light glow */
+}
+
+.parameter-input-adornment {
+  margin-left: 8px;
+  font-size: 14px;
+  color: #666; /* Subtle color for adornment */
+}
+
+.parameter-container .parameter-input-wrapper:not(:last-child) {
+  margin-right: 16px; /* Spacing between inputs */
+}
+
+.model-selector-container {
+  margin-bottom: 15px;
+}
+
+.model-select-dropdown {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #fff;
+  transition: border-color 0.3s ease;
+}
+
+.toggle-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.toggle-button-group {
+  display: flex;
+  gap: 8px;
+}
+
+.amplitude-input-container {
+  padding: 10px 0;
+}
+
+.amplitude-input-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.amplitude-input {
+  width: 100px;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  transition: border-color 0.3s ease;
+}
+
+.amplitude-adornment {
+  margin-left: 8px;
+  font-size: 14px;
+  color: #666;
+}
+
+.parameter-container {
+  display: flex;
+  gap: 16px;
+  padding: 10px 0;
+}
+
+.parameter-input-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.parameter-input {
+  width: 100px;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  transition: border-color 0.3s ease;
+}
+
+.parameter-input-adornment {
+  margin-left: 8px;
+  font-size: 14px;
+  color: #666;
+}
+
+.steering-toggle-container {
+  margin-top: 15px;
+}
+
+.steering-button-group {
+  display: flex;
+  gap: 8px;
 }
