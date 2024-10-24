@@ -371,6 +371,19 @@ ipcMain.on('save-file', (event, file, data, historical) => {
     // Write the data to the file
     fs.writeFileSync(filePath, dataString);
 
+    // Write the filenpath to the master json script
+    const masterjsonpath = path.join(directoryPath, 'dataset_master.json');
+    const jsonData = fs.readFileSync(masterjsonpath, 'utf-8');
+    let patientId = patient.id.replace('-', '_');
+    const masterjsondata = JSON.parse(jsonData);
+    // Ensure the timeline session exists
+    if (!masterjsondata[patientId]['clinicalData'][`ses_${timeline}`]) {
+      masterjsondata[patientId]['clinicalData'][`ses_${timeline}`] = [];
+    }
+
+    // Now it's safe to push filePath
+    masterjsondata[patientId]['clinicalData'][`ses_${timeline}`].push(filePath);
+    fs.writeFileSync(masterjsonpath, JSON.stringify(masterjsondata));
     // Send the file path back to the renderer process
     event.reply('file-saved', filePath);
 
@@ -1202,6 +1215,7 @@ const createWindow = async () => {
       const { directoryPath } = jsonData2;
       const masterDataFile = path.join(directoryPath, 'dataset_master.json');
       const jsonData = readJSON(masterDataFile);
+      console.log(patientID);
 
       try {
         // Check if the patientID exists in the master dataset

@@ -620,15 +620,15 @@ function PlyViewer({
       }, {});
 
     console.log('TEST!L: ', outputIPG);
-    if (outputIPG.includes('Medtronic')) {
-      Object.keys(filteredQuantities).forEach((key) => {
-        console.log('Test: ', filteredQuantities[key]);
-        Object.keys(filteredQuantities[key]).forEach((key2) => {
-          filteredQuantities[key][key2] =
-            (filteredQuantities[key][key2] / 100) * newTotalAmplitude[key];
-        });
-      });
-    }
+    // if (outputIPG.includes('Medtronic')) {
+    //   Object.keys(filteredQuantities).forEach((key) => {
+    //     console.log('Test: ', filteredQuantities[key]);
+    //     Object.keys(filteredQuantities[key]).forEach((key2) => {
+    //       filteredQuantities[key][key2] =
+    //         (filteredQuantities[key][key2] / 100) * newTotalAmplitude[key];
+    //     });
+    //   });
+    // }
 
     return {
       filteredQuantities,
@@ -668,13 +668,13 @@ function PlyViewer({
       console.log(togglePosition);
       let contactQuantity = parseFloat(quantities[contactId]);
       let newAmplitude = amplitude;
-      if (togglePosition === 'center') {
-        const newQuantities = processedData.filteredQuantities[1];
+      // if (togglePosition === 'center') {
+        const newQuantities = processedData.filteredQuantities[side];
         console.log(newQuantities);
-        newAmplitude = processedData.newTotalAmplitude[1];
+        newAmplitude = processedData.newTotalAmplitude[side];
         console.log(newAmplitude);
-        contactQuantity = parseFloat(newQuantities[contactId]);
-      }
+      // }
+      contactQuantity = parseFloat(newQuantities[contactId]);
 
       // If contactQuantity is greater than 0, add or update the sphere
       if (contactQuantity > 0) {
@@ -706,23 +706,16 @@ function PlyViewer({
           .normalize();
 
         // Create an orthogonal basis for the electrode
-        const up = new THREE.Vector3(0, 0, 1); // Assuming 'up' is along the global Z-axis
+        const up = new THREE.Vector3(0, 0, 1);
         const right = new THREE.Vector3()
           .crossVectors(direction, up)
           .normalize();
         const forward = new THREE.Vector3()
           .crossVectors(right, direction)
           .normalize();
-
-        // Linearly interpolate between startCoords and targetCoords based on normalizedLevel
         const newPosition = startCoords
           .clone()
           .lerp(targetCoords, normalizedLevel);
-
-        // Get the direction adjustment for the contact
-        // const directionOffset = contactDirections[contactId];
-
-        // Get the direction offset for the contact
         const directionOffset = new THREE.Vector3(
           contactDirections[contactId].x,
           contactDirections[contactId].y,
@@ -790,9 +783,10 @@ function PlyViewer({
 
   const handlePriorStimChange = async (event) => {
     const selectedValue = event.target.value;
-    console.log('Selected Value: ', selectedValue.split('-'));
+    // console.log('Selected Value: ', selectedValue.split('-'));
     const splitValues = selectedValue.split('-');
     const selectedPatientID = splitValues[0];
+    // const selectedPatientID = selectedValue;
     const selectedSession = splitValues[1];
     console.log(selectedPatientID);
     const electrodeLoader = new PLYLoader();
