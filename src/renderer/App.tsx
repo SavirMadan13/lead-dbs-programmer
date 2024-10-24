@@ -106,13 +106,13 @@ export default function App() {
       case 'Boston Scientific Vercise Cartesia X':
         return 'boston_scientific_vercise_cartesia_x';
       case 'Abbott ActiveTip (6146-6149)':
-        return 'abott_activetip_2mm';
+        return 'abbott_activetip_2mm';
       case 'Abbott ActiveTip (6142-6145)':
         return 'abbott_activetip_3mm';
       case 'Abbott Directed 6172 (short)':
-        return 'abott_directed_6172';
+        return 'abbott_directed_6172';
       case 'Abbott Directed 6173 (long)':
-        return 'abott_directed_6173';
+        return 'abbott_directed_6173';
       default:
         return '';
     }
@@ -169,44 +169,53 @@ export default function App() {
       }
 
       for (let i = 0; i < 9; i++) {
-        const dynamicKey = `k${i + 7}`;
-        const dynamicKey1 = `k${i}`;
+        const dynamicKey = `k${i+1}`;
+        const dynamicKey1 = `k${i+1}`;
 
+        // Running it for left side
         if (jsonData[dynamicKey2] && jsonData[dynamicKey2][dynamicKey]) {
           newQuantities[j] = newQuantities[j] || {};
-          newQuantities[j][i] = parseFloat(
+          // Setting quantities for contacts
+          newQuantities[j][i+1] = parseFloat(
             jsonData[dynamicKey2][dynamicKey].perc,
           );
+          // Setting quantity for case
           newQuantities[j][0] = parseFloat(jsonData[dynamicKey2].case.perc);
 
           const { pol } = jsonData[dynamicKey2][dynamicKey];
           newSelectedValues[j] = newSelectedValues[j] || {};
-          newSelectedValues[j][i] =
+          // Setting polarity for contacts
+          newSelectedValues[j][i+1] =
             pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
 
+          // Setting polarity for case
           const casePol = jsonData[dynamicKey2].case.pol;
           newSelectedValues[j][0] =
             casePol === 0 ? 'left' : casePol === 1 ? 'center' : 'right';
         }
-
+        // Rerun code for right side
         if (jsonData[dynamicKey3] && jsonData[dynamicKey3][dynamicKey1]) {
+          // Setting quantities for contacts
           newQuantities[j + 4] = newQuantities[j + 4] || {};
-          newQuantities[j + 4][i + 1] = parseFloat(
+          newQuantities[j + 4][i+1] = parseFloat(
             jsonData[dynamicKey3][dynamicKey1].perc,
           );
+          // Setting quantities for case
           newQuantities[j + 4][0] = parseFloat(jsonData[dynamicKey3].case.perc);
 
           const { pol } = jsonData[dynamicKey3][dynamicKey1];
+          // Setting polarity for contacts
           newSelectedValues[j + 4] = newSelectedValues[j + 4] || {};
-          newSelectedValues[j + 4][i + 1] =
+          newSelectedValues[j + 4][i+1] =
             pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
 
+            // Setting polarity for case
           const casePol = jsonData[dynamicKey3].case.pol;
           newSelectedValues[j + 4][0] =
             casePol === 0 ? 'left' : casePol === 1 ? 'center' : 'right';
         }
       }
-
+      // Combining left and right sides
       newAllQuantities[j] = newQuantities[j];
       newAllQuantities[j + 4] = newQuantities[j + 4];
     }

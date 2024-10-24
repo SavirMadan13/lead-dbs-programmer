@@ -296,8 +296,8 @@ function StimulationSettings({
       const dynamicKey2 = `Ls${j}`;
       const dynamicKey3 = `Rs${j}`;
       for (let i = 0; i < 9; i++) {
-        const dynamicKey = `k${i + 7}`;
-        const dynamicKey1 = `k${i}`;
+        const dynamicKey = `k${i + 1}`;
+        const dynamicKey1 = `k${i + 1}`;
         // let nestedData = jsonData.S[dynamicKey2][dynamicKey];
         // let nestedData = jsonData.S[dynamicKey2][dynamicKey];
         // console.log('nestred data: ', nestedData);
@@ -322,18 +322,18 @@ function StimulationSettings({
           }
         }
         if (jsonData.S[dynamicKey3][dynamicKey1]) {
-          newQuantities[j + 4][i + 1] = parseFloat(
+          newQuantities[j + 4][i] = parseFloat(
             jsonData.S[dynamicKey3][dynamicKey1].perc,
           );
           newQuantities[j + 4][0] = parseFloat(
             jsonData.S[dynamicKey3].case.perc,
           );
           if (jsonData.S[dynamicKey3][dynamicKey1].pol === 0) {
-            newSelectedValues[j + 4][i + 1] = 'left';
+            newSelectedValues[j + 4][i] = 'left';
           } else if (jsonData.S[dynamicKey3][dynamicKey1].pol === 1) {
-            newSelectedValues[j + 4][i + 1] = 'center';
+            newSelectedValues[j + 4][i] = 'center';
           } else if (jsonData.S[dynamicKey3][dynamicKey1].pol === 2) {
-            newSelectedValues[j + 4][i + 1] = 'right';
+            newSelectedValues[j + 4][i] = 'right';
           }
           if (jsonData.S[dynamicKey2].case.pol === 0) {
             newSelectedValues[j + 4][0] = 'left';

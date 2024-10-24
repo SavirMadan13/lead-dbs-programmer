@@ -1542,12 +1542,11 @@ function TabbedElectrodeIPGSelection({
         activecontacts: [],
         template: 'warp',
         sources: {},
-        elmodel: {},
-        ipg: IPG,
+        ver: '2.0',
       },
     };
 
-    data.S.elmodel = [selectedElectrodeLeft, selectedElectrodeRight];
+    // data.S.elmodel = [selectedElectrodeLeft, selectedElectrodeRight];
     const programs = Object.keys(allQuantities);
     const firstProgram = programs[0];
     console.log('Programs: ', programs);
@@ -1572,7 +1571,7 @@ function TabbedElectrodeIPGSelection({
           } else if (allSelectedValues[j][i] === 'right') {
             polarity = 2;
           }
-          let dynamicKey = `k${i + loopSize - 2}`;
+          let dynamicKey = `k${i}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: parseFloat(updatedOutputQuantity[j][i]),
             pol: polarity,
@@ -1602,7 +1601,7 @@ function TabbedElectrodeIPGSelection({
         // console.log(data.S.activecontacts);
       } else {
         for (let i = 1; i < loopSize; i++) {
-          let dynamicKey = `k${i + loopSize - 2}`;
+          let dynamicKey = `k${i}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: 0,
             pol: 0,
@@ -1635,7 +1634,7 @@ function TabbedElectrodeIPGSelection({
           } else if (allSelectedValues[j + 4][i] === 'right') {
             polarity = 2;
           }
-          let dynamicKey = `k${i - 1}`;
+          let dynamicKey = `k${i}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: parseFloat(updatedOutputQuantity[j + 4][i]),
             pol: polarity,
@@ -1665,7 +1664,7 @@ function TabbedElectrodeIPGSelection({
         // rightAmpArray[j + 4] = parseFloat(allTotalAmplitudes[j + 4]);
       } else {
         for (let i = 1; i < loopSize; i++) {
-          let dynamicKey = `k${i - 1}`;
+          let dynamicKey = `k${i}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: 0,
             pol: 0,
@@ -1809,8 +1808,8 @@ function TabbedElectrodeIPGSelection({
 
     for (let j = 1; j < 5; j++) {
       let dynamicKey2 = `Ls${j}`;
-      for (let i = 0; i < 9; i++) {
-        let dynamicKey = `k${i + 7}`;
+      for (let i = 1; i < 9; i++) {
+        let dynamicKey = `k${i}`;
         // let nestedData = jsonData.S[dynamicKey2][dynamicKey];
         let nestedData = jsonData.S[dynamicKey2][dynamicKey];
         // console.log('nestred data: ', nestedData);
@@ -1986,13 +1985,7 @@ function TabbedElectrodeIPGSelection({
           </Tabs>
         </TabPanel>
       </Tabs>
-      <div className="export-button-container">
-        {/* <button
-          className="import-button"
-          onClick={() => fileInputRef.current.click()}
-        >
-          Import Data
-        </button> */}
+      {/* <div className="export-button-container">
         <input
           ref={fileInputRef}
           className="file-input"
@@ -2002,20 +1995,7 @@ function TabbedElectrodeIPGSelection({
           style={{ display: 'none' }}
           // Hide the input element
         />
-        {/* <button className="export-button" onClick={gatherExportedData2}>
-          Visualize
-        </button>
-        <button className="export-button" onClick={handleClick}>
-          Visualize Webserver
-        </button> */}
-        {/* <button onClick={handleIPGForOutput}>IPG Output</button> */}
-        {/* <button className="export-button" onClick={sendDataToMain}>
-          Stimulate
-        </button>
-        <button className="export-button" onClick={quitApp}>
-          Close
-        </button> */}
-      </div>
+      </div> */}
       <div style={{ textAlign: 'center', paddingBottom: '35px' }}>
         <button className="export-button-final-discard" onClick={closeFunction} style={{marginRight: '15px'}}>
           Discard and Close
