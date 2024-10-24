@@ -1202,13 +1202,8 @@ function PlyViewer({
 
       secondaryControlsRef.current = controls;
 
-      camera.position.set(0, -50, 60); // Zoomed out to start
+      camera.position.set(0, -50, 50); // Zoomed out to start
       // camera.lookAt(0, 0, 0); // Ensure the camera is looking at the scene origin
-      if (side < 5) {
-        camera.lookAt(0, 100, 0); // Ensure the camera is looking at the scene origin
-      } else {
-        camera.lookAt(0, 0, 0); // Ensure the camera is looking at the scene origin
-      }
 
       // const onWindowResize = () => {
       //   camera.aspect = window.innerWidth / window.innerHeight;
@@ -1319,39 +1314,46 @@ function PlyViewer({
       const pitch = Math.atan2(v.y, v.z);
       const roll = 0;
       const newSwitchedPosition = new THREE.Vector3(
-        cameraPosition.y,
         cameraPosition.x,
+        cameraPosition.y,
         cameraPosition.z,
       );
-      // camera.position.copy(newSwitchedPosition); // Move the camera to the calculated point
-      // camera.rotation.set(yaw, pitch, roll, 'XYZ'); // Set the camera rotations
-      // camera.zoom = 2;
-      // camera.updateProjectionMatrix();
+      camera.position.copy(newSwitchedPosition); // Move the camera to the calculated point
+      camera.rotation.set(-pitch, yaw, roll, 'XYZ'); // Set the camera rotations
+      camera.zoom = 3.25;
+      camera.updateProjectionMatrix();
+    }
+  };
 
-      // const cameraPosition = new THREE.Vector3(
-      //   startCoords.x + cameraDistance * directionVector.x,
-      //   startCoords.y + cameraDistance * directionVector.y,
-      //   startCoords.z + cameraDistance * directionVector.z, // Move up along z-axis for 'above' view
-      // );
+  const changePrimaryCameraAngle = () => {
+    const camera = cameraRef.current;
+    let startCoords = [];
+    let targetCoords = [];
+    if (side < 5) {
+      const { head2: headMarkers, tail2: tailMarkers } = recoData.markers;
+      startCoords = new THREE.Vector3(...headMarkers);
+      targetCoords = new THREE.Vector3(...tailMarkers);
+    } else {
+      const { head1: headMarkers, tail1: tailMarkers } = recoData.markers;
+      startCoords = new THREE.Vector3(...headMarkers);
+      targetCoords = new THREE.Vector3(...tailMarkers);
+    }
 
-      // // Set the camera position
-      // camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
-
-      // // Make the camera look along the vector
-      // camera.lookAt(
-      //   (startCoords.x + targetCoords.x) / 2, // Midpoint of the vector
-      //   (startCoords.y + targetCoords.y) / 2,
-      //   (startCoords.z + targetCoords.z) / 2,
-      // );
-
-      // // Update the camera projection matrix
-      // camera.updateProjectionMatrix();
+    if (camera) {
+      // Calculate the direction vector by subtracting startCoords from endCoords
+      const focalPoint = new THREE.Vector3(startCoords.x, camera.position.y, camera.position.z);
+      camera.position.copy(focalPoint); // Move the camera to the calculated point
+      camera.rotation.set(0.8, 0, 0, 'XYZ');
+      camera.lookAt(startCoords);
+      camera.zoom = 3;
+      camera.updateProjectionMatrix();
     }
   };
 
   useEffect(() => {
     if (recoData) {
       changeCameraAngle();
+      // changePrimaryCameraAngle();
     }
   }, [recoData]);
 
@@ -1390,8 +1392,8 @@ function PlyViewer({
         >
           <SettingsIcon />
         </Button>
-        <button onClick={logCameraSettings}>Log Camera Settings</button>
-        <button onClick={changeCameraAngle}>Change Camera</button>
+        {/* <button onClick={logCameraSettings}>Log Camera Settings</button>
+        <button onClick={changeCameraAngle}>Change Camera</button> */}
 
         <Collapse in={open}>
           <div id="tabs-collapse">

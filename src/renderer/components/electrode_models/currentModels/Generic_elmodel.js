@@ -3741,7 +3741,7 @@ function Generic_elmodel(props, ref) {
               {showViewer ? 'Close Viewer' : 'Open Viewer'}
             </Button>
           </ButtonGroup>
-          <Form className="mb-4">
+          {/* <Form className="mb-4">
             <Form.Group controlId="dbsParameters">
               <Form.Label className="font-weight-bold">
                 DBS Parameters
@@ -3791,7 +3791,7 @@ function Generic_elmodel(props, ref) {
                 <ContentCopyIcon />
               </IconButton>
             </MuiTooltip>
-          </div>
+          </div> */}
         </div>
       </div>
       {showViewer && (

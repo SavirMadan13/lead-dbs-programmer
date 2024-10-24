@@ -1907,7 +1907,7 @@ function TabbedElectrodeIPGSelection({
   // }
 
   return (
-    <div>
+    <div className="TabbedIPGContainer">
       <div style={{ marginTop: '30px' }} />
       <div className="stimCloseContainer" />
       <Tabs
