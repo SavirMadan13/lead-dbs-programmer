@@ -27,7 +27,7 @@ console.error = () => {};
 // const inputFilePath = args[0]; // Get the first argument
 const inputFilePath = process.argv[1];
 // const inputFilePath =
-//   '/Users/savirmadan/Documents/Localization/Output/Patient0357Output/derivatives/leaddbs/sub-CbctDbs0357/stimulations/MNI152NLin2009bAsym/inputData.json';
+//   '/Volumes/Expansion/Lead-Tutor/LeadTutor/groupFolder/derivatives/leadgroup/20240802104138/inputData.json';
 // const inputFilePath =
 //   '/Users/savirmadan/Documents/inputData.json';
 class AppUpdater {

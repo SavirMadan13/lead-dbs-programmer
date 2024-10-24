@@ -107,13 +107,13 @@ export default function App() {
       case 'Boston Scientific Vercise Cartesia X':
         return 'boston_scientific_vercise_cartesia_x';
       case 'Abbott ActiveTip (6146-6149)':
-        return 'abott_activetip_2mm';
+        return 'abbott_activetip_2mm';
       case 'Abbott ActiveTip (6142-6145)':
         return 'abbott_activetip_3mm';
       case 'Abbott Directed 6172 (short)':
-        return 'abott_directed_6172';
+        return 'abbott_directed_6172';
       case 'Abbott Directed 6173 (long)':
-        return 'abott_directed_6173';
+        return 'abbott_directed_6173';
       default:
         return '';
     }
@@ -147,6 +147,7 @@ export default function App() {
     const newTotalAmplitude = {};
     const newAllQuantities = {};
     const newAllVolAmpToggles = {};
+    const newAllTogglePositions = {};
 
     console.log('Imported Amplitude: ', jsonData.amplitude);
 
@@ -160,30 +161,34 @@ export default function App() {
       const dynamicKey3 = `Rs${j}`;
       if (jsonData[dynamicKey2]['va'] === 2) {
         newAllVolAmpToggles[j] = 'center';
+        newAllTogglePositions[j] = '%';
       } else if (jsonData[dynamicKey2]['va'] === 1) {
         newAllVolAmpToggles[j] = 'right';
+        newAllTogglePositions[j] = 'V';
       }
 
       if (jsonData[dynamicKey3]['va'] === 2) {
         newAllVolAmpToggles[j + 4] = 'center';
+        newAllTogglePositions[j + 4] = '%';
       } else if (jsonData[dynamicKey3]['va'] === 1) {
         newAllVolAmpToggles[j + 4] = 'right';
+        newAllTogglePositions[j + 4] = 'V';
       }
 
       for (let i = 0; i < 9; i++) {
-        const dynamicKey = `k${i + 7}`;
-        const dynamicKey1 = `k${i}`;
+        const dynamicKey = `k${i + 1}`;
+        const dynamicKey1 = `k${i + 1}`;
 
         if (jsonData[dynamicKey2] && jsonData[dynamicKey2][dynamicKey]) {
           newQuantities[j] = newQuantities[j] || {};
-          newQuantities[j][i] = parseFloat(
+          newQuantities[j][i+1] = parseFloat(
             jsonData[dynamicKey2][dynamicKey].perc,
           );
           newQuantities[j][0] = parseFloat(jsonData[dynamicKey2].case.perc);
 
           const { pol } = jsonData[dynamicKey2][dynamicKey];
           newSelectedValues[j] = newSelectedValues[j] || {};
-          newSelectedValues[j][i] =
+          newSelectedValues[j][i+1] =
             pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
 
           const casePol = jsonData[dynamicKey2].case.pol;
@@ -193,14 +198,14 @@ export default function App() {
 
         if (jsonData[dynamicKey3] && jsonData[dynamicKey3][dynamicKey1]) {
           newQuantities[j + 4] = newQuantities[j + 4] || {};
-          newQuantities[j + 4][i + 1] = parseFloat(
+          newQuantities[j + 4][i+1] = parseFloat(
             jsonData[dynamicKey3][dynamicKey1].perc,
           );
           newQuantities[j + 4][0] = parseFloat(jsonData[dynamicKey3].case.perc);
 
           const { pol } = jsonData[dynamicKey3][dynamicKey1];
           newSelectedValues[j + 4] = newSelectedValues[j + 4] || {};
-          newSelectedValues[j + 4][i + 1] =
+          newSelectedValues[j + 4][i+1] =
             pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
 
           const casePol = jsonData[dynamicKey3].case.pol;
@@ -252,7 +257,6 @@ export default function App() {
       });
     }
 
-
     Object.keys(newAllVolAmpToggles).forEach((key) => {
       if (newAllVolAmpToggles[key] === 'right') {
         outputIPG = 'Medtronic_Activa';
@@ -270,107 +274,11 @@ export default function App() {
       outputVisModel,
       newAllVolAmpToggles,
       outputIPG,
+      newAllTogglePositions,
     };
 
     // Need to add some type of filtering here that detects whether it is Medtronic Activa, and then needs to put just mA values, not %
   };
-
-  // useEffect(() => {
-  //   console.log(window.electron.ipcRenderer);
-  //   if (window.electron && window.electron.ipcRenderer) {
-  //     window.electron.ipcRenderer.once('import-file', (arg) => {
-  //       try {
-  //         console.log('Received import-file event');
-  //         console.log(arg);
-  //         console.log('Import Data:', arg.patientname[0]);
-  //         setPatientName(arg.patientname[0]);
-  //         electrodeList = arg.electrodeModels;
-  //         const outputElectrode = handleImportedElectrode(electrodeList[0]);
-  //         const outputIPG = handleIPG(electrodeList[0]);
-  //         console.log('Tester: ', outputIPG);
-  //         setElectrodeMaster(outputElectrode);
-  //         setIpgMaster(outputIPG);
-  //         setImportNewS(arg.S);
-
-  //         const tempPatients = arg.patientname;
-  //         console.log('TEMPPAtients', tempPatients);
-
-  //         let initialStates;
-
-  //         if (tempPatients.length === 1) {
-  //           const patient = tempPatients[0];
-  //           const electrodes = electrodeList[0];
-  //           console.log(arg.S);
-  //           // const processedS = arg.S
-  //           //   ? gatherImportedDataNew(arg.S)
-  //           //   : {
-  //           //       filteredQuantities: {},
-  //           //       filteredValues: {},
-  //           //       newTotalAmplitude: {},
-  //           //     };
-  //           const processedS =
-  //             Array.isArray(arg.S) && arg.S.length === 0
-  //               ? {
-  //                   filteredQuantities: {},
-  //                   filteredValues: {},
-  //                   newTotalAmplitude: {},
-  //                   outputVisModel: '3',
-  //                   newAllVolAmpToggles: {},
-  //                 }
-  //               : gatherImportedDataNew(arg.S, outputIPG);
-  //           console.log(arg.S);
-  //           initialStates = {
-  //             [patient]: {
-  //               ...initialState,
-  //               leftElectrode: outputElectrode,
-  //               rightElectrode: outputElectrode,
-  //               IPG: outputIPG,
-  //               allQuantities: processedS.filteredQuantities,
-  //               allSelectedValues: processedS.filteredValues,
-  //               allTotalAmplitudes: processedS.newTotalAmplitude,
-  //               visModel: processedS.outputVisModel,
-  //               allVolAmpToggles: processedS.newAllVolAmpToggles,
-  //             },
-  //           };
-  //         } else {
-  //           initialStates = tempPatients.reduce((acc, patient, index) => {
-  //             console.log(`Processing patient ${index + 1}`);
-  //             const electrodes = electrodeList[index];
-  //             const processedS = arg.S[index]
-  //               ? gatherImportedDataNew(arg.S[index], outputIPG)
-  //               : {
-  //                   filteredQuantities: {},
-  //                   filteredValues: {},
-  //                   newTotalAmplitude: {},
-  //                   outputVisModel: '3',
-  //                   newAllVolAmpToggles: {},
-  //                 };
-  //             acc[patient] = {
-  //               ...initialState,
-  //               leftElectrode: outputElectrode,
-  //               rightElectrode: outputElectrode,
-  //               IPG: outputIPG,
-  //               allQuantities: processedS.filteredQuantities,
-  //               allSelectedValues: processedS.filteredValues,
-  //               allTotalAmplitudes: processedS.newTotalAmplitude,
-  //               visModel: processedS.outputVisModel,
-  //               allVolAmpToggles: processedS.newAllVolAmpToggles,
-  //             };
-  //             return acc;
-  //           }, {});
-  //         }
-
-  //         console.log('Patients:', initialStates);
-  //         setPatientStates(initialStates);
-  //         setPatients(tempPatients);
-  //       } catch (error) {
-  //         console.error('Error processing import-file event:', error);
-  //       }
-  //     });
-  //   } else {
-  //     console.error('ipcRenderer is not available');
-  //   }
-  // }, []);
 
   useEffect(() => {
     console.log(window.electron.ipcRenderer);
@@ -412,6 +320,7 @@ export default function App() {
                   outputVisModel: '3',
                   newAllVolAmpToggles: {},
                   outputIPG: handleIPG(electrodeList[index]),
+                  newAllTogglePositions: {},
                 };
             acc[patient] = {
               ...initialState,
@@ -423,6 +332,7 @@ export default function App() {
               allTotalAmplitudes: processedS.newTotalAmplitude,
               visModel: processedS.outputVisModel,
               allVolAmpToggles: processedS.newAllVolAmpToggles,
+              allTogglePositions: processedS.newAllTogglePositions,
             };
             return acc;
           }, {});
@@ -491,6 +401,7 @@ export default function App() {
     let outputQuantities = {};
     console.log(allQuantities);
     console.log(allTotalAmplitudes);
+    console.log(allTogglePositions);
     const updatedQuantities = { ...allQuantities };
     Object.keys(allTogglePositions).forEach((position) => {
       if (allTogglePositions[position] === 'mA') {
@@ -587,12 +498,13 @@ export default function App() {
         activecontacts: [],
         template: 'warp',
         sources: {},
-        elmodel: {},
-        ipg: IPG,
+        // elmodel: {},
+        // ipg: IPG,
+        ver: '2.0',
       },
     };
 
-    data.S.elmodel = [selectedElectrodeLeft, selectedElectrodeRight];
+    // data.S.elmodel = [selectedElectrodeLeft, selectedElectrodeRight];
     const programs = Object.keys(allQuantities);
     const firstProgram = programs[0];
     console.log('Programs: ', programs);
@@ -617,7 +529,7 @@ export default function App() {
           } else if (allSelectedValues[j][i] === 'right') {
             polarity = 2;
           }
-          let dynamicKey = `k${i + loopSize - 2}`;
+          let dynamicKey = `k${i}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: parseFloat(updatedOutputQuantity[j][i]),
             pol: polarity,
@@ -647,7 +559,7 @@ export default function App() {
         // console.log(data.S.activecontacts);
       } else {
         for (let i = 1; i < loopSize; i++) {
-          let dynamicKey = `k${i + loopSize - 2}`;
+          let dynamicKey = `k${i}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: 0,
             pol: 0,
@@ -680,7 +592,7 @@ export default function App() {
           } else if (allSelectedValues[j + 4][i] === 'right') {
             polarity = 2;
           }
-          let dynamicKey = `k${i - 1}`;
+          let dynamicKey = `k${i}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: parseFloat(updatedOutputQuantity[j + 4][i]),
             pol: polarity,
@@ -710,7 +622,7 @@ export default function App() {
         // rightAmpArray[j + 4] = parseFloat(allTotalAmplitudes[j + 4]);
       } else {
         for (let i = 1; i < loopSize; i++) {
-          let dynamicKey = `k${i - 1}`;
+          let dynamicKey = `k${i}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: 0,
             pol: 0,
@@ -798,7 +710,7 @@ export default function App() {
   };
 
   const handleExport = () => {
-    console.log(patientStates);
+    console.log('Patient States for Export', patientStates);
     let outputData = [];
     try {
       Object.values(patientStates).forEach((tempStates, index) => {
