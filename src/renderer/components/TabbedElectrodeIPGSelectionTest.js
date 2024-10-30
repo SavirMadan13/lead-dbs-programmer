@@ -2051,7 +2051,7 @@ function TabbedElectrodeIPGSelection({
         >
           Discard
         </button> */}
-        <button className="export-button-final" onClick={sendDataToMain}>
+        <button className="export-button-final" onClick={sendDataToMain} style={{marginTop: '70px'}}>
           Save
         </button>
       </div>

@@ -176,8 +176,8 @@ function Generic_elmodel(props, ref) {
               //   // face={face}
               //   // fill="transparent"
               // />,
-              // <CenterContact key={contactNum} level={levelIndex + 1} />,
-              <Nondirectional key={contactNum} level={levelIndex + 1} />,
+              <CenterContact key={contactNum} level={levelIndex + 1} />,
+              // <Nondirectional key={contactNum} level={levelIndex + 1} />,
             );
           }
         } else if (face === 'right') {
@@ -3594,16 +3594,16 @@ function Generic_elmodel(props, ref) {
             </div>
           ))}
         </div>
-        <div className="left-contacts">
+        <div className="left-contacts-test">
           {leftContacts.map((Lcon) => (
-            <div className="image-item">
-              <div className="image-container">
+            <div className="image-item-left">
+              <div className="image-container-left">
                 {React.cloneElement(Lcon, {
                   key: Lcon.key,
                   className: `${selectedValues[Lcon.key]}-color`,
                 })}
                 {!isNaN(Number(Lcon.key)) && (
-                  <div className="triple-toggle-boston-test">
+                  <div className="triple-toggle-boston-test-left">
                     <TripleToggleTest
                       key={Lcon.key}
                       value={selectedValues[Lcon.key]}
@@ -3622,7 +3622,7 @@ function Generic_elmodel(props, ref) {
                   </div>
                 )}
               </div>
-              <p className="image-name-boston" style={{ color: 'white' }}>
+              <p className="image-name-boston-left" style={{ color: 'white' }}>
                 {names[Lcon.key]}
               </p>
             </div>
@@ -3661,22 +3661,22 @@ function Generic_elmodel(props, ref) {
                 </div>
               )}
             </div>
-            <p className="image-name-boston" style={{ color: 'white' }}>
+            <p className="image-name-boston" style={{ color: 'white', paddingTop: '100px', marginLeft: '95px' }}>
               {names[svg.key]}
             </p>
           </div>
         ))}
       </div>
-      <div className="right-contacts">
+      <div className="right-contacts-test">
         {rightContacts.map((rCon) => (
-          <div className="image-item">
-            <div className="image-container">
+          <div className="image-item-right">
+            <div className="image-container-right">
               {React.cloneElement(rCon, {
                 key: rCon.key,
                 className: `${selectedValues[rCon.key]}-color`,
               })}
               {!isNaN(Number(rCon.key)) && (
-                <div className="triple-toggle-boston-test">
+                <div className="triple-toggle-boston-test-right">
                   <TripleToggleTest
                     key={rCon.key}
                     value={selectedValues[rCon.key]}
@@ -3695,7 +3695,7 @@ function Generic_elmodel(props, ref) {
                 </div>
               )}
             </div>
-            <p className="image-name-boston" style={{ color: 'white' }}>
+            <p className="image-name-boston-right" style={{ color: 'white' }}>
               {names[rCon.key]}
             </p>
           </div>
@@ -3816,7 +3816,7 @@ function Generic_elmodel(props, ref) {
           ))}
         </div>
       </div> */}
-      <div>
+      <div style={{zIndex: '10'}}>
         {handleIPG()}
         {radioValue === '2' &&
           (stimController === 0 || stimController === 3) && (
