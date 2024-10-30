@@ -115,6 +115,36 @@ function PlyViewer({
     loadPlyFile(); // Call the async function
   }, []);
 
+  useEffect(() => {
+    // This loads in the combined electrodes for the selected patient
+    const loadPlyFile = async () => {
+      try {
+        const fileData = await window.electron.ipcRenderer.invoke(
+          'load-test-file',
+          historical,
+        );
+        // setPlyFile(fileData);
+        const loader = new PLYLoader();
+        const geometry = loader.parse(fileData);
+
+        const material = new THREE.MeshStandardMaterial({
+          vertexColors: geometry.hasAttribute('color'),
+          flatShading: true,
+          metalness: 0.1, // More reflective
+          roughness: 0.5, // Shinier surface
+          transparent: true, // Enable transparency
+          opacity: 0.8, // Set opacity to 60%
+        });
+        // eslint-disable-next-line no-use-before-define
+        addMeshToScene('Test OSS VTA', geometry, material);
+      } catch (error) {
+        console.error('Error loading PLY file:', error);
+      }
+    };
+
+    loadPlyFile(); // Call the async function
+  }, []);
+
   // New states for visibility and thresholding
   const [meshVisibility, setMeshVisibility] = useState({});
   const [meshOpacity, setMeshOpacity] = useState({});

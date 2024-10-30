@@ -28,19 +28,25 @@ import './ElecModelStyling/boston_vercise_directed.css';
 import { ReactComponent as IPG } from '../images/IPG.svg';
 import { ReactComponent as Contact } from '../images/Contact.svg';
 import { ReactComponent as Tail } from '../images/ElectrodeTailContact.svg';
-import { ReactComponent as RightContact } from '../images/RightContact.svg';
-import { ReactComponent as LeftContact } from '../images/LeftContact.svg';
+// import { ReactComponent as RightContact } from '../images/RightContact.svg';
+// import { ReactComponent as LeftContact } from '../images/LeftContact.svg';
 import { ReactComponent as HeadTop } from '../images/head_top.svg';
-import { ReactComponent as HeadBottom } from '../images/head_bottom.svg';
-import { ReactComponent as UpArrow } from '../images/UpArrow.svg';
-import { ReactComponent as DownArrow } from '../images/DownArrow.svg';
-import { ReactComponent as ClockwiseArrow } from '../images/ClockwiseArrow.svg';
-import { ReactComponent as CounterClockwiseArrow } from '../images/CounterClockwiseArrow.svg';
+// import { ReactComponent as HeadBottom } from '../images/head_bottom.svg';
+// import { ReactComponent as UpArrow } from '../images/UpArrow.svg';
+// import { ReactComponent as DownArrow } from '../images/DownArrow.svg';
+// import { ReactComponent as ClockwiseArrow } from '../images/ClockwiseArrow.svg';
+// import { ReactComponent as CounterClockwiseArrow } from '../images/CounterClockwiseArrow.svg';
 import { ReactComponent as ForwardButton } from '../images/FrontButton.svg';
 import { ReactComponent as BackButton } from '../images/BackButton.svg';
 import { ReactComponent as LeftButton } from '../images/LeftButton.svg';
 import { ReactComponent as RightButton } from '../images/RightButton.svg';
 import { ReactComponent as SplitEvenButton } from '../images/SplitEvenButton.svg';
+import { ReactComponent as NewBottomContact } from '../images/NewUI/BottomContact.svg';
+import { ReactComponent as LeftContact } from '../images/NewUI/LeftContact.svg';
+import { ReactComponent as RightContact } from '../images/NewUI/RightContact.svg';
+import { ReactComponent as CenterContact } from '../images/NewUI/CenterContact.svg';
+import { ReactComponent as Nondirectional } from '../images/NewUI/NonDirectionalContact.svg';
+import { ReactComponent as Background } from '../images/NewUI/Background.svg';
 import PercentageAmplitudeToggle from '../../PercentageAmplitudeToggle';
 import AssistedToggle from '../../AssistedToggle';
 import VolumeAmplitudeToggle from '../../VoltageAmplitudeToggle';
@@ -129,8 +135,8 @@ function Generic_elmodel(props, ref) {
   console.log('Parsed: ', parsedEtageidx);
   // Generate Contact components based on parsed etageidx
   const centerColumn = [
-    <HeadTop key="headTop" />,
-    <Contact key="headBottom" fill="transparent" />,
+    // <HeadTop key="headTop" />,
+    // <Contact key="headBottom" fill="transparent" />,
   ];
   const rightColumn = [];
   const leftColumn = [];
@@ -154,51 +160,62 @@ function Generic_elmodel(props, ref) {
           if (elspec.tipiscontact === 1 && contactNum === 1) {
             console.log(elspec.tipiscontact);
             centerColumn.push(
-              <Tail
-                key={contactNum}
-                level={levelIndex + 1}
-                // face={face}
-                // fill="transparent"
-              />,
+              // <Tail
+              //   key={contactNum}
+              //   level={levelIndex + 1}
+              //   // face={face}
+              //   // fill="transparent"
+              // />,
+              <NewBottomContact key={contactNum} level={levelIndex + 1} />,
             );
           } else {
             centerColumn.push(
-              <Contact
-                key={contactNum}
-                level={levelIndex + 1}
-                // face={face}
-                // fill="transparent"
-              />,
+              // <Contact
+              //   key={contactNum}
+              //   level={levelIndex + 1}
+              //   // face={face}
+              //   // fill="transparent"
+              // />,
+              // <CenterContact key={contactNum} level={levelIndex + 1} />,
+              <Nondirectional key={contactNum} level={levelIndex + 1} />,
             );
           }
         } else if (face === 'right') {
           leftColumn.push(
-            <Contact
-              key={contactNum}
-              level={levelIndex + 1}
-              // face={face}
-              // fill="transparent"
-            />,
+            // <Contact
+            //   key={contactNum}
+            //   level={levelIndex + 1}
+            //   // face={face}
+            //   // fill="transparent"
+            // />,
+            <LeftContact key={contactNum} level={levelIndex + 1} />,
           );
         } else {
           rightColumn.push(
-            <Contact
-              key={contactNum}
-              level={levelIndex + 1}
-              // face={face}
-              // fill="transparent"
-            />,
+            // <Contact
+            //   key={contactNum}
+            //   level={levelIndex + 1}
+            //   // face={face}
+            //   // fill="transparent"
+            // />,
+            <RightContact key={contactNum} level={levelIndex + 1} />,
           );
         }
       });
     });
   if (elspec.tipiscontact === 0) {
     centerColumn.push(
-      <Tail
-        key="tail"
-        // face={face}
-        fill="transparent"
-      />,
+      // <Tail
+      //   key="tail"
+      //   // face={face}
+      //   fill="transparent"
+      // />,
+      // <Tail
+      //   key="tail"
+      //   // face={face}
+      //   fill="transparent"
+      // />,
+      <NewBottomContact key="tail" fill="white" />,
     );
   }
   // parsedEtageidx.forEach((sharedLevel, levelIndex) => {
@@ -462,10 +479,10 @@ function Generic_elmodel(props, ref) {
     props.totalAmplitude || 0,
   );
 
-  const initialSelectedValues = {0: 'right'};
-  const initialQuantityBoston = {0: 100};
-  const initialQuantity = {0: 0};
-  const initialAnimation = {0: null};
+  const initialSelectedValues = { 0: 'right' };
+  const initialQuantityBoston = { 0: 100 };
+  const initialQuantity = { 0: 0 };
+  const initialAnimation = { 0: null };
   for (let i = 0; i < elspec.numel; i++) {
     initialSelectedValues[i + 1] = 'left';
     initialQuantityBoston[i + 1] = 0;
@@ -474,7 +491,8 @@ function Generic_elmodel(props, ref) {
   }
 
   const [selectedValues, setSelectedValues] = useState(
-    props.selectedValues || initialSelectedValues);
+    props.selectedValues || initialSelectedValues,
+  );
 
   const [animation, setAnimation] = useState(initialAnimation);
 
@@ -3376,7 +3394,6 @@ function Generic_elmodel(props, ref) {
       // console.log('here');
       handleActivaVoltage();
     }
-
   }, [
     currentLabel,
     props.IPG,
@@ -3615,16 +3632,17 @@ function Generic_elmodel(props, ref) {
       <div className="Elmodel-center">
         {svgs.map((svg) => (
           <div
-            className="image-item"
-            style={{ zIndex: calculateZIndex(svg.key) }}
+            className="image-item-2"
+            style={{ zIndex: svg.key }}
           >
-            <div className="image-container">
+            <div className="background-image"><Background /></div>
+            <div className="image-container-test">
               {React.cloneElement(svg, {
                 key: svg.key,
                 className: `${selectedValues[svg.key]}-color`,
               })}
               {!isNaN(Number(svg.key)) && (
-                <div className="triple-toggle-boston-test">
+                <div className="triple-toggle-boston-test-2">
                   <TripleToggleTest
                     key={svg.key}
                     value={selectedValues[svg.key]}
@@ -3683,6 +3701,121 @@ function Generic_elmodel(props, ref) {
           </div>
         ))}
       </div>
+      {/* <div className="dbs-electrode-container">
+        <div className="dbs-electrode-column dbs-electrode-left">
+          <div className="dbs-electrode-ipg-section">
+            {ipgs.map((ipg) => (
+              <div className="dbs-electrode-ipg-item" key={ipg.key}>
+                <div className="dbs-electrode-image-wrapper">
+                  <div className="overlay-container">
+                    {React.cloneElement(ipg, {
+                      className: `${selectedValues[ipg.key]}-color`,
+                    })}
+                    {!isNaN(Number(ipg.key)) && (
+                      <div className="triple-toggle-dbs-ipg">
+                        <TripleToggleTest
+                          value={selectedValues[ipg.key]}
+                          switchPosition={selectedValues[ipg.key]}
+                          animation={animation[ipg.key]}
+                          quantity={quantities[ipg.key]}
+                          onChange={(value, anime) =>
+                            handleTripleToggleChange(value, anime, ipg.key)
+                          }
+                          onQuantityChange={(value, anime, quantity) =>
+                            handleQuantityChange(quantity, ipg.key)
+                          }
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {leftContacts.map((contact) => (
+            <div className="dbs-electrode-item" key={contact.key}>
+              <div className="overlay-container">
+                {React.cloneElement(contact, {
+                  className: `${selectedValues[contact.key]}-color`,
+                })}
+                {!isNaN(Number(contact.key)) && (
+                  <TripleToggleTest
+                    value={selectedValues[contact.key]}
+                    switchPosition={selectedValues[contact.key]}
+                    animation={animation[contact.key]}
+                    quantity={quantities[contact.key]}
+                    onChange={(value, anime) =>
+                      handleTripleToggleChange(value, anime, contact.key)
+                    }
+                    onQuantityChange={(value, anime, quantity) =>
+                      handleQuantityChange(quantity, contact.key)
+                    }
+                  />
+                )}
+              </div>
+              <p className="dbs-electrode-label">{names[contact.key]}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="dbs-electrode-column dbs-electrode-center">
+          <div className="dbs-electrode-background">
+            <Background />
+          </div>
+          {svgs.map((svg) => (
+            <div className="dbs-electrode-item" key={svg.key}>
+              <div className="overlay-container">
+                {React.cloneElement(svg, {
+                  className: `${selectedValues[svg.key]}-color`,
+                })}
+                {!isNaN(Number(svg.key)) && (
+                  <TripleToggleTest
+                    value={selectedValues[svg.key]}
+                    switchPosition={selectedValues[svg.key]}
+                    animation={animation[svg.key]}
+                    quantity={quantities[svg.key]}
+                    onChange={(value, anime) =>
+                      handleTripleToggleChange(value, anime, svg.key)
+                    }
+                    onQuantityChange={(value, anime, quantity) =>
+                      handleQuantityChange(quantity, svg.key)
+                    }
+                  />
+                )}
+              </div>
+              <p className="dbs-electrode-label">{names[svg.key]}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="dbs-electrode-column dbs-electrode-right">
+          {rightContacts.map((contact) => (
+            <div className="dbs-electrode-item" key={contact.key}>
+              <div className="overlay-container">
+                {React.cloneElement(contact, {
+                  className: `${selectedValues[contact.key]}-color`,
+                })}
+                {!isNaN(Number(contact.key)) && (
+                  <TripleToggleTest
+                    value={selectedValues[contact.key]}
+                    switchPosition={selectedValues[contact.key]}
+                    animation={animation[contact.key]}
+                    quantity={quantities[contact.key]}
+                    onChange={(value, anime) =>
+                      handleTripleToggleChange(value, anime, contact.key)
+                    }
+                    onQuantityChange={(value, anime, quantity) =>
+                      handleQuantityChange(quantity, contact.key)
+                    }
+                  />
+                )}
+              </div>
+              <p className="dbs-electrode-label">{names[contact.key]}</p>
+            </div>
+          ))}
+        </div>
+      </div> */}
       <div>
         {handleIPG()}
         {radioValue === '2' &&
@@ -3716,7 +3849,7 @@ function Generic_elmodel(props, ref) {
             <RightButton className="svgButtons" onClick={handleLeftButton} />
           </div>
         )}
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', zIndex: 100 }}>
           <ButtonGroup vertical>
             <Button
               onClick={calculateQuantitiesWithDistribution}

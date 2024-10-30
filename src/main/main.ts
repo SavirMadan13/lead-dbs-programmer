@@ -1158,6 +1158,15 @@ const createWindow = async () => {
     return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
   });
 
+  ipcMain.handle('load-test-file', async (event, historical) => {
+    const { patient, timeline, directoryPath, leadDBS } = historical;
+    const filePath =
+      '/Users/savirmadan/Downloads/potential_test.ply';
+    console.log(filePath);
+    const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
+    return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
+  });
+
   ipcMain.handle('load-ply-file-anatomy', async (event, historical) => {
     const { patient, timeline, directoryPath, leadDBS } = historical;
     if (leadDBS) {
