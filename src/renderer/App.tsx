@@ -293,7 +293,7 @@ export default function App() {
           // console.log('Tester: ', outputIPG);
           // setElectrodeMaster(outputElectrode);
           // setIpgMaster(outputIPG);
-          // setImportNewS(arg.S);
+          setImportNewS(arg.S);
 
           // const tempPatients = arg.patientname;
           // setPatientName(arg.patientname[0]);
@@ -469,6 +469,7 @@ export default function App() {
     visModel,
     allTogglePositions,
     allPercAmpToggles,
+    index,
   ) => {
     // handleFileChange('1');
     // saveQuantitiesandValues();
@@ -480,29 +481,35 @@ export default function App() {
     // console.log(exportAmplitudeData);
     const leftHemiArr = [];
     const rightHemiArr = [];
+    console.log(importNewS);
     const data = {
       S: {
-        label: groupLabel,
-        Rs1: {},
-        Rs2: {},
-        Rs3: {},
-        Rs4: {},
-        Ls1: {},
-        Ls2: {},
-        Ls3: {},
-        Ls4: {},
-        active: {},
-        model: '',
-        monopolarmodel: 0,
-        amplitude: {},
-        activecontacts: [],
-        template: 'warp',
-        sources: {},
-        // elmodel: {},
-        // ipg: IPG,
-        ver: '2.0',
+        ...importNewS[index],
       },
     };
+    // const data = {
+    //   S: {
+    //     label: groupLabel,
+    //     Rs1: {},
+    //     Rs2: {},
+    //     Rs3: {},
+    //     Rs4: {},
+    //     Ls1: {},
+    //     Ls2: {},
+    //     Ls3: {},
+    //     Ls4: {},
+    //     active: {},
+    //     model: '',
+    //     monopolarmodel: 0,
+    //     amplitude: {},
+    //     activecontacts: [],
+    //     template: 'warp',
+    //     sources: {},
+    //     // elmodel: {},
+    //     // ipg: IPG,
+    //     ver: '2.0',
+    //   },
+    // };
 
     // data.S.elmodel = [selectedElectrodeLeft, selectedElectrodeRight];
     const programs = Object.keys(allQuantities);
@@ -725,6 +732,7 @@ export default function App() {
           tempStates.visModel,
           tempStates.allTogglePositions,
           tempStates.allPercAmpToggles,
+          index,
         );
         outputData[index] = tempData; // Using index instead of key
       });
