@@ -61,6 +61,7 @@ export default function App() {
   const [importNewS, setImportNewS] = useState({});
   const [electrodeMaster, setElectrodeMaster] = useState('');
   const [ipgMaster, setIpgMaster] = useState('');
+  const [exportS, setExportS] = useState(null);
 
   const initialState = {
     IPG: '',
@@ -510,6 +511,7 @@ export default function App() {
             importNewS={importNewS}
             electrodeMaster={electrodeMaster}
             ipgMaster={ipgMaster}
+            templateS={importNewS}
           />
         )}
       </div>

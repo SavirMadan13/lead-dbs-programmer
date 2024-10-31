@@ -65,6 +65,7 @@ function TabbedElectrodeIPGSelection({
   setStimChanged,
   namingConvention,
   selectedPatient,
+  templateS,
 }) {
   const testElectrodeRef = React.createRef();
   // const [selectedElectrode, setSelectedElectrode] = useState('');
@@ -1524,27 +1525,33 @@ function TabbedElectrodeIPGSelection({
     // console.log(exportAmplitudeData);
     const leftHemiArr = [];
     const rightHemiArr = [];
+    // const data = {
+    //   S: {
+    //     label: selectedPatient,
+    //     Rs1: {},
+    //     Rs2: {},
+    //     Rs3: {},
+    //     Rs4: {},
+    //     Ls1: {},
+    //     Ls2: {},
+    //     Ls3: {},
+    //     Ls4: {},
+    //     active: {},
+    //     model: '',
+    //     monopolarmodel: 0,
+    //     amplitude: {},
+    //     activecontacts: [],
+    //     template: 'warp',
+    //     sources: {},
+    //     ver: '2.0',
+    //   },
+    // };
     const data = {
       S: {
-        label: selectedPatient,
-        Rs1: {},
-        Rs2: {},
-        Rs3: {},
-        Rs4: {},
-        Ls1: {},
-        Ls2: {},
-        Ls3: {},
-        Ls4: {},
-        active: {},
-        model: '',
-        monopolarmodel: 0,
-        amplitude: {},
-        activecontacts: [],
-        template: 'warp',
-        sources: {},
-        ver: '2.0',
+        ...templateS,
       },
     };
+    console.log(data);
 
     // data.S.elmodel = [selectedElectrodeLeft, selectedElectrodeRight];
     const programs = Object.keys(allQuantities);
