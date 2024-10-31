@@ -25,9 +25,9 @@ console.error = () => {};
 // const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
 // console.log(args);
 // const inputFilePath = args[0]; // Get the first argument
-const inputFilePath = process.argv[1];
-// const inputFilePath =
-//   '/Volumes/Expansion/Lead-Tutor/LeadTutor/groupFolder/derivatives/leadgroup/20240802104138/inputData.json';
+// const inputFilePath = process.argv[1];
+const inputFilePath =
+  '/Volumes/Expansion/ProgrammerTesting/derivatives/leadgroup/20241031135259/inputData.json';
 // const inputFilePath =
 //   '/Users/savirmadan/Documents/inputData.json';
 class AppUpdater {
