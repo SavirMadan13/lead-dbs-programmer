@@ -673,7 +673,8 @@ export default function App() {
     const sourcesArray = activeArray;
     const rightLength = newActiveArray.length;
     data.S.sources = sourcesArray;
-    data.S.active = [leftLength, rightLength];
+    // data.S.active = [leftLength, rightLength];
+    data.S.active = [1, 1];
     // data.S.activecontacts = activeContacts(allSelectedValues[1]);
 
     for (let i = 1; i < 9; i++) {
