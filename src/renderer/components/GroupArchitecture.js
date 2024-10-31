@@ -275,6 +275,7 @@ function GroupArchitecture({
           importNewS={importNewS}
           selectedPatient={selectedPatient}
           templateS={templateS}
+          active={currentPatientState.active}
         />
       )}
     </div>

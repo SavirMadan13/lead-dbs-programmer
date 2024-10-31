@@ -84,6 +84,7 @@ export default function App() {
     showDropdown: true,
     filePath: '',
     stimChanged: true,
+    active: [],
   };
 
   const handleImportedElectrode = (importedElectrode) => {
@@ -293,7 +294,7 @@ export default function App() {
           setElectrodeMaster(outputElectrode);
           setIpgMaster(outputIPG);
           setImportNewS(arg.S);
-
+          const activeArray = arg.S.active;
           const tempPatients = arg.labels;
           console.log('TEMPPAtients', tempPatients);
 
@@ -318,6 +319,7 @@ export default function App() {
                     newTotalAmplitude: {},
                     outputVisModel: '3',
                     newAllVolAmpToggles: {},
+                    active: activeArray,
                   }
                 : gatherImportedDataNew(arg.S, outputIPG);
             console.log(arg.S);
@@ -332,6 +334,7 @@ export default function App() {
                 allTotalAmplitudes: processedS.newTotalAmplitude,
                 visModel: processedS.outputVisModel,
                 allVolAmpToggles: processedS.newAllVolAmpToggles,
+                active: activeArray,
               },
             };
           } else {
@@ -346,6 +349,7 @@ export default function App() {
                     newTotalAmplitude: {},
                     outputVisModel: '3',
                     newAllVolAmpToggles: {},
+                    active: activeArray,
                   };
               acc[patient] = {
                 ...initialState,
@@ -357,6 +361,7 @@ export default function App() {
                 allTotalAmplitudes: processedS.newTotalAmplitude,
                 visModel: processedS.outputVisModel,
                 allVolAmpToggles: processedS.newAllVolAmpToggles,
+                active: activeArray,
               };
               return acc;
             }, {});
