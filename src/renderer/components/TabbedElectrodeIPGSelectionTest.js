@@ -33,6 +33,8 @@ import Abbott_directed_6173 from './electrode_models/currentModels/Abbott_direct
 import Boston_vercise_cartesia_HX from './electrode_models/currentModels/Boston_vercise_cartesia_HX';
 import Boston_vercise_cartesia_X from './electrode_models/currentModels/Boston_vercise_cartesia_X';
 import Boston_vercise_directed_new from './electrode_models/currentModels/Boston_vercise_directed_new';
+import electrodeModels from './electrodeModels.json';
+import Generic_elmodel from './electrode_models/currentModels/Generic_elmodel';
 
 function TabbedElectrodeIPGSelection({
   IPG,
@@ -99,6 +101,7 @@ function TabbedElectrodeIPGSelection({
   // const [namingConvention, setNamingConvention] = useState('clinical');
   const fileInputRef = useRef(null);
   const [visualizationModel, setVisualizationModel] = useState('3');
+  const [templateSpace, setTemplateSpace] = useState(0);
   // const [allQuantities, setAllQuantities] = useState({});
   // const [allSelectedValues, setAllSelectedValues] = useState({});
 
@@ -168,6 +171,9 @@ function TabbedElectrodeIPGSelection({
     const tempModel = testElectrodeRef.current.getStateVisModel();
     setVisualizationModel(tempModel);
     setVisModel(tempModel);
+
+    const updatedTemplateSpace = testElectrodeRef.current.getStateTemplateSpace();
+    setTemplateSpace(updatedTemplateSpace);
 
     const updatedSessionTitle = {
       ...sessionTitle,
@@ -249,6 +255,8 @@ function TabbedElectrodeIPGSelection({
 
     sessionTitle[key] = testElectrodeRef.current.getStateSessionTitle();
     allTogglePositions[key] = testElectrodeRef.current.getStateTogglePosition();
+    // templateSpace = testElectrodeRef.current.getStateTemplateSpace();
+    return testElectrodeRef.current.getStateTemplateSpace();
     // }
   };
 
@@ -283,390 +291,6 @@ function TabbedElectrodeIPGSelection({
       default:
         return '';
     }
-  };
-
-  const testElectrodeOptions = {
-    BostonCartesia: (
-      <BostonCartesia
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-      />
-    ),
-    Medtronic3389: (
-      <Medtronic3389
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-      />
-    ),
-    Medtronic3387: (
-      <Medtronic3387
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-      />
-    ),
-    Medtronic3391: (
-      <Medtronic3391
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-      />
-    ),
-    MedtronicB33005: (
-      <MedtronicB33005
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-      />
-    ),
-    BostonScientificVercise: (
-      <BostonScientificVercise
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-      />
-    ),
-    BostonCartesiaTest: (
-      <BostonCartesiaTest
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-        totalAmplitude={allTotalAmplitudes[key]}
-        parameters={allStimulationParameters[key]}
-        visModel={visModel[1]}
-        sessionTitle={sessionTitle[1]}
-      />
-    ),
-    NewBostonCartesiaTest: (
-      <NewBostonCartesiaTest
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-      />
-    ),
-    BostonScientificCartesiaHX: (
-      <BostonScientificCartesiaHX
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-        totalAmplitude={allTotalAmplitudes[key]}
-        parameters={allStimulationParameters[key]}
-        visModel={visModel[1]}
-        sessionTitle={sessionTitle[1]}
-      />
-    ),
-    BostonScientificCartesiaX: (
-      <BostonScientificCartesiaX
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-        totalAmplitude={allTotalAmplitudes[key]}
-        parameters={allStimulationParameters[key]}
-        visModel={visModel[1]}
-        sessionTitle={sessionTitle[1]}
-      />
-    ),
-    AbbottDirectedTest: (
-      <AbbottDirectedTest
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-      />
-    ),
-    // boston_vercise_directed: (
-    //   <Boston_vercise_directed
-    //     ref={testElectrodeRef}
-    //     key={key}
-    //     name={key}
-    //     allQuantities={allQuantities}
-    //     quantities={allQuantities[key]}
-    //     selectedValues={allSelectedValues[key]}
-    //     IPG={IPG}
-    //     totalAmplitude={allTotalAmplitudes[key]}
-    //     parameters={allStimulationParameters[key]}
-    //     visModel={visModel[1]}
-    //     sessionTitle={sessionTitle[1]}
-    //     togglePosition={allTogglePositions[key]}
-    //     percAmpToggle={allPercAmpToggles[key]}
-    //     volAmpToggle={allVolAmpToggles[key]}
-    //     // stimChanged={stimChanged}
-    //     // setStimChanged={setStimChanged}
-    //     // outputIPG={outputIPG}
-    //   />
-    // ),
-    boston_vercise_directed: (
-      <Boston_vercise_directed_new
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        allQuantities={allQuantities}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-        totalAmplitude={allTotalAmplitudes[key]}
-        parameters={allStimulationParameters[key]}
-        // visModel={visModel[1]}
-        visModel={visModel}
-        sessionTitle={sessionTitle[1]}
-        togglePosition={allTogglePositions[key]}
-        percAmpToggle={allPercAmpToggles[key]}
-        volAmpToggle={allVolAmpToggles[key]}
-        contactNaming={namingConvention}
-        adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
-        // stimChanged={stimChanged}
-        // setStimChanged={setStimChanged}
-        // outputIPG={outputIPG}
-      />
-    ),
-    boston_vercise_cartesia_hx: (
-      <Boston_vercise_cartesia_HX
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-        totalAmplitude={allTotalAmplitudes[key]}
-        parameters={allStimulationParameters[key]}
-        visModel={visModel}
-        sessionTitle={sessionTitle[1]}
-        togglePosition={allTogglePositions[key]}
-        percAmpToggle={allPercAmpToggles[key]}
-        volAmpToggle={allVolAmpToggles[key]}
-      />
-    ),
-    boston_vercise_cartesia_x: (
-      <Boston_vercise_cartesia_X
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-        totalAmplitude={allTotalAmplitudes[key]}
-        parameters={allStimulationParameters[key]}
-        visModel={visModel}
-        sessionTitle={sessionTitle[1]}
-        togglePosition={allTogglePositions[key]}
-        percAmpToggle={allPercAmpToggles[key]}
-        volAmpToggle={allVolAmpToggles[key]}
-      />
-    ),
-    boston_vercise: (
-      <Boston_vercise
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-        totalAmplitude={allTotalAmplitudes[key]}
-        parameters={allStimulationParameters[key]}
-        visModel={visModel}
-        sessionTitle={sessionTitle[1]}
-        togglePosition={allTogglePositions[key]}
-        percAmpToggle={allPercAmpToggles[key]}
-        volAmpToggle={allVolAmpToggles[key]}
-        contactNaming={namingConvention}
-      />
-    ),
-    medtronic_3389: (
-      <Medtronic_3389
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-        totalAmplitude={allTotalAmplitudes[key]}
-        parameters={allStimulationParameters[key]}
-        visModel={visModel}
-        sessionTitle={sessionTitle[1]}
-        togglePosition={allTogglePositions[key]}
-        percAmpToggle={allPercAmpToggles[key]}
-        volAmpToggle={allVolAmpToggles[key]}
-        contactNaming={namingConvention}
-      />
-    ),
-    medtronic_3387: (
-      <Medtronic_3387
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-        totalAmplitude={allTotalAmplitudes[key]}
-        parameters={allStimulationParameters[key]}
-        visModel={visModel}
-        sessionTitle={sessionTitle[1]}
-        togglePosition={allTogglePositions[key]}
-        percAmpToggle={allPercAmpToggles[key]}
-        volAmpToggle={allVolAmpToggles[key]}
-        contactNaming={namingConvention}
-      />
-    ),
-    medtronic_3391: (
-      <Medtronic_3391
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-        totalAmplitude={allTotalAmplitudes[key]}
-        parameters={allStimulationParameters[key]}
-        visModel={visModel}
-        sessionTitle={sessionTitle[1]}
-        togglePosition={allTogglePositions[key]}
-        percAmpToggle={allPercAmpToggles[key]}
-        volAmpToggle={allVolAmpToggles[key]}
-        contactNaming={namingConvention}
-      />
-    ),
-    medtronic_b33005: (
-      <Medtronic_B33005
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-        totalAmplitude={allTotalAmplitudes[key]}
-        parameters={allStimulationParameters[key]}
-        visModel={visModel}
-        sessionTitle={sessionTitle[1]}
-        togglePosition={allTogglePositions[key]}
-        percAmpToggle={allPercAmpToggles[key]}
-        volAmpToggle={allVolAmpToggles[key]}
-        contactNaming={namingConvention}
-      />
-    ),
-    medtronic_b33015: (
-      <Medtronic_B33015
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-        totalAmplitude={allTotalAmplitudes[key]}
-        parameters={allStimulationParameters[key]}
-        visModel={visModel}
-        sessionTitle={sessionTitle[1]}
-        togglePosition={allTogglePositions[key]}
-        percAmpToggle={allPercAmpToggles[key]}
-        volAmpToggle={allVolAmpToggles[key]}
-        contactNaming={namingConvention}
-      />
-    ),
-    abbott_activetip_2mm: (
-      <Abbott_activetip_2mm
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        allQuantities={allQuantities}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-        totalAmplitude={allTotalAmplitudes[key]}
-        parameters={allStimulationParameters[key]}
-        visModel={visModel}
-        sessionTitle={sessionTitle[1]}
-        togglePosition={allTogglePositions[key]}
-        percAmpToggle={allPercAmpToggles[key]}
-        volAmpToggle={allVolAmpToggles[key]}
-        contactNaming={namingConvention}
-      />
-    ),
-    abbott_activetip_3mm: (
-      <Abbott_activetip_3mm
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        allQuantities={allQuantities}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-        totalAmplitude={allTotalAmplitudes[key]}
-        parameters={allStimulationParameters[key]}
-        visModel={visModel}
-        sessionTitle={sessionTitle[1]}
-        togglePosition={allTogglePositions[key]}
-        percAmpToggle={allPercAmpToggles[key]}
-        volAmpToggle={allVolAmpToggles[key]}
-        contactNaming={namingConvention}
-      />
-    ),
-    abbott_directed_6172: (
-      <Abbott_directed_6172
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-        totalAmplitude={allTotalAmplitudes[key]}
-        parameters={allStimulationParameters[key]}
-        visModel={visModel}
-        sessionTitle={sessionTitle[1]}
-        togglePosition={allTogglePositions[key]}
-        percAmpToggle={allPercAmpToggles[key]}
-        volAmpToggle={allVolAmpToggles[key]}
-        contactNaming={namingConvention}
-      />
-    ),
-    abbott_directed_6173: (
-      <Abbott_directed_6173
-        ref={testElectrodeRef}
-        key={key}
-        name={key}
-        quantities={allQuantities[key]}
-        selectedValues={allSelectedValues[key]}
-        IPG={IPG}
-        totalAmplitude={allTotalAmplitudes[key]}
-        parameters={allStimulationParameters[key]}
-        visModel={visModel}
-        sessionTitle={sessionTitle[1]}
-        togglePosition={allTogglePositions[key]}
-        percAmpToggle={allPercAmpToggles[key]}
-        volAmpToggle={allVolAmpToggles[key]}
-        contactNaming={namingConvention}
-      />
-    ),
   };
 
   const [importedData, setImportedData] = useState(null);
@@ -1070,7 +694,7 @@ function TabbedElectrodeIPGSelection({
 
   const gatherExportedData5 = () => {
     // handleFileChange('1');
-    saveQuantitiesandValues();
+    const exportTemplateSpace = saveQuantitiesandValues();
     let updatedOutputQuantity = {};
     updatedOutputQuantity = handleTogglePositions();
     console.log('Updated output quantity: ', updatedOutputQuantity);
@@ -1306,6 +930,7 @@ function TabbedElectrodeIPGSelection({
     }
     // console.log('export vis model', exportVisModel);
     data.S.model = exportVisModel;
+    data.S.estimateInTemplate = exportTemplateSpace;
     // if (Array.isArray(data.S.activecontacts) && data.S.activecontacts.length > 0 && data.S.activecontacts[0] === undefined) {
     //   data.S.activecontacts.shift();
     // }
@@ -1491,7 +1116,31 @@ function TabbedElectrodeIPGSelection({
                 /> */}
                 {/* </div> */}
                 <div className="form-container">
-                  {testElectrodeOptions[selectedElectrodeRight]}
+                  {/* {testElectrodeOptions[selectedElectrodeRight]} */}
+                  <Generic_elmodel
+                    ref={testElectrodeRef}
+                    key={key}
+                    name={key}
+                    allQuantities={allQuantities}
+                    quantities={allQuantities[key]}
+                    selectedValues={allSelectedValues[key]}
+                    IPG={IPG}
+                    totalAmplitude={allTotalAmplitudes[key]}
+                    parameters={allStimulationParameters[key]}
+                    // visModel={visModel[1]}
+                    visModel={visModel}
+                    sessionTitle={sessionTitle[1]}
+                    togglePosition={allTogglePositions[key]}
+                    percAmpToggle={allPercAmpToggles[key]}
+                    volAmpToggle={allVolAmpToggles[key]}
+                    contactNaming={namingConvention}
+                    adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
+                    elspec={electrodeModels[selectedElectrodeLeft]}
+                    templateSpace={templateSpace}
+                    // stimChanged={stimChanged}
+                    // setStimChanged={setStimChanged}
+                    // outputIPG={outputIPG}
+                  />
                   <div className="electrode-label">
                     {convertElectrode(selectedElectrodeRight)}
                   </div>
@@ -1537,7 +1186,31 @@ function TabbedElectrodeIPGSelection({
                   placeholder={`Enter value in ${tabState.unit}`}
                 /> */}
                 <div className="form-container">
-                  {testElectrodeOptions[selectedElectrodeLeft]}
+                  {/* {testElectrodeOptions[selectedElectrodeLeft]} */}
+                  <Generic_elmodel
+                    ref={testElectrodeRef}
+                    key={key}
+                    name={key}
+                    allQuantities={allQuantities}
+                    quantities={allQuantities[key]}
+                    selectedValues={allSelectedValues[key]}
+                    IPG={IPG}
+                    totalAmplitude={allTotalAmplitudes[key]}
+                    parameters={allStimulationParameters[key]}
+                    // visModel={visModel[1]}
+                    visModel={visModel}
+                    sessionTitle={sessionTitle[1]}
+                    togglePosition={allTogglePositions[key]}
+                    percAmpToggle={allPercAmpToggles[key]}
+                    volAmpToggle={allVolAmpToggles[key]}
+                    contactNaming={namingConvention}
+                    adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
+                    elspec={electrodeModels[selectedElectrodeLeft]}
+                    templateSpace={templateSpace}
+                    // stimChanged={stimChanged}
+                    // setStimChanged={setStimChanged}
+                    // outputIPG={outputIPG}
+                  />
                   <div className="electrode-label">
                     {convertElectrode(selectedElectrodeLeft)}
                   </div>
