@@ -3004,10 +3004,12 @@ function Generic_elmodel(props, ref) {
       calculatePercentageFromAmplitude();
       outputTogglePosition = '%';
       setCurrentLabel('mA');
+      setPercAmpToggle('left');
     } else if (newValue === 'center' && researchToggle !== 'right') {
       calculateAmplitudeFromPercentage();
       outputTogglePosition = 'mA';
       setCurrentLabel('mA');
+      setPercAmpToggle('center');
     } else if (newValue === 'right') {
       if (researchToggle === 'left') {
         calculateAmplitudeFromPercentage();
