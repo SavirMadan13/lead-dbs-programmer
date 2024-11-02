@@ -68,6 +68,108 @@ function StimulationSettings({
     setImportCount(newCount);
   }
 
+  const varargout = [
+    { displayName: 'Medtronic 3389', value: 'medtronic_3389' },
+    { displayName: 'Medtronic 3387', value: 'medtronic_3387' },
+    { displayName: 'Medtronic 3391', value: 'medtronic_3391' },
+    { displayName: 'Medtronic B33005', value: 'medtronic_b33005' },
+    { displayName: 'Medtronic B33015', value: 'medtronic_b33015' },
+    { displayName: 'Boston Scientific Vercise', value: 'boston_vercise' },
+    {
+      displayName: 'Boston Scientific Vercise Directed',
+      value: 'boston_vercise_directed',
+    },
+    // {
+    //   displayName: 'Boston Scientific Vercise Cartesia HX',
+    //   value: 'boston_vercise_cartesia_hx',
+    // },
+    // {
+    //   displayName: 'Boston Scientific Vercise Cartesia X',
+    //   value: 'boston_vercise_cartesia_x',
+    // },
+    {
+      displayName: 'Abbott ActiveTip (6146-6149)',
+      value: 'abbott_activetip_2mm',
+    },
+    {
+      displayName: 'Abbott ActiveTip (6142-6145)',
+      value: 'abbott_activetip_3mm',
+    },
+    {
+      displayName: 'Abbott Directed 6172 (short)',
+      value: 'abbott_directed_05',
+    },
+    { displayName: 'Abbott Directed 6173 (long)', value: 'abbott_directed_15' },
+    { displayName: 'PINS Medical L301', value: 'pins_l301' },
+    { displayName: 'PINS Medical L302', value: 'pins_l302' },
+    { displayName: 'PINS Medical L303', value: 'pins_l303' },
+    { displayName: 'SceneRay SR1200', value: 'sceneray_sr1200' },
+    { displayName: 'SceneRay SR1210', value: 'sceneray_sr1210' },
+    { displayName: 'SceneRay SR1211', value: 'sceneray_sr1211' },
+    { displayName: 'SceneRay SR1242', value: 'sceneray_sr1242' },
+    { displayName: 'SDE-08 S8 Legacy', value: 'sde_08_s8_legacy' },
+    { displayName: 'SDE-08 S10 Legacy', value: 'sde_08_s10_legacy' },
+    { displayName: 'SDE-08 S12 Legacy', value: 'sde_08_s12_legacy' },
+    { displayName: 'SDE-08 S16 Legacy', value: 'sde_08_s16_legacy' },
+    { displayName: 'SDE-08 S8', value: 'sde_08_s8' },
+    { displayName: 'SDE-08 S10', value: 'sde_08_s10' },
+    { displayName: 'SDE-08 S12', value: 'sde_08_s12' },
+    { displayName: 'SDE-08 S14', value: 'sde_08_s14' },
+    { displayName: 'SDE-08 S16', value: 'sde_08_s16' },
+    { displayName: 'PMT 2102-04-091', value: 'pmt_2102_04_091' },
+    { displayName: 'PMT 2102-06-091', value: 'pmt_2102_06_091' },
+    { displayName: 'PMT 2102-08-091', value: 'pmt_2102_08_091' },
+    { displayName: 'PMT 2102-10-091', value: 'pmt_2102_10_091' },
+    { displayName: 'PMT 2102-12-091', value: 'pmt_2102_12_091' },
+    { displayName: 'PMT 2102-14-091', value: 'pmt_2102_14_091' },
+    { displayName: 'PMT 2102-16-091', value: 'pmt_2102_16_091' },
+    { displayName: 'PMT 2102-16-092', value: 'pmt_2102_16_092' },
+    { displayName: 'PMT 2102-16-093', value: 'pmt_2102_16_093' },
+    { displayName: 'PMT 2102-16-131', value: 'pmt_2102_16_131' },
+    { displayName: 'PMT 2102-16-142', value: 'pmt_2102_16_142' },
+    { displayName: '2069-EPC-05C-35', value: 'epc_05c' },
+    { displayName: '2069-EPC-15C-35', value: 'epc_15c' },
+    { displayName: 'NeuroPace DL-344-3.5', value: 'neuropace_dl_344_35' },
+    { displayName: 'NeuroPace DL-344-10', value: 'neuropace_dl_344_10' },
+    { displayName: 'DIXI D08-05AM', value: 'dixi_d08_05am' },
+    { displayName: 'DIXI D08-08AM', value: 'dixi_d08_08am' },
+    { displayName: 'DIXI D08-10AM', value: 'dixi_d08_10am' },
+    { displayName: 'DIXI D08-12AM', value: 'dixi_d08_12am' },
+    { displayName: 'DIXI D08-15AM', value: 'dixi_d08_15am' },
+    { displayName: 'DIXI D08-18AM', value: 'dixi_d08_18am' },
+    { displayName: 'AdTech BF08R-SP05X', value: 'adtech_bf08r_sp05x' },
+    { displayName: 'AdTech BF08R-SP21X', value: 'adtech_bf08r_sp21x' },
+    { displayName: 'AdTech BF08R-SP61X', value: 'adtech_bf08r_sp61x' },
+    { displayName: 'AdTech BF09R-SP61X-0BB', value: 'adtech_bf09r_sp61x_0bb' },
+    { displayName: 'AdTech RD06R-SP05X', value: 'adtech_rd06r_sp05x' },
+    { displayName: 'AdTech RD08R-SP05X', value: 'adtech_rd08r_sp05x' },
+    { displayName: 'AdTech RD10R-SP03X', value: 'adtech_rd10r_sp03x' },
+    { displayName: 'AdTech RD10R-SP05X', value: 'adtech_rd10r_sp05x' },
+    { displayName: 'AdTech RD10R-SP06X', value: 'adtech_rd10r_sp06x' },
+    { displayName: 'AdTech RD10R-SP07X', value: 'adtech_rd10r_sp07x' },
+    { displayName: 'AdTech RD10R-SP08X', value: 'adtech_rd10r_sp08x' },
+    { displayName: 'AdTech SD06R-SP26X', value: 'adtech_sd06r_sp26x' },
+    { displayName: 'AdTech SD08R-SP05X', value: 'adtech_sd08r_sp05x' },
+    { displayName: 'AdTech SD10R-SP05X', value: 'adtech_sd10r_sp05x' },
+    {
+      displayName: 'AdTech SD10R-SP05X Choi',
+      value: 'adtech_sd10r_sp05x_choi',
+    },
+    { displayName: 'AdTech SD14R-SP05X', value: 'adtech_sd14r_sp05x' },
+    { displayName: 'ELAINE Rat Electrode', value: 'elaine_rat_electrode' },
+    { displayName: 'FHC WU Rat Electrode', value: 'fhc_wu_rat_electrode' },
+    { displayName: 'NuMed Mini Lead', value: 'numed_minilead' },
+    {
+      displayName: 'Aleva directSTIM Directed',
+      value: 'aleva_directstim_directed',
+    },
+    { displayName: 'Aleva directSTIM 11500', value: 'aleva_directstim_11500' },
+    {
+      displayName: 'SmartFlow Cannula NGS-NC-06',
+      value: 'smartflow_ngs_nc_06',
+    },
+  ];
+
   const handleImportedElectrode = (importedElectrode) => {
     if (importedElectrode === 'Boston Scientific Vercise Directed') {
       setLeftElectrode('boston_vercise_directed');
@@ -239,6 +341,7 @@ function StimulationSettings({
     setRightElectrode(selectedRightElectrode);
     setAllQuantities({});
     setAllSelectedValues({});
+    setAllTotalAmplitudes({});
   };
 
   const handleIPGChange = (e) => {
@@ -296,8 +399,8 @@ function StimulationSettings({
       const dynamicKey2 = `Ls${j}`;
       const dynamicKey3 = `Rs${j}`;
       for (let i = 0; i < 9; i++) {
-        const dynamicKey = `k${i + 7}`;
-        const dynamicKey1 = `k${i}`;
+        const dynamicKey = `k${i + 1}`;
+        const dynamicKey1 = `k${i + 1}`;
         // let nestedData = jsonData.S[dynamicKey2][dynamicKey];
         // let nestedData = jsonData.S[dynamicKey2][dynamicKey];
         // console.log('nestred data: ', nestedData);
@@ -322,18 +425,18 @@ function StimulationSettings({
           }
         }
         if (jsonData.S[dynamicKey3][dynamicKey1]) {
-          newQuantities[j + 4][i + 1] = parseFloat(
+          newQuantities[j + 4][i] = parseFloat(
             jsonData.S[dynamicKey3][dynamicKey1].perc,
           );
           newQuantities[j + 4][0] = parseFloat(
             jsonData.S[dynamicKey3].case.perc,
           );
           if (jsonData.S[dynamicKey3][dynamicKey1].pol === 0) {
-            newSelectedValues[j + 4][i + 1] = 'left';
+            newSelectedValues[j + 4][i] = 'left';
           } else if (jsonData.S[dynamicKey3][dynamicKey1].pol === 1) {
-            newSelectedValues[j + 4][i + 1] = 'center';
+            newSelectedValues[j + 4][i] = 'center';
           } else if (jsonData.S[dynamicKey3][dynamicKey1].pol === 2) {
-            newSelectedValues[j + 4][i + 1] = 'right';
+            newSelectedValues[j + 4][i] = 'right';
           }
           if (jsonData.S[dynamicKey2].case.pol === 0) {
             newSelectedValues[j + 4][0] = 'left';
@@ -655,7 +758,7 @@ function StimulationSettings({
               onChange={(e) => handleLeftElectrodeChange(e)}
               // disabled
             >
-              <option value="">None</option>
+              {/* <option value="">None</option>
               <option value="abbott_activetip_2mm">
                 Abbott ActiveTip (2mm)
               </option>
@@ -678,7 +781,12 @@ function StimulationSettings({
               <option value="medtronic_3389">Medtronic 3389</option>
               <option value="medtronic_3391">Medtronic 3391</option>
               <option value="medtronic_b33005">Medtronic B33005</option>
-              <option value="medtronic_b33015">Medtronic B33015</option>
+              <option value="medtronic_b33015">Medtronic B33015</option> */}
+              {varargout.map((electrode, index) => (
+                <option key={index} value={electrode.value}>
+                  {electrode.displayName}
+                </option>
+              ))}
             </select>
             <div />
             <h2 style={{ fontSize: 16 }}>Right Electrode</h2>
@@ -686,7 +794,7 @@ function StimulationSettings({
               value={rightElectrode}
               onChange={(e) => handleRightElectrodeChange(e)}
             >
-              <option value="">None</option>
+              {/* <option value="">None</option>
               <option value="abbott_activetip_2mm">
                 Abbott ActiveTip (2mm)
               </option>
@@ -709,7 +817,12 @@ function StimulationSettings({
               <option value="medtronic_3389">Medtronic 3389</option>
               <option value="medtronic_3391">Medtronic 3391</option>
               <option value="medtronic_b33005">Medtronic B33005</option>
-              <option value="medtronic_b33015">Medtronic B33015</option>
+              <option value="medtronic_b33015">Medtronic B33015</option> */}
+              {varargout.map((electrode, index) => (
+                <option key={index} value={electrode.value}>
+                  {electrode.displayName}
+                </option>
+              ))}
             </select>
             <div />
             <h2 style={{ fontSize: 16 }}>IPG</h2>

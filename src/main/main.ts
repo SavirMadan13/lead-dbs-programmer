@@ -26,8 +26,7 @@ console.error = () => {};
 // console.log(args);
 // const inputFilePath = args[0]; // Get the first argument
 const inputFilePath = process.argv[1];
-// const inputFilePath =
-//   '/Volumes/Expansion/ProgrammerTesting/derivatives/leadgroup/20241031135259/inputData.json';
+// const inputFilePath = '/Users/savirmadan/Downloads/inputDataGroup.json';
 // const inputFilePath =
 //   '/Users/savirmadan/Documents/inputData.json';
 class AppUpdater {
