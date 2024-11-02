@@ -172,7 +172,8 @@ function TabbedElectrodeIPGSelection({
     setVisualizationModel(tempModel);
     setVisModel(tempModel);
 
-    const updatedTemplateSpace = testElectrodeRef.current.getStateTemplateSpace();
+    const updatedTemplateSpace =
+      testElectrodeRef.current.getStateTemplateSpace();
     setTemplateSpace(updatedTemplateSpace);
 
     const updatedSessionTitle = {
@@ -260,37 +261,144 @@ function TabbedElectrodeIPGSelection({
     // }
   };
 
+  const varargout = [
+    { displayName: 'Medtronic 3389', value: 'medtronic_3389' },
+    { displayName: 'Medtronic 3387', value: 'medtronic_3387' },
+    { displayName: 'Medtronic 3391', value: 'medtronic_3391' },
+    { displayName: 'Medtronic B33005', value: 'medtronic_b33005' },
+    { displayName: 'Medtronic B33015', value: 'medtronic_b33015' },
+    { displayName: 'Boston Scientific Vercise', value: 'boston_vercise' },
+    {
+      displayName: 'Boston Scientific Vercise Directed',
+      value: 'boston_vercise_directed',
+    },
+    // {
+    //   displayName: 'Boston Scientific Vercise Cartesia HX',
+    //   value: 'boston_vercise_cartesia_hx',
+    // },
+    // {
+    //   displayName: 'Boston Scientific Vercise Cartesia X',
+    //   value: 'boston_vercise_cartesia_x',
+    // },
+    {
+      displayName: 'Abbott ActiveTip (6146-6149)',
+      value: 'abbott_activetip_2mm',
+    },
+    {
+      displayName: 'Abbott ActiveTip (6142-6145)',
+      value: 'abbott_activetip_3mm',
+    },
+    {
+      displayName: 'Abbott Directed 6172 (short)',
+      value: 'abbott_directed_05',
+    },
+    { displayName: 'Abbott Directed 6173 (long)', value: 'abbott_directed_15' },
+    { displayName: 'PINS Medical L301', value: 'pins_l301' },
+    { displayName: 'PINS Medical L302', value: 'pins_l302' },
+    { displayName: 'PINS Medical L303', value: 'pins_l303' },
+    { displayName: 'SceneRay SR1200', value: 'sceneray_sr1200' },
+    { displayName: 'SceneRay SR1210', value: 'sceneray_sr1210' },
+    { displayName: 'SceneRay SR1211', value: 'sceneray_sr1211' },
+    { displayName: 'SceneRay SR1242', value: 'sceneray_sr1242' },
+    { displayName: 'SDE-08 S8 Legacy', value: 'sde_08_s8_legacy' },
+    { displayName: 'SDE-08 S10 Legacy', value: 'sde_08_s10_legacy' },
+    { displayName: 'SDE-08 S12 Legacy', value: 'sde_08_s12_legacy' },
+    { displayName: 'SDE-08 S16 Legacy', value: 'sde_08_s16_legacy' },
+    { displayName: 'SDE-08 S8', value: 'sde_08_s8' },
+    { displayName: 'SDE-08 S10', value: 'sde_08_s10' },
+    { displayName: 'SDE-08 S12', value: 'sde_08_s12' },
+    { displayName: 'SDE-08 S14', value: 'sde_08_s14' },
+    { displayName: 'SDE-08 S16', value: 'sde_08_s16' },
+    { displayName: 'PMT 2102-04-091', value: 'pmt_2102_04_091' },
+    { displayName: 'PMT 2102-06-091', value: 'pmt_2102_06_091' },
+    { displayName: 'PMT 2102-08-091', value: 'pmt_2102_08_091' },
+    { displayName: 'PMT 2102-10-091', value: 'pmt_2102_10_091' },
+    { displayName: 'PMT 2102-12-091', value: 'pmt_2102_12_091' },
+    { displayName: 'PMT 2102-14-091', value: 'pmt_2102_14_091' },
+    { displayName: 'PMT 2102-16-091', value: 'pmt_2102_16_091' },
+    { displayName: 'PMT 2102-16-092', value: 'pmt_2102_16_092' },
+    { displayName: 'PMT 2102-16-093', value: 'pmt_2102_16_093' },
+    { displayName: 'PMT 2102-16-131', value: 'pmt_2102_16_131' },
+    { displayName: 'PMT 2102-16-142', value: 'pmt_2102_16_142' },
+    { displayName: '2069-EPC-05C-35', value: 'epc_05c' },
+    { displayName: '2069-EPC-15C-35', value: 'epc_15c' },
+    { displayName: 'NeuroPace DL-344-3.5', value: 'neuropace_dl_344_35' },
+    { displayName: 'NeuroPace DL-344-10', value: 'neuropace_dl_344_10' },
+    { displayName: 'DIXI D08-05AM', value: 'dixi_d08_05am' },
+    { displayName: 'DIXI D08-08AM', value: 'dixi_d08_08am' },
+    { displayName: 'DIXI D08-10AM', value: 'dixi_d08_10am' },
+    { displayName: 'DIXI D08-12AM', value: 'dixi_d08_12am' },
+    { displayName: 'DIXI D08-15AM', value: 'dixi_d08_15am' },
+    { displayName: 'DIXI D08-18AM', value: 'dixi_d08_18am' },
+    { displayName: 'AdTech BF08R-SP05X', value: 'adtech_bf08r_sp05x' },
+    { displayName: 'AdTech BF08R-SP21X', value: 'adtech_bf08r_sp21x' },
+    { displayName: 'AdTech BF08R-SP61X', value: 'adtech_bf08r_sp61x' },
+    { displayName: 'AdTech BF09R-SP61X-0BB', value: 'adtech_bf09r_sp61x_0bb' },
+    { displayName: 'AdTech RD06R-SP05X', value: 'adtech_rd06r_sp05x' },
+    { displayName: 'AdTech RD08R-SP05X', value: 'adtech_rd08r_sp05x' },
+    { displayName: 'AdTech RD10R-SP03X', value: 'adtech_rd10r_sp03x' },
+    { displayName: 'AdTech RD10R-SP05X', value: 'adtech_rd10r_sp05x' },
+    { displayName: 'AdTech RD10R-SP06X', value: 'adtech_rd10r_sp06x' },
+    { displayName: 'AdTech RD10R-SP07X', value: 'adtech_rd10r_sp07x' },
+    { displayName: 'AdTech RD10R-SP08X', value: 'adtech_rd10r_sp08x' },
+    { displayName: 'AdTech SD06R-SP26X', value: 'adtech_sd06r_sp26x' },
+    { displayName: 'AdTech SD08R-SP05X', value: 'adtech_sd08r_sp05x' },
+    { displayName: 'AdTech SD10R-SP05X', value: 'adtech_sd10r_sp05x' },
+    {
+      displayName: 'AdTech SD10R-SP05X Choi',
+      value: 'adtech_sd10r_sp05x_choi',
+    },
+    { displayName: 'AdTech SD14R-SP05X', value: 'adtech_sd14r_sp05x' },
+    { displayName: 'ELAINE Rat Electrode', value: 'elaine_rat_electrode' },
+    { displayName: 'FHC WU Rat Electrode', value: 'fhc_wu_rat_electrode' },
+    { displayName: 'NuMed Mini Lead', value: 'numed_minilead' },
+    {
+      displayName: 'Aleva directSTIM Directed',
+      value: 'aleva_directstim_directed',
+    },
+    { displayName: 'Aleva directSTIM 11500', value: 'aleva_directstim_11500' },
+    {
+      displayName: 'SmartFlow Cannula NGS-NC-06',
+      value: 'smartflow_ngs_nc_06',
+    },
+  ];
+
+  // const convertElectrode = (electrode) => {
+  //   switch (electrode) {
+  //     case 'boston_vercise_directed':
+  //       return 'Boston Scientific Vercise Directed';
+  //     case 'medtronic_3389':
+  //       return 'Medtronic 3389';
+  //     case 'medtronic_3387':
+  //       return 'Medtronic 3387';
+  //     case 'medtronic_3391':
+  //       return 'Medtronic 3391';
+  //     case 'medtronic_b33005':
+  //       return 'Medtronic B33005';
+  //     case 'medtronic_b33015':
+  //       return 'Medtronic B33015';
+  //     case 'boston_scientific_vercise':
+  //       return 'Boston Scientific Vercise';
+  //     case 'boston_scientific_vercise_cartesia_hx':
+  //       return 'Boston Scientific Vercise Cartesia HX';
+  //     case 'boston_scientific_vercise_cartesia_x':
+  //       return 'Boston Scientific Vercise Cartesia X';
+  //     case 'abott_activetip_2mm':
+  //       return 'Abbott ActiveTip (6146-6149)';
+  //     case 'abbott_activetip_3mm':
+  //       return 'Abbott ActiveTip (6142-6145)';
+  //     case 'abott_directed_6172':
+  //       return 'Abbott Directed 6172 (short)';
+  //     case 'abott_directed_6173':
+  //       return 'Abbott Directed 6173 (long)';
+  //     default:
+  //       return '';
+  //   }
+  // };
+
   const convertElectrode = (electrode) => {
-    switch (electrode) {
-      case 'boston_vercise_directed':
-        return 'Boston Scientific Vercise Directed';
-      case 'medtronic_3389':
-        return 'Medtronic 3389';
-      case 'medtronic_3387':
-        return 'Medtronic 3387';
-      case 'medtronic_3391':
-        return 'Medtronic 3391';
-      case 'medtronic_b33005':
-        return 'Medtronic B33005';
-      case 'medtronic_b33015':
-        return 'Medtronic B33015';
-      case 'boston_scientific_vercise':
-        return 'Boston Scientific Vercise';
-      case 'boston_scientific_vercise_cartesia_hx':
-        return 'Boston Scientific Vercise Cartesia HX';
-      case 'boston_scientific_vercise_cartesia_x':
-        return 'Boston Scientific Vercise Cartesia X';
-      case 'abott_activetip_2mm':
-        return 'Abbott ActiveTip (6146-6149)';
-      case 'abbott_activetip_3mm':
-        return 'Abbott ActiveTip (6142-6145)';
-      case 'abott_directed_6172':
-        return 'Abbott Directed 6172 (short)';
-      case 'abott_directed_6173':
-        return 'Abbott Directed 6173 (long)';
-      default:
-        return '';
-    }
+    const electrodeInfo = varargout.find((item) => item.value === electrode);
+    return electrodeInfo ? electrodeInfo.displayName : '';
   };
 
   const [importedData, setImportedData] = useState(null);
@@ -902,12 +1010,12 @@ function TabbedElectrodeIPGSelection({
       for (let j = 1; j < loopSize; j++) {
         zerosArr.push(0);
       }
-      if (data.S.activecontacts[i-1]) {
-        if (data.S.activecontacts[i-1] === null) {
-          data.S.activecontacts[i-1] = zerosArr;
+      if (data.S.activecontacts[i - 1]) {
+        if (data.S.activecontacts[i - 1] === null) {
+          data.S.activecontacts[i - 1] = zerosArr;
         }
       } else {
-        data.S.activecontacts[i-1] = zerosArr;
+        data.S.activecontacts[i - 1] = zerosArr;
       }
     }
 
@@ -1232,7 +1340,11 @@ function TabbedElectrodeIPGSelection({
         />
       </div> */}
       <div style={{ textAlign: 'center', paddingBottom: '35px' }}>
-        <button className="export-button-final-discard" onClick={closeFunction} style={{marginRight: '15px'}}>
+        <button
+          className="export-button-final-discard"
+          onClick={closeFunction}
+          style={{ marginRight: '15px' }}
+        >
           Discard and Close
         </button>
         <button className="export-button-final" onClick={sendDataToMain}>
