@@ -178,16 +178,16 @@
 }
 .center-color {
   /* background-color: green; */
-  /* fill: rgba(229, 40, 40, 0.41); */
-  fill: rgb(229, 98, 98);
+  fill: rgba(229, 40, 40, 0.41);
+  /* fill: rgb(229, 98, 98); */
   /* Change the background color for the 'center' position */
 }
 
 .right-color {
   /* background-color: blue; */
-  /* fill: rgba(50, 50, 244, 0.411); */
+  fill: rgba(50, 50, 244, 0.411);
   /* fill: rgba(28, 73, 144, 0.411); */
-  fill: rgba(28, 73, 144, 0.411);
+  /* fill: rgba(28, 73, 144, 0.411); */
   /* Change the background color for the 'right' position */
 }
 
@@ -571,12 +571,13 @@ h2 {
 
 .center-color {
   /* fill: rgba(230, 35, 0, 0.709); */
-  fill: rgb(177, 49, 29);
+  fill: rgb(177, 56, 34);
+  /* fill: rgb(177, 49, 29); */
 }
 
 .right-color {
-  /* fill: #2259dabb; */
-  fill: #2b4c97;
+  fill: #325dc3;
+  /* fill: #2b4c97; */
 
 }
 
@@ -1279,7 +1280,7 @@ button:active {
 
 .background-image {
   z-index: -20;
-  margin-left: 65px;
+  margin-left: 66px;
   margin-bottom: -80px;
   width: 270px;
 }
@@ -1362,7 +1363,7 @@ button:active {
 .right-contacts-test {
   flex: 1;
   margin-top: 327px;
-  margin-left: -55px;
+  margin-left: -65px;
 }
 
 .image-container-right {
@@ -1384,7 +1385,7 @@ button:active {
 
   position: absolute;
   top: 90px;
-  left: 40px;
+  left: 50px;
   z-index: 6;
 }
 
@@ -1394,7 +1395,7 @@ button:active {
   /* color: black; */
   font-size: 14px;
   top: 100px;
-  left: 175px;
+  left: 185px;
   z-index: 2;
 }
 

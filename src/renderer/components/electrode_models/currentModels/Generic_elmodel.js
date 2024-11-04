@@ -168,7 +168,7 @@ function Generic_elmodel(props, ref) {
               // />,
               <NewBottomContact key={contactNum} level={levelIndex + 1} />,
             );
-          } else {
+          } else if (face === 'center') {
             centerColumn.push(
               // <Contact
               //   key={contactNum}
@@ -177,6 +177,17 @@ function Generic_elmodel(props, ref) {
               //   // fill="transparent"
               // />,
               <CenterContact key={contactNum} level={levelIndex + 1} />,
+              // <Nondirectional key={contactNum} level={levelIndex + 1} />,
+            );
+          } else {
+            centerColumn.push(
+              // <Contact
+              //   key={contactNum}
+              //   level={levelIndex + 1}
+              //   // face={face}
+              //   // fill="transparent"
+              // />,
+              <Nondirectional key={contactNum} level={levelIndex + 1} />,
               // <Nondirectional key={contactNum} level={levelIndex + 1} />,
             );
           }
@@ -215,7 +226,7 @@ function Generic_elmodel(props, ref) {
       //   // face={face}
       //   fill="transparent"
       // />,
-      <NewBottomContact key="tail" fill="white" />,
+      <NewBottomContact key="tail" fill="rgb(122, 125, 131)" />,
     );
   }
   // parsedEtageidx.forEach((sharedLevel, levelIndex) => {
