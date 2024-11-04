@@ -49,6 +49,7 @@ function GroupArchitecture({
     showDropdown: true,
     filePath: '',
     stimChanged: true,
+    allTemplateSpaces: {},
   };
 
   const [renderKey, setRenderKey] = useState(0); // Added state for forcing re-render
@@ -289,6 +290,10 @@ function GroupArchitecture({
           patientStates={patientStates}
           importNewS={importNewS}
           selectedPatient={selectedPatient}
+          allTemplateSpaces={currentPatientState.allTemplateSpaces}
+          setAllTemplateSpaces={(value) =>
+            handleStateChange(selectedPatient, { allTemplateSpaces: value })
+          }
         />
       )}
       <div className="sticky-buttons-container">

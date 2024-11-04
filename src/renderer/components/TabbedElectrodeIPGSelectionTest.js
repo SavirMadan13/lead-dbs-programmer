@@ -67,6 +67,8 @@ function TabbedElectrodeIPGSelection({
   setStimChanged,
   namingConvention,
   selectedPatient,
+  allTemplateSpaces,
+  setAllTemplateSpaces,
 }) {
   const testElectrodeRef = React.createRef();
   // const [selectedElectrode, setSelectedElectrode] = useState('');
@@ -170,9 +172,8 @@ function TabbedElectrodeIPGSelection({
     setVisualizationModel(tempModel);
     setVisModel(tempModel);
 
-    const updatedTemplateSpace =
-      testElectrodeRef.current.getStateTemplateSpace();
-    setTemplateSpace(updatedTemplateSpace);
+    const updatedTemplateSpace = testElectrodeRef.current.getStateTemplateSpace();
+    setAllTemplateSpaces(updatedTemplateSpace);
 
     const updatedSessionTitle = {
       ...sessionTitle,
@@ -254,7 +255,9 @@ function TabbedElectrodeIPGSelection({
 
     sessionTitle[key] = testElectrodeRef.current.getStateSessionTitle();
     allTogglePositions[key] = testElectrodeRef.current.getStateTogglePosition();
-    setTemplateSpace(testElectrodeRef.current.getStateTemplateSpace());
+    setAllTemplateSpaces(testElectrodeRef.current.getStateTemplateSpace());
+    // allTemplateSpaces[key] = testElectrodeRef.current.getStateTemplateSpace();
+    // setTemplateSpace(testElectrodeRef.current.getStateTemplateSpace());
     // }
   };
 
@@ -1235,7 +1238,7 @@ function TabbedElectrodeIPGSelection({
           onClick={saveQuantitiesandValues}
           style={{ marginRight: '15px', marginBottom: '-40px' }}
         >
-          Save
+          Save Patient
         </button>
       </div>
       <Tabs className="tabs-container">
@@ -1282,7 +1285,7 @@ function TabbedElectrodeIPGSelection({
                     contactNaming={namingConvention}
                     adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
                     elspec={electrodeModels[selectedElectrodeLeft]}
-                    templateSpace={templateSpace}
+                    templateSpace={allTemplateSpaces}
                     // stimChanged={stimChanged}
                     // setStimChanged={setStimChanged}
                     // outputIPG={outputIPG}
@@ -1335,7 +1338,7 @@ function TabbedElectrodeIPGSelection({
                     contactNaming={namingConvention}
                     adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
                     elspec={electrodeModels[selectedElectrodeLeft]}
-                    templateSpace={templateSpace}
+                    templateSpace={allTemplateSpaces}
                     // stimChanged={stimChanged}
                     // setStimChanged={setStimChanged}
                     // outputIPG={outputIPG}

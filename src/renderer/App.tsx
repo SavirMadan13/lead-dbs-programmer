@@ -84,6 +84,7 @@ export default function App() {
     showDropdown: true,
     filePath: '',
     stimChanged: true,
+    allTemplateSpaces: 0,
   };
 
   const varargout = [
@@ -580,6 +581,7 @@ export default function App() {
     allTogglePositions,
     allPercAmpToggles,
     index,
+    allTemplateSpaces,
   ) => {
     // handleFileChange('1');
     // saveQuantitiesandValues();
@@ -820,6 +822,7 @@ export default function App() {
     }
     // console.log('export vis model', exportVisModel);
     data.S.model = exportVisModel;
+    data.S.estimateInTemplate = allTemplateSpaces;
     // if (Array.isArray(data.S.activecontacts) && data.S.activecontacts.length > 0 && data.S.activecontacts[0] === undefined) {
     //   data.S.activecontacts.shift();
     // }
@@ -844,6 +847,7 @@ export default function App() {
           tempStates.allTogglePositions,
           tempStates.allPercAmpToggles,
           index,
+          tempStates.allTemplateSpaces,
         );
         outputData[index] = tempData; // Using index instead of key
       });
