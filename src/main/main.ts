@@ -1317,8 +1317,18 @@ const createWindow = async () => {
     console.log('');
   });
 
+//   mainWindow.on('close', (event) => {
+//     // Only quit if the window is closing for real, not being hidden
+//     if (mainWindow) {
+//       mainWindow = null;
+//       app.quit();
+//     }
+//   });
+// }
+
   app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') app.quit();
+    // app.quit();
   });
 
   const menuBuilder = new MenuBuilder(mainWindow);

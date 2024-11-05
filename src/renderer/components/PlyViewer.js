@@ -1217,14 +1217,14 @@ function PlyViewer({
       controls.zoomSpeed = 0.5;
       controlsRef.current = controls;
 
-      const secondaryControls = new OrbitControls(secondaryCamera, secondaryRenderer.domElement);
-      secondaryControls.enableDamping = true;
-      secondaryControls.dampingFactor = 0.1;
-      secondaryControls.rotateSpeed = 0.8;
-      secondaryControls.zoomSpeed = 0.5;
-      secondaryControls.current = secondaryControls;
+      // const secondaryControls = new OrbitControls(secondaryCamera, secondaryRenderer.domElement);
+      // secondaryControls.enableDamping = true;
+      // secondaryControls.dampingFactor = 0.1;
+      // secondaryControls.rotateSpeed = 0.8;
+      // secondaryControls.zoomSpeed = 0.5;
+      // secondaryControls.current = secondaryControls;
 
-      secondaryControlsRef.current = controls;
+      // secondaryControlsRef.current = controls;
 
       camera.position.set(0, -50, 50); // Zoomed out to start
       // camera.lookAt(0, 0, 0); // Ensure the camera is looking at the scene origin
