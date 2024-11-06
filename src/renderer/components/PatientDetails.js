@@ -12,6 +12,11 @@ import { PatientContext } from './PatientContext';
 // import NiftiViewer from './NiftiViewer';
 
 function PatientDetails({ directoryPath, leadDBS }) {
+
+  useEffect(() => {
+    window.electron.zoom.setZoomLevel(-1);
+  }, []);
+
   const location = useLocation();
   const { patient } = location.state || {}; // Retrieve patient from state
   const { patients } = useContext(PatientContext); // Optional: Use context for patient data

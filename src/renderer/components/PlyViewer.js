@@ -153,24 +153,24 @@ function PlyViewer({
   const [newTremor, setNewTremor] = useState({ name: '', coords: [0, 0, 0] });
   const [showModal, setShowModal] = useState(false);
   const [tremorData, setTremorData] = useState([
-    { name: 'Papavassilliou et al', coords: [-14.5, -17.7, -2.8] },
-    { name: 'Hamel et al', coords: [-13.79, -18.04, -1.06] },
-    { name: 'Herzog et al', coords: [-14.04, -16.66, -2.92] },
-    { name: 'Blomstedt et al', coords: [-12.61, -17.24, -0.28] },
-    { name: 'Barbe et al', coords: [-12.31, -18.2, -1.26] },
-    { name: 'Sandvik et al', coords: [-13.77, -12.56, 1.5] },
-    { name: 'Sandvik et al2', coords: [-13.11, -16.53, -1.61] },
-    { name: 'Fytagoridis et al', coords: [-12.93, -17.17, -0.62] },
-    { name: 'Cury et al', coords: [-14.91, -4.47, -5.88] },
-    { name: 'Fiechter et al', coords: [-15.36, -16.3, -3.89] },
-    { name: 'Barbe et al2', coords: [-11.97, -16.64, -0.86] },
-    { name: 'Nowacki et al', coords: [-11.51, -16.04, 0.6] },
-    { name: 'Nowacki et al2', coords: [-13.75, -14.77, -3.1] },
-    { name: 'Philipson et al', coords: [-13.03, -18.4, -1.91] },
-    { name: 'Tsuboi et al', coords: [-15.35, -15.34, -0.51] },
-    { name: 'Elias et al', coords: [-17.3, -13.9, 4.2] },
-    { name: 'Tsuboi et al2', coords: [-15.0, -17.0, 1.0] },
-    { name: 'Middlebrooks et al', coords: [-15.5, -15.5, 0.5] },
+    { name: 'Papavassilliou et al', coords: [14.5, -17.7, -2.8] },
+    { name: 'Hamel et al', coords: [13.79, -18.04, -1.06] },
+    { name: 'Herzog et al', coords: [14.04, -16.66, -2.92] },
+    { name: 'Blomstedt et al', coords: [12.61, -17.24, -0.28] },
+    { name: 'Barbe et al', coords: [12.31, -18.2, -1.26] },
+    { name: 'Sandvik et al', coords: [13.77, -12.56, 1.5] },
+    { name: 'Sandvik et al2', coords: [13.11, -16.53, -1.61] },
+    { name: 'Fytagoridis et al', coords: [12.93, -17.17, -0.62] },
+    { name: 'Cury et al', coords: [14.91, -4.47, -5.88] },
+    { name: 'Fiechter et al', coords: [15.36, -16.3, -3.89] },
+    { name: 'Barbe et al2', coords: [11.97, -16.64, -0.86] },
+    { name: 'Nowacki et al', coords: [11.51, -16.04, 0.6] },
+    { name: 'Nowacki et al2', coords: [13.75, -14.77, -3.1] },
+    { name: 'Philipson et al', coords: [13.03, -18.4, -1.91] },
+    { name: 'Tsuboi et al', coords: [15.35, -15.34, -0.51] },
+    { name: 'Elias et al', coords: [17.3, -13.9, 4.2] },
+    { name: 'Tsuboi et al2', coords: [15.0, -17.0, 1.0] },
+    { name: 'Middlebrooks et al', coords: [15.5, -15.5, 0.5] },
   ]);
 
   // Handle input change for new tremor data
@@ -1388,9 +1388,9 @@ function PlyViewer({
 
   // Don't forget this
 
-  useEffect(() => {
-    window.electron.zoom.setZoomLevel(-3);
-  }, []);
+  // useEffect(() => {
+  //   window.electron.zoom.setZoomLevel(-3);
+  // }, []);
 
   return (
     <div>

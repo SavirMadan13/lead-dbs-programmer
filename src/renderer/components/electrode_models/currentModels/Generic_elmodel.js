@@ -59,8 +59,13 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { Tooltip as MuiTooltip } from '@mui/material';
 
 function Generic_elmodel(props, ref) {
-  console.log(props);
+  console.log('Props: ', props);
   const { elspec } = props;
+
+  useEffect(() => {
+    window.electron.zoom.setZoomLevel(-3);
+  }, []);
+
   const parseEtageidx = (etageidx) => {
     return etageidx.map((levelStr) => {
       if (levelStr.includes(':')) {
@@ -318,7 +323,7 @@ function Generic_elmodel(props, ref) {
     let newNames = [];
     if (elspec.numel === 4) {
       if (props.contactNaming === 'clinical') {
-        if (props.name < 5) {
+        if (elspec.matfname.includes("boston")) {
           newNames = {
             0: IPG,
             1: '1',
@@ -329,34 +334,34 @@ function Generic_elmodel(props, ref) {
         } else {
           newNames = {
             0: IPG,
-            1: '1',
-            2: '2',
-            3: '3',
-            4: '4',
+            1: '0',
+            2: '1',
+            3: '2',
+            4: '3',
           };
         }
       } else {
         if (props.name < 5) {
           newNames = {
             0: IPG,
-            1: 'k8',
-            2: 'k9',
-            3: 'k10',
-            4: 'k11',
+            1: 'k1',
+            2: 'k2',
+            3: 'k3',
+            4: 'k4',
           };
         } else {
           newNames = {
             0: IPG,
-            1: 'k0',
-            2: 'k1',
-            3: 'k2',
-            4: 'k3',
+            1: 'k1',
+            2: 'k2',
+            3: 'k3',
+            4: 'k4',
           };
         }
       }
     } else if (elspec.numel === 8 && elspec.isdirected === 1) {
       if (props.contactNaming === 'clinical') {
-        if (props.name < 5) {
+        if (elspec.matfname.includes("boston")) {
           newNames = {
             0: IPG,
             1: '1',
@@ -371,60 +376,28 @@ function Generic_elmodel(props, ref) {
         } else {
           newNames = {
             0: IPG,
-            1: '1',
-            2: '2A',
-            3: '2B',
-            4: '2C',
-            5: '3A',
-            6: '3B',
-            7: '3C',
-            8: '4',
+            1: '0',
+            2: '1A',
+            3: '1B',
+            4: '1C',
+            5: '2A',
+            6: '2B',
+            7: '2C',
+            8: '3',
           };
         }
       } else {
         if (props.name < 5) {
           newNames = {
             0: IPG,
-            1: 'k8',
-            2: 'k9',
-            3: 'k10',
-            4: 'k11',
-            5: 'k12',
-            6: 'k13',
-            7: 'k14',
-            8: 'k15',
-          };
-        } else {
-          newNames = {
-            0: IPG,
-            1: 'k0',
-            2: 'k1',
-            3: 'k2',
-            4: 'k3',
-            5: 'k4',
-            6: 'k5',
-            7: 'k6',
-            8: 'k7',
-          };
-        }
-      }
-    } else {
-      if (props.contactNaming === 'clinical') {
-        for (let i = 0; i < elspec.numel; i++) {
-          newNames[i + 1] = i + 1;
-        }
-      } else {
-        if (props.name < 5) {
-          newNames = {
-            0: IPG,
-            1: 'k9',
-            2: 'k10',
-            3: 'k11',
-            4: 'k12',
-            5: 'k13',
-            6: 'k14',
-            7: 'k15',
-            8: 'k16',
+            1: 'k1',
+            2: 'k2',
+            3: 'k3',
+            4: 'k4',
+            5: 'k5',
+            6: 'k6',
+            7: 'k7',
+            8: 'k8',
           };
         } else {
           newNames = {
@@ -438,6 +411,16 @@ function Generic_elmodel(props, ref) {
             7: 'k7',
             8: 'k8',
           };
+        }
+      }
+    } else {
+      if (props.contactNaming === 'clinical') {
+        for (let i = 0; i < elspec.numel; i++) {
+          newNames[i + 1] = i + 1;
+        }
+      } else {
+        for (let i = 0; i < elspec.numel; i++) {
+          newNames[i + 1] = `k${i + 1}`;
         }
       }
     }
@@ -3198,7 +3181,7 @@ function Generic_elmodel(props, ref) {
     // this.props.onChange(value, animation);
     // this.setState({ switchPosition: value, animation });
   };
-  const [showViewer, setShowViewer] = useState(true);
+  const [showViewer, setShowViewer] = useState(false);
   const handleOpenViewer = () => {
     setShowViewer(!showViewer);
   };
@@ -3607,7 +3590,9 @@ function Generic_elmodel(props, ref) {
         </div>
         <div className="left-contacts-test">
           {leftContacts.map((Lcon) => (
-            <div className="image-item-left">
+            <div
+              className={showViewer ? 'image-item-left' : 'image-item-default'}
+            >
               <div className="image-container-left">
                 {React.cloneElement(Lcon, {
                   key: Lcon.key,
@@ -3712,121 +3697,6 @@ function Generic_elmodel(props, ref) {
           </div>
         ))}
       </div>
-      {/* <div className="dbs-electrode-container">
-        <div className="dbs-electrode-column dbs-electrode-left">
-          <div className="dbs-electrode-ipg-section">
-            {ipgs.map((ipg) => (
-              <div className="dbs-electrode-ipg-item" key={ipg.key}>
-                <div className="dbs-electrode-image-wrapper">
-                  <div className="overlay-container">
-                    {React.cloneElement(ipg, {
-                      className: `${selectedValues[ipg.key]}-color`,
-                    })}
-                    {!isNaN(Number(ipg.key)) && (
-                      <div className="triple-toggle-dbs-ipg">
-                        <TripleToggleTest
-                          value={selectedValues[ipg.key]}
-                          switchPosition={selectedValues[ipg.key]}
-                          animation={animation[ipg.key]}
-                          quantity={quantities[ipg.key]}
-                          onChange={(value, anime) =>
-                            handleTripleToggleChange(value, anime, ipg.key)
-                          }
-                          onQuantityChange={(value, anime, quantity) =>
-                            handleQuantityChange(quantity, ipg.key)
-                          }
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {leftContacts.map((contact) => (
-            <div className="dbs-electrode-item" key={contact.key}>
-              <div className="overlay-container">
-                {React.cloneElement(contact, {
-                  className: `${selectedValues[contact.key]}-color`,
-                })}
-                {!isNaN(Number(contact.key)) && (
-                  <TripleToggleTest
-                    value={selectedValues[contact.key]}
-                    switchPosition={selectedValues[contact.key]}
-                    animation={animation[contact.key]}
-                    quantity={quantities[contact.key]}
-                    onChange={(value, anime) =>
-                      handleTripleToggleChange(value, anime, contact.key)
-                    }
-                    onQuantityChange={(value, anime, quantity) =>
-                      handleQuantityChange(quantity, contact.key)
-                    }
-                  />
-                )}
-              </div>
-              <p className="dbs-electrode-label">{names[contact.key]}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="dbs-electrode-column dbs-electrode-center">
-          <div className="dbs-electrode-background">
-            <Background />
-          </div>
-          {svgs.map((svg) => (
-            <div className="dbs-electrode-item" key={svg.key}>
-              <div className="overlay-container">
-                {React.cloneElement(svg, {
-                  className: `${selectedValues[svg.key]}-color`,
-                })}
-                {!isNaN(Number(svg.key)) && (
-                  <TripleToggleTest
-                    value={selectedValues[svg.key]}
-                    switchPosition={selectedValues[svg.key]}
-                    animation={animation[svg.key]}
-                    quantity={quantities[svg.key]}
-                    onChange={(value, anime) =>
-                      handleTripleToggleChange(value, anime, svg.key)
-                    }
-                    onQuantityChange={(value, anime, quantity) =>
-                      handleQuantityChange(quantity, svg.key)
-                    }
-                  />
-                )}
-              </div>
-              <p className="dbs-electrode-label">{names[svg.key]}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="dbs-electrode-column dbs-electrode-right">
-          {rightContacts.map((contact) => (
-            <div className="dbs-electrode-item" key={contact.key}>
-              <div className="overlay-container">
-                {React.cloneElement(contact, {
-                  className: `${selectedValues[contact.key]}-color`,
-                })}
-                {!isNaN(Number(contact.key)) && (
-                  <TripleToggleTest
-                    value={selectedValues[contact.key]}
-                    switchPosition={selectedValues[contact.key]}
-                    animation={animation[contact.key]}
-                    quantity={quantities[contact.key]}
-                    onChange={(value, anime) =>
-                      handleTripleToggleChange(value, anime, contact.key)
-                    }
-                    onQuantityChange={(value, anime, quantity) =>
-                      handleQuantityChange(quantity, contact.key)
-                    }
-                  />
-                )}
-              </div>
-              <p className="dbs-electrode-label">{names[contact.key]}</p>
-            </div>
-          ))}
-        </div>
-      </div> */}
       <div style={{zIndex: '10'}}>
         {handleIPG()}
         {radioValue === '2' &&
@@ -3885,7 +3755,7 @@ function Generic_elmodel(props, ref) {
               {showViewer ? 'Close Viewer' : 'Open Viewer'}
             </Button>
           </ButtonGroup>
-          {/* <Form className="mb-4">
+          <Form className="mb-4">
             <Form.Group controlId="dbsParameters">
               <Form.Label className="font-weight-bold">
                 DBS Parameters
@@ -3935,7 +3805,7 @@ function Generic_elmodel(props, ref) {
                 <ContentCopyIcon />
               </IconButton>
             </MuiTooltip>
-          </div> */}
+          </div>
         </div>
       </div>
       {showViewer && (
