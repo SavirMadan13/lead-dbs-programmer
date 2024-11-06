@@ -13,6 +13,7 @@ import ClinicalScores from './components/ClinicalScores';
 import PlyViewer from './components/PlyViewer';
 import PlyViewerWithVTA from './components/PlyViewerWithVTA';
 import CustomTable from './components/CustomTable';
+import GroupStats from './components/GroupStats';
 
 export default function App() {
   const [directoryPath, setDirectoryPath] = useState(null);
@@ -116,7 +117,7 @@ export default function App() {
     };
   }, []);
 
-  const [zoomLevel, setZoomLevel] = useState(-3);
+  const [zoomLevel, setZoomLevel] = useState(-1);
 
   useEffect(() => {
     window.electron.zoom.setZoomLevel(zoomLevel);
@@ -194,6 +195,14 @@ export default function App() {
                 <div style={{ maxWidth: '1000px' }}>
                   {/* <PlyViewer /> */}
                   <CustomTable />
+                </div>
+              }
+            />
+            <Route
+              path="/group"
+              element={
+                <div style={{ maxWidth: '1000px' }}>
+                  <GroupStats />
                 </div>
               }
             />

@@ -220,6 +220,58 @@ ipcMain.on(
   },
 );
 
+ipcMain.on(
+  'import-file-clinical-group',
+  async (event, id, timeline, directoryPath, leadDBS) => {
+    const fs = require('fs');
+    const path = require('path');
+    console.log('Timeline: ', timeline);
+    const outputData = {};
+    Object.keys(timeline).forEach((key) => {
+      try {
+        // Loop through each timeline item and process it individually
+        // Construct the file path dynamically
+        let patientDir = path.join(directoryPath, `${id}`);
+        let fileName = `${id}_ses-${timeline[key]}_clinical.json`;
+        if (leadDBS) {
+          patientDir = path.join(
+            directoryPath,
+            'derivatives/leaddbs',
+            `${id}`,
+            'clinical',
+          );
+          fileName = `${id}_ses-${timeline[key]}_clinical.json`;
+        }
+
+        const sessionDir = path.join(patientDir, `ses-${timeline[key]}`);
+        const filePath = path.join(sessionDir, fileName);
+
+        // Check if the file exists before trying to read it
+        if (!fs.existsSync(filePath)) {
+          console.error('File not found:', filePath);
+          // event.reply(`import-file-clinical-${timeline}`, 'File not found');
+          return;
+        }
+
+        // Read and parse the JSON data
+        const fileData = fs.readFileSync(filePath);
+        const jsonData = JSON.parse(fileData);
+
+        // Send the data back to the renderer process for this specific timeline
+        console.log(`Sending data for ${timeline[key]}`, jsonData);
+        outputData[timeline[key]] = jsonData;
+        // event.reply(`import-file-clinical-${timeline}`, jsonData);
+      } catch (err) {
+        outputData[timeline[key]] = 'Does not exist';
+        console.error('An unexpected error occurred:', err);
+        return;
+        // event.reply('import-file-error', err.message);
+      }
+    });
+    event.reply('import-file-clinical-group', outputData);
+  },
+);
+
 ipcMain.on('import-previous-files', (event, fileID, importData) => {
   const fs = require('fs');
 
@@ -1160,8 +1212,7 @@ const createWindow = async () => {
 
   ipcMain.handle('load-test-file', async (event, historical) => {
     const { patient, timeline, directoryPath, leadDBS } = historical;
-    const filePath =
-      '/Users/savirmadan/Downloads/potential_test.ply';
+    const filePath = '/Users/savirmadan/Downloads/potential_test.ply';
     console.log(filePath);
     const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
     return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
@@ -1275,7 +1326,10 @@ const createWindow = async () => {
         anatomyPlyPath.replace(/\\\//g, '');
         combinedElectrodesPlyPath.replace(/\\\//g, '');
         clinicalReconstructionPath.replace(/\\\//g, '');
-        stimulationParametersPath = stimulationParametersPath.replace(/\\\//g, '');
+        stimulationParametersPath = stimulationParametersPath.replace(
+          /\\\//g,
+          '',
+        );
         // Read both PLY files as binary
         const anatomyPlyData = fs.readFileSync(anatomyPlyPath);
         const combinedElectrodesPlyData = fs.readFileSync(
@@ -1286,7 +1340,10 @@ const createWindow = async () => {
           'utf8',
         );
         const clinicalDataOutput = JSON.parse(clinicalReconstructionData);
-        const stimulationParametersData = fs.readFileSync(stimulationParametersPath, 'utf8');
+        const stimulationParametersData = fs.readFileSync(
+          stimulationParametersPath,
+          'utf8',
+        );
         const jsonData3 = JSON.parse(stimulationParametersData); // Parse the string into a JSON object
         // Return both files as buffers in an object
         return {
@@ -1317,14 +1374,14 @@ const createWindow = async () => {
     console.log('');
   });
 
-//   mainWindow.on('close', (event) => {
-//     // Only quit if the window is closing for real, not being hidden
-//     if (mainWindow) {
-//       mainWindow = null;
-//       app.quit();
-//     }
-//   });
-// }
+  //   mainWindow.on('close', (event) => {
+  //     // Only quit if the window is closing for real, not being hidden
+  //     if (mainWindow) {
+  //       mainWindow = null;
+  //       app.quit();
+  //     }
+  //   });
+  // }
 
   app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') app.quit();

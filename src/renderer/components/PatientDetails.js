@@ -12,7 +12,6 @@ import { PatientContext } from './PatientContext';
 // import NiftiViewer from './NiftiViewer';
 
 function PatientDetails({ directoryPath, leadDBS }) {
-
   useEffect(() => {
     window.electron.zoom.setZoomLevel(-1);
   }, []);
@@ -128,6 +127,12 @@ function PatientDetails({ directoryPath, leadDBS }) {
         }),
     };
     addChildToTimeline(timelineLabel, newChild); // Add the Clinical Scores child to the specified timeline
+  };
+
+  const handleGroupStats = () => {
+    navigate('/group', {
+      state: { patient, timeline: timelines, directoryPath, leadDBS },
+    });
   };
 
   const handleAddStimulationParameters = (timelineLabel) => {
@@ -288,6 +293,9 @@ function PatientDetails({ directoryPath, leadDBS }) {
           onClick={() => handleAddClinicalScores(timeline)}
         >
           Add Clinical Scores
+        </button>
+        <button className="export-button" onClick={() => handleGroupStats()}>
+          Group Stats
         </button>
       </div>
       {/* <button className="back-button" onClick={() => navigate('/viewer')}>
