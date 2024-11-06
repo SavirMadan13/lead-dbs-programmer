@@ -591,9 +591,36 @@ const createWindow = async () => {
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
-  if (process.platform !== 'darwin') {
-    app.quit();
+  // if (process.platform !== 'darwin') {
+  //   app.quit();
+  // }
+  const f = fs.readFileSync(inputFilePath);
+
+  // Parse the JSON data
+  const jsonData = JSON.parse(f);
+
+  const stimPath = jsonData.stimDir;
+  stimulationDirectory = stimPath.replace(/\\\//g, '/');
+  const newStimFilePath = path.join(stimulationDirectory, 'data.json');
+
+  // Create a valid JSON object
+  const jsonDataToWrite = {
+    message: 'App Closed Without Saving Parameters',
+    timestamp: new Date().toISOString(), // Optional: add a timestamp or any other data
+  };
+
+  try {
+    // Convert the object to a JSON string
+    const dataString = JSON.stringify(jsonDataToWrite, null, 2); // 'null, 2' adds indentation for readability
+    // Write the JSON string to the file
+    fs.writeFileSync(newStimFilePath, dataString);
+    console.log('File written successfully!');
+  } catch (error) {
+    // Handle the error here
+    console.error('Error writing to file:', error);
   }
+
+  app.quit();
 });
 
 app
