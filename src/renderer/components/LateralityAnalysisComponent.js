@@ -4,33 +4,33 @@ import Plot from 'react-plotly.js';
 function LateralityAnalysisComponent({ rawData }) {
   function splitScoresByLaterality(scores, threshold) {
     const leftSideItems = [
-      '3.3c',
-      '3.3e',
-      '3.4b',
-      '3.5b',
-      '3.6b',
-      '3.7b',
-      '3.8b',
-      '3.15b',
-      '3.16b',
-      '3.17b',
-      '3.17d',
-    ];
-    const rightSideItems = [
-      '3.3b',
-      '3.3d',
-      '3.4a',
-      '3.5a',
-      '3.6a',
-      '3.7a',
-      '3.8a',
-      '3.15a',
-      '3.16a',
-      '3.17a',
-      '3.17c',
+      '3.3c: Rigidity- LUE',
+      '3.3e: Rigidity- LLE',
+      '3.4b: Finger tapping- Left hand',
+      '3.5b: Hand movements- Left hand',
+      '3.6b: Pronation- supination movements- Left hand',
+      '3.7b: Toe tapping- Left foot',
+      '3.8b: Leg agility- Left leg',
+      '3.15b: Postural tremor- Left hand',
+      '3.16b: Kinetic tremor- Left hand',
+      '3.17b: Rest tremor amplitude- LUE',
+      '3.17d: Rest tremor amplitude- LLE',
     ];
 
-    // Sum the values for left and right sides after applying the threshold
+    const rightSideItems = [
+      '3.3b: Rigidity- RUE',
+      '3.3d: Rigidity- RLE',
+      '3.4a: Finger tapping- Right hand',
+      '3.5a: Hand movements- Right hand',
+      '3.6a: Pronation- supination movements- Right hand',
+      '3.7a: Toe tapping- Right foot',
+      '3.8a: Leg agility- Right leg',
+      '3.15a: Postural tremor- Right hand',
+      '3.16a: Kinetic tremor- Right hand',
+      '3.17a: Rest tremor amplitude- RUE',
+      '3.17c: Rest tremor amplitude- RLE',
+    ];
+
     const leftSideSum = leftSideItems.reduce((sum, item) => {
       const value = scores[item] || 0;
       return sum + (value >= threshold ? value : 0);
@@ -44,123 +44,159 @@ function LateralityAnalysisComponent({ rawData }) {
     return { leftSideSum, rightSideSum };
   }
 
-  const [threshold, setThreshold] = useState(0); // Default threshold value
+  const [threshold, setThreshold] = useState(0);
 
   const handleThresholdChange = (e) => {
     setThreshold(Number(e.target.value));
   };
 
-  // Initialize arrays to hold the summed left and right side values for all patients
-  const baselineLeftSumValues = [];
-  const baselineRightSumValues = [];
-  const postopLeftSumValues = [];
-  const postopRightSumValues = [];
+  const leftSumsByTimepoint = {};
+  const rightSumsByTimepoint = {};
 
   rawData.forEach((patientData) => {
-    const baselineLaterality = splitScoresByLaterality(
-      patientData.baseline,
-      threshold,
-    );
-    const postopLaterality = splitScoresByLaterality(
-      patientData.postop,
-      threshold,
-    );
+    Object.keys(patientData).forEach((timepoint) => {
+      if (timepoint !== 'id') {
+        const { leftSideSum, rightSideSum } = splitScoresByLaterality(
+          patientData[timepoint],
+          threshold,
+        );
 
-    baselineLeftSumValues.push(baselineLaterality.leftSideSum);
-    baselineRightSumValues.push(baselineLaterality.rightSideSum);
-    postopLeftSumValues.push(postopLaterality.leftSideSum);
-    postopRightSumValues.push(postopLaterality.rightSideSum);
+        if (!leftSumsByTimepoint[timepoint]) {
+          leftSumsByTimepoint[timepoint] = [];
+          rightSumsByTimepoint[timepoint] = [];
+        }
+
+        leftSumsByTimepoint[timepoint].push(leftSideSum);
+        rightSumsByTimepoint[timepoint].push(rightSideSum);
+      }
+    });
   });
+
+  const plotData = [];
+  let isFirstLeft = true;
+  let isFirstRight = true;
+
+  Object.keys(leftSumsByTimepoint)
+    .sort((a, b) => {
+      if (a === 'baseline') return -1;
+      if (b === 'baseline') return 1;
+      return a.localeCompare(b, undefined, { numeric: true });
+    })
+    .forEach((timepoint) => {
+      plotData.push(
+        {
+          type: 'box',
+          x: leftSumsByTimepoint[timepoint].map(() => timepoint),
+          y: leftSumsByTimepoint[timepoint],
+          name: 'Left Side',
+          boxpoints: 'all',
+          jitter: 0.3,
+          pointpos: -1.8,
+          marker: { color: 'rgba(0, 123, 255, 0.7)', size: 10 },
+          line: { color: 'rgba(0, 123, 255, 1)' },
+          fillcolor: 'rgba(0, 123, 255, 0.3)',
+          showlegend: isFirstLeft,
+        },
+        {
+          type: 'box',
+          x: rightSumsByTimepoint[timepoint].map(() => timepoint),
+          y: rightSumsByTimepoint[timepoint],
+          name: 'Right Side',
+          boxpoints: 'all',
+          jitter: 0.3,
+          pointpos: -1.8,
+          marker: { color: 'rgba(255, 99, 132, 0.7)', size: 10 },
+          line: { color: 'rgba(255, 99, 132, 1)' },
+          fillcolor: 'rgba(255, 99, 132, 0.3)',
+          showlegend: isFirstRight,
+        },
+      );
+
+      isFirstLeft = false;
+      isFirstRight = false;
+    });
 
   return (
     <div>
       <Plot
-        data={[
-          {
-            type: 'box',
-            x: baselineLeftSumValues.map(() => 'Baseline Left Side'),
-            y: baselineLeftSumValues,
-            name: 'Baseline Left Side',
-            boxpoints: 'all',
-            jitter: 0.3,
-            pointpos: -1.8,
-            marker: {
-              color: 'rgba(0, 123, 255, 0.7)',
-              size: 10,
-            },
-            line: {
-              color: 'rgba(0, 123, 255, 1)',
-            },
-            fillcolor: 'rgba(0, 123, 255, 0.3)',
-          },
-          {
-            type: 'box',
-            x: postopLeftSumValues.map(() => 'Postop Left Side'),
-            y: postopLeftSumValues,
-            name: 'Postop Left Side',
-            boxpoints: 'all',
-            jitter: 0.3,
-            pointpos: -1.8,
-            marker: {
-              color: 'rgba(255, 99, 132, 0.7)',
-              size: 10,
-            },
-            line: {
-              color: 'rgba(255, 99, 132, 1)',
-            },
-            fillcolor: 'rgba(255, 99, 132, 0.3)',
-          },
-          {
-            type: 'box',
-            x: baselineRightSumValues.map(() => 'Baseline Right Side'),
-            y: baselineRightSumValues,
-            name: 'Baseline Right Side',
-            boxpoints: 'all',
-            jitter: 0.3,
-            pointpos: -1.8,
-            marker: {
-              color: 'rgba(75, 192, 192, 0.7)',
-              size: 10,
-            },
-            line: {
-              color: 'rgba(75, 192, 192, 1)',
-            },
-            fillcolor: 'rgba(75, 192, 192, 0.3)',
-          },
-          {
-            type: 'box',
-            x: postopRightSumValues.map(() => 'Postop Right Side'),
-            y: postopRightSumValues,
-            name: 'Postop Right Side',
-            boxpoints: 'all',
-            jitter: 0.3,
-            pointpos: -1.8,
-            marker: {
-              color: 'rgba(153, 102, 255, 0.7)',
-              size: 10,
-            },
-            line: {
-              color: 'rgba(153, 102, 255, 1)',
-            },
-            fillcolor: 'rgba(153, 102, 255, 0.3)',
-          },
-        ]}
+        data={plotData}
         layout={{
-          title: 'Laterality Analysis',
+          title: {
+            text: 'Laterality',
+            font: {
+              family: 'Arial, sans-serif',
+              size: 24,
+              color: '#333',
+            },
+            x: 0.5,
+            xanchor: 'center',
+          },
           yaxis: {
-            title: 'Scores',
+            title: {
+              text: 'Scores',
+              font: {
+                family: 'Arial, sans-serif',
+                size: 18,
+                color: '#333',
+              },
+            },
+            tickfont: {
+              size: 14,
+              color: '#333',
+            },
+            gridcolor: '#e6e6e6',
+            zeroline: true,
+            zerolinecolor: '#e6e6e6',
+            rangemode: 'tozero',
+          },
+          xaxis: {
+            title: {
+              text: 'Timepoints',
+              font: {
+                family: 'Arial, sans-serif',
+                size: 18,
+                color: '#333',
+              },
+            },
+            tickfont: {
+              size: 14,
+              color: '#333',
+            },
+            gridcolor: '#f2f2f2',
           },
           boxmode: 'group',
+          showlegend: true,
+          legend: {
+            x: 1,
+            y: 1,
+            xanchor: 'right',
+            yanchor: 'top',
+            bgcolor: 'rgba(255, 255, 255, 0.8)',
+            bordercolor: '#ccc',
+            borderwidth: 1,
+            font: {
+              family: 'Arial, sans-serif',
+              size: 14,
+              color: '#333',
+            },
+          },
+          plot_bgcolor: '#f9f9f9',
+          paper_bgcolor: '#ffffff',
+          margin: { l: 80, r: 40, t: 80, b: 60 },
+          hovermode: 'closest',
         }}
+        style={{ width: '100%', height: '100%' }}
       />
       <div>
-        {/* <label>Set Threshold: </label> */}
-        <h2 style={{fontSize: '16px'}}>Set Threshold: </h2>
+        <label style={{ fontSize: '16px', fontWeight: 'bold' }}>
+          Set Threshold:{' '}
+        </label>
         <input
           type="number"
           value={threshold}
           onChange={handleThresholdChange}
           placeholder="Enter threshold value"
+          style={{ marginLeft: '10px', padding: '5px', fontSize: '14px' }}
         />
       </div>
     </div>

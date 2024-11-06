@@ -475,7 +475,6 @@ function GroupStats() {
 
             {/* Analysis Tab Content */}
             <TabPanel>
-              <div>Analysis</div>
               {currentStage === 'analyze' && (
                 <UPDRSAnalysisComponent
                   currentStage={currentStage}
