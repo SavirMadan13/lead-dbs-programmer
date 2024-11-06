@@ -68,6 +68,13 @@ function GroupStats() {
   };
   const [initialScores, setInitialScores] = useState(UPDRS);
 
+  const reorderTimeline = (timeline) => {
+    // Filter out 'baseline' and add it to the start of a new array
+    return ["baseline", ...timeline.filter(time => time !== "baseline")];
+  };
+  // Usage example
+  const reorderedTimeline = reorderTimeline(timeline);
+
   const handleScoreChange = (score) => {
     if (score === 'UPDRS') {
       setInitialScores(UPDRS);
@@ -93,14 +100,33 @@ function GroupStats() {
   const keys = Object.keys(initialScores);
   const headerChunks = chunkArray(keys, columnsPerRow);
 
-  const [patients, setPatients] = useState([
-    {
-      id: patient.id,
-      baseline: { ...initialScores },
-      '3months': { ...initialScores },
-      '6months': { ...initialScores },
-    },
-  ]);
+  // const [patients, setPatients] = useState([
+  //   {
+  //     id: patient.id,
+  //     baseline: { ...initialScores },
+  //     '3months': { ...initialScores },
+  //     '6months': { ...initialScores },
+  //   },
+  // ]);
+
+  const reorderScores = (importedScores) => {
+    // Separate 'baseline' and other timepoints
+    const { baseline, ...otherScores } = importedScores;
+    console.log({baseline, ...otherScores});
+    // Reconstruct the object with 'baseline' first
+    return { baseline, ...otherScores };
+  };
+
+  const initializePatientData = () => {
+    const timepointData = {};
+    timeline.forEach((timepoint) => {
+      timepointData[timepoint] = { ...initialScores };
+    });
+    const reorderedScores = reorderScores(timepointData);
+    return { id: patient.id, ...reorderedScores };
+  };
+
+  const [patients, setPatients] = useState([initializePatientData()]);
 
   window.electron.ipcRenderer.sendMessage(
     'import-file-clinical-group',
@@ -117,6 +143,8 @@ function GroupStats() {
   //   directoryPath,
   //   leadDBS,
   // );
+
+
 
   useEffect(() => {
     if (window.electron && window.electron.ipcRenderer) {
@@ -135,10 +163,11 @@ function GroupStats() {
         });
         // When all timelines are processed, update patients
         // if (Object.keys(importedScores).length === timeline.length) {
+        const reorderedScores = reorderScores(importedScores);
         setPatients([
           {
             id: patient.id,
-            ...importedScores, // Spread all timelines with dynamic keys
+            ...reorderedScores, // Spread all timelines with dynamic keys
           },
         ]);
         // }
