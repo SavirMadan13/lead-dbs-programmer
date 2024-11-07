@@ -3628,7 +3628,8 @@ function Generic_elmodel(props, ref) {
       <div className="Elmodel-center">
         {svgs.map((svg) => (
           <div
-            className="image-item-2"
+            // className="image-item-2"
+            className={showViewer ? "image-item-2-viewer" : "image-item-2"}
             style={{ zIndex: svg.key }}
           >
             <div className="background-image"><Background /></div>
