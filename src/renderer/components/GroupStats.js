@@ -63,14 +63,14 @@ function GroupStats() {
     '3.17b: Rest tremor amplitude- LUE': 0,
     '3.17c: Rest tremor amplitude- RLE': 0,
     '3.17d: Rest tremor amplitude- LLE': 0,
-    '3.17e: Rest tremor amplitue- Lip/jaw': 0,
+    '3.17e: Rest tremor amplitude- Lip/jaw': 0,
     '3.18: Constancy of rest tremor': 0,
   };
   const [initialScores, setInitialScores] = useState(UPDRS);
 
   const reorderTimeline = (timeline) => {
     // Filter out 'baseline' and add it to the start of a new array
-    return ["baseline", ...timeline.filter(time => time !== "baseline")];
+    return ['baseline', ...timeline.filter((time) => time !== 'baseline')];
   };
   // Usage example
   const reorderedTimeline = reorderTimeline(timeline);
@@ -112,7 +112,7 @@ function GroupStats() {
   const reorderScores = (importedScores) => {
     // Separate 'baseline' and other timepoints
     const { baseline, ...otherScores } = importedScores;
-    console.log({baseline, ...otherScores});
+    console.log({ baseline, ...otherScores });
     // Reconstruct the object with 'baseline' first
     return { baseline, ...otherScores };
   };
@@ -143,8 +143,6 @@ function GroupStats() {
   //   directoryPath,
   //   leadDBS,
   // );
-
-
 
   useEffect(() => {
     if (window.electron && window.electron.ipcRenderer) {
@@ -536,12 +534,17 @@ function GroupStats() {
           )}
         </div>
       )} */}
-      <button className="export-button" onClick={() => navigate(-1)}>
-        Back to Patient Details
-      </button>
-      <button className="export-button-final" onClick={sendDataToMain}>
-        Save Clinical Scores
-      </button>
+      {currentStage !== 'analyze' && (
+        <div>
+          <button className="export-button" onClick={() => navigate(-1)}>
+            Back to Patient Details
+          </button>
+          {/* <button className="export-button-final" onClick={sendDataToMain}>
+            Save Clinical Scores
+          </button> */}
+        </div>
+      )}
+
       {/* <button onClick={() => navigate('/custom-table')}>
         Add custom table
       </button> */}

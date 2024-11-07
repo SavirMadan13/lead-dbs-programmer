@@ -115,43 +115,46 @@ function PlyViewer({
     loadPlyFile(); // Call the async function
   }, []);
 
-  useEffect(() => {
-    // This loads in the combined electrodes for the selected patient
-    const loadPlyFile = async () => {
-      try {
-        const fileData = await window.electron.ipcRenderer.invoke(
-          'load-test-file',
-          historical,
-        );
-        // setPlyFile(fileData);
-        const loader = new PLYLoader();
-        const geometry = loader.parse(fileData);
+  // useEffect(() => {
+  //   // This loads in the combined electrodes for the selected patient
+  //   const loadPlyFile = async () => {
+  //     try {
+  //       const fileData = await window.electron.ipcRenderer.invoke(
+  //         'load-test-file',
+  //         historical,
+  //       );
+  //       // setPlyFile(fileData);
+  //       const loader = new PLYLoader();
+  //       const geometry = loader.parse(fileData);
 
-        const material = new THREE.MeshStandardMaterial({
-          vertexColors: geometry.hasAttribute('color'),
-          flatShading: true,
-          metalness: 0.1, // More reflective
-          roughness: 0.5, // Shinier surface
-          transparent: true, // Enable transparency
-          opacity: 0.8, // Set opacity to 60%
-        });
-        // eslint-disable-next-line no-use-before-define
-        addMeshToScene('Test OSS VTA', geometry, material);
-      } catch (error) {
-        console.error('Error loading PLY file:', error);
-      }
-    };
+  //       const material = new THREE.MeshStandardMaterial({
+  //         vertexColors: geometry.hasAttribute('color'),
+  //         flatShading: true,
+  //         metalness: 0.1, // More reflective
+  //         roughness: 0.5, // Shinier surface
+  //         transparent: true, // Enable transparency
+  //         opacity: 0.8, // Set opacity to 60%
+  //       });
+  //       // eslint-disable-next-line no-use-before-define
+  //       addMeshToScene('Test OSS VTA', geometry, material);
+  //     } catch (error) {
+  //       console.error('Error loading PLY file:', error);
+  //     }
+  //   };
 
-    loadPlyFile(); // Call the async function
-  }, []);
+  //   loadPlyFile(); // Call the async function
+  // }, []);
 
   // New states for visibility and thresholding
+
   const [meshVisibility, setMeshVisibility] = useState({});
   const [meshOpacity, setMeshOpacity] = useState({});
   const [threshold, setThreshold] = useState(0.5); // Example thresholding value
 
   const [newTremor, setNewTremor] = useState({ name: '', coords: [0, 0, 0] });
   const [showModal, setShowModal] = useState(false);
+  const [showPDModal, setShowPDModal] = useState(false);
+  const [newPD, setNewPD] = useState({ name: '', coords: [0, 0, 0] });
   const [tremorData, setTremorData] = useState([
     { name: 'Papavassilliou et al', coords: [14.5, -17.7, -2.8] },
     { name: 'Hamel et al', coords: [13.79, -18.04, -1.06] },
@@ -173,10 +176,29 @@ function PlyViewer({
     { name: 'Middlebrooks et al', coords: [15.5, -15.5, 0.5] },
   ]);
 
+  const [pdData, setPdData] = useState([
+    { name: 'Ehlen et al 2013', coords: [11.95, 14.16, 1.62] },
+    { name: 'Horn et al 2017', coords: [14.04, -13.2, -4.8] },
+    { name: 'Krugel et al 2014', coords: [12.13, -13.93, -6.93] },
+    { name: 'Todt et al 2022', coords: [12.3, 1.6, 2.3] },
+    { name: 'Akram et al 2017 - Rigidity', coords: [9, -13, -7] },
+    { name: 'Akram et al 2017 - Tremor', coords: [11, -12, -6] },
+    { name: 'Boutet et al 2024 - Bradykinesia', coords: [12.2, -13, -4.4] },
+    { name: 'Dembek et al - Motor', coords: [13.3, -13.5, -5.4] },
+  ]);
+
   // Handle input change for new tremor data
   const handleNewTremorChange = (e) => {
     const { name, value } = e.target;
     setNewTremor((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleNewPDChange = (e) => {
+    const { name, value } = e.target;
+    setNewPD((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -192,6 +214,18 @@ function PlyViewer({
       ]);
       // Reset the form
       setNewTremor({ name: '', coords: [0, 0, 0] });
+    }
+  };
+
+  const addNewPD = () => {
+    const { name, coords } = newPD;
+    if (name && coords.length === 3) {
+      setPdData((prevData) => [
+        ...prevData,
+        { name, coords: coords.map(Number) },
+      ]);
+      // Reset the form
+      setNewPD({ name: '', coords: [0, 0, 0] });
     }
   };
 
@@ -364,6 +398,28 @@ function PlyViewer({
   const handleTremorChange = (event) => {
     const selectTremor = event.target.value;
     const tremorItem = tremorData[selectTremor];
+    const [x, y, z] = tremorItem.coords;
+    const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+    const sphereMaterial = new THREE.MeshStandardMaterial({
+      color: getRandomColor(),
+      transparent: true,
+      opacity: 0.8,
+    });
+
+    addMeshToScene(tremorItem.name, sphereGeometry, sphereMaterial, [x, y, z]);
+    // setSelectedTremor((prevSelectedTremor) => {
+    //   if (prevSelectedTremor.includes(selectedValue)) {
+    //     // If already selected, remove it
+    //     return prevSelectedTremor.filter((item) => item !== selectedValue);
+    //   }
+    //   // If not selected, add it
+    //   return [...prevSelectedTremor, selectedValue];
+    // });
+  };
+
+  const handlePDChange = (event) => {
+    const selectTremor = event.target.value;
+    const tremorItem = pdData[selectTremor];
     const [x, y, z] = tremorItem.coords;
     const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
     const sphereMaterial = new THREE.MeshStandardMaterial({
@@ -1460,7 +1516,7 @@ function PlyViewer({
               {/* Tab for Atlases */}
               <Tab eventKey="atlases" title="Atlases">
                 <div style={controlPanelStyle2}>
-                  <select onChange={handleFileChange} multiple>
+                  <select onChange={handleFileChange} multiple style={{ height: '500px', width: '300px' }}>
                     {plyFiles.map((file, index) => (
                       <option key={index} value={index}>
                         {file.name}
@@ -1471,7 +1527,7 @@ function PlyViewer({
               </Tab>
               <Tab eventKey="priorStims" title="Patient Database">
                 <div style={controlPanelStyle2}>
-                  <select onChange={handlePriorStimChange} multiple>
+                  <select onChange={handlePriorStimChange} multiple style={{ height: '500px', width: '300px' }}>
                     {priorStims &&
                       Object.keys(priorStims).map((patientId, index) => (
                         <optgroup key={index} label={patientId}>
@@ -1496,7 +1552,7 @@ function PlyViewer({
                 <Tabs defaultActiveKey="tremor" id="nested-tabs-inside">
                   <Tab eventKey="tremor" title="Tremor">
                     <div style={controlPanelStyle2}>
-                      <select onChange={handleTremorChange} multiple>
+                      <select onChange={handleTremorChange} multiple style={{ height: '500px', width: '300px' }}>
                         {tremorData.map((tremor, index) => (
                           <option key={index} value={index}>
                             {tremor.name}
@@ -1592,8 +1648,100 @@ function PlyViewer({
                     </div>
                   </Tab>
                   <Tab eventKey="pd" title="PD">
-                    <div style={controlPanelStyle2}>
-                      <h4>Coordinates...</h4>
+                  <div style={controlPanelStyle2}>
+                      <select onChange={handlePDChange} multiple style={{ height: '500px', width: '300px' }}>
+                        {pdData.map((tremor, index) => (
+                          <option key={index} value={index}>
+                            {tremor.name}
+                          </option>
+                        ))}
+                      </select>
+                      <Button
+                        variant="primary"
+                        onClick={() => setShowPDModal(true)}
+                      >
+                        Add Coordinates
+                      </Button>
+                      <Modal
+                        show={showPDModal}
+                        onHide={() => setShowPDModal(false)}
+                      >
+                        <Modal.Header closeButton>
+                          <Modal.Title>Add New Coordinates</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                          <input
+                            type="text"
+                            name="name"
+                            placeholder="Name"
+                            value={newPD.name}
+                            onChange={handleNewPDChange}
+                            className="form-control"
+                          />
+                          <input
+                            type="number"
+                            name="coords"
+                            placeholder="X"
+                            value={newPD.coords[0]}
+                            onChange={(e) =>
+                              setNewPD({
+                                ...newPD,
+                                coords: [
+                                  e.target.value,
+                                  newPD.coords[1],
+                                  newPD.coords[2],
+                                ],
+                              })
+                            }
+                            className="form-control mt-2"
+                          />
+                          <input
+                            type="number"
+                            name="coords"
+                            placeholder="Y"
+                            value={newPD.coords[1]}
+                            onChange={(e) =>
+                              setNewTremor({
+                                ...newPD,
+                                coords: [
+                                  newPD.coords[0],
+                                  e.target.value,
+                                  newPD.coords[2],
+                                ],
+                              })
+                            }
+                            className="form-control mt-2"
+                          />
+                          <input
+                            type="number"
+                            name="coords"
+                            placeholder="Z"
+                            value={newPD.coords[2]}
+                            onChange={(e) =>
+                              setNewTremor({
+                                ...newPD,
+                                coords: [
+                                  newPD.coords[0],
+                                  newPD.coords[1],
+                                  e.target.value,
+                                ],
+                              })
+                            }
+                            className="form-control mt-2"
+                          />
+                        </Modal.Body>
+                        <Modal.Footer>
+                          <Button
+                            variant="secondary"
+                            onClick={() => setShowPDModal(false)}
+                          >
+                            Close
+                          </Button>
+                          <Button variant="primary" onClick={addNewPD}>
+                            Add
+                          </Button>
+                        </Modal.Footer>
+                      </Modal>
                     </div>
                   </Tab>
                 </Tabs>
@@ -1638,17 +1786,12 @@ const viewerStyle = {
 };
 
 const controlPanelStyle2 = {
-  // display: 'flex',
-  // flexDirection: 'column', // Stack controls vertically
-  // height: '600px', // Matches the height of the viewer
-  // // overflowY: 'auto', // Allows scrolling if controls exceed height
-  // width: '300px', // Fixed width for the control panel
-  // backgroundColor: '#f8f9fa',
   display: 'flex',
   flexDirection: 'column', // Stack controls vertically
-  maxHeight: '600px', // Matches the height of the viewer
-  overflowY: 'auto', // Allows scrolling if controls exceed height
+  // maxHeight: '600px', // Matches the height of the viewer
+  // overflowY: 'auto', // Allows scrolling if controls exceed height
   width: '300px', // Fixed width for the control panel
+  height: '600px',
   padding: '10px',
   backgroundColor: '#f8f9fa',
 };

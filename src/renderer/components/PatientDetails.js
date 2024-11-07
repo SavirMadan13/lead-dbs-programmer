@@ -295,7 +295,7 @@ function PatientDetails({ directoryPath, leadDBS }) {
           Add Clinical Scores
         </button>
         <button className="export-button" onClick={() => handleGroupStats()}>
-          Group Stats
+          Stats
         </button>
       </div>
       {/* <button className="back-button" onClick={() => navigate('/viewer')}>

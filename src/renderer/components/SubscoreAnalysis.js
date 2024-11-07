@@ -1,47 +1,62 @@
 // import React, { useState } from 'react';
 // import Plot from 'react-plotly.js';
 
-// function LateralityAnalysisComponent({ rawData, showPercentage }) {
-//   function splitScoresByLaterality(scores, threshold) {
-//     const leftSideItems = [
-//       '3.3c: Rigidity- LUE',
-//       '3.3e: Rigidity- LLE',
-//       '3.4b: Finger tapping- Left hand',
-//       '3.5b: Hand movements- Left hand',
-//       '3.6b: Pronation- supination movements- Left hand',
-//       '3.7b: Toe tapping- Left foot',
-//       '3.8b: Leg agility- Left leg',
-//       '3.15b: Postural tremor- Left hand',
-//       '3.16b: Kinetic tremor- Left hand',
-//       '3.17b: Rest tremor amplitude- LUE',
-//       '3.17d: Rest tremor amplitude- LLE',
-//     ];
-
-//     const rightSideItems = [
-//       '3.3b: Rigidity- RUE',
-//       '3.3d: Rigidity- RLE',
+// function SubscoreAnalysis({ rawData }) {
+//   function splitScoresBySubscore(scores, threshold) {
+//     const bradykinesiaItems = [
 //       '3.4a: Finger tapping- Right hand',
+//       '3.4b: Finger tapping- Left hand',
 //       '3.5a: Hand movements- Right hand',
+//       '3.5b: Hand movements- Left hand',
 //       '3.6a: Pronation- supination movements- Right hand',
+//       '3.6b: Pronation- supination movements- Left hand',
 //       '3.7a: Toe tapping- Right foot',
+//       '3.7b: Toe tapping- Left foot',
 //       '3.8a: Leg agility- Right leg',
-//       '3.15a: Postural tremor- Right hand',
-//       '3.16a: Kinetic tremor- Right hand',
-//       '3.17a: Rest tremor amplitude- RUE',
-//       '3.17c: Rest tremor amplitude- RLE',
+//       '3.8b: Leg agility- Left leg',
+//       '3.14: Global spontaneity of movement'
 //     ];
 
-//     const leftSideSum = leftSideItems.reduce((sum, item) => {
-//       const value = scores[item] || 0;
-//       return sum + (value >= threshold ? value : 0);
-//     }, 0);
+//     const rigidityItems = [
+//       '3.3a: Rigidity- Neck',
+//       '3.3b: Rigidity- RUE',
+//       '3.3c: Rigidity- LUE',
+//       '3.3d: Rigidity- RLE',
+//       '3.3e: Rigidity- LLE'
+//     ];
 
-//     const rightSideSum = rightSideItems.reduce((sum, item) => {
-//       const value = scores[item] || 0;
-//       return sum + (value >= threshold ? value : 0);
-//     }, 0);
+//     const tremorItems = [
+//       '3.15a: Postural tremor- Right hand',
+//       '3.15b: Postural tremor- Left hand',
+//       '3.16a: Kinetic tremor- Right hand',
+//       '3.16b: Kinetic tremor- Left hand',
+//       '3.17a: Rest tremor amplitude- RUE',
+//       '3.17b: Rest tremor amplitude- LUE',
+//       '3.17c: Rest tremor amplitude- RLE',
+//       '3.17d: Rest tremor amplitude- LLE',
+//       '3.17e: Rest tremor amplitude- Lip/jaw',
+//       '3.18: Constancy of rest tremor'
+//     ];
 
-//     return { leftSideSum, rightSideSum };
+//     const axialItems = [
+//       '3.1: Speech',
+//       '3.2: Facial expression',
+//       '3.9: Arising from chair',
+//       '3.10: Gait',
+//       '3.11: Freezing of gait',
+//       '3.12: Postural stability',
+//       '3.13: Posture'
+//     ];
+
+//     const calculateSum = (items) =>
+//       items.reduce((sum, item) => sum + (scores[item] >= threshold ? scores[item] : 0), 0);
+
+//     return {
+//       bradykinesia: calculateSum(bradykinesiaItems),
+//       rigidity: calculateSum(rigidityItems),
+//       tremor: calculateSum(tremorItems),
+//       axial: calculateSum(axialItems)
+//     };
 //   }
 
 //   const [threshold, setThreshold] = useState(0);
@@ -50,68 +65,59 @@
 //     setThreshold(Number(e.target.value));
 //   };
 
-//   const leftSumsByTimepoint = {};
-//   const rightSumsByTimepoint = {};
+//   const subscoreSumsByTimepoint = {
+//     bradykinesia: {},
+//     rigidity: {},
+//     tremor: {},
+//     axial: {}
+//   };
 
 //   rawData.forEach((patientData) => {
 //     Object.keys(patientData).forEach((timepoint) => {
 //       if (timepoint !== 'id') {
-//         const { leftSideSum, rightSideSum } = splitScoresByLaterality(
+//         const { bradykinesia, rigidity, tremor, axial } = splitScoresBySubscore(
 //           patientData[timepoint],
 //           threshold
 //         );
 
-//         if (!leftSumsByTimepoint[timepoint]) {
-//           leftSumsByTimepoint[timepoint] = 0;
-//           rightSumsByTimepoint[timepoint] = 0;
+//         if (!subscoreSumsByTimepoint.bradykinesia[timepoint]) {
+//           subscoreSumsByTimepoint.bradykinesia[timepoint] = 0;
+//           subscoreSumsByTimepoint.rigidity[timepoint] = 0;
+//           subscoreSumsByTimepoint.tremor[timepoint] = 0;
+//           subscoreSumsByTimepoint.axial[timepoint] = 0;
 //         }
 
-//         leftSumsByTimepoint[timepoint] += leftSideSum;
-//         rightSumsByTimepoint[timepoint] += rightSideSum;
+//         subscoreSumsByTimepoint.bradykinesia[timepoint] += bradykinesia;
+//         subscoreSumsByTimepoint.rigidity[timepoint] += rigidity;
+//         subscoreSumsByTimepoint.tremor[timepoint] += tremor;
+//         subscoreSumsByTimepoint.axial[timepoint] += axial;
 //       }
 //     });
 //   });
 
-//   const plotData = [
-//     {
+//   const plotData = [];
+//   const subscoreNames = ['bradykinesia', 'rigidity', 'tremor', 'axial'];
+//   const colors = ['rgba(0, 123, 255, 0.7)', 'rgba(255, 99, 132, 0.7)', 'rgba(60, 179, 113, 0.7)', 'rgba(255, 165, 0, 0.7)'];
+
+//   subscoreNames.forEach((subscore, index) => {
+//     plotData.push({
 //       type: 'scatter',
 //       mode: 'lines+markers',
-//       x: Object.keys(leftSumsByTimepoint).sort((a, b) => {
+//       x: Object.keys(subscoreSumsByTimepoint[subscore]).sort((a, b) => {
 //         if (a === 'baseline') return -1;
 //         if (b === 'baseline') return 1;
 //         return a.localeCompare(b, undefined, { numeric: true });
 //       }),
-//       y: Object.keys(leftSumsByTimepoint)
-//         .sort((a, b) => {
-//           if (a === 'baseline') return -1;
-//           if (b === 'baseline') return 1;
-//           return a.localeCompare(b, undefined, { numeric: true });
-//         })
-//         .map((timepoint) => leftSumsByTimepoint[timepoint]),
-//       name: 'Left Side',
-//       line: { color: 'rgba(0, 123, 255, 0.7)' },
-//       marker: { color: 'rgba(0, 123, 255, 0.7)' }
-//     },
-//     {
-//       type: 'scatter',
-//       mode: 'lines+markers',
-//       x: Object.keys(rightSumsByTimepoint).sort((a, b) => {
+//       y: Object.keys(subscoreSumsByTimepoint[subscore]).sort((a, b) => {
 //         if (a === 'baseline') return -1;
 //         if (b === 'baseline') return 1;
 //         return a.localeCompare(b, undefined, { numeric: true });
-//       }),
-//       y: Object.keys(rightSumsByTimepoint)
-//         .sort((a, b) => {
-//           if (a === 'baseline') return -1;
-//           if (b === 'baseline') return 1;
-//           return a.localeCompare(b, undefined, { numeric: true });
-//         })
-//         .map((timepoint) => rightSumsByTimepoint[timepoint]),
-//       name: 'Right Side',
-//       line: { color: 'rgba(255, 99, 132, 0.7)' },
-//       marker: { color: 'rgba(255, 99, 132, 0.7)' }
-//     }
-//   ];
+//       }).map((timepoint) => subscoreSumsByTimepoint[subscore][timepoint]),
+//       name: subscore.charAt(0).toUpperCase() + subscore.slice(1),
+//       line: { color: colors[index] },
+//       marker: { color: colors[index] }
+//     });
+//   });
 
 //   return (
 //     <div>
@@ -187,52 +193,67 @@
 //   );
 // }
 
-// export default LateralityAnalysisComponent;
+// export default SubscoreAnalysis;
 
 import React, { useState } from 'react';
 import Plot from 'react-plotly.js';
 
-function LateralityAnalysisComponent({ rawData, showPercentage }) {
-  function splitScoresByLaterality(scores, threshold) {
-    const leftSideItems = [
-      '3.3c: Rigidity- LUE',
-      '3.3e: Rigidity- LLE',
-      '3.4b: Finger tapping- Left hand',
-      '3.5b: Hand movements- Left hand',
-      '3.6b: Pronation- supination movements- Left hand',
-      '3.7b: Toe tapping- Left foot',
-      '3.8b: Leg agility- Left leg',
-      '3.15b: Postural tremor- Left hand',
-      '3.16b: Kinetic tremor- Left hand',
-      '3.17b: Rest tremor amplitude- LUE',
-      '3.17d: Rest tremor amplitude- LLE',
-    ];
-
-    const rightSideItems = [
-      '3.3b: Rigidity- RUE',
-      '3.3d: Rigidity- RLE',
+function SubscoreAnalysis({ rawData, showPercentage }) {
+  function splitScoresBySubscore(scores, threshold) {
+    const bradykinesiaItems = [
       '3.4a: Finger tapping- Right hand',
+      '3.4b: Finger tapping- Left hand',
       '3.5a: Hand movements- Right hand',
+      '3.5b: Hand movements- Left hand',
       '3.6a: Pronation- supination movements- Right hand',
+      '3.6b: Pronation- supination movements- Left hand',
       '3.7a: Toe tapping- Right foot',
+      '3.7b: Toe tapping- Left foot',
       '3.8a: Leg agility- Right leg',
-      '3.15a: Postural tremor- Right hand',
-      '3.16a: Kinetic tremor- Right hand',
-      '3.17a: Rest tremor amplitude- RUE',
-      '3.17c: Rest tremor amplitude- RLE',
+      '3.8b: Leg agility- Left leg',
+      '3.14: Global spontaneity of movement'
     ];
 
-    const leftSideSum = leftSideItems.reduce((sum, item) => {
-      const value = scores[item] || 0;
-      return sum + (value >= threshold ? value : 0);
-    }, 0);
+    const rigidityItems = [
+      '3.3a: Rigidity- Neck',
+      '3.3b: Rigidity- RUE',
+      '3.3c: Rigidity- LUE',
+      '3.3d: Rigidity- RLE',
+      '3.3e: Rigidity- LLE'
+    ];
 
-    const rightSideSum = rightSideItems.reduce((sum, item) => {
-      const value = scores[item] || 0;
-      return sum + (value >= threshold ? value : 0);
-    }, 0);
+    const tremorItems = [
+      '3.15a: Postural tremor- Right hand',
+      '3.15b: Postural tremor- Left hand',
+      '3.16a: Kinetic tremor- Right hand',
+      '3.16b: Kinetic tremor- Left hand',
+      '3.17a: Rest tremor amplitude- RUE',
+      '3.17b: Rest tremor amplitude- LUE',
+      '3.17c: Rest tremor amplitude- RLE',
+      '3.17d: Rest tremor amplitude- LLE',
+      '3.17e: Rest tremor amplitude- Lip/jaw',
+      '3.18: Constancy of rest tremor'
+    ];
 
-    return { leftSideSum, rightSideSum };
+    const axialItems = [
+      '3.1: Speech',
+      '3.2: Facial expression',
+      '3.9: Arising from chair',
+      '3.10: Gait',
+      '3.11: Freezing of gait',
+      '3.12: Postural stability',
+      '3.13: Posture'
+    ];
+
+    const calculateSum = (items) =>
+      items.reduce((sum, item) => sum + (scores[item] >= threshold ? scores[item] : 0), 0);
+
+    return {
+      bradykinesia: calculateSum(bradykinesiaItems),
+      rigidity: calculateSum(rigidityItems),
+      tremor: calculateSum(tremorItems),
+      axial: calculateSum(axialItems)
+    };
   }
 
   const [threshold, setThreshold] = useState(0);
@@ -241,80 +262,80 @@ function LateralityAnalysisComponent({ rawData, showPercentage }) {
     setThreshold(Number(e.target.value));
   };
 
-  const leftSumsByTimepoint = {};
-  const rightSumsByTimepoint = {};
+  const subscoreSumsByTimepoint = {
+    bradykinesia: {},
+    rigidity: {},
+    tremor: {},
+    axial: {}
+  };
 
   rawData.forEach((patientData) => {
     Object.keys(patientData).forEach((timepoint) => {
       if (timepoint !== 'id') {
-        const { leftSideSum, rightSideSum } = splitScoresByLaterality(
+        const { bradykinesia, rigidity, tremor, axial } = splitScoresBySubscore(
           patientData[timepoint],
           threshold
         );
 
-        if (!leftSumsByTimepoint[timepoint]) {
-          leftSumsByTimepoint[timepoint] = 0;
-          rightSumsByTimepoint[timepoint] = 0;
+        if (!subscoreSumsByTimepoint.bradykinesia[timepoint]) {
+          subscoreSumsByTimepoint.bradykinesia[timepoint] = 0;
+          subscoreSumsByTimepoint.rigidity[timepoint] = 0;
+          subscoreSumsByTimepoint.tremor[timepoint] = 0;
+          subscoreSumsByTimepoint.axial[timepoint] = 0;
         }
 
-        leftSumsByTimepoint[timepoint] += leftSideSum;
-        rightSumsByTimepoint[timepoint] += rightSideSum;
+        subscoreSumsByTimepoint.bradykinesia[timepoint] += bradykinesia;
+        subscoreSumsByTimepoint.rigidity[timepoint] += rigidity;
+        subscoreSumsByTimepoint.tremor[timepoint] += tremor;
+        subscoreSumsByTimepoint.axial[timepoint] += axial;
       }
     });
   });
 
-  const baselineLeft = leftSumsByTimepoint['baseline'] || 1;
-  const baselineRight = rightSumsByTimepoint['baseline'] || 1;
+  // Calculate baseline for percentage improvement if needed
+  const baseline = {
+    bradykinesia: subscoreSumsByTimepoint.bradykinesia['baseline'] || 1,
+    rigidity: subscoreSumsByTimepoint.rigidity['baseline'] || 1,
+    tremor: subscoreSumsByTimepoint.tremor['baseline'] || 1,
+    axial: subscoreSumsByTimepoint.axial['baseline'] || 1,
+  };
 
-  const leftYValues = Object.keys(leftSumsByTimepoint)
-    .sort((a, b) => (a === 'baseline' ? -1 : b === 'baseline' ? 1 : a.localeCompare(b, undefined, { numeric: true })))
-    .map((timepoint) =>
-      showPercentage
-        ? ((baselineLeft - leftSumsByTimepoint[timepoint]) / baselineLeft) * 100
-        : leftSumsByTimepoint[timepoint]
-    );
+  // Prepare data for the plot with dynamic range calculation
+  const plotData = [];
+  const subscoreNames = ['bradykinesia', 'rigidity', 'tremor', 'axial'];
+  const colors = ['rgba(0, 123, 255, 0.7)', 'rgba(255, 99, 132, 0.7)', 'rgba(60, 179, 113, 0.7)', 'rgba(255, 165, 0, 0.7)'];
 
-  const rightYValues = Object.keys(rightSumsByTimepoint)
-    .sort((a, b) => (a === 'baseline' ? -1 : b === 'baseline' ? 1 : a.localeCompare(b, undefined, { numeric: true })))
-    .map((timepoint) =>
-      showPercentage
-        ? ((baselineRight - rightSumsByTimepoint[timepoint]) / baselineRight) * 100
-        : rightSumsByTimepoint[timepoint]
-    );
+  let allYValues = [];
 
-  // Calculate the minimum y-value and adjust range accordingly
-  const minYValue = Math.min(...leftYValues, ...rightYValues);
-  // const yAxisRange = [minYValue - 10, Math.max(...leftYValues, ...rightYValues) + 10];
-  const yAxisRange = showPercentage ? [minYValue - 10, Math.max(...leftYValues, ...rightYValues) + 10] : [0, Math.max(...leftYValues, ...rightYValues) + 2];
+  subscoreNames.forEach((subscore, index) => {
+    const yValues = Object.keys(subscoreSumsByTimepoint[subscore])
+      .sort((a, b) => (a === 'baseline' ? -1 : b === 'baseline' ? 1 : a.localeCompare(b, undefined, { numeric: true })))
+      .map((timepoint) =>
+        showPercentage
+          ? ((baseline[subscore] - subscoreSumsByTimepoint[subscore][timepoint]) / baseline[subscore]) * 100
+          : subscoreSumsByTimepoint[subscore][timepoint]
+      );
 
-  const plotData = [
-    {
+    allYValues = allYValues.concat(yValues);
+
+    plotData.push({
       type: 'scatter',
       mode: 'lines+markers',
-      x: Object.keys(leftSumsByTimepoint).sort((a, b) => {
+      x: Object.keys(subscoreSumsByTimepoint[subscore]).sort((a, b) => {
         if (a === 'baseline') return -1;
         if (b === 'baseline') return 1;
         return a.localeCompare(b, undefined, { numeric: true });
       }),
-      y: leftYValues,
-      name: 'Left Side',
-      line: { color: 'rgba(0, 123, 255, 0.7)' },
-      marker: { color: 'rgba(0, 123, 255, 0.7)' }
-    },
-    {
-      type: 'scatter',
-      mode: 'lines+markers',
-      x: Object.keys(rightSumsByTimepoint).sort((a, b) => {
-        if (a === 'baseline') return -1;
-        if (b === 'baseline') return 1;
-        return a.localeCompare(b, undefined, { numeric: true });
-      }),
-      y: rightYValues,
-      name: 'Right Side',
-      line: { color: 'rgba(255, 99, 132, 0.7)' },
-      marker: { color: 'rgba(255, 99, 132, 0.7)' }
-    }
-  ];
+      y: yValues,
+      name: subscore.charAt(0).toUpperCase() + subscore.slice(1),
+      line: { color: colors[index] },
+      marker: { color: colors[index] }
+    });
+  });
+
+  // Determine y-axis range with padding below the minimum value
+  const minYValue = Math.min(...allYValues);
+  const yAxisRange = showPercentage ? [minYValue - 10, Math.max(...allYValues) + 10] : [0, Math.max(...allYValues) + 2];
 
   return (
     <div>
@@ -337,7 +358,7 @@ function LateralityAnalysisComponent({ rawData, showPercentage }) {
             gridcolor: '#e6e6e6',
             zeroline: true,
             zerolinecolor: '#000', // Black zero line for clarity
-            range: yAxisRange, // Set dynamic range based on minYValue
+            range: yAxisRange, // Dynamic y-axis range
           },
           xaxis: {
             title: {
@@ -404,4 +425,4 @@ function LateralityAnalysisComponent({ rawData, showPercentage }) {
   );
 }
 
-export default LateralityAnalysisComponent;
+export default SubscoreAnalysis;
