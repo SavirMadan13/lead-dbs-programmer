@@ -60,7 +60,7 @@ function ClinicalScores() {
     '3.17b: Rest tremor amplitude- LUE': 0,
     '3.17c: Rest tremor amplitude- RLE': 0,
     '3.17d: Rest tremor amplitude- LLE': 0,
-    '3.17e: Rest tremor amplitue- Lip/jaw': 0,
+    '3.17e: Rest tremor amplitude- Lip/jaw': 0,
     '3.18: Constancy of rest tremor': 0,
   };
   const [initialScores, setInitialScores] = useState(UPDRS);

@@ -19,6 +19,7 @@ import {
 import { Edit, Delete, Save, Cancel } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { PatientContext } from './PatientContext';
+import DatabaseStats from './DatabaseStats';
 
 function PatientDatabase({ key, directoryPath }) {
   const { patients, setPatients } = useContext(PatientContext);
@@ -588,6 +589,11 @@ function PatientDatabase({ key, directoryPath }) {
           </Table>
         </TableContainer>
       </Container>
+      <div>
+        {directoryPath && patients.length > 0 && (
+          <DatabaseStats patients={patients} directoryPath={directoryPath} />
+        )}
+      </div>
     </div>
   );
 }

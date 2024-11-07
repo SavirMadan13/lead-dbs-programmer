@@ -537,6 +537,66 @@ ipcMain.on('set-status', (event, arg) => {
   }
 });
 
+// Function to read JSON from the provided path
+function readJSON(filePath) {
+  try {
+    const data = fs.readFileSync(filePath, 'utf8'); // Synchronous file read
+    return JSON.parse(data); // Parse and return the JSON data
+  } catch (error) {
+    console.error(`Error reading JSON file from ${filePath}:`, error);
+    return null; // Return null or handle the error accordingly
+  }
+}
+
+ipcMain.on('database-group-figures', (event, directoryPath) => {
+  console.log(directoryPath);
+  const databaseMasterFile = path.join(directoryPath, 'dataset_master.json');
+  const databaseData = readJSON(databaseMasterFile);
+  event.reply('database-group-figures', databaseData);
+});
+
+ipcMain.handle('get-clinical-data', async (event, directoryPath, patientsWithTimelines) => {
+  try {
+    // Loop through each patient and their respective timelines
+    const allClinicalData = await Promise.all(
+      patientsWithTimelines.map(async ({ id, timelines }) => {
+        const patientClinicalData = {};
+
+        for (const timeline of timelines) {
+          // Construct the path based on the new directory structure
+          const sessionPath = path.join(
+            directoryPath,
+            'derivatives',
+            'leaddbs',
+            id,
+            'clinical',
+            `ses-${timeline}`
+          );
+          const clinicalFilePath = path.join(sessionPath, `${id}_ses-${timeline}_clinical.json`);
+
+          try {
+            // Check if the clinical.json file exists, then read and parse it
+            if (fs.existsSync(clinicalFilePath)) {
+              const clinicalData = JSON.parse(await fs.promises.readFile(clinicalFilePath, 'utf-8'));
+              patientClinicalData[timeline] = clinicalData;
+            }
+          } catch (error) {
+            console.error(`Error reading clinical.json for patient ${id}, session ${timeline}:`, error);
+          }
+        }
+
+        // Return the structured data for the patient
+        return { id, clinicalData: patientClinicalData };
+      })
+    );
+
+    return allClinicalData; // Returns an array with each patient's clinical data structured by timeline
+  } catch (error) {
+    console.error('Error fetching clinical data:', error);
+    throw error;
+  }
+});
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
@@ -1009,17 +1069,6 @@ const createWindow = async () => {
       }
     }
   });
-
-  // Function to read JSON from the provided path
-  function readJSON(filePath) {
-    try {
-      const data = fs.readFileSync(filePath, 'utf8'); // Synchronous file read
-      return JSON.parse(data); // Parse and return the JSON data
-    } catch (error) {
-      console.error(`Error reading JSON file from ${filePath}:`, error);
-      return null; // Return null or handle the error accordingly
-    }
-  }
 
   // Function to get all PLY files from atlas folders
   function getPlyFilesFromAtlases(atlasesPath) {
