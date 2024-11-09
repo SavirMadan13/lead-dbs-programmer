@@ -27,7 +27,7 @@ function PatientDatabase({ key, directoryPath }) {
   const [editedPatient, setEditedPatient] = useState({}); // Hold the patient data while editing
   const [searchTerm, setSearchTerm] = useState('');
   const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('name');
+  const [orderBy, setOrderBy] = useState('id');
   const [editMode, setEditMode] = useState(false);
   const navigate = useNavigate();
   const [columns, setColumns] = useState([
@@ -260,8 +260,6 @@ function PatientDatabase({ key, directoryPath }) {
         >
           {editMode ? 'Close Edit Mode' : 'Edit Table'}
         </Button>
-
-        {/* Conditionally render column management UI */}
         {editMode && (
           <div>
             <TextField

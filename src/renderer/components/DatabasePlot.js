@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Plot from 'react-plotly.js';
 
 function DatabasePlot({ clinicalData }) {
-  const [showPercentage, setShowPercentage] = useState(false);
+  const [showPercentage, setShowPercentage] = useState(true);
   const traces = clinicalData.map((patientData, index) => {
     const patientID = patientData.id;
     const timelines = Object.keys(patientData.clinicalData);
