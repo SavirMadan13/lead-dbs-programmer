@@ -7,6 +7,7 @@ import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directe
 import { RichTreeView } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import HomeIcon from '@mui/icons-material/Home';
 import { PatientContext } from './PatientContext';
 // import NiivueViewer from './NiivueViewer';
 // import NiftiViewer from './NiftiViewer';
@@ -243,6 +244,15 @@ function PatientDetails({ directoryPath, leadDBS }) {
   return (
     <div className="patient-details">
       {/* Section Title */}
+      <HomeIcon
+        onClick={() => navigate('/')}
+        style={{
+          fontSize: '36px', // Customize size
+          color: '#1a73e8', // Customize color
+          cursor: 'pointer', // Add pointer cursor on hover
+          margin: '0 10px' // Add some margin for spacing
+        }}
+      />
       <h1 className="patient-title">Patient Details</h1>
 
       {/* Divider */}
@@ -364,9 +374,18 @@ function PatientDetails({ directoryPath, leadDBS }) {
       </div>
 
       {/* Navigation Buttons */}
-      <button className="back-button" onClick={() => navigate('/')}>
+      {/* <HomeIcon
+        onClick={() => navigate('/')}
+        style={{
+          fontSize: '36px', // Customize size
+          color: '#1a73e8', // Customize color
+          cursor: 'pointer', // Add pointer cursor on hover
+          margin: '0 10px' // Add some margin for spacing
+        }}
+      /> */}
+      {/* <button className="back-button" onClick={() => navigate('/')}>
         Back to Table
-      </button>
+      </button> */}
       {/* <button onClick={() => setNiiVue(!niiVue)}>Show NiivueViewer</button> */}
       {/* {niiVue && (
         <div>

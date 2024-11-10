@@ -232,7 +232,7 @@ function PatientDatabase({ key, directoryPath }) {
           textAlign: 'center',
         }}
       >
-        DBS Database
+        DBS Patient Database
       </Typography>
       {/* <AppBar
         position="static"
@@ -392,7 +392,7 @@ function PatientDatabase({ key, directoryPath }) {
             // variant="contained"
             // color="default"
             onClick={() => setEditMode((prev) => !prev)}
-            style={{ width: editMode ? '180px' : '180px' }}
+            style={{ width: '180px', marginLeft: 'auto' }}
           >
             {editMode ? 'Close Edit Mode' : 'Edit Table Columns'}
           </Button>
@@ -454,7 +454,7 @@ function PatientDatabase({ key, directoryPath }) {
               style={{
                 fontSize: '14px',
                 padding: '10px 20px',
-                marginLeft: 'auto',
+                // marginLeft: 'auto',
               }}
             >
               Add Patient

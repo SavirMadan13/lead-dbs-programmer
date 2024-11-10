@@ -10,8 +10,8 @@ import SubscoreAnalysis from './SubscoreAnalysis';
 
 function UPDRSAnalysisComponent({ currentStage, rawData }) {
   console.log(rawData);
-  const [analysisType, setAnalysisType] = useState('raincloud');
-  const [showPercentage, setShowPercentage] = useState(false);
+  const [analysisType, setAnalysisType] = useState('all');
+  const [showPercentage, setShowPercentage] = useState(true);
 
   const handleAnalysisChange = (e) => {
     setAnalysisType(e.target.value);
