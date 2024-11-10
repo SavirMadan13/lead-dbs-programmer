@@ -130,7 +130,7 @@ export default function App() {
         <SettingsIcon
           className="settings-icon"
           onClick={() => setShowSettings(!showSettings)}
-          style={{ cursor: 'pointer', fontSize: '24px', color: '#6c757d' }} // Optional styling
+          style={{ cursor: 'pointer', fontSize: '24px', color: '#6c757d', zIndex: '10' }} // Optional styling
         />
 
         {showSettings && (
@@ -157,10 +157,12 @@ export default function App() {
             <Route
               path="/"
               element={
-                <PatientDatabase
-                  key={renderKey}
-                  directoryPath={directoryPath}
-                />
+                <div style={{marginTop: '0px'}}>
+                  <PatientDatabase
+                    key={renderKey}
+                    directoryPath={directoryPath}
+                  />
+                </div>
               }
             />
             <Route
@@ -184,9 +186,7 @@ export default function App() {
             <Route
               path="/viewer"
               element={
-                <div style={{ maxWidth: '1000px' }}>
-                  {/* <PlyViewer /> */}
-                </div>
+                <div style={{ maxWidth: '1000px' }}>{/* <PlyViewer /> */}</div>
               }
             />
             <Route

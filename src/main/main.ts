@@ -385,7 +385,7 @@ ipcMain.on('save-file', (event, file, data, historical) => {
     console.error('Missing patient, timeline, or directoryPath');
     return;
   }
-
+  // const masterjsonpath = path.join(directoryPath, 'dataset_master.json');
   // Construct the proper folder structure based on the patient ID and timeline
   let patientDir = path.join(directoryPath, `sub-${patient.id}`);
   let sessionDir = path.join(patientDir, `ses-${timeline}`);
@@ -487,6 +487,19 @@ ipcMain.on('save-file-clinical', (event, data, historical) => {
     // Write the data to the file
     fs.writeFileSync(filePath, dataString);
 
+    // const masterjsonpath = path.join(directoryPath, 'dataset_master.json');
+    // const jsonData = fs.readFileSync(masterjsonpath, 'utf-8');
+    // let patientId = patient.id.replace('-', '_');
+    // const masterjsondata = JSON.parse(jsonData);
+    // // Ensure the timeline session exists
+    // if (!masterjsondata[patientId]['clinicalData'][`ses_${timeline}`]) {
+    //   masterjsondata[patientId]['clinicalData'][`ses_${timeline}`] = [];
+    // }
+
+    // // Now it's safe to push filePath
+    // masterjsondata[patientId]['clinicalData'][`ses_${timeline}`].push(filePath);
+    // fs.writeFileSync(masterjsonpath, JSON.stringify(masterjsondata));
+
     // Send the file path back to the renderer process
     event.reply('file-saved', filePath);
 
@@ -555,47 +568,58 @@ ipcMain.on('database-group-figures', (event, directoryPath) => {
   event.reply('database-group-figures', databaseData);
 });
 
-ipcMain.handle('get-clinical-data', async (event, directoryPath, patientsWithTimelines) => {
-  try {
-    // Loop through each patient and their respective timelines
-    const allClinicalData = await Promise.all(
-      patientsWithTimelines.map(async ({ id, timelines }) => {
-        const patientClinicalData = {};
+ipcMain.handle(
+  'get-clinical-data',
+  async (event, directoryPath, patientsWithTimelines) => {
+    try {
+      // Loop through each patient and their respective timelines
+      const allClinicalData = await Promise.all(
+        patientsWithTimelines.map(async ({ id, timelines }) => {
+          const patientClinicalData = {};
 
-        for (const timeline of timelines) {
-          // Construct the path based on the new directory structure
-          const sessionPath = path.join(
-            directoryPath,
-            'derivatives',
-            'leaddbs',
-            id,
-            'clinical',
-            `ses-${timeline}`
-          );
-          const clinicalFilePath = path.join(sessionPath, `${id}_ses-${timeline}_clinical.json`);
+          for (const timeline of timelines) {
+            // Construct the path based on the new directory structure
+            const sessionPath = path.join(
+              directoryPath,
+              'derivatives',
+              'leaddbs',
+              id,
+              'clinical',
+              `ses-${timeline}`,
+            );
+            const clinicalFilePath = path.join(
+              sessionPath,
+              `${id}_ses-${timeline}_clinical.json`,
+            );
 
-          try {
-            // Check if the clinical.json file exists, then read and parse it
-            if (fs.existsSync(clinicalFilePath)) {
-              const clinicalData = JSON.parse(await fs.promises.readFile(clinicalFilePath, 'utf-8'));
-              patientClinicalData[timeline] = clinicalData;
+            try {
+              // Check if the clinical.json file exists, then read and parse it
+              if (fs.existsSync(clinicalFilePath)) {
+                const clinicalData = JSON.parse(
+                  await fs.promises.readFile(clinicalFilePath, 'utf-8'),
+                );
+                patientClinicalData[timeline] = clinicalData;
+              }
+            } catch (error) {
+              console.error(
+                `Error reading clinical.json for patient ${id}, session ${timeline}:`,
+                error,
+              );
             }
-          } catch (error) {
-            console.error(`Error reading clinical.json for patient ${id}, session ${timeline}:`, error);
           }
-        }
 
-        // Return the structured data for the patient
-        return { id, clinicalData: patientClinicalData };
-      })
-    );
+          // Return the structured data for the patient
+          return { id, clinicalData: patientClinicalData };
+        }),
+      );
 
-    return allClinicalData; // Returns an array with each patient's clinical data structured by timeline
-  } catch (error) {
-    console.error('Error fetching clinical data:', error);
-    throw error;
-  }
-});
+      return allClinicalData; // Returns an array with each patient's clinical data structured by timeline
+    } catch (error) {
+      console.error('Error fetching clinical data:', error);
+      throw error;
+    }
+  },
+);
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');

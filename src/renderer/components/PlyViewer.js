@@ -6,6 +6,7 @@ import * as nifti from 'nifti-reader-js'; // Correctly importing the nifti modul
 import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 import { Tabs, Tab, Collapse, Button, Form, Modal } from 'react-bootstrap';
 import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings icon
+// import { remote } from 'electron'; // Use 'electron' for Electron v12+
 
 function PlyViewer({
   quantities,
@@ -1436,6 +1437,17 @@ function PlyViewer({
       // changePrimaryCameraAngle();
     }
   }, [recoData]);
+
+  // useEffect(() => {
+  //   const mainWindow = remote.getCurrentWindow();
+  //   if (open) {
+  //     // Increase the window height when the Collapse is open
+  //     mainWindow.setSize(mainWindow.getSize()[0], mainWindow.getSize()[1] + 300);
+  //   } else {
+  //     // Decrease the window height when the Collapse is closed
+  //     mainWindow.setSize(mainWindow.getSize()[0], mainWindow.getSize()[1] - 300);
+  //   }
+  // }, [open]);
 
   // useEffect(() => {
   //   // Example: Resize window to 1024x768 on component load

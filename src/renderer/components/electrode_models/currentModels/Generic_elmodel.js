@@ -3749,10 +3749,14 @@ function Generic_elmodel(props, ref) {
             >
               Refactor
             </Button>
-            <Button onClick={handleClearButton} className="button">
+            <Button onClick={handleClearButton}
+            className="button"
+            >
               Clear
             </Button>
-            <Button onClick={handleOpenViewer} className="button">
+            <Button onClick={handleOpenViewer}
+            className="button"
+            >
               {showViewer ? 'Close Viewer' : 'Open Viewer'}
             </Button>
           </ButtonGroup>

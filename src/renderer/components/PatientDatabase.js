@@ -15,6 +15,8 @@ import {
   TableSortLabel,
   Select,
   MenuItem,
+  AppBar,
+  Toolbar,
 } from '@mui/material';
 import { Edit, Delete, Save, Cancel } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -226,15 +228,33 @@ function PatientDatabase({ key, directoryPath }) {
         variant="h3"
         style={{
           fontWeight: 'bold',
-          marginBottom: '20px',
+          marginBottom: '-20px',
           textAlign: 'center',
         }}
       >
         DBS Database
       </Typography>
+      {/* <AppBar
+        position="static"
+        style={{ backgroundColor: '#1a73e8', marginBottom: '20px' }}
+      >
+        <Toolbar>
+          <Typography
+            variant="h3"
+            style={{
+              fontWeight: 'bold',
+              textAlign: 'center',
+              flexGrow: 1,
+              color: '#fff',
+            }}
+          >
+            DBS Database
+          </Typography>
+        </Toolbar>
+      </AppBar> */}
 
       {/* Search Bar */}
-      <div className="search-container" style={{ textAlign: 'right' }}>
+      {/* <div className="search-container" style={{ textAlign: 'right' }}>
         <TextField
           label="Search"
           variant="outlined"
@@ -244,11 +264,22 @@ function PatientDatabase({ key, directoryPath }) {
           InputLabelProps={{ style: { fontSize: '14px' } }} // Label font size
           InputProps={{ style: { fontSize: '14px' } }} // Input font size
         />
-      </div>
+      </div> */}
 
       <Container style={{ display: 'flex', flexDirection: 'column' }}>
         {/* Patient Table */}
-        <Button
+        {/* <div className="search-container" style={{ textAlign: 'right' }}>
+          <TextField
+            label="Search"
+            variant="outlined"
+            margin="normal"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputLabelProps={{ style: { fontSize: '14px' } }} // Label font size
+            InputProps={{ style: { fontSize: '14px' } }} // Input font size
+          />
+        </div> */}
+        {/* <Button
           variant="contained"
           color="default"
           onClick={() => setEditMode((prev) => !prev)}
@@ -325,62 +356,128 @@ function PatientDatabase({ key, directoryPath }) {
           }}
         >
           Add Patient
-        </Button>
+        </Button> */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            marginBottom: '-20px',
+          }}
+        >
+          {/* Search Field */}
+          {!editMode && (
+            <TextField
+              label="Search"
+              variant="standard"
+              margin="normal"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputLabelProps={{ style: { fontSize: '14px' } }}
+              InputProps={{ style: { fontSize: '14px' } }}
+            />
+          )}
+          {/* <TextField
+            label="Search"
+            variant="outlined"
+            margin="normal"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputLabelProps={{ style: { fontSize: '14px' } }}
+            InputProps={{ style: { fontSize: '14px' } }}
+          /> */}
+
+          {/* Edit Mode Button */}
+          <Button
+            // variant="contained"
+            // color="default"
+            onClick={() => setEditMode((prev) => !prev)}
+            style={{ width: editMode ? '180px' : '180px' }}
+          >
+            {editMode ? 'Close Edit Mode' : 'Edit Table Columns'}
+          </Button>
+
+          {/* Conditionally Rendered New Column Controls */}
+          {editMode && (
+            <>
+              <TextField
+                label="New Column ID"
+                value={newColumnId}
+                onChange={(e) => setNewColumnId(e.target.value)}
+                variant="outlined"
+                size="small"
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  addColumn(newColumnId, newColumnId);
+                  setNewColumnId('');
+                }}
+              >
+                Add Column
+              </Button>
+              <Select
+                value={columnToDelete}
+                onChange={(e) => setColumnToDelete(e.target.value)}
+                displayEmpty
+                style={{ minWidth: '150px' }}
+              >
+                <MenuItem value="" disabled>
+                  Select column to delete
+                </MenuItem>
+                {columns.map((column) => (
+                  <MenuItem key={column.id} value={column.id}>
+                    {column.label}
+                  </MenuItem>
+                ))}
+              </Select>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => {
+                  removeColumn(columnToDelete);
+                  setColumnToDelete('');
+                }}
+              >
+                Remove Column
+              </Button>
+            </>
+          )}
+
+          {/* Add Patient Button */}
+          {!editMode && (
+            <Button
+              // variant="contained"
+              // color="primary"
+              onClick={addPatient}
+              style={{
+                fontSize: '14px',
+                padding: '10px 20px',
+                marginLeft: 'auto',
+              }}
+            >
+              Add Patient
+            </Button>
+          )}
+          {/* <Button
+            variant="contained"
+            color="primary"
+            onClick={addPatient}
+            style={{
+              fontSize: '14px',
+              padding: '10px 20px',
+              marginLeft: 'auto',
+            }}
+          >
+            Add Patient
+          </Button> */}
+        </div>
         <TableContainer
           component={Paper}
           style={{ flex: 1, marginTop: '20px' }}
         >
           <Table>
-            {/* <TableHead>
-              <TableRow>
-                <TableCell>
-                  <TableSortLabel
-                    active={orderBy === 'id'}
-                    direction={orderBy === 'id' ? order : 'asc'}
-                    onClick={() => handleRequestSort('id')}
-                  >
-                    ID
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={orderBy === 'name'}
-                    direction={orderBy === 'name' ? order : 'asc'}
-                    onClick={() => handleRequestSort('name')}
-                  >
-                    Name
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={orderBy === 'age'}
-                    direction={orderBy === 'age' ? order : 'asc'}
-                    onClick={() => handleRequestSort('age')}
-                  >
-                    Age
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={orderBy === 'gender'}
-                    direction={orderBy === 'gender' ? order : 'asc'}
-                    onClick={() => handleRequestSort('gender')}
-                  >
-                    Gender
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={orderBy === 'diagnosis'}
-                    direction={orderBy === 'diagnosis' ? order : 'asc'}
-                    onClick={() => handleRequestSort('diagnosis')}
-                  >
-                    Diagnosis
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead> */}
             <TableHead>
               <TableRow>
                 {/* <TableCell>ID</TableCell> */}
@@ -407,110 +504,6 @@ function PatientDatabase({ key, directoryPath }) {
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
-            {/* <TableBody>
-              {filteredPatients.map((patient) => (
-                <TableRow key={patient.id}>
-                  <TableCell
-                    style={{
-                      cursor: editRowId === patient.id ? 'default' : 'pointer',
-                      color: editRowId === patient.id ? 'black' : 'blue',
-                    }}
-                    onClick={
-                      editRowId !== patient.id
-                        ? () =>
-                            navigate(`/patient/${patient.id}`, {
-                              state: { patient },
-                            })
-                        : undefined
-                    }
-                  >
-                    {editRowId === patient.id ? (
-                      <TextField
-                        value={editedPatient.id || ''}
-                        name="id"
-                        onChange={handleEditChange}
-                      />
-                    ) : (
-                      patient.id
-                    )}
-                  </TableCell>
-                  <TableCell onClick={() => handleEditClick(patient)}>
-                    {editRowId === patient.id ? (
-                      <TextField
-                        value={editedPatient.name || ''}
-                        name="name"
-                        onChange={handleEditChange}
-                      />
-                    ) : (
-                      patient.name
-                    )}
-                  </TableCell>
-                  <TableCell onClick={() => handleEditClick(patient)}>
-                    {editRowId === patient.id ? (
-                      <TextField
-                        value={editedPatient.age || ''}
-                        name="age"
-                        onChange={handleEditChange}
-                      />
-                    ) : (
-                      patient.age
-                    )}
-                  </TableCell>
-                  <TableCell onClick={() => handleEditClick(patient)}>
-                    {editRowId === patient.id ? (
-                      <TextField
-                        value={editedPatient.gender || ''}
-                        name="gender"
-                        onChange={handleEditChange}
-                      />
-                    ) : (
-                      patient.gender
-                    )}
-                  </TableCell>
-                  <TableCell onClick={() => handleEditClick(patient)}>
-                    {editRowId === patient.id ? (
-                      <TextField
-                        value={editedPatient.diagnosis || ''}
-                        name="diagnosis"
-                        onChange={handleEditChange}
-                      />
-                    ) : (
-                      patient.diagnosis
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {editRowId === patient.id ? (
-                      <>
-                        <IconButton onClick={handleSaveClick} color="primary">
-                          <Save />
-                        </IconButton>
-                        <IconButton
-                          onClick={handleCancelClick}
-                          color="secondary"
-                        >
-                          <Cancel />
-                        </IconButton>
-                      </>
-                    ) : (
-                      <>
-                        <IconButton
-                          onClick={() => handleEditClick(patient)}
-                          color="primary"
-                        >
-                          <Edit />
-                        </IconButton>
-                        <IconButton
-                          onClick={() => deletePatient(patient.id)}
-                          color="secondary"
-                        >
-                          <Delete />
-                        </IconButton>
-                      </>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody> */}
             <TableBody>
               {filteredPatients.map((patient) => (
                 <TableRow key={patient.id}>
