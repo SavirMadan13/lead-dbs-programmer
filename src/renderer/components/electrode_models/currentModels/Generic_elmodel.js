@@ -3649,7 +3649,7 @@ function Generic_elmodel(props, ref) {
         {svgs.map((svg) => (
           <div
             className="image-item"
-            style={{ zIndex: calculateZIndex(svg.key) }}
+            // style={{ zIndex: calculateZIndex(svg.key) }}
           >
             <div className="image-container">
               {React.cloneElement(svg, {

@@ -29,7 +29,8 @@ console.error = () => {};
 // console.log(args);
 // const inputFilePath = args[0]; // Get the first argument
 // const inputFilePath = process.argv[1];
-const inputFilePath = '/Users/savirmadan/Downloads/inputData.json';
+// const inputFilePath = '/Users/savirmadan/Downloads/inputData.json';
+const inputFilePath = '/Users/savirmadan/Downloads/BIDS/derivatives/leaddbs/sub-pt/stimulations/MNI152NLin2009bAsym/inputData.json';
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
