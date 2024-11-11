@@ -3415,19 +3415,21 @@ function Generic_elmodel(props, ref) {
             onChange={handleVisModelChange}
           >
             <option>Choose a model</option>
-            <option value="1">Dembek 2017</option>
+            {elspec.isdirected !== 1 && (<option value="1">Dembek 2017</option>)}
             <option value="2">FastField (Baniasadi 2020)</option>
             <option value="3">SimBio/FieldTrip (see Horn 2017)</option>
-            <option value="4">Kuncel 2008</option>
-            <option value="5">Maedler 2012</option>
+            {elspec.isdirected === 0 && (<option value="4">Kuncel 2008</option>)}
+            {elspec.isdirected === 0 && (<option value="5">Maedler 2012</option>)}
             <option value="6">OSS-DBS (Butenko 2020)</option>
           </Form.Select>
           <div>
-            <Form.Check
-              label={<span style={{ color: 'black' }}>Estimate in template space</span>}
-              checked={templateSpace === 1}
-              onChange={handleCheckboxChange}
-            />
+            {(visModel === '3' || visModel === '6') && (
+              <Form.Check
+                label={<span style={{ color: 'black' }}>Estimate in template space</span>}
+                checked={templateSpace === 1}
+                onChange={handleCheckboxChange}
+              />
+            )}
           </div>
           {/* <div /> */}
           <div className="PercentageAmplitudeToggle">
