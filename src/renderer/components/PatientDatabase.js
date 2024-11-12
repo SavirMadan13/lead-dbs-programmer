@@ -447,18 +447,28 @@ function PatientDatabase({ key, directoryPath }) {
 
           {/* Add Patient Button */}
           {!editMode && (
-            <Button
-              // variant="contained"
-              // color="primary"
-              onClick={addPatient}
-              style={{
-                fontSize: '14px',
-                padding: '10px 20px',
-                // marginLeft: 'auto',
-              }}
-            >
-              Add Patient
-            </Button>
+            <div>
+              <Button
+                // variant="contained"
+                // color="primary"
+                onClick={addPatient}
+                style={{
+                  fontSize: '14px',
+                  padding: '10px 20px',
+                  // marginLeft: 'auto',
+                }}
+              >
+                Add Patient
+              </Button>
+              <Button
+                // variant="contained"
+                // color="default"
+                onClick={() => navigate('/groupstats')}
+                style={{ marginLeft: '5px' }}
+              >
+                Group Stats
+              </Button>
+            </div>
           )}
           {/* <Button
             variant="contained"
@@ -581,9 +591,10 @@ function PatientDatabase({ key, directoryPath }) {
         </TableContainer>
       </Container>
       <div>
-        {directoryPath && patients.length > 0 && (
-          <DatabaseStats patients={patients} directoryPath={directoryPath} />
-        )}
+        {/* {directoryPath && patients.length > 0 && (
+          // <DatabaseStats patients={patients} directoryPath={directoryPath} />
+          <button onClick={() => navigate('/groupstats')}>Group Stats</button>
+        )} */}
       </div>
     </div>
   );

@@ -14,6 +14,7 @@ import PlyViewer from './components/PlyViewer';
 import PlyViewerWithVTA from './components/PlyViewerWithVTA';
 import CustomTable from './components/CustomTable';
 import GroupStats from './components/GroupStats';
+import DatabaseStats from './components/DatabaseStats';
 
 export default function App() {
   const [directoryPath, setDirectoryPath] = useState(null);
@@ -203,6 +204,14 @@ export default function App() {
               element={
                 <div style={{ maxWidth: '1000px' }}>
                   <GroupStats />
+                </div>
+              }
+            />
+            <Route
+              path="/groupstats"
+              element={
+                <div style={{ maxWidth: '1000px' }}>
+                  <DatabaseStats directoryPath={directoryPath} />
                 </div>
               }
             />

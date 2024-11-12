@@ -5,6 +5,7 @@ import { Form, Button, Table, Container } from 'react-bootstrap';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import * as XLSX from 'xlsx';
+import HomeIcon from '@mui/icons-material/Home';
 import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 import PairedTTestComponent from './PairedTTestComponent';
 import BoxPlotComponent from './BoxPlotComponent';
@@ -430,7 +431,15 @@ function GroupStats() {
     <div>
       <div>
         <Container>
-          <h4>Choose Score Type</h4>
+          <HomeIcon
+            onClick={() => navigate('/')}
+            style={{
+              fontSize: '36px', // Customize size
+              color: '#1a73e8', // Customize color
+              cursor: 'pointer', // Add pointer cursor on hover
+              margin: '0 10px', // Add some margin for spacing
+            }}
+          />
           <Form.Select
             value={selectedScoreType}
             onChange={(e) => handleScoreChange(e.target.value)}

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import HomeIcon from '@mui/icons-material/Home';
 import PairedTTestComponent from './PairedTTestComponent';
 import BoxPlotComponent from './BoxPlotComponent';
 import LateralityAnalysisComponent from './LateralityAnalysisComponent';
@@ -12,6 +14,7 @@ function UPDRSAnalysisComponent({ currentStage, rawData }) {
   console.log(rawData);
   const [analysisType, setAnalysisType] = useState('all');
   const [showPercentage, setShowPercentage] = useState(true);
+  const navigate = useNavigate(); // Initialize the navigate hook
 
   const handleAnalysisChange = (e) => {
     setAnalysisType(e.target.value);
