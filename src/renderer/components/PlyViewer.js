@@ -195,6 +195,8 @@ function PlyViewer({
     { name: 'Boutet et al 2024 - Bradykinesia', coords: [12.2, -13, -4.4] },
     { name: 'Dembek et al - Motor', coords: [13.3, -13.5, -5.4] },
     { name: 'Avoidance coordinate - test', coords: [12.73, -14.36, -6.7] },
+    { name: 'Low connectivity sbc', coords: [11.57, -12.84, -7.51] },
+    { name: 'High connectivity sbc', coords: [8.6, -9.8, -9.4] },
   ]);
 
   // Handle input change for new tremor data
@@ -1612,6 +1614,13 @@ function PlyViewer({
     setSelectedValues(updatedSelectedValues);
   };
 
+  const cylinderSurfaceArea = (diameter, height, n_contacts=1) => {
+    const radius = diameter / 2;
+    const contact_area = 2 * Math.PI * radius * height
+    const directional_area = contact_area / n_contacts
+    return directional_area
+  };
+
   const handleSTNParameters = () => {
     const STNCoords = new THREE.Vector3(11.28, -13.92, -9.02);
     let bestQuantities = {};
@@ -2136,7 +2145,7 @@ function PlyViewer({
                     <Button variant="primary" onClick={handleAvoidance}>
                       Avoid
                     </Button>
-                    <span>{solutionText}</span>
+                    {/* <span>{solutionText}</span> */}
                   </div>
                 </div>
               </Tab>
