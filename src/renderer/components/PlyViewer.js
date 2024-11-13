@@ -10,11 +10,16 @@ import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings
 
 function PlyViewer({
   quantities,
+  setQuantities,
+  selectedValues,
+  setSelectedValues,
   amplitude,
+  setAmplitude,
   side,
   historical,
   togglePosition,
   tab,
+  names,
 }) {
   const [plyFile, setPlyFile] = useState(null);
   const mountRef = useRef(null);
@@ -35,6 +40,7 @@ function PlyViewer({
   const [open, setOpen] = useState(false);
   const [recoData, setRecoData] = useState(null);
   const [elecCoords, setElecCoords] = useState(null);
+  const [roi, setRoi] = useState('tremor-0');
 
   // Thresholding/Modification stuff
 
@@ -156,6 +162,8 @@ function PlyViewer({
   const [showModal, setShowModal] = useState(false);
   const [showPDModal, setShowPDModal] = useState(false);
   const [newPD, setNewPD] = useState({ name: '', coords: [0, 0, 0] });
+  const [solutionText, setSolutionText] = useState('');
+  const [stimParams, setStimParams] = useState({});
   const [tremorData, setTremorData] = useState([
     { name: 'Papavassilliou et al', coords: [14.5, -17.7, -2.8] },
     { name: 'Hamel et al', coords: [13.79, -18.04, -1.06] },
@@ -186,6 +194,7 @@ function PlyViewer({
     { name: 'Akram et al 2017 - Tremor', coords: [11, -12, -6] },
     { name: 'Boutet et al 2024 - Bradykinesia', coords: [12.2, -13, -4.4] },
     { name: 'Dembek et al - Motor', coords: [13.3, -13.5, -5.4] },
+    { name: 'Avoidance coordinate - test', coords: [12.73, -14.36, -6.7] },
   ]);
 
   // Handle input change for new tremor data
@@ -507,6 +516,16 @@ function PlyViewer({
     4: 4,
   };
   if (Object.keys(quantities).length > 6) {
+    // contactDirections = {
+    //   1: { x: 0, y: 0, z: 0 }, // Example directional adjustment for contact 1
+    //   2: { x: 1, y: 0, z: 0 }, // Contact 2 adjustment
+    //   3: { x: -0.5, y: -0.86, z: 0 }, // Contact 3 adjustment
+    //   4: { x: -0.5, y: 0.86, z: 0 }, // Contact 4 adjustment
+    //   5: { x: 1, y: 0, z: 0 }, // Contact 5 adjustment
+    //   6: { x: -0.5, y: -0.86, z: 0 }, // Contact 6 adjustment
+    //   7: { x: -0.5, y: 0.86, z: 0 }, // Contact 7 adjustment
+    //   8: { x: 0, y: 0, z: 0 }, // Contact 8 adjustment
+    // };
     contactDirections = {
       1: { x: 0, y: 0, z: 0 }, // Example directional adjustment for contact 1
       2: { x: 1, y: 0, z: 0 }, // Contact 2 adjustment
@@ -756,10 +775,10 @@ function PlyViewer({
       let contactQuantity = parseFloat(quantities[contactId]);
       let newAmplitude = amplitude;
       // if (togglePosition === 'center') {
-        const newQuantities = processedData.filteredQuantities[side];
-        console.log(newQuantities);
-        newAmplitude = processedData.newTotalAmplitude[side];
-        console.log(newAmplitude);
+      const newQuantities = processedData.filteredQuantities[side];
+      console.log(newQuantities);
+      newAmplitude = processedData.newTotalAmplitude[side];
+      console.log(newAmplitude);
       // }
       contactQuantity = parseFloat(newQuantities[contactId]);
 
@@ -927,6 +946,7 @@ function PlyViewer({
     return updatedQuantities;
   };
 
+  // VTA
   const updateSpherePosition = () => {
     const scene = sceneRef.current;
     if (!scene) return;
@@ -1422,7 +1442,11 @@ function PlyViewer({
 
     if (camera) {
       // Calculate the direction vector by subtracting startCoords from endCoords
-      const focalPoint = new THREE.Vector3(startCoords.x, camera.position.y, camera.position.z);
+      const focalPoint = new THREE.Vector3(
+        startCoords.x,
+        camera.position.y,
+        camera.position.z,
+      );
       camera.position.copy(focalPoint); // Move the camera to the calculated point
       camera.rotation.set(0.8, 0, 0, 'XYZ');
       camera.lookAt(startCoords);
@@ -1437,6 +1461,301 @@ function PlyViewer({
       // changePrimaryCameraAngle();
     }
   }, [recoData]);
+
+  // const findNearestCoordinate = (target, coordinates) => {
+  //   const [x1, y1, z1] = target;
+  //   let minIndex = -1;
+  //   let minDistance = Infinity;
+
+  //   coordinates.forEach(([x2, y2, z2], index) => {
+  //     const distance = Math.sqrt(
+  //       Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2) + Math.pow(z2 - z1, 2),
+  //     );
+  //     if (distance < minDistance) {
+  //       minDistance = distance;
+  //       minIndex = index;
+  //     }
+  //   });
+  //   return minIndex;
+  // };
+
+  // const findNearestCoordinate = (target, coordinates) => {
+  //   const [x1, y1, z1] = target;
+  //   let minIndex = -1;
+  //   let minDistance = Infinity;
+  //   const coordinateDistances = [];
+  //   coordinates.forEach(([x2, y2, z2], index) => {
+  //     const distance = Math.sqrt(
+  //       (x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2,
+  //     );
+  //     // coordinateDistances.push(distance);
+  //     if (distance < minDistance) {
+  //       minDistance = distance;
+  //       minIndex = index;
+  //     }
+  //   });
+
+  //   return {
+  //     index: minIndex,
+  //     distance: minDistance,
+  //     distanceArray: coordinateDistances,
+  //   };
+  // };
+
+  const findNearestCoordinate = (target, coordinates) => {
+    const [x1, y1, z1] = target;
+    let minIndex = -1;
+    let minDistance = Infinity;
+    const coordinateDistances = coordinates.map(([x2, y2, z2], index) => {
+      const distance = Math.sqrt(
+        (x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2,
+      );
+      if (distance < minDistance) {
+        minDistance = distance;
+        minIndex = index;
+      }
+      return { index, distance };
+    });
+
+    // Sort distances to assign ranks
+    const rankedDistances = [...coordinateDistances]
+      .sort((a, b) => a.distance - b.distance)
+      .map((item, rank) => ({ ...item, rank: rank + 1 })); // Rank starts from 1
+
+    return {
+      index: minIndex,
+      distance: minDistance,
+      distanceArray: rankedDistances, // Array with distances and ranks
+    };
+  };
+
+  const calvinsGoodness = (candidate, target, avoidance) => {
+    const euclideanDistance = (point1, point2) => {
+      const [x1, y1, z1] = point1;
+      const [x2, y2, z2] = point2;
+      return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2);
+    };
+
+    const distanceToTarget = euclideanDistance(candidate, target);
+    const distanceToAvoidance = euclideanDistance(candidate, avoidance);
+    const sum = distanceToTarget + distanceToAvoidance;
+
+    // Calculate the normalized goodness score
+    return (distanceToAvoidance - distanceToTarget) / sum;
+  };
+
+  const findOptimalCoordinate = (target, avoidance, candidates) => {
+    const scores = candidates.map((candidate, index) => ({
+      index,
+      score: calvinsGoodness(candidate, target, avoidance),
+    }));
+
+    // Sort by score in descending order (best to worst)
+    scores.sort((a, b) => b.score - a.score);
+
+    const bestIndex = scores[0].index;
+    const rankedIndices = scores.map((item) => item.index);
+    const [x1, y1, z1] = target;
+    const [x2, y2, z2] = candidates[bestIndex];
+    const distance = Math.sqrt(
+      (x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2,
+    );
+
+    return { bestIndex, rankedIndices, distance };
+  };
+
+  // const calculateAmplitude = (distance, k = 1.3) => {
+  //   console.log(distance);
+  //   return (distance / k) ** 2;
+  // };
+
+  const calculateAmplitude = (distance, k = 1.3) => {
+    const tmpAmp = (distance / k) ** 2;
+    return Math.round(tmpAmp * 10) / 10;
+  };
+
+  // const calculateAmplitude = (distance, k = 0.22) => {
+  //   const tmpAmp = k * distance ** 2 - 0.1;
+  //   return Math.round(tmpAmp * 10) / 10;
+  // };
+
+  const getCoordsForRoi = () => {
+    // Determine if selected roi is from tremorData or pdData
+    const [dataType, index] = roi.split('-');
+    const data = dataType === 'tremor' ? tremorData : pdData;
+    return data[parseInt(index, 10)].coords;
+  };
+
+  const handleQuantityStateChange = (index, tmpAmp) => {
+    console.log(stimParams);
+    const updatedQuantities = { ...quantities };
+    const updatedSelectedValues = { ...selectedValues };
+    const changedContact = index + 1;
+    Object.keys(updatedQuantities).forEach((contact) => {
+      if (parseFloat(contact) === 0) {
+        return;
+      }
+      if (parseFloat(contact) === changedContact) {
+        updatedSelectedValues[contact] = 'center';
+        if (togglePosition === 'center') {
+          updatedQuantities[contact] = tmpAmp;
+        } else {
+          updatedQuantities[contact] = 100;
+        }
+      } else {
+        updatedQuantities[contact] = 0;
+        updatedSelectedValues[contact] = 'left';
+      }
+    });
+    setAmplitude(tmpAmp);
+    setQuantities(updatedQuantities);
+    setSelectedValues(updatedSelectedValues);
+  };
+
+  const handleSTNParameters = () => {
+    const STNCoords = new THREE.Vector3(11.28, -13.92, -9.02);
+    let bestQuantities = {};
+    let bestAmplitude = amplitude; // Initial amplitude
+    let minDistance = Infinity;
+
+    const newCoords = [];
+
+    let rotationAngle = 0;
+    if (side < 5 && Object.keys(quantities).length > 6) {
+      rotationAngle = recoData.directionality.roll_out_left - 60;
+    } else {
+      rotationAngle = recoData.directionality.roll_out_right - 120;
+    }
+    const rotationQuaternion = new THREE.Quaternion();
+    rotationQuaternion.setFromAxisAngle(
+      new THREE.Vector3(0, 0, 1),
+      THREE.MathUtils.degToRad(rotationAngle),
+    ); // Z-axis rotation
+
+    Object.keys(contactDirections).forEach((contactId) => {
+      console.log(togglePosition);
+      let contactQuantity = parseFloat(quantities[contactId]);
+      if (togglePosition === 'center') {
+        const newQuantities = calculatePercentageFromAmplitude();
+        contactQuantity = parseFloat(newQuantities[contactId]);
+      }
+
+      // If contactQuantity is greater than 0, add or update the sphere
+      // Check if the sphere already exists in VTASpheresRef
+      // if (!VTASpheresRef[contactId]) {
+      // Calculate position and amplitude
+      console.log('PLYViewer', quantities, keyLevels, contactDirections);
+      const vectorLevel = keyLevels[contactId];
+      const clampedLevel = Math.min(Math.max(vectorLevel, 1), 4);
+      const normalizedLevel = (clampedLevel - 1) / (4 - 1);
+
+      let startCoords = [];
+      let targetCoords = [];
+      if (side < 5) {
+        const { head2: headMarkers, tail2: tailMarkers } = recoData.markers;
+        startCoords = new THREE.Vector3(...headMarkers);
+        targetCoords = new THREE.Vector3(...tailMarkers);
+      } else {
+        const { head1: headMarkers, tail1: tailMarkers } = recoData.markers;
+        startCoords = new THREE.Vector3(...headMarkers);
+        targetCoords = new THREE.Vector3(...tailMarkers);
+      }
+
+      // Calculate the direction of the electrode
+      const direction = new THREE.Vector3()
+        .subVectors(targetCoords, startCoords)
+        .normalize();
+
+      // Create an orthogonal basis for the electrode
+      const up = new THREE.Vector3(0, 0, 1); // Assuming 'up' is along the global Z-axis
+      const right = new THREE.Vector3().crossVectors(direction, up).normalize();
+      const forward = new THREE.Vector3()
+        .crossVectors(right, direction)
+        .normalize();
+
+      // Linearly interpolate between startCoords and targetCoords based on normalizedLevel
+      const newPosition = startCoords
+        .clone()
+        .lerp(targetCoords, normalizedLevel);
+
+      // Get the direction adjustment for the contact
+      // const directionOffset = contactDirections[contactId];
+
+      // Get the direction offset for the contact
+      const directionOffset = new THREE.Vector3(
+        contactDirections[contactId].x,
+        contactDirections[contactId].y,
+        contactDirections[contactId].z,
+      );
+
+      // Apply the rotation to the directionOffset using the quaternion
+      directionOffset.applyQuaternion(rotationQuaternion);
+
+      // Apply the direction offset to the newPosition relative to the electrode’s orientation
+      newPosition.x +=
+        right.x * directionOffset.x +
+        forward.x * directionOffset.y +
+        direction.x * directionOffset.z;
+      newPosition.y +=
+        right.y * directionOffset.x +
+        forward.y * directionOffset.y +
+        direction.y * directionOffset.z;
+      newPosition.z +=
+        right.z * directionOffset.x +
+        forward.z * directionOffset.y +
+        direction.z * directionOffset.z;
+
+      newCoords.push([newPosition.x, newPosition.y, newPosition.z]);
+    });
+
+    console.log('NewCoords: ', newCoords);
+    setElecCoords(newCoords);
+    console.log('Roi coords: ', getCoordsForRoi());
+    const sweetspotCoord = getCoordsForRoi();
+    const coordinateOutput = findNearestCoordinate(sweetspotCoord, newCoords);
+    const activeContact = coordinateOutput.index;
+    const activeAmplitude = calculateAmplitude(coordinateOutput.distance);
+    console.log(coordinateOutput.distanceArray);
+    console.log(activeAmplitude);
+    console.log(activeContact);
+    setStimParams({
+      index: activeContact + 1,
+      amplitude: activeAmplitude,
+      distanceMaster: coordinateOutput.distanceArray,
+    });
+    const outputText = `Active Contact: ${
+      names[activeContact + 1]
+    }, Amplitude: ${activeAmplitude}`;
+    setSolutionText(outputText);
+    handleQuantityStateChange(activeContact, activeAmplitude);
+  };
+
+  const handleAddContacts = () => {
+    console.log(stimParams);
+    const newIndex = stimParams.distanceMaster[1].index;
+    const newContact = newIndex + 1;
+    const outputText = `Active Contacts: ${names[stimParams.distanceMaster[0].index + 1]} and ${names[newContact]}, Amplitude: ${stimParams.amplitude}`;
+    setSolutionText(outputText);
+  };
+
+  const handleAvoidance = () => {
+    const avoidCoord = [12.73, -14.36, -6.7];
+    const sweetspotCoord = getCoordsForRoi();
+    const { bestIndex, rankedIndices, distance } = findOptimalCoordinate(sweetspotCoord, avoidCoord, elecCoords);
+    console.log(bestIndex);
+    const newContact = bestIndex + 1;
+    const outputText = `${names[newContact]}`;
+    const newAmplitude = calculateAmplitude(distance);
+    setSolutionText(outputText);
+    const outputAmplitude = newAmplitude < 5 ? newAmplitude : stimParams.amplitude;
+    // handleQuantityStateChange(bestIndex, stimParams.amplitude);
+    handleQuantityStateChange(bestIndex, outputAmplitude);
+  };
+
+  const handleRoiChange = (event) => {
+    console.log(event.target.value);
+    setRoi(event.target.value);
+  };
 
   // useEffect(() => {
   //   const mainWindow = remote.getCurrentWindow();
@@ -1528,7 +1847,11 @@ function PlyViewer({
               {/* Tab for Atlases */}
               <Tab eventKey="atlases" title="Atlases">
                 <div style={controlPanelStyle2}>
-                  <select onChange={handleFileChange} multiple style={{ height: '500px', width: '300px' }}>
+                  <select
+                    onChange={handleFileChange}
+                    multiple
+                    style={{ height: '500px', width: '300px' }}
+                  >
                     {plyFiles.map((file, index) => (
                       <option key={index} value={index}>
                         {file.name}
@@ -1539,7 +1862,11 @@ function PlyViewer({
               </Tab>
               <Tab eventKey="priorStims" title="Patient Database">
                 <div style={controlPanelStyle2}>
-                  <select onChange={handlePriorStimChange} multiple style={{ height: '500px', width: '300px' }}>
+                  <select
+                    onChange={handlePriorStimChange}
+                    multiple
+                    style={{ height: '500px', width: '300px' }}
+                  >
                     {priorStims &&
                       Object.keys(priorStims).map((patientId, index) => (
                         <optgroup key={index} label={patientId}>
@@ -1564,7 +1891,11 @@ function PlyViewer({
                 <Tabs defaultActiveKey="tremor" id="nested-tabs-inside">
                   <Tab eventKey="tremor" title="Tremor">
                     <div style={controlPanelStyle2}>
-                      <select onChange={handleTremorChange} multiple style={{ height: '500px', width: '300px' }}>
+                      <select
+                        onChange={handleTremorChange}
+                        multiple
+                        style={{ height: '500px', width: '300px' }}
+                      >
                         {tremorData.map((tremor, index) => (
                           <option key={index} value={index}>
                             {tremor.name}
@@ -1660,8 +1991,12 @@ function PlyViewer({
                     </div>
                   </Tab>
                   <Tab eventKey="pd" title="PD">
-                  <div style={controlPanelStyle2}>
-                      <select onChange={handlePDChange} multiple style={{ height: '500px', width: '300px' }}>
+                    <div style={controlPanelStyle2}>
+                      <select
+                        onChange={handlePDChange}
+                        multiple
+                        style={{ height: '500px', width: '300px' }}
+                      >
                         {pdData.map((tremor, index) => (
                           <option key={index} value={index}>
                             {tremor.name}
@@ -1757,6 +2092,53 @@ function PlyViewer({
                     </div>
                   </Tab>
                 </Tabs>
+              </Tab>
+              <Tab eventKey="solution" title="Automatic Solution">
+                <div>
+                  <select
+                    id="options"
+                    style={{ width: '200px' }}
+                    value={roi}
+                    onChange={handleRoiChange}
+                  >
+                    <optgroup label="Tremor Data">
+                      {tremorData.map((tremor, index) => (
+                        <option
+                          key={`tremor-${index}`}
+                          value={`tremor-${index}`}
+                        >
+                          {tremor.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="PD Data">
+                      {pdData.map((pd, index) => (
+                        <option key={`pd-${index}`} value={`pd-${index}`}>
+                          {pd.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                  </select>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      marginTop: '10px',
+                    }}
+                  >
+                    <Button variant="primary" onClick={handleSTNParameters}>
+                      Provide Solution
+                    </Button>
+                    <Button variant="primary" onClick={handleAddContacts}>
+                      Add Therapy
+                    </Button>
+                    <Button variant="primary" onClick={handleAvoidance}>
+                      Avoid
+                    </Button>
+                    <span>{solutionText}</span>
+                  </div>
+                </div>
               </Tab>
             </Tabs>
           </div>

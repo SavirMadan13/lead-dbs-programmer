@@ -3830,11 +3830,16 @@ function Generic_elmodel(props, ref) {
         >
           <PlyViewer
             quantities={quantities}
+            setQuantities={setQuantities}
+            selectedValues={selectedValues}
+            setSelectedValues={setSelectedValues}
             amplitude={totalAmplitude}
+            setAmplitude={setTotalAmplitude}
             side={props.name}
             historical={props.historical}
             togglePosition={percAmpToggle}
             tab={props.key}
+            names={names}
           />
         </div>
       )}
