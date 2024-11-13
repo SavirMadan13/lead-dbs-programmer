@@ -41,6 +41,7 @@ function PlyViewer({
   const [recoData, setRecoData] = useState(null);
   const [elecCoords, setElecCoords] = useState(null);
   const [roi, setRoi] = useState('tremor-0');
+  const [avoidRoi, setAvoidRoi] = useState('tremor-0');
 
   // Thresholding/Modification stuff
 
@@ -195,8 +196,8 @@ function PlyViewer({
     { name: 'Boutet et al 2024 - Bradykinesia', coords: [12.2, -13, -4.4] },
     { name: 'Dembek et al - Motor', coords: [13.3, -13.5, -5.4] },
     { name: 'Avoidance coordinate - test', coords: [12.73, -14.36, -6.7] },
-    { name: 'Low connectivity sbc', coords: [11.57, -12.84, -7.51] },
-    { name: 'High connectivity sbc', coords: [8.6, -9.8, -9.4] },
+    { name: 'Cognition < 65', coords: [14.3, -13.7, -3.7] },
+    { name: 'Cognition > 65', coords: [7.3, -10.2, -11.7] },
   ]);
 
   // Handle input change for new tremor data
@@ -1588,6 +1589,13 @@ function PlyViewer({
     return data[parseInt(index, 10)].coords;
   };
 
+  const getCoordsForAvoidRoi = () => {
+    // Determine if selected roi is from tremorData or pdData
+    const [dataType, index] = avoidRoi.split('-');
+    const data = dataType === 'tremor' ? tremorData : pdData;
+    return data[parseInt(index, 10)].coords;
+  };
+
   const handleQuantityStateChange = (index, tmpAmp) => {
     console.log(stimParams);
     const updatedQuantities = { ...quantities };
@@ -1604,6 +1612,30 @@ function PlyViewer({
         } else {
           updatedQuantities[contact] = 100;
         }
+      } else {
+        updatedQuantities[contact] = 0;
+        updatedSelectedValues[contact] = 'left';
+      }
+    });
+    setAmplitude(tmpAmp);
+    setQuantities(updatedQuantities);
+    setSelectedValues(updatedSelectedValues);
+  };
+
+  const handleQuantityStateChangeGroup = (indexList, tmpAmp) => {
+    console.log(stimParams);
+    const updatedQuantities = { ...quantities };
+    const updatedSelectedValues = { ...selectedValues };
+
+    Object.keys(updatedQuantities).forEach((contact) => {
+      if (parseFloat(contact) === 0) {
+        return;
+      }
+
+      // Check if the contact is in the list of specified indexes
+      if (indexList.includes(parseFloat(contact) - 1)) {
+        updatedSelectedValues[contact] = 'center';
+        updatedQuantities[contact] = togglePosition === 'center' ? tmpAmp/2 : 100/2;
       } else {
         updatedQuantities[contact] = 0;
         updatedSelectedValues[contact] = 'left';
@@ -1745,10 +1777,13 @@ function PlyViewer({
     const newContact = newIndex + 1;
     const outputText = `Active Contacts: ${names[stimParams.distanceMaster[0].index + 1]} and ${names[newContact]}, Amplitude: ${stimParams.amplitude}`;
     setSolutionText(outputText);
+    handleQuantityStateChangeGroup([stimParams.distanceMaster[0].index, newIndex], stimParams.amplitude)
   };
 
   const handleAvoidance = () => {
-    const avoidCoord = [12.73, -14.36, -6.7];
+    // const avoidCoord = [12.73, -14.36, -6.7];
+    // const avoidCoord = [7.3, -10.2, -11.7];
+    const avoidCoord = getCoordsForAvoidRoi();
     const sweetspotCoord = getCoordsForRoi();
     const { bestIndex, rankedIndices, distance } = findOptimalCoordinate(sweetspotCoord, avoidCoord, elecCoords);
     console.log(bestIndex);
@@ -1764,6 +1799,11 @@ function PlyViewer({
   const handleRoiChange = (event) => {
     console.log(event.target.value);
     setRoi(event.target.value);
+  };
+
+  const handleAvoidanceRoiChange = (event) => {
+    console.log(event.target.value);
+    setAvoidRoi(event.target.value);
   };
 
   // useEffect(() => {
@@ -2104,11 +2144,42 @@ function PlyViewer({
               </Tab>
               <Tab eventKey="solution" title="Automatic Solution">
                 <div>
+                  <h3 style={{fontSize: '14px'}}>Optimize for:</h3>
                   <select
                     id="options"
                     style={{ width: '200px' }}
                     value={roi}
                     onChange={handleRoiChange}
+                  >
+                    <optgroup label="Tremor Data">
+                      {tremorData.map((tremor, index) => (
+                        <option
+                          key={`tremor-${index}`}
+                          value={`tremor-${index}`}
+                        >
+                          {tremor.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="PD Data">
+                      {pdData.map((pd, index) => (
+                        <option key={`pd-${index}`} value={`pd-${index}`}>
+                          {pd.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                  </select>
+                  <div>
+                    <Button variant="primary" onClick={handleSTNParameters}>
+                      Provide Solution
+                    </Button>
+                  </div>
+                  <h3 style={{fontSize: '14px'}}>Avoid:</h3>
+                  <select
+                    id="options"
+                    style={{ width: '200px' }}
+                    value={avoidRoi}
+                    onChange={handleAvoidanceRoiChange}
                   >
                     <optgroup label="Tremor Data">
                       {tremorData.map((tremor, index) => (
@@ -2136,9 +2207,9 @@ function PlyViewer({
                       marginTop: '10px',
                     }}
                   >
-                    <Button variant="primary" onClick={handleSTNParameters}>
+                    {/* <Button variant="primary" onClick={handleSTNParameters}>
                       Provide Solution
-                    </Button>
+                    </Button> */}
                     <Button variant="primary" onClick={handleAddContacts}>
                       Add Therapy
                     </Button>

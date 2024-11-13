@@ -1964,7 +1964,7 @@ function TabbedElectrodeIPGSelection({
                     contactNaming={namingConvention}
                     adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
                     historical={historical}
-                    tempParamInput={tempParamInput}
+                    // tempParamInput={tempParamInput}
                     elspec={electrodeModels[selectedElectrodeRight]}
                     // stimChanged={stimChanged}
                     // setStimChanged={setStimChanged}
