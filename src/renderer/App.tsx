@@ -12,6 +12,7 @@ import StimulationSettings from './components/StimulationSettings';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import GroupArchitecture from './components/GroupArchitecture';
+import { json } from 'node:stream/consumers';
 
 const importData = [];
 
@@ -112,19 +113,46 @@ export default function App() {
     const polarity_R = "C+";
 
     // Setting all contacts to zero
+    // Setting all contacts to zero
     Object.keys(overallQuantities).forEach((key) => {
-      Object.keys(
-        overallQuantities[key].foreach((contact) => {
-          overallQuantities[key][contact] = 0;
-          overallSelectedValues[key][contact] = 'left';
-        }),
-      );
+      Object.keys(overallQuantities[key]).forEach((contact) => {
+        overallQuantities[key][contact] = 0;
+        overallSelectedValues[key][contact] = 'left';
+      });
     });
 
     let activePlusContacts = []; // Array to store all active '+' contacts
     let activeMinusContacts = []; // Array to store all active '-' contacts
     let totalPlusContacts = 0; // Counter for total '+' contacts
     let totalMinusContacts = 0; // Counter for total '-' contacts
+
+    function processContact(part) {
+      if (part.match(/[0-3][a-c]*[+-]?/)) {
+        // Extract the contact level, active letters, and polarity (default to '-')
+        const contactLevel = parseInt(part[0]); // The first character is the level number
+        const activeLetters = part.slice(1).replace(/[+-]/, ''); // Get the letters, skipping polarity
+        const polarity = part.includes('+') ? '+' : '-'; // Default to '-' if not specified
+
+        // Get the range of contacts based on level and active letters
+        const contactRange = getContactsForLevel(contactLevel, activeLetters);
+
+        // Add to the appropriate contact array based on polarity
+        if (polarity === '+') {
+          activePlusContacts = [...activePlusContacts, ...contactRange];
+          totalPlusContacts += contactRange.length;
+        } else {
+          activeMinusContacts = [...activeMinusContacts, ...contactRange];
+          totalMinusContacts += contactRange.length;
+        }
+      }
+    }
+
+    // Process each contact input from Excel
+    processContact(Contact_L);
+    processContact(Contact_R);
+
+    console.log(activePlusContacts, activeMinusContacts, totalMinusContacts, totalPlusContacts);
+
   };
 
   const handleFileChange = (event) => {
@@ -139,6 +167,9 @@ export default function App() {
         const jsonData = XLSX.utils.sheet_to_json(sheet);
         console.log(jsonData); // Pass data to your handler function
         console.log(patientStates);
+        Object.keys(patientStates).forEach((key, index) => {
+          parseInput(jsonData[index], patientStates[key]);
+        });
       };
       reader.readAsArrayBuffer(file);
     }
