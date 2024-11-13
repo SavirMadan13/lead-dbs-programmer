@@ -1892,6 +1892,8 @@ function TabbedElectrodeIPGSelection({
     }
   }, [importedData]);
 
+  const [tempParamInput, setTempParamInput] = useState('0-/C+; 2mA');
+
   // useEffect(() => {
   //   if (stimChanged) {
   //     console.log('STIMCHANGED: ', stimChanged);
@@ -1962,6 +1964,7 @@ function TabbedElectrodeIPGSelection({
                     contactNaming={namingConvention}
                     adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
                     historical={historical}
+                    tempParamInput={tempParamInput}
                     elspec={electrodeModels[selectedElectrodeRight]}
                     // stimChanged={stimChanged}
                     // setStimChanged={setStimChanged}

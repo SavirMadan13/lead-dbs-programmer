@@ -3291,6 +3291,12 @@ function Generic_elmodel(props, ref) {
     const parsedResult = parseInput(paramInput);
   };
 
+  useEffect(() => {
+    if (props.tempParamInput) {
+      parseInput(props.tempParamInput);
+    }
+  }, []);
+
   const [exportedText, setExportedText] = useState('');
 
   const reverseParse = () => {

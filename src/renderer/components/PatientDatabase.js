@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import {
   TextField,
   Button,
@@ -20,8 +20,10 @@ import {
 } from '@mui/material';
 import { Edit, Delete, Save, Cancel } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
 import { PatientContext } from './PatientContext';
 import DatabaseStats from './DatabaseStats';
+
 
 function PatientDatabase({ key, directoryPath }) {
   const { patients, setPatients } = useContext(PatientContext);
@@ -42,6 +44,28 @@ function PatientDatabase({ key, directoryPath }) {
   const [newColumnId, setNewColumnId] = useState('');
   const [newColumnLabel, setNewColumnLabel] = useState('');
   const [columnToDelete, setColumnToDelete] = useState('');
+
+  const fileInputRef = useRef(null);
+
+  const handleButtonClick = () => {
+    fileInputRef.current.click(); // Trigger file input click
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(sheet);
+        console.log(jsonData); // Pass data to your handler function
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  };
 
   // Handle input changes for the edited patient
   const handleEditChange = (e) => {
@@ -468,6 +492,19 @@ function PatientDatabase({ key, directoryPath }) {
               >
                 Group Stats
               </Button>
+              <Button
+                style={{ marginLeft: '5px' }}
+                onClick={handleButtonClick}
+              >
+                Import Stimulation Parameters
+              </Button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                accept=".xlsx, .xls"
+                onChange={handleFileChange}
+              />
             </div>
           )}
           {/* <Button
