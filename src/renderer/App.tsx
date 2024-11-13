@@ -1,9 +1,10 @@
 import { MemoryRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 
 import Dropdown from 'react-bootstrap/dropdown';
 import { Slider } from '@mui/material';
+import * as XLSX from 'xlsx';
 import TabbedElectrodeIPGSelectionTest from './components/TabbedElectrodeIPGSelectionTest';
 import Navbar from './components/Navbar';
 // import Navbar from 'react-bootstrap/Navbar'
@@ -62,6 +63,86 @@ export default function App() {
   const [electrodeMaster, setElectrodeMaster] = useState('');
   const [ipgMaster, setIpgMaster] = useState('');
   const [groupLabel, setGrouplabel] = useState('');
+
+  const fileInputRef = useRef(null);
+
+  const handleButtonClick = () => {
+    fileInputRef.current.click(); // Trigger file input click
+  };
+
+  function getContactsForLevel(level, activeLetters) {
+    const contactMap = {
+      0: { a: 1 }, // Contacts at level 1
+      1: { a: 2, b: 3, c: 4 }, // Contacts at level 2
+      2: { a: 5, b: 6, c: 7 },
+      3: { a: 8 }, // Contacts at level 3 (only a and b here)
+    };
+
+    const fullRange = Object.values(contactMap[level]);
+
+    // If no active letters (e.g., "1-"), return the full range of contacts for the level
+    if (!activeLetters || activeLetters === 'abc') {
+      return fullRange;
+    }
+
+    // Otherwise, return only the contacts specified by the letters (e.g., "ac")
+    return activeLetters.split('').map((letter) => contactMap[level][letter]);
+  }
+
+  const parseInput = (jsonData, overallState) => {
+    const overallQuantities = { ...overallState.allQuantities };
+    const overallSelectedValues = { ...overallState.allSelectedValues };
+    const importedData = jsonData;
+
+    const Amp_L = jsonData.Amp_L;
+    const Amp_R = jsonData.Amp_R;
+    const Contact_L = jsonData.Contact_L;
+    const Contact_R = jsonData.Contact_R;
+
+    const leftAmplitude = parseFloat(Amp_L.replace(" mA", ""));
+    const rightAmplitude = parseFloat(Amp_R.replace(" mA", ""));
+
+    const contactLevel_L = parseInt(Contact_L[0]);
+    const activeLetter_L = Contact_L.slice(1);
+
+    const contactLevel_R = parseInt(Contact_R[0]);
+    const activeLetter_R = Contact_R.slice(1);
+
+    const polarity_L = "C+"; // Default polarity
+    const polarity_R = "C+";
+
+    // Setting all contacts to zero
+    Object.keys(overallQuantities).forEach((key) => {
+      Object.keys(
+        overallQuantities[key].foreach((contact) => {
+          overallQuantities[key][contact] = 0;
+          overallSelectedValues[key][contact] = 'left';
+        }),
+      );
+    });
+
+    let activePlusContacts = []; // Array to store all active '+' contacts
+    let activeMinusContacts = []; // Array to store all active '-' contacts
+    let totalPlusContacts = 0; // Counter for total '+' contacts
+    let totalMinusContacts = 0; // Counter for total '-' contacts
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(sheet);
+        console.log(jsonData); // Pass data to your handler function
+        console.log(patientStates);
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  };
 
   const initialState = {
     IPG: '',
@@ -223,7 +304,9 @@ export default function App() {
   // };
 
   const handleImportedElectrode = (importedElectrode) => {
-    const electrodeInfo = varargout.find((item) => item.displayName === importedElectrode);
+    const electrodeInfo = varargout.find(
+      (item) => item.displayName === importedElectrode,
+    );
     return electrodeInfo ? electrodeInfo.value : 'boston_vercise_directed';
   };
 
@@ -292,14 +375,14 @@ export default function App() {
 
         if (jsonData[dynamicKey2] && jsonData[dynamicKey2][dynamicKey]) {
           newQuantities[j] = newQuantities[j] || {};
-          newQuantities[j][i+1] = parseFloat(
+          newQuantities[j][i + 1] = parseFloat(
             jsonData[dynamicKey2][dynamicKey].perc,
           );
           newQuantities[j][0] = parseFloat(jsonData[dynamicKey2].case.perc);
 
           const { pol } = jsonData[dynamicKey2][dynamicKey];
           newSelectedValues[j] = newSelectedValues[j] || {};
-          newSelectedValues[j][i+1] =
+          newSelectedValues[j][i + 1] =
             pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
 
           const casePol = jsonData[dynamicKey2].case.pol;
@@ -309,14 +392,14 @@ export default function App() {
 
         if (jsonData[dynamicKey3] && jsonData[dynamicKey3][dynamicKey1]) {
           newQuantities[j + 4] = newQuantities[j + 4] || {};
-          newQuantities[j + 4][i+1] = parseFloat(
+          newQuantities[j + 4][i + 1] = parseFloat(
             jsonData[dynamicKey3][dynamicKey1].perc,
           );
           newQuantities[j + 4][0] = parseFloat(jsonData[dynamicKey3].case.perc);
 
           const { pol } = jsonData[dynamicKey3][dynamicKey1];
           newSelectedValues[j + 4] = newSelectedValues[j + 4] || {};
-          newSelectedValues[j + 4][i+1] =
+          newSelectedValues[j + 4][i + 1] =
             pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
 
           const casePol = jsonData[dynamicKey3].case.pol;
@@ -508,7 +591,11 @@ export default function App() {
     return updatedQuantities;
   };
 
-  const handleTogglePositions = (allQuantities, allTotalAmplitudes, allTogglePositions) => {
+  const handleTogglePositions = (
+    allQuantities,
+    allTotalAmplitudes,
+    allTogglePositions,
+  ) => {
     let outputQuantities = {};
     console.log(allQuantities);
     console.log(allTotalAmplitudes);
@@ -586,7 +673,11 @@ export default function App() {
     // handleFileChange('1');
     // saveQuantitiesandValues();
     let updatedOutputQuantity = {};
-    updatedOutputQuantity = handleTogglePositions(allQuantities, allTotalAmplitudes, allTogglePositions);
+    updatedOutputQuantity = handleTogglePositions(
+      allQuantities,
+      allTotalAmplitudes,
+      allTogglePositions,
+    );
     console.log('Updated output quantity: ', updatedOutputQuantity);
     // parseAllVariables();
     const exportAmplitudeData = handleExportAmplitude(allTotalAmplitudes);
@@ -794,12 +885,12 @@ export default function App() {
       for (let j = 1; j < loopSize; j++) {
         zerosArr.push(0);
       }
-      if (data.S.activecontacts[i-1]) {
-        if (data.S.activecontacts[i-1] === null) {
-          data.S.activecontacts[i-1] = zerosArr;
+      if (data.S.activecontacts[i - 1]) {
+        if (data.S.activecontacts[i - 1] === null) {
+          data.S.activecontacts[i - 1] = zerosArr;
         }
       } else {
-        data.S.activecontacts[i-1] = zerosArr;
+        data.S.activecontacts[i - 1] = zerosArr;
       }
     }
 
@@ -870,12 +961,24 @@ export default function App() {
       <div className="Navbar">
         <Navbar />
       </div>
-      <div style={{paddingTop: '20px', paddingBottom: '-50px'}}></div>
+      <div style={{ paddingTop: '20px', paddingBottom: '-50px' }}></div>
       {/* <div
         style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '20px' }}
       >
         Patient: {patientName}
       </div> */}
+      <div>
+        <button className="export-button-final" onClick={handleButtonClick}>
+          Import stimulation parameters
+        </button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          accept=".xlsx, .xls"
+          onChange={handleFileChange}
+        />
+      </div>
       <div>
         {patients.length > 0 && (
           <GroupArchitecture
@@ -898,7 +1001,11 @@ export default function App() {
         >
           Discard and Close
         </button>
-        <button className="export-button-final" onClick={handleExport} style={{marginRight: '15px'}}>
+        <button
+          className="export-button-final"
+          onClick={handleExport}
+          style={{ marginRight: '15px' }}
+        >
           Save and Close
         </button>
       </div>
