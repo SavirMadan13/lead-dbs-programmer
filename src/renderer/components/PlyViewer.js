@@ -198,6 +198,7 @@ function PlyViewer({
     { name: 'Avoidance coordinate - test', coords: [12.73, -14.36, -6.7] },
     { name: 'Cognition < 65', coords: [14.3, -13.7, -3.7] },
     { name: 'Cognition > 65', coords: [7.3, -10.2, -11.7] },
+    { name: 'Gait', coords: [6.2, -8.3, -9.7] },
   ]);
 
   // Handle input change for new tremor data
