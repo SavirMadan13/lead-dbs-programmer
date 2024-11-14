@@ -13,6 +13,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import GroupArchitecture from './components/GroupArchitecture';
 import { json } from 'node:stream/consumers';
+import electrodeModels from './components/electrodeModels.json';
 
 const importData = [];
 
@@ -121,12 +122,16 @@ export default function App() {
       });
     });
 
-    let activePlusContacts = []; // Array to store all active '+' contacts
-    let activeMinusContacts = []; // Array to store all active '-' contacts
-    let totalPlusContacts = 0; // Counter for total '+' contacts
-    let totalMinusContacts = 0; // Counter for total '-' contacts
+    let leftActivePlusContacts = []; // Array for active '+' contacts on the left
+    let leftActiveMinusContacts = []; // Array for active '-' contacts on the left
+    let rightActivePlusContacts = []; // Array for active '+' contacts on the right
+    let rightActiveMinusContacts = []; // Array for active '-' contacts on the right
+    let leftTotalPlusContacts = 0; // Counter for total '+' contacts on the left
+    let leftTotalMinusContacts = 0; // Counter for total '-' contacts on the left
+    let rightTotalPlusContacts = 0; // Counter for total '+' contacts on the right
+    let rightTotalMinusContacts = 0; // Counter for total '-' contacts on the right
 
-    function processContact(part) {
+    function processContact(part, side) {
       if (part.match(/[0-3][a-c]*[+-]?/)) {
         // Extract the contact level, active letters, and polarity (default to '-')
         const contactLevel = parseInt(part[0]); // The first character is the level number
@@ -136,22 +141,58 @@ export default function App() {
         // Get the range of contacts based on level and active letters
         const contactRange = getContactsForLevel(contactLevel, activeLetters);
 
-        // Add to the appropriate contact array based on polarity
-        if (polarity === '+') {
-          activePlusContacts = [...activePlusContacts, ...contactRange];
-          totalPlusContacts += contactRange.length;
-        } else {
-          activeMinusContacts = [...activeMinusContacts, ...contactRange];
-          totalMinusContacts += contactRange.length;
+        // Add to the appropriate contact array and counter based on side and polarity
+        if (side === 'left') {
+          if (polarity === '+') {
+            leftActivePlusContacts = [...leftActivePlusContacts, ...contactRange];
+            leftTotalPlusContacts += contactRange.length;
+          } else {
+            leftActiveMinusContacts = [...leftActiveMinusContacts, ...contactRange];
+            leftTotalMinusContacts += contactRange.length;
+          }
+        } else if (side === 'right') {
+          if (polarity === '+') {
+            rightActivePlusContacts = [...rightActivePlusContacts, ...contactRange];
+            rightTotalPlusContacts += contactRange.length;
+          } else {
+            rightActiveMinusContacts = [...rightActiveMinusContacts, ...contactRange];
+            rightTotalMinusContacts += contactRange.length;
+          }
         }
+      }
+
+      if (side === 'left') {
+        const minusEvenSplit = leftAmplitude / leftTotalMinusContacts;
+        leftActiveMinusContacts.forEach((contact) => {
+          overallQuantities[1][contact] = minusEvenSplit;
+        });
+      }
+      if (side === 'right') {
+        const minusEvenSplit = rightAmplitude / rightTotalMinusContacts;
+        rightActiveMinusContacts.forEach((contact) => {
+          overallQuantities[5][contact] = minusEvenSplit;
+        });
       }
     }
 
-    // Process each contact input from Excel
-    processContact(Contact_L);
-    processContact(Contact_R);
+    // Process each contact input from Excel, specifying the side
+    processContact(Contact_L, 'left');
+    processContact(Contact_R, 'right');
 
-    console.log(activePlusContacts, activeMinusContacts, totalMinusContacts, totalPlusContacts);
+    console.log("Left Active Plus Contacts:", leftActivePlusContacts);
+    console.log("Left Active Minus Contacts:", leftActiveMinusContacts);
+    console.log("Right Active Plus Contacts:", rightActivePlusContacts);
+    console.log("Right Active Minus Contacts:", rightActiveMinusContacts);
+    console.log("Left Total Plus Contacts:", leftTotalPlusContacts);
+    console.log("Left Total Minus Contacts:", leftTotalMinusContacts);
+    console.log("Right Total Plus Contacts:", rightTotalPlusContacts);
+    console.log("Right Total Minus Contacts:", rightTotalMinusContacts);
+    console.log('Overall quantities: ', overallQuantities);
+
+    console.log(electrodeModels);
+    console.log(overallState);
+
+    // console.log(activePlusContacts, activeMinusContacts, totalMinusContacts, totalPlusContacts);
 
   };
 
