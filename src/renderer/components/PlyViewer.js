@@ -20,6 +20,7 @@ function PlyViewer({
   togglePosition,
   tab,
   names,
+  elspec,
 }) {
   const [plyFile, setPlyFile] = useState(null);
   const mountRef = useRef(null);
@@ -1573,15 +1574,15 @@ function PlyViewer({
   //   return (distance / k) ** 2;
   // };
 
-  const calculateAmplitude = (distance, k = 1.3) => {
-    const tmpAmp = (distance / k) ** 2;
-    return Math.round(tmpAmp * 10) / 10;
-  };
-
-  // const calculateAmplitude = (distance, k = 0.22) => {
-  //   const tmpAmp = k * distance ** 2 - 0.1;
+  // const calculateAmplitude = (distance, k = 1.3) => {
+  //   const tmpAmp = (distance / k) ** 2;
   //   return Math.round(tmpAmp * 10) / 10;
   // };
+
+  const calculateAmplitude = (distance, k = 0.22) => {
+    const tmpAmp = k * (distance ** 2) + 0.1;
+    return Math.round(tmpAmp * 10) / 10;
+  };
 
   const getCoordsForRoi = () => {
     // Determine if selected roi is from tremorData or pdData
@@ -1623,7 +1624,7 @@ function PlyViewer({
     setSelectedValues(updatedSelectedValues);
   };
 
-  const handleQuantityStateChangeGroup = (indexList, tmpAmp) => {
+  const handleQuantityStateChangeGroup = (indexList, tmpAmp, contactShare) => {
     console.log(stimParams);
     const updatedQuantities = { ...quantities };
     const updatedSelectedValues = { ...selectedValues };
@@ -1636,7 +1637,7 @@ function PlyViewer({
       // Check if the contact is in the list of specified indexes
       if (indexList.includes(parseFloat(contact) - 1)) {
         updatedSelectedValues[contact] = 'center';
-        updatedQuantities[contact] = togglePosition === 'center' ? tmpAmp/2 : 100/2;
+        updatedQuantities[contact] = togglePosition === 'center' ? tmpAmp * contactShare[parseFloat(contact - 1)] : 100 * contactShare[parseFloat(contact - 1)];
       } else {
         updatedQuantities[contact] = 0;
         updatedSelectedValues[contact] = 'left';
@@ -1647,11 +1648,52 @@ function PlyViewer({
     setSelectedValues(updatedSelectedValues);
   };
 
-  const cylinderSurfaceArea = (diameter, height, n_contacts=1) => {
+  const cylinderSurfaceArea = (diameter = elspec.contact_diameter / 1000, height = elspec.contact_length / 1000, n_contacts=1) => {
     const radius = diameter / 2;
-    const contact_area = 2 * Math.PI * radius * height
-    const directional_area = contact_area / n_contacts
+    const contact_area = 2 * Math.PI * radius * height;
+    const directional_area = contact_area / n_contacts;
     return directional_area
+  };
+
+  const getCharge = (current, pulseWidth = 30) => {
+    const currentInAmps = current * 1e-3;
+    // Calculate charge (Q) in coulombs (C)
+    const chargeInCoulombs = currentInAmps * pulseWidth * 1e-6;
+    // Convert charge to microcoulombs (µC)
+    const chargeInMicroCoulombs = chargeInCoulombs * 1e6;
+    return chargeInMicroCoulombs;
+  };
+
+  const isSafeCharge = (Q, A, D, k=1.5) => {
+    const maxSafeCharge = A * 10 ** (k - Math.log10(D));
+    // Check if the given charge per phase is below the safe threshold
+    console.log('Q: ', Q);
+    console.log('Max safe charge: ', maxSafeCharge);
+    const isSafe = Q < maxSafeCharge;
+    // Return both the boolean result and the max safe charge
+    return { isSafe, maxSafeCharge };
+  };
+
+  const calculateAmps = (charge, pulsewidth) => {
+    const chargeInCoulombs = charge * 1e-6;
+    // Calculate current (I) in amps (A)
+    const currentInAmps = (1e-6 * pulsewidth) / chargeInCoulombs;
+    // Convert current to microamps (µA)
+    const currentInMilliAmps = currentInAmps * 1e-6;
+    return Math.round(currentInMilliAmps * 10) / 10;
+  };
+
+  const handleSafety = (amp) => {
+    const contactSurfaceArea = cylinderSurfaceArea();
+    const charge = getCharge(amp);
+    const { isSafe, maxSafeCharge } = isSafeCharge(charge, contactSurfaceArea, 30);
+    let newAmplitude = amp;
+    console.log(isSafe);
+    console.log(maxSafeCharge);
+    if (!isSafe) {
+      newAmplitude = calculateAmps(maxSafeCharge, 30);
+    }
+    return newAmplitude;
   };
 
   const handleSTNParameters = () => {
@@ -1760,25 +1802,41 @@ function PlyViewer({
     console.log(coordinateOutput.distanceArray);
     console.log(activeAmplitude);
     console.log(activeContact);
+    let finalAmplitude = activeAmplitude;
+    if (activeAmplitude > 5) {
+      finalAmplitude = handleSafety(activeAmplitude);
+    }
+    console.log(finalAmplitude);
     setStimParams({
       index: activeContact + 1,
-      amplitude: activeAmplitude,
+      amplitude: finalAmplitude,
       distanceMaster: coordinateOutput.distanceArray,
     });
     const outputText = `Active Contact: ${
       names[activeContact + 1]
-    }, Amplitude: ${activeAmplitude}`;
+    }, Amplitude: ${finalAmplitude}`;
     setSolutionText(outputText);
-    handleQuantityStateChange(activeContact, activeAmplitude);
+    handleQuantityStateChange(activeContact, finalAmplitude);
   };
 
   const handleAddContacts = () => {
     console.log(stimParams);
     const newIndex = stimParams.distanceMaster[1].index;
+    const newDistance = stimParams.distanceMaster[1].distance;
+    const newAmplitude = calculateAmplitude(newDistance);
+    console.log(newAmplitude);
     const newContact = newIndex + 1;
+    const totalAmplitude = stimParams.amplitude + newAmplitude;
+    console.log(stimParams.amplitude);
+    console.log(totalAmplitude);
+    const contactShare = {};
+    contactShare[stimParams.distanceMaster[0].index] = stimParams.amplitude / totalAmplitude;
+    contactShare[newIndex] = newAmplitude / totalAmplitude;
+    console.log(contactShare);
+    const outputAmplitude = totalAmplitude > 5 ? stimParams.amplitude : totalAmplitude;
     const outputText = `Active Contacts: ${names[stimParams.distanceMaster[0].index + 1]} and ${names[newContact]}, Amplitude: ${stimParams.amplitude}`;
     setSolutionText(outputText);
-    handleQuantityStateChangeGroup([stimParams.distanceMaster[0].index, newIndex], stimParams.amplitude)
+    handleQuantityStateChangeGroup([stimParams.distanceMaster[0].index, newIndex], outputAmplitude, contactShare);
   };
 
   const handleAvoidance = () => {
@@ -2212,7 +2270,7 @@ function PlyViewer({
                       Provide Solution
                     </Button> */}
                     <Button variant="primary" onClick={handleAddContacts}>
-                      Add Therapy
+                      Add Contact
                     </Button>
                     <Button variant="primary" onClick={handleAvoidance}>
                       Avoid

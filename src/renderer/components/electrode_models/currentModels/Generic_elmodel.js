@@ -3846,6 +3846,7 @@ function Generic_elmodel(props, ref) {
             togglePosition={percAmpToggle}
             tab={props.key}
             names={names}
+            elspec={elspec}
           />
         </div>
       )}
