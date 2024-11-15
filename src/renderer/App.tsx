@@ -72,13 +72,23 @@ export default function App() {
     fileInputRef.current.click(); // Trigger file input click
   };
 
-  function getContactsForLevel(level, activeLetters) {
-    const contactMap = {
+  function getContactsForLevel(level, activeLetters, electrode) {
+    let contactMap = {
       0: { a: 1 }, // Contacts at level 1
       1: { a: 2, b: 3, c: 4 }, // Contacts at level 2
       2: { a: 5, b: 6, c: 7 },
       3: { a: 8 }, // Contacts at level 3 (only a and b here)
     };
+
+    const masterElectrodeData = electrodeModels[electrode];
+    console.log(masterElectrodeData);
+
+    if (masterElectrodeData.isdirected === 0) {
+      contactMap = {};
+      for (let i = 0; i < masterElectrodeData.numel; i++) {
+        contactMap[i] = i + 1;
+      }
+    }
 
     const fullRange = Object.values(contactMap[level]);
 
@@ -91,9 +101,19 @@ export default function App() {
     return activeLetters.split('').map((letter) => contactMap[level][letter]);
   }
 
+  const parseAmplitude = (ampString) => {
+    const value = parseFloat(ampString); // Extract numerical value
+    const unit = ampString.includes("mA") ? "mA" : ampString.includes("V") ? "V" : null; // Determine the unit
+    return { value, unit };
+  };
+
   const parseInput = (jsonData, overallState) => {
+    const outputState = { ...overallState };
     const overallQuantities = { ...overallState.allQuantities };
     const overallSelectedValues = { ...overallState.allSelectedValues };
+    const overallTotalAmplitudes = { ...overallState.allTotalAmplitudes };
+    const overallVolAmpToggles = { ...overallState.allVolAmpToggles };
+    const overallTogglePositions = { ...overallState.allTogglePositions };
     const importedData = jsonData;
 
     const Amp_L = jsonData.Amp_L;
@@ -101,8 +121,21 @@ export default function App() {
     const Contact_L = jsonData.Contact_L;
     const Contact_R = jsonData.Contact_R;
 
-    const leftAmplitude = parseFloat(Amp_L.replace(" mA", ""));
-    const rightAmplitude = parseFloat(Amp_R.replace(" mA", ""));
+    const leftAmplitude = parseAmplitude(Amp_L);
+    const rightAmplitude = parseAmplitude(Amp_R);
+
+    overallTotalAmplitudes[1] = leftAmplitude.value;
+    overallTotalAmplitudes[5] = rightAmplitude.value;
+
+    if (leftAmplitude.unit === 'V') {
+      overallVolAmpToggles[1] = 'right';
+      overallTogglePositions[1] = 'V';
+    }
+
+    if (rightAmplitude.unit === 'V') {
+      overallVolAmpToggles[5] = 'right';
+      overallTogglePositions[5] = 'V';
+    }
 
     const contactLevel_L = parseInt(Contact_L[0]);
     const activeLetter_L = Contact_L.slice(1);
@@ -139,7 +172,7 @@ export default function App() {
         const polarity = part.includes('+') ? '+' : '-'; // Default to '-' if not specified
 
         // Get the range of contacts based on level and active letters
-        const contactRange = getContactsForLevel(contactLevel, activeLetters);
+        const contactRange = getContactsForLevel(contactLevel, activeLetters, overallState.leftElectrode);
 
         // Add to the appropriate contact array and counter based on side and polarity
         if (side === 'left') {
@@ -162,15 +195,21 @@ export default function App() {
       }
 
       if (side === 'left') {
-        const minusEvenSplit = leftAmplitude / leftTotalMinusContacts;
+        overallQuantities[1][0] = leftAmplitude;
+        overallSelectedValues[1][0] = 'right';
+        const minusEvenSplit = leftAmplitude.value / leftTotalMinusContacts;
         leftActiveMinusContacts.forEach((contact) => {
           overallQuantities[1][contact] = minusEvenSplit;
+          overallSelectedValues[1][contact] = 'center';
         });
       }
       if (side === 'right') {
-        const minusEvenSplit = rightAmplitude / rightTotalMinusContacts;
+        overallQuantities[5][0] = rightAmplitude;
+        overallSelectedValues[5][0] = 'right';
+        const minusEvenSplit = rightAmplitude.value / rightTotalMinusContacts;
         rightActiveMinusContacts.forEach((contact) => {
           overallQuantities[5][contact] = minusEvenSplit;
+          overallSelectedValues[5][contact] = 'center';
         });
       }
     }
@@ -188,9 +227,18 @@ export default function App() {
     console.log("Right Total Plus Contacts:", rightTotalPlusContacts);
     console.log("Right Total Minus Contacts:", rightTotalMinusContacts);
     console.log('Overall quantities: ', overallQuantities);
-
+    console.log('Overall Selected values: ', overallSelectedValues);
     console.log(electrodeModels);
     console.log(overallState);
+
+    outputState.allQuantities = overallQuantities;
+    outputState.allSelectedValues = overallSelectedValues;
+    outputState.allTotalAmplitudes = overallTotalAmplitudes;
+    outputState.allTogglePositions = overallTogglePositions;
+    outputState.allVolAmpToggles = overallVolAmpToggles;
+
+    return outputState;
+    // return { overallQuantities, overallSelectedValues,  };
 
     // console.log(activePlusContacts, activeMinusContacts, totalMinusContacts, totalPlusContacts);
 
@@ -208,9 +256,11 @@ export default function App() {
         const jsonData = XLSX.utils.sheet_to_json(sheet);
         console.log(jsonData); // Pass data to your handler function
         console.log(patientStates);
+        const updatedPatientStates = { ...patientStates };
         Object.keys(patientStates).forEach((key, index) => {
-          parseInput(jsonData[index], patientStates[key]);
+          updatedPatientStates[key] = parseInput(jsonData[index], patientStates[key]);
         });
+        setPatientStates(updatedPatientStates);
       };
       reader.readAsArrayBuffer(file);
     }
