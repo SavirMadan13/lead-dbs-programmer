@@ -77,12 +77,13 @@ export default function App() {
       0: { a: 1 }, // Contacts at level 1
       1: { a: 2, b: 3, c: 4 }, // Contacts at level 2
       2: { a: 5, b: 6, c: 7 },
-      3: { a: 8 }, // Contacts at level 3 (only a and b here)
+      3: { a: 8 }, // Contacts at level 3
     };
 
     const masterElectrodeData = electrodeModels[electrode];
     console.log(masterElectrodeData);
 
+    // Adjust contactMap for undirected electrodes
     if (masterElectrodeData.isdirected === 0) {
       contactMap = {};
       for (let i = 0; i < masterElectrodeData.numel; i++) {
@@ -90,15 +91,23 @@ export default function App() {
       }
     }
 
+    console.log('Level: ', level);
+
+    // Retrieve the full range of contacts for the specified level
     const fullRange = Object.values(contactMap[level]);
 
-    // If no active letters (e.g., "1-"), return the full range of contacts for the level
+    // If no active letters are provided, return the full range of contacts for the level
     if (!activeLetters || activeLetters === 'abc') {
       return fullRange;
     }
 
-    // Otherwise, return only the contacts specified by the letters (e.g., "ac")
-    return activeLetters.split('').map((letter) => contactMap[level][letter]);
+    // For directed electrodes, map the active letters to contacts at the specified level
+    if (masterElectrodeData.isdirected === 1) {
+      return activeLetters.split('').map((letter) => contactMap[level][letter]);
+    }
+
+    // For undirected electrodes, return the full range of contacts
+    return fullRange;
   }
 
   const parseAmplitude = (ampString) => {
@@ -108,6 +117,9 @@ export default function App() {
   };
 
   const parseInput = (jsonData, overallState) => {
+    console.log(jsonData);
+    console.log('Overall state: ', overallState);
+    console.log('Elec Model: ', overallState.leftElectrode);
     const outputState = { ...overallState };
     const overallQuantities = { ...overallState.allQuantities };
     const overallSelectedValues = { ...overallState.allSelectedValues };
@@ -137,14 +149,14 @@ export default function App() {
       overallTogglePositions[5] = 'V';
     }
 
-    const contactLevel_L = parseInt(Contact_L[0]);
-    const activeLetter_L = Contact_L.slice(1);
+    // const contactLevel_L = parseInt(Contact_L[0]);
+    // const activeLetter_L = Contact_L.slice(1);
 
-    const contactLevel_R = parseInt(Contact_R[0]);
-    const activeLetter_R = Contact_R.slice(1);
+    // const contactLevel_R = parseInt(Contact_R[0]);
+    // const activeLetter_R = Contact_R.slice(1);
 
-    const polarity_L = "C+"; // Default polarity
-    const polarity_R = "C+";
+    // const polarity_L = "C+"; // Default polarity
+    // const polarity_R = "C+";
 
     // Setting all contacts to zero
     // Setting all contacts to zero
@@ -165,12 +177,17 @@ export default function App() {
     let rightTotalMinusContacts = 0; // Counter for total '-' contacts on the right
 
     function processContact(part, side) {
-      if (part.match(/[0-3][a-c]*[+-]?/)) {
+      const isOnlyLevel = /^[0-3]$/.test(part);
+      console.log('Part: ', part);
+      if (isOnlyLevel || part.match(/[0-3][a-c]*[+-]?/)) {
         // Extract the contact level, active letters, and polarity (default to '-')
-        const contactLevel = parseInt(part[0]); // The first character is the level number
-        const activeLetters = part.slice(1).replace(/[+-]/, ''); // Get the letters, skipping polarity
-        const polarity = part.includes('+') ? '+' : '-'; // Default to '-' if not specified
-
+        const contactLevel = isOnlyLevel ? part : parseInt(part[0]); // The first character is the level number
+        // const activeLetters = part.slice(1).replace(/[+-]/, ''); // Get the letters, skipping polarity
+        const activeLetters = isOnlyLevel
+          ? 'abc' // Default to all letters if only the level is provided
+          : part.slice(1).replace(/[+-]/, ''); // Extract letters, skipping polarity
+        // const polarity = part.includes('+') ? '+' : '-'; // Default to '-' if not specified
+        const polarity = '-';
         // Get the range of contacts based on level and active letters
         const contactRange = getContactsForLevel(contactLevel, activeLetters, overallState.leftElectrode);
 
@@ -215,21 +232,9 @@ export default function App() {
     }
 
     // Process each contact input from Excel, specifying the side
-    processContact(Contact_L, 'left');
     processContact(Contact_R, 'right');
+    processContact(Contact_L, 'left');
 
-    console.log("Left Active Plus Contacts:", leftActivePlusContacts);
-    console.log("Left Active Minus Contacts:", leftActiveMinusContacts);
-    console.log("Right Active Plus Contacts:", rightActivePlusContacts);
-    console.log("Right Active Minus Contacts:", rightActiveMinusContacts);
-    console.log("Left Total Plus Contacts:", leftTotalPlusContacts);
-    console.log("Left Total Minus Contacts:", leftTotalMinusContacts);
-    console.log("Right Total Plus Contacts:", rightTotalPlusContacts);
-    console.log("Right Total Minus Contacts:", rightTotalMinusContacts);
-    console.log('Overall quantities: ', overallQuantities);
-    console.log('Overall Selected values: ', overallSelectedValues);
-    console.log(electrodeModels);
-    console.log(overallState);
 
     outputState.allQuantities = overallQuantities;
     outputState.allSelectedValues = overallSelectedValues;
