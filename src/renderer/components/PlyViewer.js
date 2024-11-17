@@ -1512,7 +1512,9 @@ function PlyViewer({
   useEffect(() => {
     const scene = sceneRef.current;
     try {
-      const vertices = plotNiiCoords.map(([x, y, z]) => new THREE.Vector3(x, y, z));
+      const vertices = plotNiiCoords.map(
+        ([x, y, z]) => new THREE.Vector3(x, y, z),
+      );
 
       // Create a geometry and add the vertices
       const geometry = new THREE.BufferGeometry().setFromPoints(vertices);
@@ -1531,7 +1533,6 @@ function PlyViewer({
     } catch (err) {
       console.log(err);
     }
-
   }, [plotNiiCoords]);
 
   const [zoomLevel, setZoomLevel] = useState(-3);
@@ -2136,6 +2137,7 @@ function PlyViewer({
    * @returns {number} - Dot product result.
    */
   const dotProduct = (S, L) => {
+    console.log(S, L);
     const magnitudes = math.column(L, 3);
     return math.dot(S, magnitudes);
   };
@@ -2147,14 +2149,8 @@ function PlyViewer({
    * @param {Array} L - Flattened landscape values.
    * @returns {number} - Target function value.
    */
-  const targetFunction = (r, S_r, L) => {
-    if (r === 0) {
-      return 0; // No volume, so density is zero
-    }
-    const volume = ((4 * Math.PI) / 3) * r ** 3;
-    const value = dotProduct(S_r, L);
-    const valueDensity = value / volume;
-    return valueDensity;
+  const targetFunction = (S_r, L, weight = 100) => {
+    return dotProduct(S_r, L) * weight;
   };
 
   /**
@@ -2172,7 +2168,7 @@ function PlyViewer({
         // Only compute if the corresponding v value is above 0.1 (which is minimum for VTA in our radius function)
         const r = computeRadius(v[index]); // the value at index is our amperage. that is related to radius.
         const S_r = assignSphereValues(L, center, r);
-        const targetValue = targetFunction(r, S_r, L);
+        const targetValue = targetFunction(S_r, L);
         sumTargetValue += targetValue;
       }
     });
@@ -2185,7 +2181,7 @@ function PlyViewer({
    * @param {number} lambda - Penalty coefficient.
    * @returns {number} - Penalty value.
    */
-  const penaltyPerContact = (v, lambda) => lambda * Math.max(v - 5, 0);
+  const penaltyPerContact = (v, lambda) => lambda * Math.max(v - 0.1, 0);
 
   /**
    * Handler function to compute the total penalty for a vector of contact values.
@@ -2204,7 +2200,7 @@ function PlyViewer({
    * @returns {number} - Penalty value.
    */
   const penaltyAllContacts = (v, lambda) =>
-    lambda * math.max(math.sum(v) - 6, 0);
+    lambda * math.max(math.sum(v) - 0.1, 0);
 
   /**
    * Computes the loss function value.
@@ -2275,6 +2271,7 @@ function PlyViewer({
           lambda,
         ),
     );
+    console.log('Gradient vector: ', gradientVector);
     return gradientVector;
   };
 
@@ -2288,7 +2285,8 @@ function PlyViewer({
    */
   const gradientAscent = (gradientVector, v, alpha) => {
     // Use element-wise addition with math.js for efficient vector operation
-    return math.add(v, math.multiply(gradientVector, alpha));
+    const updatedV = math.add(v, math.multiply(gradientVector, alpha));
+    return updatedV.map((v_i) => Math.max(v_i, 0)); //do not allow amps below 0.
   };
 
   const filterBoxAroundSphere = (L, sphereCoords, boxSize, sphereIndex) => {
@@ -2349,7 +2347,7 @@ function PlyViewer({
 
     let currentV = [...v]; // Clone the initial guess for v
     let iteration = 0;
-    const reducedL = filterBoxAroundSphere(L, sphereCoords, 50, 2);
+    const reducedL = filterBoxAroundSphere(L, sphereCoords, 20, 2);
     console.log(reducedL);
     setPlotNiiCoords(reducedL);
     while (iteration < 5) {
