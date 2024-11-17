@@ -1283,6 +1283,21 @@ const createWindow = async () => {
     return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
   });
 
+  ipcMain.handle('load-nii-file', async (event, historical) => {
+    const { patient, timeline, directoryPath, leadDBS } = historical;
+    if (leadDBS) {
+      const filePath = '/Users/savirmadan/Downloads/Cognitive Decline Network.nii';
+      // const filePath = '/Users/savirmadan/Downloads/r0maps_stn129/rmap_updrstotal.nii';
+      const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
+      return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
+    }
+    const filePath =
+      '/Volumes/Expansion/OLD/Output/Patient0316Output/derivatives/leaddbs/sub-CbctDbs0316/export/ply/combined_electrodes.ply';
+    console.log(filePath);
+    const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
+    return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
+  });
+
   ipcMain.handle('load-test-file', async (event, historical) => {
     const { patient, timeline, directoryPath, leadDBS } = historical;
     const filePath = '/Users/savirmadan/Downloads/potential_test.ply';

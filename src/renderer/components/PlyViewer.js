@@ -2,10 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import * as THREE from 'three';
 import { PLYLoader, OrbitControls } from 'three-stdlib';
-import * as nifti from 'nifti-reader-js'; // Correctly importing the nifti module
+// import * as nifti from 'nifti-reader-js'; // Correctly importing the nifti module
+import * as nifti from 'nifti-reader-js';
 import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 import { Tabs, Tab, Collapse, Button, Form, Modal } from 'react-bootstrap';
 import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings icon
+import * as math from 'mathjs';
 // import { remote } from 'electron'; // Use 'electron' for Electron v12+
 
 function PlyViewer({
@@ -43,6 +45,8 @@ function PlyViewer({
   const [elecCoords, setElecCoords] = useState(null);
   const [roi, setRoi] = useState('tremor-0');
   const [avoidRoi, setAvoidRoi] = useState('tremor-0');
+  const [niiCoords, setNiiCoords] = useState([]);
+  const [plotNiiCoords, setPlotNiiCoords] = useState({});
 
   // Thresholding/Modification stuff
 
@@ -74,6 +78,130 @@ function PlyViewer({
     };
 
     loadPlyFile(); // Call the async function
+  }, []);
+
+  // useEffect(() => {
+  //   const loadNiftiFile = async () => {
+  //     try {
+  //       // Invoke IPC to load NIfTI file
+  //       const fileData = await window.electron.ipcRenderer.invoke(
+  //         'load-nii-file',
+  //         historical,
+  //       );
+  //       console.log(fileData);
+  //       // Parse the NIfTI file
+  //       if (!nifti.isNIFTI(fileData)) {
+  //         throw new Error('File is not a valid NIfTI file');
+  //       }
+  //       const header = nifti.readHeader(fileData);
+  //       const image = nifti.readImage(header, fileData);
+
+  //       // Find non-NaN indices and convert to 3D coordinates
+  //       const dimensions = header.dims.slice(1, 4); // Extract x, y, z dimensions
+  //       const img = new Float32Array(image);
+  //       console.log(img);
+  //       const voxelCoordinates = [];
+  //       img.forEach((value, index) => {
+  //         if (!isNaN(value)) {
+  //           const z = Math.floor(index / (dimensions[0] * dimensions[1]));
+  //           const y = Math.floor(
+  //             (index % (dimensions[0] * dimensions[1])) / dimensions[0],
+  //           );
+  //           const x = index % dimensions[0];
+  //           voxelCoordinates.push([x, y, z, value]);
+  //         }
+  //       });
+
+  //       console.log('Voxel Coordinates:', voxelCoordinates);
+  //       setNiiCoords(voxelCoordinates);
+  //       // Optionally process for rendering or further analysis here
+  //     } catch (error) {
+  //       console.error('Error loading NIfTI file:', error);
+  //     }
+  //   };
+
+  //   loadNiftiFile(); // Call the async function
+  // }, []);
+
+  useEffect(() => {
+    const loadNiftiFile = async () => {
+      try {
+        // Invoke IPC to load NIfTI file
+        const fileData = await window.electron.ipcRenderer.invoke(
+          'load-nii-file',
+          historical,
+        );
+
+        // Check if the file is a valid NIfTI file
+        if (!nifti.isNIFTI(fileData)) {
+          throw new Error('File is not a valid NIfTI file');
+        }
+
+        // Read header and image data
+        const header = nifti.readHeader(fileData);
+        const image = nifti.readImage(header, fileData);
+        console.log(header);
+        // Extract affine transformation matrix
+        const affineMatrix = header.affine;
+        console.log('Affine Matrix:', affineMatrix);
+
+        // Extract dimensions and convert voxel indices to [x, y, z, value]
+        const dimensions = header.dims.slice(1, 4);
+        const img = new Float32Array(image);
+        const voxelCoordinates = [];
+
+        const normalizeToRange = (value, min, max) => {
+          // Clamp value to a safe range
+          const newValue = Math.max(min, Math.min(max, value)); // Ensure value is in [min, max]
+          return ((newValue - min) / (max - min)) * 2 - 1; // Normalize to [-1, 1]
+        };
+
+        img.forEach((value, index) => {
+          if (!isNaN(value)) {
+            const z = Math.floor(index / (dimensions[0] * dimensions[1]));
+            const y = Math.floor(
+              (index % (dimensions[0] * dimensions[1])) / dimensions[0],
+            );
+            const x = index % dimensions[0];
+            let z_value;
+            if (value <= -1 || value >= 1) {
+              // Handle invalid values: clamp to a safe range or set to a default
+              // console.warn(`Invalid value for z-value computation: ${value}`);
+              z_value = 0; // Or assign a default value, e.g., `0`
+            } else {
+              z_value = 0.5 * math.log((1 + value) / (1 - value));
+            }
+            voxelCoordinates.push([x, y, z, z_value]);
+            // voxelCoordinates.push([x, y, z, value]);
+          }
+        });
+
+        console.log('Voxel Coordinates:', voxelCoordinates);
+
+        // Convert all voxel coordinates to world coordinates
+        const worldCoordinates = voxelCoordinates.map(([x, y, z, value]) => {
+          const voxelHomogeneous = [x, y, z, 1]; // Add 1 for homogeneous transformation
+          const worldHomogeneous = math.multiply(
+            affineMatrix,
+            voxelHomogeneous,
+          ); // Apply affine matrix
+          const [wx, wy, wz] = worldHomogeneous.slice(0, 3); // Extract world coordinates
+          return [wx, wy, wz, value]; // Add value to world coordinates
+        });
+
+        console.log('World Coordinates:', worldCoordinates);
+
+        // Optionally, set or process the world coordinates further
+        setNiiCoords(worldCoordinates);
+
+        // Set the voxel coordinates and affine matrix for further processing
+        // setNiiCoords({ voxelCoordinates, affineMatrix });
+      } catch (error) {
+        console.error('Error loading NIfTI file:', error);
+      }
+    };
+
+    loadNiftiFile();
   }, []);
 
   useEffect(() => {
@@ -1381,6 +1509,31 @@ function PlyViewer({
     }
   }, [quantities, amplitude]);
 
+  useEffect(() => {
+    const scene = sceneRef.current;
+    try {
+      const vertices = plotNiiCoords.map(([x, y, z]) => new THREE.Vector3(x, y, z));
+
+      // Create a geometry and add the vertices
+      const geometry = new THREE.BufferGeometry().setFromPoints(vertices);
+
+      // Create a material for the points
+      const material = new THREE.PointsMaterial({
+        color: 0x00ff00,
+        size: 3.0, // Size of each point
+      });
+
+      // Create the points object
+      const points = new THREE.Points(geometry, material);
+
+      // Add to the scene
+      scene.add(points);
+    } catch (err) {
+      console.log(err);
+    }
+
+  }, [plotNiiCoords]);
+
   const [zoomLevel, setZoomLevel] = useState(-3);
 
   // Function to change the camera angle
@@ -1467,46 +1620,6 @@ function PlyViewer({
     }
   }, [recoData]);
 
-  // const findNearestCoordinate = (target, coordinates) => {
-  //   const [x1, y1, z1] = target;
-  //   let minIndex = -1;
-  //   let minDistance = Infinity;
-
-  //   coordinates.forEach(([x2, y2, z2], index) => {
-  //     const distance = Math.sqrt(
-  //       Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2) + Math.pow(z2 - z1, 2),
-  //     );
-  //     if (distance < minDistance) {
-  //       minDistance = distance;
-  //       minIndex = index;
-  //     }
-  //   });
-  //   return minIndex;
-  // };
-
-  // const findNearestCoordinate = (target, coordinates) => {
-  //   const [x1, y1, z1] = target;
-  //   let minIndex = -1;
-  //   let minDistance = Infinity;
-  //   const coordinateDistances = [];
-  //   coordinates.forEach(([x2, y2, z2], index) => {
-  //     const distance = Math.sqrt(
-  //       (x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2,
-  //     );
-  //     // coordinateDistances.push(distance);
-  //     if (distance < minDistance) {
-  //       minDistance = distance;
-  //       minIndex = index;
-  //     }
-  //   });
-
-  //   return {
-  //     index: minIndex,
-  //     distance: minDistance,
-  //     distanceArray: coordinateDistances,
-  //   };
-  // };
-
   const findNearestCoordinate = (target, coordinates) => {
     const [x1, y1, z1] = target;
     let minIndex = -1;
@@ -1580,7 +1693,7 @@ function PlyViewer({
   // };
 
   const calculateAmplitude = (distance, k = 0.22) => {
-    const tmpAmp = k * (distance ** 2) + 0.1;
+    const tmpAmp = k * distance ** 2 + 0.1;
     return Math.round(tmpAmp * 10) / 10;
   };
 
@@ -1637,7 +1750,10 @@ function PlyViewer({
       // Check if the contact is in the list of specified indexes
       if (indexList.includes(parseFloat(contact) - 1)) {
         updatedSelectedValues[contact] = 'center';
-        updatedQuantities[contact] = togglePosition === 'center' ? tmpAmp * contactShare[parseFloat(contact - 1)] : 100 * contactShare[parseFloat(contact - 1)];
+        updatedQuantities[contact] =
+          togglePosition === 'center'
+            ? tmpAmp * contactShare[parseFloat(contact - 1)]
+            : 100 * contactShare[parseFloat(contact - 1)];
       } else {
         updatedQuantities[contact] = 0;
         updatedSelectedValues[contact] = 'left';
@@ -1648,11 +1764,15 @@ function PlyViewer({
     setSelectedValues(updatedSelectedValues);
   };
 
-  const cylinderSurfaceArea = (diameter = elspec.contact_diameter / 1000, height = elspec.contact_length / 1000, n_contacts=1) => {
+  const cylinderSurfaceArea = (
+    diameter = elspec.contact_diameter / 1000,
+    height = elspec.contact_length / 1000,
+    n_contacts = 1,
+  ) => {
     const radius = diameter / 2;
     const contact_area = 2 * Math.PI * radius * height;
     const directional_area = contact_area / n_contacts;
-    return directional_area
+    return directional_area;
   };
 
   const getCharge = (current, pulseWidth = 30) => {
@@ -1664,7 +1784,7 @@ function PlyViewer({
     return chargeInMicroCoulombs;
   };
 
-  const isSafeCharge = (Q, A, D, k=1.5) => {
+  const isSafeCharge = (Q, A, D, k = 1.5) => {
     const maxSafeCharge = A * 10 ** (k - Math.log10(D));
     // Check if the given charge per phase is below the safe threshold
     console.log('Q: ', Q);
@@ -1686,7 +1806,11 @@ function PlyViewer({
   const handleSafety = (amp) => {
     const contactSurfaceArea = cylinderSurfaceArea();
     const charge = getCharge(amp);
-    const { isSafe, maxSafeCharge } = isSafeCharge(charge, contactSurfaceArea, 30);
+    const { isSafe, maxSafeCharge } = isSafeCharge(
+      charge,
+      contactSurfaceArea,
+      30,
+    );
     let newAmplitude = amp;
     console.log(isSafe);
     console.log(maxSafeCharge);
@@ -1698,9 +1822,9 @@ function PlyViewer({
 
   const handleSTNParameters = () => {
     const STNCoords = new THREE.Vector3(11.28, -13.92, -9.02);
-    let bestQuantities = {};
-    let bestAmplitude = amplitude; // Initial amplitude
-    let minDistance = Infinity;
+    const bestQuantities = {};
+    const bestAmplitude = amplitude; // Initial amplitude
+    const minDistance = Infinity;
 
     const newCoords = [];
 
@@ -1830,13 +1954,21 @@ function PlyViewer({
     console.log(stimParams.amplitude);
     console.log(totalAmplitude);
     const contactShare = {};
-    contactShare[stimParams.distanceMaster[0].index] = stimParams.amplitude / totalAmplitude;
+    contactShare[stimParams.distanceMaster[0].index] =
+      stimParams.amplitude / totalAmplitude;
     contactShare[newIndex] = newAmplitude / totalAmplitude;
     console.log(contactShare);
-    const outputAmplitude = totalAmplitude > 5 ? stimParams.amplitude : totalAmplitude;
-    const outputText = `Active Contacts: ${names[stimParams.distanceMaster[0].index + 1]} and ${names[newContact]}, Amplitude: ${stimParams.amplitude}`;
+    const outputAmplitude =
+      totalAmplitude > 5 ? stimParams.amplitude : totalAmplitude;
+    const outputText = `Active Contacts: ${
+      names[stimParams.distanceMaster[0].index + 1]
+    } and ${names[newContact]}, Amplitude: ${stimParams.amplitude}`;
     setSolutionText(outputText);
-    handleQuantityStateChangeGroup([stimParams.distanceMaster[0].index, newIndex], outputAmplitude, contactShare);
+    handleQuantityStateChangeGroup(
+      [stimParams.distanceMaster[0].index, newIndex],
+      outputAmplitude,
+      contactShare,
+    );
   };
 
   const handleAvoidance = () => {
@@ -1844,13 +1976,18 @@ function PlyViewer({
     // const avoidCoord = [7.3, -10.2, -11.7];
     const avoidCoord = getCoordsForAvoidRoi();
     const sweetspotCoord = getCoordsForRoi();
-    const { bestIndex, rankedIndices, distance } = findOptimalCoordinate(sweetspotCoord, avoidCoord, elecCoords);
+    const { bestIndex, rankedIndices, distance } = findOptimalCoordinate(
+      sweetspotCoord,
+      avoidCoord,
+      elecCoords,
+    );
     console.log(bestIndex);
     const newContact = bestIndex + 1;
     const outputText = `${names[newContact]}`;
     const newAmplitude = calculateAmplitude(distance);
     setSolutionText(outputText);
-    const outputAmplitude = newAmplitude < 5 ? newAmplitude : stimParams.amplitude;
+    const outputAmplitude =
+      newAmplitude < 5 ? newAmplitude : stimParams.amplitude;
     // handleQuantityStateChange(bestIndex, stimParams.amplitude);
     handleQuantityStateChange(bestIndex, outputAmplitude);
   };
@@ -1863,6 +2000,383 @@ function PlyViewer({
   const handleAvoidanceRoiChange = (event) => {
     console.log(event.target.value);
     setAvoidRoi(event.target.value);
+  };
+  /**
+   * Validates input parameters for the optimizeSphereValues function.
+   * @param {Array} sphereCoords - Array of sphere centers, each center is an [x, y, z] coordinate.
+   * @param {Array} v - Array of contact values (e.g., [q1, q2, q3, q4]).
+   * @param {Array} L - Flattened landscape values, each row is [x, y, z, magnitude].
+   * @throws {Error} - If any validation check fails.
+   */
+  const validateInputs = (sphereCoords, v, L) => {
+    // Check that all inputs are arrays
+    if (!Array.isArray(sphereCoords)) {
+      throw new Error('sphereCoords must be an array.');
+    }
+    if (!Array.isArray(v)) {
+      throw new Error('v must be an array.');
+    }
+    if (!Array.isArray(L)) {
+      throw new Error('L must be an array.');
+    }
+
+    // Check that arrays are not empty
+    if (sphereCoords.length === 0) {
+      throw new Error('sphereCoords array cannot be empty.');
+    }
+    if (v.length === 0) {
+      throw new Error('v array cannot be empty.');
+    }
+    if (L.length === 0) {
+      throw new Error('L array cannot be empty.');
+    }
+
+    // Check length consistency
+    if (sphereCoords.length !== v.length) {
+      throw new Error('sphereCoords and v must have the same length.');
+    }
+
+    // Check that at least one v is greater than 0.1
+    const hasVOverThreshold = v.some(
+      (value) => typeof value === 'number' && value > 0.1,
+    );
+    if (!hasVOverThreshold) {
+      throw new Error(
+        'At least one contact value in v must be greater than 0.1.',
+      );
+    }
+
+    // Validate each sphere coordinate
+    sphereCoords.forEach((coord, index) => {
+      if (!Array.isArray(coord) || coord.length !== 3) {
+        throw new Error(
+          `sphereCoords[${index}] must be an array of three numeric values [x, y, z].`,
+        );
+      }
+      coord.forEach((val, subIndex) => {
+        if (typeof val !== 'number' || isNaN(val)) {
+          throw new Error(
+            `sphereCoords[${index}][${subIndex}] must be a valid number.`,
+          );
+        }
+      });
+    });
+
+    // Validate each contact value
+    v.forEach((value, index) => {
+      if (typeof value !== 'number' || isNaN(value) || value < 0) {
+        throw new Error(`v[${index}] must be a non-negative number.`);
+      }
+    });
+
+    // Validate each landscape point
+    L.forEach((point, index) => {
+      if (!Array.isArray(point) || point.length !== 4) {
+        throw new Error(
+          `L[${index}] must be an array of four numeric values [x, y, z, magnitude].`,
+        );
+      }
+      point.forEach((val, subIndex) => {
+        if (typeof val !== 'number' || isNaN(val)) {
+          throw new Error(`L[${index}][${subIndex}] must be a valid number.`);
+        }
+      });
+    });
+  };
+
+  /**
+   * Computes the radius of the sphere based on input millamps.
+   * @param {number} milliamps - Input value used to compute the radius.
+   * @returns {number} - Radius of the sphere.
+   */
+  const computeRadius = (milliamps) => {
+    const radius = (milliamps - 0.1) / 0.22;
+    return milliamps > 0.1 ? math.sqrt(radius) : 0;
+  };
+
+  /**
+   * Assigns values to the entire landscape based on the sphere's center and radius.
+   * Uses vectorized operations with math.js for improved performance.
+   * @param {Array} L - Array of points, each row is a point with each column being an [x, y, z, magnitude].
+   * @param {Array} center - Center of the sphere [x0, y0, z0].
+   * @param {number} r - Radius of the sphere.
+   * @returns {Array} - Array of 0s and 1s representing whether each point lies inside the sphere.
+   */
+  const assignSphereValues = (L, center, r) => {
+    const [x0, y0, z0] = center;
+    // Extract the x, y, z coordinates as separate arrays
+    const xCoords = math.column(L, 0);
+    const yCoords = math.column(L, 1);
+    const zCoords = math.column(L, 2);
+
+    // Compute the squared distance from each point to the sphere center
+    const dx = math.subtract(xCoords, x0);
+    const dy = math.subtract(yCoords, y0);
+    const dz = math.subtract(zCoords, z0);
+    const distanceSquared = math.add(
+      math.map(dx, (value) => value ** 2), // Element-wise square for dx
+      math.map(dy, (value) => value ** 2), // Element-wise square for dy
+      math.map(dz, (value) => value ** 2), // Element-wise square for dz
+    );
+
+    const radiusSquared = r ** 2; // Faster to square the radius for comparison than to root every squared distance.
+
+    // Perform element-wise comparison to get boolean array and convert to 0/1
+    const insideSphere = math.smaller(distanceSquared, radiusSquared); // Gets booleans via inequality
+    const sphereMask = math.multiply(insideSphere, 1); // Converts trues to 1s.
+    return sphereMask;
+  };
+
+  /**
+   * Calculates the dot product of the sphere assignment vector and the flattened landscape.
+   * @param {Array} S - Sphere assignment vector.
+   * @param {Array} L - Flattened landscape values array [x,y,z,magnitude]. Same organization of the above rows as points,
+   *                      but with a single column being value at that point.
+   *                      Each row should correspond with the row of the x,y,z in landscape for assignSphereValues
+   * @returns {number} - Dot product result.
+   */
+  const dotProduct = (S, L) => {
+    const magnitudes = math.column(L, 3);
+    return math.dot(S, magnitudes);
+  };
+
+  /**
+   * Calculates the target function value T(r), which is the density of 'high' values inside a sphere.
+   * @param {number} r - Radius of the sphere.
+   * @param {Array} S_r - Sphere assignment vector.
+   * @param {Array} L - Flattened landscape values.
+   * @returns {number} - Target function value.
+   */
+  const targetFunction = (r, S_r, L) => {
+    if (r === 0) {
+      return 0; // No volume, so density is zero
+    }
+    const volume = ((4 * Math.PI) / 3) * r ** 3;
+    const value = dotProduct(S_r, L);
+    const valueDensity = value / volume;
+    return valueDensity;
+  };
+
+  /**
+   * Computes the sum of the target function values for an array of possible sphere coordinates.
+   * Only includes spheres where the corresponding value in v is non-zero.
+   * @param {Array} sphereCoords - Array of sphere centers, each center is an [x, y, z] coordinate.
+   * @param {Array} v - Array of contact values (e.g., [q1, q2, q3, q4]).
+   * @param {Array} L - Flattened landscape values.
+   * @returns {number} - Sum of the target function values for all valid spheres.
+   */
+  const targetFunctionHandler = (sphereCoords, v, L) => {
+    let sumTargetValue = 0;
+    sphereCoords.forEach((center, index) => {
+      if (v[index] > 0) {
+        // Only compute if the corresponding v value is above 0.1 (which is minimum for VTA in our radius function)
+        const r = computeRadius(v[index]); // the value at index is our amperage. that is related to radius.
+        const S_r = assignSphereValues(L, center, r);
+        const targetValue = targetFunction(r, S_r, L);
+        sumTargetValue += targetValue;
+      }
+    });
+    return sumTargetValue;
+  };
+
+  /**
+   * Calculates the penalty for individual contacts. If contact current above 5mA, penalize.
+   * @param {number} v - Contact value (milliamperages)
+   * @param {number} lambda - Penalty coefficient.
+   * @returns {number} - Penalty value.
+   */
+  const penaltyPerContact = (v, lambda) => lambda * Math.max(v - 5, 0);
+
+  /**
+   * Handler function to compute the total penalty for a vector of contact values.
+   * @param {Array} v - Array of contact values (e.g., [q1, q2, q3, q4]).
+   * @param {number} lambda - Penalty coefficient.
+   * @returns {number} - Total penalty value for all contacts.
+   */
+  const penaltyPerContactHandler = (v, lambda) => {
+    return v.reduce((sum, value) => sum + penaltyPerContact(value, lambda), 0);
+  };
+
+  /**
+   * Calculates the penalty across all  contacts. If total current above 6mA, penalize.
+   * @param {Array} v - Array of contact values (milliamperages)
+   * @param {number} lambda - Penalty coefficient.
+   * @returns {number} - Penalty value.
+   */
+  const penaltyAllContacts = (v, lambda) =>
+    lambda * math.max(math.sum(v) - 6, 0);
+
+  /**
+   * Computes the loss function value.
+   * @param {Array} sphereCoords - Array of sphere centers, each center is an [x, y, z] coordinate.
+   * @param {Array} v - Array of contact values (e.g., [q1, q2, q3, q4]). Organized like sphereCoords
+   * @param {Array} L - Flattened landscape values.
+   * @param {number} lambda - Penalty coefficient.
+   * @returns {number} - Loss function value.
+   */
+  const lossFunction = (sphereCoords, v, L, lambda) => {
+    const T = targetFunctionHandler(sphereCoords, v, L); // Compute the total target value across all relevant spheres
+    const P1 = penaltyPerContactHandler(v, lambda); // Compute the penalty for individual contacts
+    const P2 = penaltyAllContacts(v, lambda); // Compute the overall penalty for the sum of contact values
+    return T - P1 - P2; // Return the loss function value
+  };
+
+  /**
+   * Computes the difference quotient (numerical derivative) for a given element in the vector v.
+   * @param {Array} v - Array of contact values (e.g., [q1, q2, q3, q4]).
+   * @param {number} lossCurrent - loss at the current array of v.
+   * @param {number} index - Index of the element to compute the derivative for.
+   * @param {number} h - Small step size for numerical differentiation.
+   * @param {Array} sphereCoords - Array of sphere centers.
+   * @param {Array} L - Flattened landscape values.
+   * @param {number} lambda - Penalty coefficient.
+   * @returns {number} - Numerical derivative at the specified index.
+   */
+  const partialDifferenceQuotient = (
+    v,
+    lossCurrent,
+    index,
+    h,
+    sphereCoords,
+    L,
+    lambda,
+  ) => {
+    const vForward = [...v]; // Create a copy of v
+    vForward[index] += h; // Perturb (step forward) by h only for the variable v at index i
+    const lossForward = lossFunction(sphereCoords, vForward, L, lambda);
+    const partialDifference = (lossForward - lossCurrent) / h;
+    return partialDifference;
+  };
+
+  /**
+   * Computes the gradient vector of the loss function across all elements in v.
+   * Uses the `partialDifferenceQuotient` function for numerical differentiation.
+   * @param {Array} v - Array of contact values (e.g., [q1, q2, q3, q4]).
+   * @param {number} h - Small step size for numerical differentiation.
+   * @param {Array} sphereCoords - Array of sphere centers.
+   * @param {Array} L - Flattened landscape values.
+   * @param {number} lambda - Penalty coefficient.
+   * @returns {Array} - Gradient vector of the loss function.
+   */
+  const gradientVectorHandler = (v, h, sphereCoords, L, lambda) => {
+    const lossCurrent = lossFunction(sphereCoords, v, L, lambda); // Compute the current loss
+    const gradientVector = v.map(
+      (
+        v_i,
+        index, // Use `partialDifferenceQuotient` for each element in v to construct the gradient vector
+      ) =>
+        partialDifferenceQuotient(
+          v,
+          lossCurrent,
+          index,
+          h,
+          sphereCoords,
+          L,
+          lambda,
+        ),
+    );
+    return gradientVector;
+  };
+
+  /**
+   * Performs a single step of gradient ascent to update the contact values.
+   * Uses the computed gradient vector to adjust each element of v in the direction of increasing the loss function.
+   * @param {Array} gradientVector - The gradient vector of the loss function (numerical derivatives for each element of v).
+   * @param {Array} v - Array of contact values (e.g., [q1, q2, q3, q4]).
+   * @param {number} alpha - Learning rate for gradient ascent (step size).
+   * @returns {Array} - Updated array of contact values after the gradient ascent step.
+   */
+  const gradientAscent = (gradientVector, v, alpha) => {
+    // Use element-wise addition with math.js for efficient vector operation
+    return math.add(v, math.multiply(gradientVector, alpha));
+  };
+
+  const filterBoxAroundSphere = (L, sphereCoords, boxSize, sphereIndex) => {
+    // Extract the center of the box from the third sphere coordinate
+    const [cx, cy, cz] = sphereCoords[sphereIndex];
+    console.log(cx, cy, cz);
+    console.log(L);
+    // Define the half-size of the box (since the box is symmetric around the center)
+    const halfBox = boxSize / 2;
+
+    // Filter L based on the box boundaries
+    const filteredL = L.filter(
+      ([x, y, z]) =>
+        x >= cx - halfBox &&
+        x <= cx + halfBox &&
+        y >= cy - halfBox &&
+        y <= cy + halfBox &&
+        z >= cz - halfBox &&
+        z <= cz + halfBox,
+    );
+
+    console.log(`Filtered L size: ${filteredL.length}`);
+    return filteredL;
+  };
+
+  /**
+   * Orchestrates the optimization process using gradient ascent.
+   *
+   * STOP Rules
+   * grad L1 norm     - not implemented
+   * grad L2 norm     - not implemented
+   * max iterations   - implemented
+   * convergence      - not implemented
+   * plateau dtxn     - not implemented
+   *
+   * NOTES:
+   * Potential Logical Error: No safeguard against differing array lengths.
+   * Ensure that sphereCoords and v are always of equal length to prevent unintended behavior.
+   *
+   * Performs a maximum of 100 iterations and includes placeholders for additional stopping rules.
+   * @param {Array} sphereCoords - Array of sphere centers, each center is an [x, y, z] coordinate.
+   * @param {Array} v - Initial guess for the array of contact values (e.g., [q1, q2, q3, q4]).
+   * @param {Array} L - Flattened landscape values, an array of (n,m) where n is the points and m is 4 cols (x coord,y coord,z coord,magnitude)
+   * @param {number} lambda - Penalty coefficient.
+   * @param {number} alpha - Learning rate for gradient ascent (step size).
+   * @param {number} h - Small step size for numerical differentiation.
+   * @returns {Array} - Optimized array of contact values.
+   */
+  const optimizeSphereValues = (
+    sphereCoords,
+    v,
+    L,
+    lambda = 10,
+    alpha = 0.01,
+    h = 0.05,
+  ) => {
+    validateInputs(sphereCoords, v, L); // throw errors if inputs are incorrect.
+
+    let currentV = [...v]; // Clone the initial guess for v
+    let iteration = 0;
+    const reducedL = filterBoxAroundSphere(L, sphereCoords, 50, 2);
+    console.log(reducedL);
+    setPlotNiiCoords(reducedL);
+    while (iteration < 5) {
+      //  allows 100 steps of 0.05mA changes (max of 5mA in total change)
+      const gradientVector = gradientVectorHandler(
+        currentV,
+        h,
+        sphereCoords,
+        reducedL,
+        lambda,
+      ); // get gradient
+      const updatedV = gradientAscent(gradientVector, currentV, alpha); // ascend gradient
+      currentV = updatedV; // update
+      iteration += 1; // increment
+    }
+    console.log(`Optimization completed after ${iteration} iterations.`);
+    return currentV;
+  };
+
+  const handleNiiMap = () => {
+    const sphereCoords = elecCoords;
+    console.log(elecCoords);
+    // const v = [0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75];
+    const v = [5, 5, 5, 5];
+    const L = niiCoords;
+    const outputV = optimizeSphereValues(sphereCoords, v, L);
+    console.log(outputV);
   };
 
   // useEffect(() => {
@@ -2203,7 +2717,7 @@ function PlyViewer({
               </Tab>
               <Tab eventKey="solution" title="Automatic Solution">
                 <div>
-                  <h3 style={{fontSize: '14px'}}>Optimize for:</h3>
+                  <h3 style={{ fontSize: '14px' }}>Optimize for:</h3>
                   <select
                     id="options"
                     style={{ width: '200px' }}
@@ -2233,7 +2747,7 @@ function PlyViewer({
                       Provide Solution
                     </Button>
                   </div>
-                  <h3 style={{fontSize: '14px'}}>Avoid:</h3>
+                  <h3 style={{ fontSize: '14px' }}>Avoid:</h3>
                   <select
                     id="options"
                     style={{ width: '200px' }}
@@ -2274,6 +2788,9 @@ function PlyViewer({
                     </Button>
                     <Button variant="primary" onClick={handleAvoidance}>
                       Avoid
+                    </Button>
+                    <Button variant="primary" onClick={handleNiiMap}>
+                      Test Nii Map
                     </Button>
                     {/* <span>{solutionText}</span> */}
                   </div>
