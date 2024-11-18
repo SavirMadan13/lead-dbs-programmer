@@ -5,14 +5,14 @@ import './App.css';
 import Dropdown from 'react-bootstrap/dropdown';
 import { Slider } from '@mui/material';
 import * as XLSX from 'xlsx';
+import { ButtonGroup, Button } from 'react-bootstrap';
+import { json } from 'node:stream/consumers';
 import TabbedElectrodeIPGSelectionTest from './components/TabbedElectrodeIPGSelectionTest';
 import Navbar from './components/Navbar';
 // import Navbar from 'react-bootstrap/Navbar'
 import StimulationSettings from './components/StimulationSettings';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { ButtonGroup, Button } from 'react-bootstrap';
 import GroupArchitecture from './components/GroupArchitecture';
-import { json } from 'node:stream/consumers';
 import electrodeModels from './components/electrodeModels.json';
 
 const importData = [];
@@ -112,7 +112,11 @@ export default function App() {
 
   const parseAmplitude = (ampString) => {
     const value = parseFloat(ampString); // Extract numerical value
-    const unit = ampString.includes("mA") ? "mA" : ampString.includes("V") ? "V" : null; // Determine the unit
+    const unit = ampString.includes('mA')
+      ? 'mA'
+      : ampString.includes('V')
+      ? 'V'
+      : null; // Determine the unit
     return { value, unit };
   };
 
@@ -128,10 +132,10 @@ export default function App() {
     const overallTogglePositions = { ...overallState.allTogglePositions };
     const importedData = jsonData;
 
-    const Amp_L = jsonData.Amp_L;
-    const Amp_R = jsonData.Amp_R;
-    const Contact_L = jsonData.Contact_L;
-    const Contact_R = jsonData.Contact_R;
+    const { Amp_L } = jsonData;
+    const { Amp_R } = jsonData;
+    const { Contact_L } = jsonData;
+    const { Contact_R } = jsonData;
 
     const leftAmplitude = parseAmplitude(Amp_L);
     const rightAmplitude = parseAmplitude(Amp_R);
@@ -189,23 +193,39 @@ export default function App() {
         // const polarity = part.includes('+') ? '+' : '-'; // Default to '-' if not specified
         const polarity = '-';
         // Get the range of contacts based on level and active letters
-        const contactRange = getContactsForLevel(contactLevel, activeLetters, overallState.leftElectrode);
+        const contactRange = getContactsForLevel(
+          contactLevel,
+          activeLetters,
+          overallState.leftElectrode,
+        );
 
         // Add to the appropriate contact array and counter based on side and polarity
         if (side === 'left') {
           if (polarity === '+') {
-            leftActivePlusContacts = [...leftActivePlusContacts, ...contactRange];
+            leftActivePlusContacts = [
+              ...leftActivePlusContacts,
+              ...contactRange,
+            ];
             leftTotalPlusContacts += contactRange.length;
           } else {
-            leftActiveMinusContacts = [...leftActiveMinusContacts, ...contactRange];
+            leftActiveMinusContacts = [
+              ...leftActiveMinusContacts,
+              ...contactRange,
+            ];
             leftTotalMinusContacts += contactRange.length;
           }
         } else if (side === 'right') {
           if (polarity === '+') {
-            rightActivePlusContacts = [...rightActivePlusContacts, ...contactRange];
+            rightActivePlusContacts = [
+              ...rightActivePlusContacts,
+              ...contactRange,
+            ];
             rightTotalPlusContacts += contactRange.length;
           } else {
-            rightActiveMinusContacts = [...rightActiveMinusContacts, ...contactRange];
+            rightActiveMinusContacts = [
+              ...rightActiveMinusContacts,
+              ...contactRange,
+            ];
             rightTotalMinusContacts += contactRange.length;
           }
         }
@@ -235,7 +255,6 @@ export default function App() {
     processContact(Contact_R, 'right');
     processContact(Contact_L, 'left');
 
-
     outputState.allQuantities = overallQuantities;
     outputState.allSelectedValues = overallSelectedValues;
     outputState.allTotalAmplitudes = overallTotalAmplitudes;
@@ -246,7 +265,224 @@ export default function App() {
     // return { overallQuantities, overallSelectedValues,  };
 
     // console.log(activePlusContacts, activeMinusContacts, totalMinusContacts, totalPlusContacts);
+  };
 
+  // Parse contact string (e.g., "2", "2a", "1abc")
+  function parseContacts(
+    contactStr,
+    contacts,
+    isDirectional,
+    directionalLevels,
+  ) {
+    if (!contactStr) return [];
+    contactStr = String(contactStr);
+    console.log(contactStr);
+    const activeContacts = new Set();
+
+    if (contactStr === 'C') {
+      // Case is active
+      console.log(contactStr);
+      activeContacts.add('Case');
+    } else if (isDirectional) {
+      // Directional logic
+      const contactPattern = /^(\d+)([abc]*)$/;
+      const match = contactStr.match(contactPattern);
+
+      if (match) {
+        const level = parseInt(match[1]);
+        const subContacts =
+          match[2] || (directionalLevels.includes(level) ? 'abc' : ''); // Default to all if unspecified and directional
+
+        if (subContacts.includes('a')) activeContacts.add(`${level}a`);
+        if (subContacts.includes('b')) activeContacts.add(`${level}b`);
+        if (subContacts.includes('c')) activeContacts.add(`${level}c`);
+      }
+    } else {
+      // Non-directional logic
+      const level = parseInt(contactStr);
+      for (let i = 0; i < contacts; i++) {
+        activeContacts.add(`${level}`);
+      }
+    }
+
+    return Array.from(activeContacts);
+  }
+
+  // Process an electrode (Right or Left)
+  function processElectrode(
+    anode,
+    cathode,
+    value,
+    contacts,
+    isDirectional,
+    directionalLevels,
+  ) {
+
+    // Parse the value (detect mA or V)
+    console.log(value);
+    const match = value.match(/([\d.]+)\s*(mA|V)/);
+    const amplitude = match ? parseFloat(match[1]) : null;
+    const unit = match ? match[2] : null;
+    console.log(String(anode), cathode, value);
+
+    return {
+      anodes: parseContacts(String(anode), contacts, isDirectional, directionalLevels),
+      cathodes: parseContacts(
+        cathode,
+        contacts,
+        isDirectional,
+        directionalLevels,
+      ),
+      amplitude,
+      unit,
+    };
+  }
+
+  function parseElectrodeData(excelFile, electrodeConfig) {
+    // Example `electrodeConfig`: { contacts: 8, isDirectional: true, directionalLevels: [1, 2] }
+    const { contacts, isDirectional, directionalLevels } = electrodeConfig;
+    console.log('Excel file: ', excelFile);
+    // Parse the Excel file
+    // const workbook = XLSX.read(excelFile.path, { type: "binary" });
+    // const sheetName = workbook.SheetNames[0]; // Assuming the first sheet
+    // const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
+
+    const data = excelFile;
+    console.log(data);
+    const patients2 = [];
+
+    // Process each row of data (starting after the header row)
+    for (let i = 0; i < data.length; i++) {
+      const row = data[i];
+      console.log(row);
+      // console.log(row)
+      // if (!row[0]) continue; // Skip empty rows
+
+      const patient = {
+        id: row['ID'],
+        rightElectrode: processElectrode(
+          row['Right Anode (-)'],
+          row['Right Cathode (+)'],
+          row['Right Voltage/Current'],
+          contacts,
+          isDirectional,
+          directionalLevels,
+        ),
+        leftElectrode: processElectrode(
+          row['Left Anode (-)'],
+          row['Left Cathode (+)'],
+          row['Left Voltage/Current'],
+          contacts,
+          isDirectional,
+          directionalLevels,
+        ),
+      };
+      console.log(patient);
+
+      patients2.push(patient);
+    }
+
+    return patients2;
+  }
+
+  const handleImportedExcelData = (tempPatientStates, patients, electrodeConfig) => {
+    const { numContacts, isDirectional, directionalLevels } = electrodeConfig;
+    const updatedPatientStates = { ...patients };
+    const directionalContactMap = { 'Case': 0, 0: 1, '1a': 2, '1b': 3, '1c': 4, '2a': 5, '2b': 6, '2c': 7, 3: 8};
+    const nonDirectionalMap = (numContacts) => {
+      const outputContactMap = {'Case': 0};
+      for (let i=0; i < numContacts; i++) {
+        outputContactMap[i] = i + 1;
+      }
+      return outputContactMap;
+    };
+    const contactMapper = isDirectional ? directionalContactMap : nonDirectionalMap(numContacts);
+    Object.keys(updatedPatientStates).forEach((key, index) => {
+      const updatedQuantities = { ...updatedPatientStates[key].allQuantities };
+      const updatedSelectedValues = { ...updatedPatientStates[key].allSelectedValues };
+      const updatedTogglePositions = { ...updatedPatientStates[key].allTogglePositions };
+      console.log(updatedTogglePositions);
+      const updatedVolAmpToggles = { ...updatedPatientStates[key].allVolAmpToggles };
+      const updatedAmplitudes = { ...updatedPatientStates[key].allTotalAmplitudes };
+      const numRightAnodes = tempPatientStates[index].rightElectrode.anodes.length;
+      console.log(numRightAnodes);
+      const numRightCathodes = tempPatientStates[index].rightElectrode.cathodes.length;
+      const numLeftAnodes = tempPatientStates[index].leftElectrode.anodes.length;
+      const numLeftCathodes = tempPatientStates[index].leftElectrode.cathodes.length;
+
+      Object.keys(updatedQuantities).forEach((key) => {
+        Object.keys(updatedQuantities[key]).forEach((contact) => {
+          updatedQuantities[key][contact] = 0;
+          updatedSelectedValues[key][contact] = 'left';
+        });
+      });
+
+      tempPatientStates[index].rightElectrode.anodes.map((anode) => {
+        let contact = contactMapper[anode];
+        if (tempPatientStates[index].rightElectrode.unit === 'mA') {
+          updatedQuantities[5][contact] = tempPatientStates[index].rightElectrode.amplitude / numRightAnodes;
+          updatedSelectedValues[5][contact] = 'center';
+          updatedTogglePositions[5] = tempPatientStates[index].rightElectrode.unit;
+          updatedVolAmpToggles[5] = 'center';
+        } else {
+          updatedQuantities[5][contact] = tempPatientStates[index].rightElectrode.amplitude;
+          updatedSelectedValues[5][contact] = 'center';
+          updatedTogglePositions[5] = tempPatientStates[index].rightElectrode.unit;
+          updatedVolAmpToggles[5] = 'right';
+        }
+      });
+      tempPatientStates[index].rightElectrode.cathodes.map((cathode) => {
+        let contact = contactMapper[cathode];
+        if (tempPatientStates[index].rightElectrode.unit === 'mA') {
+          updatedQuantities[5][contact] = tempPatientStates[index].rightElectrode.amplitude / numRightCathodes;
+          updatedSelectedValues[5][contact] = 'right';
+          updatedTogglePositions[5] = tempPatientStates[index].rightElectrode.unit;
+          updatedVolAmpToggles[5] = 'center';
+        } else {
+          updatedQuantities[5][contact] = tempPatientStates[index].rightElectrode.amplitude;
+          updatedSelectedValues[5][contact] = 'right';
+          updatedTogglePositions[5] = tempPatientStates[index].rightElectrode.unit;
+          updatedVolAmpToggles[5] = 'right';
+        }
+      });
+      tempPatientStates[index].leftElectrode.anodes.map((anode) => {
+        let contact = contactMapper[anode];
+        if (tempPatientStates[index].leftElectrode.unit === 'mA') {
+          updatedQuantities[1][contact] = tempPatientStates[index].leftElectrode.amplitude / numLeftAnodes;
+          updatedSelectedValues[1][contact] = 'center';
+          updatedTogglePositions[1] = tempPatientStates[index].leftElectrode.unit;
+          updatedVolAmpToggles[1] = 'center';
+        } else {
+          updatedQuantities[1][contact] = tempPatientStates[index].leftElectrode.amplitude;
+          updatedSelectedValues[1][contact] = 'center';
+          updatedTogglePositions[1] = tempPatientStates[index].leftElectrode.unit;
+          updatedVolAmpToggles[1] = 'right';
+        }
+      });
+      tempPatientStates[index].leftElectrode.cathodes.map((cathode) => {
+        let contact = contactMapper[cathode];
+        if (tempPatientStates[index].leftElectrode.unit === 'mA') {
+          updatedQuantities[1][contact] = tempPatientStates[index].leftElectrode.amplitude / numLeftCathodes;
+          updatedSelectedValues[1][contact] = 'right';
+          updatedTogglePositions[1] = tempPatientStates[index].leftElectrode.unit;
+          updatedVolAmpToggles[1] = 'center';
+        } else {
+          updatedQuantities[1][contact] = tempPatientStates[index].leftElectrode.amplitude;
+          updatedSelectedValues[1][contact] = 'right';
+          updatedTogglePositions[1] = tempPatientStates[index].leftElectrode.unit;
+          updatedVolAmpToggles[1] = 'right';
+        }
+      });
+      updatedAmplitudes[5] = tempPatientStates[index].rightElectrode.amplitude;
+      updatedAmplitudes[1] = tempPatientStates[index].leftElectrode.amplitude;
+      updatedPatientStates[key].allQuantities = updatedQuantities;
+      updatedPatientStates[key].allSelectedValues = updatedSelectedValues;
+      updatedPatientStates[key].allTogglePositions = updatedTogglePositions;
+      updatedPatientStates[key].allVolAmpToggles = updatedVolAmpToggles;
+      updatedPatientStates[key].allTotalAmplitudes = updatedAmplitudes;
+    });
+    console.log(updatedPatientStates);
+    setPatientStates(updatedPatientStates);
   };
 
   const handleFileChange = (event) => {
@@ -262,10 +498,19 @@ export default function App() {
         console.log(jsonData); // Pass data to your handler function
         console.log(patientStates);
         const updatedPatientStates = { ...patientStates };
-        Object.keys(patientStates).forEach((key, index) => {
-          updatedPatientStates[key] = parseInput(jsonData[index], patientStates[key]);
-        });
-        setPatientStates(updatedPatientStates);
+        // Object.keys(patientStates).forEach((key, index) => {
+          // updatedPatientStates[key] = parseInput(jsonData[index], patientStates[key]);
+        const electrodeConfig = {
+          contacts: 8,
+          isDirectional: true,
+          directionalLevels: [1, 2],
+        };
+        const tempPatientStates = parseElectrodeData(jsonData, electrodeConfig);
+        handleImportedExcelData(tempPatientStates, patientStates, electrodeConfig);
+        console.log(tempPatientStates);
+          // updatedPatientStates[key] = parseElectrodeData(jsonData, electrodeConfig);
+        // });
+        // setPatientStates(updatedPatientStates);
       };
       reader.readAsArrayBuffer(file);
     }
@@ -480,18 +725,18 @@ export default function App() {
 
       const dynamicKey2 = `Ls${j}`;
       const dynamicKey3 = `Rs${j}`;
-      if (jsonData[dynamicKey2]['va'] === 2) {
+      if (jsonData[dynamicKey2].va === 2) {
         newAllVolAmpToggles[j] = 'center';
         newAllTogglePositions[j] = '%';
-      } else if (jsonData[dynamicKey2]['va'] === 1) {
+      } else if (jsonData[dynamicKey2].va === 1) {
         newAllVolAmpToggles[j] = 'right';
         newAllTogglePositions[j] = 'V';
       }
 
-      if (jsonData[dynamicKey3]['va'] === 2) {
+      if (jsonData[dynamicKey3].va === 2) {
         newAllVolAmpToggles[j + 4] = 'center';
         newAllTogglePositions[j + 4] = '%';
-      } else if (jsonData[dynamicKey3]['va'] === 1) {
+      } else if (jsonData[dynamicKey3].va === 1) {
         newAllVolAmpToggles[j + 4] = 'right';
         newAllTogglePositions[j + 4] = 'V';
       }
@@ -546,7 +791,7 @@ export default function App() {
         return obj;
       }, {});
 
-    let filteredQuantities = Object.keys(newQuantities)
+    const filteredQuantities = Object.keys(newQuantities)
       .filter((key) => Object.keys(newQuantities[key]).length > 0)
       .reduce((obj, key) => {
         obj[key] = newQuantities[key];
@@ -854,7 +1099,7 @@ export default function App() {
     const leftAmpArray = [];
 
     for (let j = 1; j < 5; j++) {
-      let dynamicKey2 = `Ls${j}`;
+      const dynamicKey2 = `Ls${j}`;
       if (allSelectedValues[j] && updatedOutputQuantity[j]) {
         // Need to change the i = 9 to number of electrodes to accomodate for 16 contact electrodes
         for (let i = 1; i < loopSize; i++) {
@@ -866,7 +1111,7 @@ export default function App() {
           } else if (allSelectedValues[j][i] === 'right') {
             polarity = 2;
           }
-          let dynamicKey = `k${i}`;
+          const dynamicKey = `k${i}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: parseFloat(updatedOutputQuantity[j][i]),
             pol: polarity,
@@ -896,7 +1141,7 @@ export default function App() {
         // console.log(data.S.activecontacts);
       } else {
         for (let i = 1; i < loopSize; i++) {
-          let dynamicKey = `k${i}`;
+          const dynamicKey = `k${i}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: 0,
             pol: 0,
@@ -918,7 +1163,7 @@ export default function App() {
     const rightAmpArray = [];
 
     for (let j = 1; j < 5; j++) {
-      let dynamicKey2 = `Rs${j}`;
+      const dynamicKey2 = `Rs${j}`;
       if (allSelectedValues[j + 4] && updatedOutputQuantity[j + 4]) {
         for (let i = 1; i < loopSize; i++) {
           let polarity = 0;
@@ -929,7 +1174,7 @@ export default function App() {
           } else if (allSelectedValues[j + 4][i] === 'right') {
             polarity = 2;
           }
-          let dynamicKey = `k${i}`;
+          const dynamicKey = `k${i}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: parseFloat(updatedOutputQuantity[j + 4][i]),
             pol: polarity,
@@ -959,7 +1204,7 @@ export default function App() {
         // rightAmpArray[j + 4] = parseFloat(allTotalAmplitudes[j + 4]);
       } else {
         for (let i = 1; i < loopSize; i++) {
-          let dynamicKey = `k${i}`;
+          const dynamicKey = `k${i}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: 0,
             pol: 0,
@@ -1050,11 +1295,11 @@ export default function App() {
 
   const handleExport = () => {
     console.log('Patient States for Export', patientStates);
-    let outputData = [];
+    const outputData = [];
     try {
       Object.values(patientStates).forEach((tempStates, index) => {
         console.log('TempStates: ', tempStates);
-        let tempData = gatherExportedData5(
+        const tempData = gatherExportedData5(
           tempStates.allTotalAmplitudes,
           tempStates.allQuantities,
           tempStates.allSelectedValues,
@@ -1088,7 +1333,7 @@ export default function App() {
       <div className="Navbar">
         <Navbar />
       </div>
-      <div style={{ paddingTop: '20px', paddingBottom: '-50px' }}></div>
+      <div style={{ paddingTop: '20px', paddingBottom: '-50px' }} />
       {/* <div
         style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '20px' }}
       >
