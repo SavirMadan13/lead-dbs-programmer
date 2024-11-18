@@ -1286,8 +1286,9 @@ const createWindow = async () => {
   ipcMain.handle('load-nii-file', async (event, historical) => {
     const { patient, timeline, directoryPath, leadDBS } = historical;
     if (leadDBS) {
-      // const filePath = '/Users/savirmadan/Downloads/Cognitive Decline Network.nii';
-      const filePath = '/Users/savirmadan/Downloads/r0maps_stn129/rmap_updrstotal.nii';
+      const filePath = '/Users/savirmadan/Downloads/Cognitive Decline Network.nii';
+      // const filePath = '/Users/savirmadan/Downloads/r0maps_stn129/rmap_updrstotal.nii';
+      // const filePath = '/Users/savirmadan/Downloads/r0maps_stn129/rmap_tremor.nii';
       const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
       return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
     }

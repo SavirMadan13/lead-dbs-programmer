@@ -46,8 +46,9 @@ function PlyViewer({
   const [elecCoords, setElecCoords] = useState(null);
   const [roi, setRoi] = useState('tremor-0');
   const [avoidRoi, setAvoidRoi] = useState('tremor-0');
-  const [niiCoords, setNiiCoords] = useState([]);
+  const [niiCoords, setNiiCoords] = useState(null);
   const [plotNiiCoords, setPlotNiiCoords] = useState({});
+  const [niiSolution, setNiiSolution] = useState('');
 
   // Thresholding/Modification stuff
 
@@ -80,6 +81,83 @@ function PlyViewer({
 
     loadPlyFile(); // Call the async function
   }, []);
+
+  // const loadNiftiFile = async () => {
+  //   try {
+  //     // Invoke IPC to load NIfTI file
+  //     const fileData = await window.electron.ipcRenderer.invoke(
+  //       'load-nii-file',
+  //       historical,
+  //     );
+
+  //     // Check if the file is a valid NIfTI file
+  //     if (!nifti.isNIFTI(fileData)) {
+  //       throw new Error('File is not a valid NIfTI file');
+  //     }
+
+  //     // Read header and image data
+  //     const header = nifti.readHeader(fileData);
+  //     const image = nifti.readImage(header, fileData);
+  //     console.log(header);
+  //     // Extract affine transformation matrix
+  //     const affineMatrix = header.affine;
+  //     console.log('Affine Matrix:', affineMatrix);
+
+  //     // Extract dimensions and convert voxel indices to [x, y, z, value]
+  //     const dimensions = header.dims.slice(1, 4);
+  //     const img = new Float32Array(image);
+  //     const voxelCoordinates = [];
+
+  //     const normalizeToRange = (value, min, max) => {
+  //       // Clamp value to a safe range
+  //       const newValue = Math.max(min, Math.min(max, value)); // Ensure value is in [min, max]
+  //       return ((newValue - min) / (max - min)) * 2 - 1; // Normalize to [-1, 1]
+  //     };
+
+  //     img.forEach((value, index) => {
+  //       if (!isNaN(value)) {
+  //         const z = Math.floor(index / (dimensions[0] * dimensions[1]));
+  //         const y = Math.floor(
+  //           (index % (dimensions[0] * dimensions[1])) / dimensions[0],
+  //         );
+  //         const x = index % dimensions[0];
+  //         let z_value;
+  //         if (value <= -1 || value >= 1) {
+  //           // Handle invalid values: clamp to a safe range or set to a default
+  //           // console.warn(`Invalid value for z-value computation: ${value}`);
+  //           z_value = 0; // Or assign a default value, e.g., `0`
+  //         } else {
+  //           z_value = 0.5 * math.log((1 + value) / (1 - value));
+  //         }
+  //         voxelCoordinates.push([x, y, z, z_value]);
+  //         // voxelCoordinates.push([x, y, z, value]);
+  //       }
+  //     });
+
+  //     console.log('Voxel Coordinates:', voxelCoordinates);
+
+  //     // Convert all voxel coordinates to world coordinates
+  //     const worldCoordinates = voxelCoordinates.map(([x, y, z, value]) => {
+  //       const voxelHomogeneous = [x, y, z, 1]; // Add 1 for homogeneous transformation
+  //       const worldHomogeneous = math.multiply(
+  //         affineMatrix,
+  //         voxelHomogeneous,
+  //       ); // Apply affine matrix
+  //       const [wx, wy, wz] = worldHomogeneous.slice(0, 3); // Extract world coordinates
+  //       return [wx, wy, wz, value]; // Add value to world coordinates
+  //     });
+
+  //     console.log('World Coordinates:', worldCoordinates);
+
+  //     // Optionally, set or process the world coordinates further
+  //     setNiiCoords(worldCoordinates);
+  //     return worldCoordinates;
+  //     // Set the voxel coordinates and affine matrix for further processing
+  //     // setNiiCoords({ voxelCoordinates, affineMatrix });
+  //   } catch (error) {
+  //     console.error('Error loading NIfTI file:', error);
+  //   }
+  // };
 
   // useEffect(() => {
   //   const loadNiftiFile = async () => {
@@ -124,6 +202,11 @@ function PlyViewer({
   //   loadNiftiFile(); // Call the async function
   // }, []);
 
+  const convert_fox_to_mni = (coordinates, resolution=2) => {
+    const offset = [45, 63, 36];
+    return coordinates.map((value, index) => (value - offset[index]) * resolution);
+  };
+
   useEffect(() => {
     const loadNiftiFile = async () => {
       try {
@@ -137,11 +220,12 @@ function PlyViewer({
         if (!nifti.isNIFTI(fileData)) {
           throw new Error('File is not a valid NIfTI file');
         }
-
+        console.log(fileData);
         // Read header and image data
         const header = nifti.readHeader(fileData);
         const image = nifti.readImage(header, fileData);
         console.log(header);
+        console.log(image);
         // Extract affine transformation matrix
         const affineMatrix = header.affine;
         console.log('Affine Matrix:', affineMatrix);
@@ -149,6 +233,7 @@ function PlyViewer({
         // Extract dimensions and convert voxel indices to [x, y, z, value]
         const dimensions = header.dims.slice(1, 4);
         const img = new Float32Array(image);
+        console.log(img);
         const voxelCoordinates = [];
 
         const normalizeToRange = (value, min, max) => {
@@ -156,6 +241,15 @@ function PlyViewer({
           const newValue = Math.max(min, Math.min(max, value)); // Ensure value is in [min, max]
           return ((newValue - min) / (max - min)) * 2 - 1; // Normalize to [-1, 1]
         };
+
+        console.log('Dimensions:', dimensions); // Should match size(nii.img)
+        console.log('Sample Mappings:');
+        [0, 1, 100, 1000, 100000].forEach((index) => {
+          const z = Math.floor(index / (dimensions[0] * dimensions[1]));
+          const y = Math.floor((index % (dimensions[0] * dimensions[1])) / dimensions[0]);
+          const x = index % dimensions[0];
+          console.log(`Index ${index} => x: ${x}, y: ${y}, z: ${z}`);
+        });
 
         img.forEach((value, index) => {
           if (!isNaN(value)) {
@@ -172,31 +266,29 @@ function PlyViewer({
             } else {
               z_value = 0.5 * math.log((1 + value) / (1 - value));
             }
-            voxelCoordinates.push([x, y, z, z_value]);
+            voxelCoordinates.push([x, y, z, value]);
             // voxelCoordinates.push([x, y, z, value]);
           }
         });
 
         console.log('Voxel Coordinates:', voxelCoordinates);
+        const inverseAffineMatrix = math.inv(affineMatrix);
+        console.log('srow_x:', header.srow_x);
 
-        // Convert all voxel coordinates to world coordinates
-        const worldCoordinates = voxelCoordinates.map(([x, y, z, value]) => {
+        const inverseMatrix = inverseAffineMatrix.map(row => row.map(value => value));
+        const mniCoordinates = voxelCoordinates.map(([x, y, z, value]) => {
           const voxelHomogeneous = [x, y, z, 1]; // Add 1 for homogeneous transformation
-          const worldHomogeneous = math.multiply(
-            affineMatrix,
-            voxelHomogeneous,
-          ); // Apply affine matrix
-          const [wx, wy, wz] = worldHomogeneous.slice(0, 3); // Extract world coordinates
-          return [wx, wy, wz, value]; // Add value to world coordinates
+
+          const transformedVoxels = math.multiply(affineMatrix, voxelHomogeneous);
+
+          const [wx, wy, wz] = transformedVoxels.slice(0, 3);
+          return [wx, wy, wz, value];
+
         });
 
-        console.log('World Coordinates:', worldCoordinates);
+        console.log('MNI Coordinates:', mniCoordinates);
 
-        // Optionally, set or process the world coordinates further
-        setNiiCoords(worldCoordinates);
-
-        // Set the voxel coordinates and affine matrix for further processing
-        // setNiiCoords({ voxelCoordinates, affineMatrix });
+        setNiiCoords(mniCoordinates);
       } catch (error) {
         console.error('Error loading NIfTI file:', error);
       }
@@ -204,6 +296,76 @@ function PlyViewer({
 
     loadNiftiFile();
   }, []);
+
+  // useEffect(() => {
+  //   const loadNiftiFile = async () => {
+  //     try {
+  //       // Invoke IPC to load NIfTI file
+  //       const fileData = await window.electron.ipcRenderer.invoke(
+  //         'load-nii-file',
+  //         historical,
+  //       );
+
+  //       // Check if the file is a valid NIfTI file
+  //       if (!nifti.isNIFTI(fileData)) {
+  //         throw new Error('File is not a valid NIfTI file');
+  //       }
+
+  //       // Read header and image data
+  //       const header = nifti.readHeader(fileData);
+  //       const image = nifti.readImage(header, fileData);
+  //       console.log(header);
+
+  //       // Extract dimensions and voxel data
+  //       const dimensions = header.dims.slice(1, 4); // Image dimensions
+  //       const pixdim = [header.pixDims[1], header.pixDims[2], header.pixDims[3]]; // Voxel dimensions
+  //       const qoffset = [header.qoffset_x, header.qoffset_y, header.qoffset_z]; // Origin offsets
+  //       console.log('Voxel Dimensions (pixdim):', pixdim);
+  //       console.log('Origin Offsets (qoffset):', qoffset);
+
+  //       const img = new Float32Array(image);
+  //       const voxelCoordinates = [];
+
+  //       // Iterate through the image data and extract voxel indices
+  //       img.forEach((value, index) => {
+  //         if (!isNaN(value)) {
+  //           const z = Math.floor(index / (dimensions[0] * dimensions[1]));
+  //           const y = Math.floor(
+  //             (index % (dimensions[0] * dimensions[1])) / dimensions[0],
+  //           );
+  //           const x = index % dimensions[0];
+
+  //           let z_value;
+  //           if (value <= -1 || value >= 1) {
+  //             z_value = 0; // Clamp or default value
+  //           } else {
+  //             z_value = 0.5 * math.log((1 + value) / (1 - value)); // Log transform
+  //           }
+  //           voxelCoordinates.push([x, y, z, z_value]);
+  //         }
+  //       });
+
+  //       console.log('Voxel Coordinates:', voxelCoordinates);
+
+  //       // Convert voxel coordinates to MNI coordinates
+  //       const mniCoordinates = voxelCoordinates.map(([x, y, z, value]) => {
+  //         const mniX = x * pixdim[0] + qoffset[0];
+  //         const mniY = y * pixdim[1] + qoffset[1];
+  //         const mniZ = z * pixdim[2] + qoffset[2];
+  //         return [mniX, mniY, mniZ, value]; // Add intensity value
+  //       });
+
+  //       console.log('MNI Coordinates:', mniCoordinates);
+
+  //       // Optionally, set or process the MNI coordinates further
+  //       setNiiCoords(mniCoordinates);
+  //     } catch (error) {
+  //       console.error('Error loading NIfTI file:', error);
+  //     }
+  //   };
+
+  //   loadNiftiFile();
+  // }, []);
 
   useEffect(() => {
     // This loads the anatomy.ply scene
@@ -1510,29 +1672,225 @@ function PlyViewer({
     }
   }, [quantities, amplitude]);
 
+
+  // useEffect(() => {
+  //   const scene = sceneRef.current;
+  //   try {
+  //     // Extract vertices and R values from plotNiiCoords
+  //     const vertices = plotNiiCoords.map(([x, y, z]) => new THREE.Vector3(x, y, z));
+  //     const rValues = plotNiiCoords.map(([x, y, z, r]) => r); // Extract R values
+
+  //     // Create a geometry and add the vertices
+  //     const geometry = new THREE.BufferGeometry().setFromPoints(vertices);
+
+  //     // Create an array to hold colors for each point
+  //     const colors = new Float32Array(vertices.length * 3);
+
+  //     // Normalize R values for coloring
+  //     const minR = Math.min(...rValues);
+  //     const maxR = Math.max(...rValues);
+
+  //     // Assign colors based on R values
+  //     rValues.forEach((r, i) => {
+  //       const color = new THREE.Color();
+
+  //       const normalizedR = Math.atan(r) / Math.PI + 0.5;
+
+  //       if (r < 0) {
+  //         // Map negative R values to cooler colors (blue to cyan)
+  //         color.setHSL(0.6 - 0.2 * normalizedR, 1.0, 0.5); // Hue: blue to cyan
+  //       } else {
+  //         // Map positive R values to warmer colors (yellow to red)
+  //         color.setHSL(0.1 + 0.3 * normalizedR, 1.0, 0.6); // Hue: yellow to red, brighter
+  //       }
+
+  //       // Assign color values
+  //       colors[i * 3] = color.r; // Red
+  //       colors[i * 3 + 1] = color.g; // Green
+  //       colors[i * 3 + 2] = color.b; // Blue
+  //     });
+
+  //     console.log(rValues);
+
+  //     // Add the color attribute to the geometry
+  //     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+  //     // Create a material for the points with vertexColors enabled
+  //     const material = new THREE.PointsMaterial({
+  //       vertexColors: true, // Enable per-vertex colors
+  //       size: 5.0, // Increase size for better visibility
+  //     });
+
+  //     // Create the points object
+  //     const points = new THREE.Points(geometry, material);
+
+  //     // Add to the scene
+  //     scene.add(points);
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // }, [plotNiiCoords]);
+
+  // useEffect(() => {
+  //   const scene = sceneRef.current;
+  //   try {
+  //     // Debugging: Log data samples and statistics
+  //     console.log('Total Number of Points in plotNiiCoords:', plotNiiCoords.length);
+
+  //     // Log the first 10 coordinates
+  //     console.log('Sample Coordinates (First 10):');
+  //     plotNiiCoords.slice(0, 10).forEach((coord, index) => {
+  //       console.log(`Point ${index}:`, coord);
+  //     });
+
+  //     // Log a random sample of 10 points
+  //     const sampleSize = 10;
+  //     const randomSamples = Array.from({ length: sampleSize }, () => {
+  //       const randomIndex = Math.floor(Math.random() * plotNiiCoords.length);
+  //       return plotNiiCoords[randomIndex];
+  //     });
+
+  //     console.log('Random Sample of Coordinates:');
+  //     randomSamples.forEach((coord, index) => {
+  //       console.log(`Point ${index}:`, coord);
+  //     });
+
+  //     // Calculate summary statistics
+  //     const xValues = plotNiiCoords.map(([x]) => x);
+  //     const yValues = plotNiiCoords.map(([, y]) => y);
+  //     const zValues = plotNiiCoords.map(([, , z]) => z);
+  //     const rValues = plotNiiCoords.map(([, , , r]) => r);
+
+  //     const getStats = (values) => {
+  //       let min = Infinity;
+  //       let max = -Infinity;
+  //       let sum = 0;
+
+  //       values.forEach((value) => {
+  //         if (value < min) min = value;
+  //         if (value > max) max = value;
+  //         sum += value;
+  //       });
+
+  //       const mean = sum / values.length;
+
+  //       return { min, max, mean };
+  //     };
+
+  //     console.log('X Stats:', getStats(xValues));
+  //     console.log('Y Stats:', getStats(yValues));
+  //     console.log('Z Stats:', getStats(zValues));
+  //     console.log('R Stats:', getStats(rValues));
+
+  //     // Log a grid view of coordinates
+  //     const gridSize = 5; // Number of points to log per axis
+  //     const step = Math.floor(plotNiiCoords.length / gridSize);
+
+  //     console.log('Grid View of Coordinates:');
+  //     for (let i = 0; i < plotNiiCoords.length; i += step) {
+  //       console.log(`Point ${i}:`, plotNiiCoords[i]);
+  //     }
+
+  //     // Visualization: Subset data for rendering
+  //     const samplingRate = 0.1; // Render 10% of points
+  //     const sampledPlotNiiCoords = plotNiiCoords.filter(() => Math.random() < samplingRate);
+  //     console.log('Number of Sampled Points:', sampledPlotNiiCoords.length);
+
+  //     // Extract vertices and R values from sampled data
+  //     const vertices = sampledPlotNiiCoords.map(([x, y, z]) => new THREE.Vector3(x, y, z));
+  //     const rValuesSampled = sampledPlotNiiCoords.map(([x, y, z, r]) => r);
+
+  //     // Create a geometry and add the vertices
+  //     const geometry = new THREE.BufferGeometry().setFromPoints(vertices);
+
+  //     // Create an array to hold colors
+  //     const colors = new Float32Array(vertices.length * 3);
+
+  //     // Normalize R values for coloring
+  //     const minR = Math.min(...rValuesSampled);
+  //     const maxR = Math.max(...rValuesSampled);
+
+  //     // Assign colors based on R values
+  //     rValuesSampled.forEach((r, i) => {
+  //       const color = new THREE.Color();
+  //       const normalizedR = Math.atan(r) / Math.PI + 0.5;
+
+  //       if (r < 0) {
+  //         // Map negative R values to cooler colors (blue to cyan)
+  //         color.setHSL(0.6 - 0.2 * normalizedR, 1.0, 0.5);
+  //       } else {
+  //         // Map positive R values to warmer colors (yellow to red)
+  //         color.setHSL(0.1 + 0.3 * normalizedR, 1.0, 0.6);
+  //       }
+
+  //       // Assign color values
+  //       colors[i * 3] = color.r;
+  //       colors[i * 3 + 1] = color.g;
+  //       colors[i * 3 + 2] = color.b;
+  //     });
+
+  //     // Add the color attribute to the geometry
+  //     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+  //     // Create a material for the points with vertexColors enabled
+  //     const material = new THREE.PointsMaterial({
+  //       vertexColors: true, // Enable per-vertex colors
+  //       size: 5.0, // Increase size for better visibility
+  //     });
+
+  //     // Create the points object
+  //     const points = new THREE.Points(geometry, material);
+
+  //     // Add to the scene
+  //     scene.add(points);
+  //   } catch (err) {
+  //     console.error('Error in rendering:', err);
+  //   }
+  // }, [plotNiiCoords]);
+
   useEffect(() => {
     const scene = sceneRef.current;
     try {
-      const vertices = plotNiiCoords.map(
-        ([x, y, z]) => new THREE.Vector3(x, y, z),
-      );
+      // Step 1: Filter extreme R values
+      const filteredCoords = plotNiiCoords.filter(([x, y, z, r]) => r > 1e-5 && r < 1e5);
 
-      // Create a geometry and add the vertices
+      // Step 2: Extract and clamp R values
+      const rValues = filteredCoords.map(([x, y, z, r]) => r);
+      const clampedRValues = rValues.map((r) => Math.max(1e-5, Math.min(r, 1e5)));
+
+      // Step 3: Normalize R values linearly
+      const minR = Math.min(...clampedRValues);
+      const maxR = Math.max(...clampedRValues);
+      const normalizedRValues = clampedRValues.map((r) => (r - minR) / (maxR - minR));
+
+      console.log('Filtered and Normalized R Values:', normalizedRValues);
+
+      // Step 4: Create vertices and geometry
+      const vertices = filteredCoords.map(([x, y, z]) => new THREE.Vector3(x, y, z));
       const geometry = new THREE.BufferGeometry().setFromPoints(vertices);
 
-      // Create a material for the points
-      const material = new THREE.PointsMaterial({
-        color: 0x00ff00,
-        size: 3.0, // Size of each point
+      // Step 5: Create colors array
+      const colors = new Float32Array(vertices.length * 3);
+      normalizedRValues.forEach((r, i) => {
+        const color = new THREE.Color();
+        color.setHSL(0.1 + 0.3 * r, 1.0, 0.6); // Yellow to red
+        colors[i * 3] = color.r;
+        colors[i * 3 + 1] = color.g;
+        colors[i * 3 + 2] = color.b;
       });
 
-      // Create the points object
-      const points = new THREE.Points(geometry, material);
+      // Add colors to geometry
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-      // Add to the scene
+      // Create and add points to the scene
+      const material = new THREE.PointsMaterial({
+        vertexColors: true,
+        size: 5.0,
+      });
+      const points = new THREE.Points(geometry, material);
       scene.add(points);
     } catch (err) {
-      console.log(err);
+      console.error('Error in rendering:', err);
     }
   }, [plotNiiCoords]);
 
@@ -2374,9 +2732,31 @@ function PlyViewer({
     // const v = [0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75];
     const v = [5, 5, 5, 5, 5, 5, 5, 5];
     const L = niiCoords;
-    const reducedL = filterBoxAroundSphere(L, sphereCoords, 20, 2);
-    const outputV = optimizeSphereValues(sphereCoords, v, reducedL);
-    console.log(outputV);
+    const reducedL = filterBoxAroundSphere(L, sphereCoords, 5, 2);
+    const normalizedPlotNiiCoords = reducedL.map(([x, y, z, r]) => {
+      // Apply arctan normalization
+      const normalizedR = Math.atan(r); // Normalize arctan(r) to [0, 1]
+      // Return the updated coordinate array with normalized R
+      return [x, y, z, normalizedR];
+    });
+    setPlotNiiCoords(reducedL);
+    // const reducedLJSON = JSON.stringify(normalizedPlotNiiCoords, null, 2);
+
+    // // Create a Blob and download it
+    // const blob = new Blob([reducedLJSON], { type: 'application/json' });
+    // const url = URL.createObjectURL(blob);
+
+    // // Create a temporary anchor element to trigger the download
+    // const a = document.createElement('a');
+    // a.href = url;
+    // a.download = 'L.json'; // The name of the downloaded file
+    // a.click();
+
+    // // Clean up the URL object
+    // URL.revokeObjectURL(url);
+    // const outputV = optimizeSphereValues(sphereCoords, v, normalizedPlotNiiCoords);
+    // console.log(outputV);
+    // setNiiSolution(outputV);
   };
 
   // useEffect(() => {
@@ -2793,6 +3173,7 @@ function PlyViewer({
                       Test Nii Map
                     </Button>
                     {/* <span>{solutionText}</span> */}
+                    <span>{niiSolution}</span>
                   </div>
                 </div>
               </Tab>
