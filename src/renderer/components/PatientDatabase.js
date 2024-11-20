@@ -493,6 +493,14 @@ function PatientDatabase({ key, directoryPath }) {
                 Group Stats
               </Button>
               <Button
+                // variant="contained"
+                // color="default"
+                onClick={() => navigate('/niivue')}
+                style={{ marginLeft: '5px' }}
+              >
+                NiiVue
+              </Button>
+              <Button
                 style={{ marginLeft: '5px' }}
                 onClick={handleButtonClick}
               >
