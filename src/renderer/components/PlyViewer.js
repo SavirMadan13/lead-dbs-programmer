@@ -82,366 +82,126 @@ function PlyViewer({
     loadPlyFile(); // Call the async function
   }, []);
 
-  // const loadNiftiFile = async () => {
-  //   try {
-  //     // Invoke IPC to load NIfTI file
-  //     const fileData = await window.electron.ipcRenderer.invoke(
-  //       'load-nii-file',
-  //       historical,
-  //     );
-
-  //     // Check if the file is a valid NIfTI file
-  //     if (!nifti.isNIFTI(fileData)) {
-  //       throw new Error('File is not a valid NIfTI file');
-  //     }
-
-  //     // Read header and image data
-  //     const header = nifti.readHeader(fileData);
-  //     const image = nifti.readImage(header, fileData);
-  //     console.log(header);
-  //     // Extract affine transformation matrix
-  //     const affineMatrix = header.affine;
-  //     console.log('Affine Matrix:', affineMatrix);
-
-  //     // Extract dimensions and convert voxel indices to [x, y, z, value]
-  //     const dimensions = header.dims.slice(1, 4);
-  //     const img = new Float32Array(image);
-  //     const voxelCoordinates = [];
-
-  //     const normalizeToRange = (value, min, max) => {
-  //       // Clamp value to a safe range
-  //       const newValue = Math.max(min, Math.min(max, value)); // Ensure value is in [min, max]
-  //       return ((newValue - min) / (max - min)) * 2 - 1; // Normalize to [-1, 1]
-  //     };
-
-  //     img.forEach((value, index) => {
-  //       if (!isNaN(value)) {
-  //         const z = Math.floor(index / (dimensions[0] * dimensions[1]));
-  //         const y = Math.floor(
-  //           (index % (dimensions[0] * dimensions[1])) / dimensions[0],
-  //         );
-  //         const x = index % dimensions[0];
-  //         let z_value;
-  //         if (value <= -1 || value >= 1) {
-  //           // Handle invalid values: clamp to a safe range or set to a default
-  //           // console.warn(`Invalid value for z-value computation: ${value}`);
-  //           z_value = 0; // Or assign a default value, e.g., `0`
-  //         } else {
-  //           z_value = 0.5 * math.log((1 + value) / (1 - value));
-  //         }
-  //         voxelCoordinates.push([x, y, z, z_value]);
-  //         // voxelCoordinates.push([x, y, z, value]);
-  //       }
-  //     });
-
-  //     console.log('Voxel Coordinates:', voxelCoordinates);
-
-  //     // Convert all voxel coordinates to world coordinates
-  //     const worldCoordinates = voxelCoordinates.map(([x, y, z, value]) => {
-  //       const voxelHomogeneous = [x, y, z, 1]; // Add 1 for homogeneous transformation
-  //       const worldHomogeneous = math.multiply(
-  //         affineMatrix,
-  //         voxelHomogeneous,
-  //       ); // Apply affine matrix
-  //       const [wx, wy, wz] = worldHomogeneous.slice(0, 3); // Extract world coordinates
-  //       return [wx, wy, wz, value]; // Add value to world coordinates
-  //     });
-
-  //     console.log('World Coordinates:', worldCoordinates);
-
-  //     // Optionally, set or process the world coordinates further
-  //     setNiiCoords(worldCoordinates);
-  //     return worldCoordinates;
-  //     // Set the voxel coordinates and affine matrix for further processing
-  //     // setNiiCoords({ voxelCoordinates, affineMatrix });
-  //   } catch (error) {
-  //     console.error('Error loading NIfTI file:', error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   const loadNiftiFile = async () => {
-  //     try {
-  //       // Invoke IPC to load NIfTI file
-  //       const fileData = await window.electron.ipcRenderer.invoke(
-  //         'load-nii-file',
-  //         historical,
-  //       );
-  //       console.log(fileData);
-  //       // Parse the NIfTI file
-  //       if (!nifti.isNIFTI(fileData)) {
-  //         throw new Error('File is not a valid NIfTI file');
-  //       }
-  //       const header = nifti.readHeader(fileData);
-  //       const image = nifti.readImage(header, fileData);
-
-  //       // Find non-NaN indices and convert to 3D coordinates
-  //       const dimensions = header.dims.slice(1, 4); // Extract x, y, z dimensions
-  //       const img = new Float32Array(image);
-  //       console.log(img);
-  //       const voxelCoordinates = [];
-  //       img.forEach((value, index) => {
-  //         if (!isNaN(value)) {
-  //           const z = Math.floor(index / (dimensions[0] * dimensions[1]));
-  //           const y = Math.floor(
-  //             (index % (dimensions[0] * dimensions[1])) / dimensions[0],
-  //           );
-  //           const x = index % dimensions[0];
-  //           voxelCoordinates.push([x, y, z, value]);
-  //         }
-  //       });
-
-  //       console.log('Voxel Coordinates:', voxelCoordinates);
-  //       setNiiCoords(voxelCoordinates);
-  //       // Optionally process for rendering or further analysis here
-  //     } catch (error) {
-  //       console.error('Error loading NIfTI file:', error);
-  //     }
-  //   };
-
-  //   loadNiftiFile(); // Call the async function
-  // }, []);
-
-  const convert_fox_to_mni = (coordinates, resolution=2) => {
+  const convert_fox_to_mni = (coordinates, resolution = 2) => {
     const offset = [45, 63, 36];
-    return coordinates.map((value, index) => (value - offset[index]) * resolution);
+    return coordinates.map(
+      (value, index) => (value - offset[index]) * resolution,
+    );
   };
 
-
   // Current working model
-  // useEffect(() => {
-  //   const loadNiftiFile = async () => {
-  //     try {
-  //       // Invoke IPC to load NIfTI file
-  //       const fileData = await window.electron.ipcRenderer.invoke(
-  //         'load-nii-file',
-  //         historical,
-  //       );
-
-  //       // Check if the file is a valid NIfTI file
-  //       if (!nifti.isNIFTI(fileData)) {
-  //         throw new Error('File is not a valid NIfTI file');
-  //       }
-  //       console.log(fileData);
-  //       // Read header and image data
-  //       const header = nifti.readHeader(fileData);
-  //       const image = nifti.readImage(header, fileData);
-  //       console.log(header);
-  //       console.log(image);
-  //       // Extract affine transformation matrix
-  //       const affineMatrix = header.affine;
-  //       console.log('Affine Matrix:', affineMatrix);
-
-  //       // Extract dimensions and convert voxel indices to [x, y, z, value]
-  //       const dimensions = header.dims.slice(1, 4);
-  //       const img = new Float32Array(image);
-  //       console.log(img);
-  //       const voxelCoordinates = [];
-
-  //       const normalizeToRange = (value, min, max) => {
-  //         // Clamp value to a safe range
-  //         const newValue = Math.max(min, Math.min(max, value)); // Ensure value is in [min, max]
-  //         return ((newValue - min) / (max - min)) * 2 - 1; // Normalize to [-1, 1]
-  //       };
-
-  //       console.log('Dimensions:', dimensions); // Should match size(nii.img)
-  //       console.log('Sample Mappings:');
-  //       [0, 1, 100, 1000, 100000].forEach((index) => {
-  //         const z = Math.floor(index / (dimensions[0] * dimensions[1]));
-  //         const y = Math.floor((index % (dimensions[0] * dimensions[1])) / dimensions[0]);
-  //         const x = index % dimensions[0];
-  //         console.log(`Index ${index} => x: ${x}, y: ${y}, z: ${z}`);
-  //       });
-
-  //       img.forEach((value, index) => {
-  //         if (!isNaN(value)) {
-  //           const z = Math.floor(index / (dimensions[0] * dimensions[1]));
-  //           const y = Math.floor(
-  //             (index % (dimensions[0] * dimensions[1])) / dimensions[0],
-  //           );
-  //           const x = index % dimensions[0];
-  //           let z_value;
-  //           if (value <= -1 || value >= 1) {
-  //             // Handle invalid values: clamp to a safe range or set to a default
-  //             // console.warn(`Invalid value for z-value computation: ${value}`);
-  //             z_value = 0; // Or assign a default value, e.g., `0`
-  //           } else {
-  //             z_value = 0.5 * math.log((1 + value) / (1 - value));
-  //           }
-  //           voxelCoordinates.push([x, y, z, value]);
-  //           // voxelCoordinates.push([x, y, z, value]);
-  //         }
-  //       });
-
-  //       console.log('Voxel Coordinates:', voxelCoordinates);
-  //       const inverseAffineMatrix = math.inv(affineMatrix);
-  //       console.log('srow_x:', header.srow_x);
-
-  //       const inverseMatrix = inverseAffineMatrix.map(row => row.map(value => value));
-  //       const mniCoordinates = voxelCoordinates.map(([x, y, z, value]) => {
-  //         const voxelHomogeneous = [x, y, z, 1]; // Add 1 for homogeneous transformation
-
-  //         const transformedVoxels = math.multiply(affineMatrix, voxelHomogeneous);
-
-  //         const [wx, wy, wz] = transformedVoxels.slice(0, 3);
-  //         return [wx, wy, wz, value];
-
-  //       });
-
-  //       console.log('MNI Coordinates:', mniCoordinates);
-
-  //       setNiiCoords(mniCoordinates);
-  //     } catch (error) {
-  //       console.error('Error loading NIfTI file:', error);
-  //     }
-  //   };
-
-  //   loadNiftiFile();
-  // }, []);
-
   useEffect(() => {
-    const loadCSVFile = async () => {
+    const loadNiftiFile = async () => {
       try {
-        // Invoke IPC to load NIfTI file
         const fileData = await window.electron.ipcRenderer.invoke(
-          'load-csv-file',
+          'load-nii-file',
           historical,
         );
 
-        console.log(fileData);
+        // Validate if the file is a valid NIfTI file
+        if (!nifti.isNIFTI(fileData)) {
+          throw new Error('File is not a valid NIfTI file');
+        }
 
-        // Parse CSV data into an array of arrays
-        const rows = fileData
-        .trim() // Remove any extra whitespace or newline at the end
-        .split('\n') // Split into rows
-        .map((row) => row.split(',').map(Number)); // Split each row into columns and convert to numbers
+        const header = nifti.readHeader(fileData);
+        let image = nifti.readImage(header, fileData);
 
-          console.log(rows);
-          setNiiCoords(rows);
-        // Read header and image data
+        // Ensure `image` is a valid ArrayBuffer
+        if (!(image instanceof ArrayBuffer)) {
+          console.log('Adjusting image to ArrayBuffer...');
+          image = new Uint8Array(image).buffer;
+        }
+
+        // Handle endian mismatch
+        if (!header.littleEndian) {
+          console.warn('File is in big-endian format. Adjusting...');
+          const dataView = new DataView(image);
+          const correctedData = new Float32Array(image.byteLength / 4);
+          for (let i = 0; i < correctedData.length; i++) {
+            correctedData[i] = dataView.getFloat32(i * 4, false); // false = big-endian
+          }
+          image = correctedData;
+        } else {
+          image = new Float32Array(image);
+        }
+
+        // Apply scaling factors
+        const { scl_slope = 1, scl_inter = 0 } = header;
+        const img = new Float32Array(
+          image.map((value) => value * scl_slope + scl_inter),
+        );
+
+        // Extract dimensions
+        const dimensions = header.dims.slice(1, 4);
+        console.log('Dimensions:', dimensions);
+
+        // Generate voxel coordinates
+        const voxelCoordinates = [];
+        img.forEach((value, index) => {
+          if (!isNaN(value)) {
+            const z = Math.floor(index / (dimensions[0] * dimensions[1]));
+            const y = Math.floor(
+              (index % (dimensions[0] * dimensions[1])) / dimensions[0],
+            );
+            const x = index % dimensions[0];
+            voxelCoordinates.push([x, y, z, value]);
+          }
+        });
+
+        console.log('Voxel Coordinates:', voxelCoordinates);
+
+        // Transform to MNI coordinates using affine matrix
+        const affineMatrix = header.affine;
+        const mniCoordinates = voxelCoordinates.map(([x, y, z, value]) => {
+          const voxelHomogeneous = [x, y, z, 1]; // Add 1 for homogeneous transformation
+          const transformedVoxels = math.multiply(
+            affineMatrix,
+            voxelHomogeneous,
+          );
+          const [wx, wy, wz] = transformedVoxels.slice(0, 3);
+          return [wx, wy, wz, value];
+        });
+
+        console.log('MNI Coordinates:', mniCoordinates);
+
+        // Set the state with the transformed coordinates
+        setNiiCoords(mniCoordinates);
       } catch (error) {
         console.error('Error loading NIfTI file:', error);
       }
     };
 
-    loadCSVFile();
+    loadNiftiFile();
   }, []);
 
+  /////////////// CSV ////////////
 
   // useEffect(() => {
-  //   const loadNiftiFile = async () => {
-  //     try {
-  //       const fileData = await window.electron.ipcRenderer.invoke('load-nii-file', historical);
-
-  //       if (!nifti.isNIFTI(fileData)) {
-  //         throw new Error('File is not a valid NIfTI file');
-  //       }
-
-  //       const header = nifti.readHeader(fileData);
-  //       const image = nifti.readImage(header, fileData);
-
-  //       const affineMatrix = header.affine; // Ensure this matches MATLAB V.mat
-  //       const dimensions = header.dims.slice(1, 4);
-  //       const img = new Float32Array(image);
-
-  //       const voxelCoordinates = [];
-  //       img.forEach((value, index) => {
-  //         if (!isNaN(value)) {
-  //           const z = Math.floor(index / (dimensions[0] * dimensions[1]));
-  //           const y = Math.floor((index % (dimensions[0] * dimensions[1])) / dimensions[0]);
-  //           const x = index % dimensions[0];
-  //           voxelCoordinates.push([x, y, z, value]); // Add r value here
-  //         }
-  //       });
-
-  //       const affineMatrixTransposed = math.transpose(affineMatrix); // Ensure alignment with MATLAB
-
-  //       const mniCoordinates = voxelCoordinates.map(([x, y, z, r]) => {
-  //         const transformed = math.multiply(affineMatrixTransposed, [x, y, z, 1]); // Homogeneous transformation
-  //         const [wx, wy, wz] = transformed.slice(0, 3); // Drop homogeneous coordinate
-  //         return [wx, wy, wz, r]; // Append r back to the transformed coordinates
-  //       });
-
-  //       setNiiCoords(mniCoordinates);
-
-  //       console.log('Voxel Coordinates:', voxelCoordinates);
-  //       console.log('MNI Coordinates:', mniCoordinates);
-  //     } catch (error) {
-  //       console.error('Error loading NIfTI file:', error);
-  //     }
-  //   };
-
-  //   loadNiftiFile();
-  // }, []);
-
-  // useEffect(() => {
-  //   const loadNiftiFile = async () => {
+  //   const loadCSVFile = async () => {
   //     try {
   //       // Invoke IPC to load NIfTI file
   //       const fileData = await window.electron.ipcRenderer.invoke(
-  //         'load-nii-file',
+  //         'load-csv-file',
   //         historical,
   //       );
 
-  //       // Check if the file is a valid NIfTI file
-  //       if (!nifti.isNIFTI(fileData)) {
-  //         throw new Error('File is not a valid NIfTI file');
-  //       }
+  //       console.log(fileData);
 
+  //       // Parse CSV data into an array of arrays
+  //       const rows = fileData
+  //       .trim() // Remove any extra whitespace or newline at the end
+  //       .split('\n') // Split into rows
+  //       .map((row) => row.split(',').map(Number)); // Split each row into columns and convert to numbers
+
+  //         console.log(rows);
+  //         setNiiCoords(rows);
   //       // Read header and image data
-  //       const header = nifti.readHeader(fileData);
-  //       const image = nifti.readImage(header, fileData);
-  //       console.log(header);
-
-  //       // Extract dimensions and voxel data
-  //       const dimensions = header.dims.slice(1, 4); // Image dimensions
-  //       const pixdim = [header.pixDims[1], header.pixDims[2], header.pixDims[3]]; // Voxel dimensions
-  //       const qoffset = [header.qoffset_x, header.qoffset_y, header.qoffset_z]; // Origin offsets
-  //       console.log('Voxel Dimensions (pixdim):', pixdim);
-  //       console.log('Origin Offsets (qoffset):', qoffset);
-
-  //       const img = new Float32Array(image);
-  //       const voxelCoordinates = [];
-
-  //       // Iterate through the image data and extract voxel indices
-  //       img.forEach((value, index) => {
-  //         if (!isNaN(value)) {
-  //           const z = Math.floor(index / (dimensions[0] * dimensions[1]));
-  //           const y = Math.floor(
-  //             (index % (dimensions[0] * dimensions[1])) / dimensions[0],
-  //           );
-  //           const x = index % dimensions[0];
-
-  //           let z_value;
-  //           if (value <= -1 || value >= 1) {
-  //             z_value = 0; // Clamp or default value
-  //           } else {
-  //             z_value = 0.5 * math.log((1 + value) / (1 - value)); // Log transform
-  //           }
-  //           voxelCoordinates.push([x, y, z, z_value]);
-  //         }
-  //       });
-
-  //       console.log('Voxel Coordinates:', voxelCoordinates);
-
-  //       // Convert voxel coordinates to MNI coordinates
-  //       const mniCoordinates = voxelCoordinates.map(([x, y, z, value]) => {
-  //         const mniX = x * pixdim[0] + qoffset[0];
-  //         const mniY = y * pixdim[1] + qoffset[1];
-  //         const mniZ = z * pixdim[2] + qoffset[2];
-  //         return [mniX, mniY, mniZ, value]; // Add intensity value
-  //       });
-
-  //       console.log('MNI Coordinates:', mniCoordinates);
-
-  //       // Optionally, set or process the MNI coordinates further
-  //       setNiiCoords(mniCoordinates);
   //     } catch (error) {
   //       console.error('Error loading NIfTI file:', error);
   //     }
   //   };
 
-  //   loadNiftiFile();
+  //   loadCSVFile();
   // }, []);
 
   useEffect(() => {
@@ -1749,7 +1509,6 @@ function PlyViewer({
     }
   }, [quantities, amplitude]);
 
-
   // useEffect(() => {
   //   const scene = sceneRef.current;
   //   try {
@@ -1929,21 +1688,29 @@ function PlyViewer({
     const scene = sceneRef.current;
     try {
       // Step 1: Filter extreme R values
-      const filteredCoords = plotNiiCoords.filter(([x, y, z, r]) => r > 1e-5 && r < 1e5);
+      const filteredCoords = plotNiiCoords.filter(
+        ([x, y, z, r]) => r > 1e-5 && r < 1e5,
+      );
 
       // Step 2: Extract and clamp R values
       const rValues = filteredCoords.map(([x, y, z, r]) => r);
-      const clampedRValues = rValues.map((r) => Math.max(1e-5, Math.min(r, 1e5)));
+      const clampedRValues = rValues.map((r) =>
+        Math.max(1e-5, Math.min(r, 1e5)),
+      );
 
       // Step 3: Normalize R values linearly
       const minR = Math.min(...clampedRValues);
       const maxR = Math.max(...clampedRValues);
-      const normalizedRValues = clampedRValues.map((r) => (r - minR) / (maxR - minR));
+      const normalizedRValues = clampedRValues.map(
+        (r) => (r - minR) / (maxR - minR),
+      );
 
       console.log('Filtered and Normalized R Values:', normalizedRValues);
 
       // Step 4: Create vertices and geometry
-      const vertices = filteredCoords.map(([x, y, z]) => new THREE.Vector3(x, y, z));
+      const vertices = filteredCoords.map(
+        ([x, y, z]) => new THREE.Vector3(x, y, z),
+      );
       const geometry = new THREE.BufferGeometry().setFromPoints(vertices);
 
       // Step 5: Create colors array
@@ -2726,88 +2493,88 @@ function PlyViewer({
   // };
 
   const findClusters = (coordinates, epsilon) => {
-  // Step 1: Filter for positive points
-  const positivePoints = coordinates.filter(([x, y, z, r]) => r > 0);
+    // Step 1: Filter for positive points
+    const positivePoints = coordinates.filter(([x, y, z, r]) => r > 0);
 
-  // Step 2: Helper to calculate Euclidean distance
-  const calculateDistance = ([x1, y1, z1], [x2, y2, z2]) =>
-    math.sqrt(
-      math.pow(x1 - x2, 2) + math.pow(y1 - y2, 2) + math.pow(z1 - z2, 2)
+    // Step 2: Helper to calculate Euclidean distance
+    const calculateDistance = ([x1, y1, z1], [x2, y2, z2]) =>
+      math.sqrt(
+        math.pow(x1 - x2, 2) + math.pow(y1 - y2, 2) + math.pow(z1 - z2, 2),
+      );
+
+    // Step 3: Clustering algorithm
+    const clusters = [];
+    const visited = new Set();
+
+    const growCluster = (startIndex) => {
+      const cluster = [];
+      const queue = [startIndex];
+
+      while (queue.length > 0) {
+        const currentIndex = queue.pop();
+        if (visited.has(currentIndex)) continue;
+
+        visited.add(currentIndex);
+        const currentPoint = positivePoints[currentIndex];
+        cluster.push(currentPoint);
+
+        // Find neighbors within epsilon distance
+        positivePoints.forEach((point, index) => {
+          if (!visited.has(index)) {
+            const distance = calculateDistance(
+              currentPoint.slice(0, 3),
+              point.slice(0, 3),
+            );
+            if (distance <= epsilon) {
+              queue.push(index);
+            }
+          }
+        });
+      }
+
+      return cluster;
+    };
+
+    // Step 4: Iterate through all points to form clusters
+    positivePoints.forEach((point, index) => {
+      if (!visited.has(index)) {
+        const newCluster = growCluster(index);
+        clusters.push(newCluster);
+      }
+    });
+
+    // Step 5: Find the largest cluster
+    const largestCluster = clusters.reduce(
+      (largest, cluster) =>
+        cluster.length > largest.length ? cluster : largest,
+      [],
     );
 
-  // Step 3: Clustering algorithm
-  const clusters = [];
-  const visited = new Set();
+    // Step 6: Compute averages for the largest cluster
+    const total = largestCluster.reduce(
+      (acc, [x, y, z, r]) => {
+        acc.x += x;
+        acc.y += y;
+        acc.z += z;
+        acc.r += r;
+        return acc;
+      },
+      { x: 0, y: 0, z: 0, r: 0 },
+    );
 
-  const growCluster = (startIndex) => {
-    const cluster = [];
-    const queue = [startIndex];
+    const numPoints = largestCluster.length;
 
-    while (queue.length > 0) {
-      const currentIndex = queue.pop();
-      if (visited.has(currentIndex)) continue;
+    const average = {
+      x: total.x / numPoints,
+      y: total.y / numPoints,
+      z: total.z / numPoints,
+      r: total.r / numPoints,
+    };
 
-      visited.add(currentIndex);
-      const currentPoint = positivePoints[currentIndex];
-      cluster.push(currentPoint);
-
-      // Find neighbors within epsilon distance
-      positivePoints.forEach((point, index) => {
-        if (!visited.has(index)) {
-          const distance = calculateDistance(
-            currentPoint.slice(0, 3),
-            point.slice(0, 3)
-          );
-          if (distance <= epsilon) {
-            queue.push(index);
-          }
-        }
-      });
-    }
-
-    return cluster;
-  };
-
-  // Step 4: Iterate through all points to form clusters
-  positivePoints.forEach((point, index) => {
-    if (!visited.has(index)) {
-      const newCluster = growCluster(index);
-      clusters.push(newCluster);
-    }
-  });
-
-  // Step 5: Find the largest cluster
-  const largestCluster = clusters.reduce(
-    (largest, cluster) =>
-      cluster.length > largest.length ? cluster : largest,
-    []
-  );
-
-  // Step 6: Compute averages for the largest cluster
-  const total = largestCluster.reduce(
-    (acc, [x, y, z, r]) => {
-      acc.x += x;
-      acc.y += y;
-      acc.z += z;
-      acc.r += r;
-      return acc;
-    },
-    { x: 0, y: 0, z: 0, r: 0 }
-  );
-
-  const numPoints = largestCluster.length;
-
-  const average = {
-    x: total.x / numPoints,
-    y: total.y / numPoints,
-    z: total.z / numPoints,
-    r: total.r / numPoints,
-  };
-
-  return {
-    average,
-    points: largestCluster, // The points in the largest cluster
-  };
+    return {
+      average,
+      points: largestCluster, // The points in the largest cluster
+    };
   };
 
   const filterBoxAroundSphere = (L, sphereCoords, boxSize, sphereIndex) => {
@@ -2898,7 +2665,12 @@ function PlyViewer({
     const v = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5];
     // const v = [1, 1, 1, 1];
     const L = niiCoords;
-    const {filteredL, clusters} = filterBoxAroundSphere(L, sphereCoords, 20, 2);
+    const { filteredL, clusters } = filterBoxAroundSphere(
+      L,
+      sphereCoords,
+      20,
+      2,
+    );
     const reducedL = filteredL;
     // const reducedL = L;
     const normalizedPlotNiiCoords = reducedL.map(([x, y, z, r]) => {
@@ -2907,8 +2679,15 @@ function PlyViewer({
       // Return the updated coordinate array with normalized R
       return [x, y, z, normalizedR];
     });
-    const sweetspotCoord = [clusters.average.x, clusters.average.y, clusters.average.z];
-    const coordinateOutput = findNearestCoordinate(sweetspotCoord, sphereCoords);
+    const sweetspotCoord = [
+      clusters.average.x,
+      clusters.average.y,
+      clusters.average.z,
+    ];
+    const coordinateOutput = findNearestCoordinate(
+      sweetspotCoord,
+      sphereCoords,
+    );
     const activeContact = coordinateOutput.index;
     const activeAmplitude = calculateAmplitude(coordinateOutput.distance);
     console.log(coordinateOutput.distanceArray);
@@ -2930,7 +2709,7 @@ function PlyViewer({
 
     // Update the array
     const updatedV = v.map((value, index) =>
-      index === activeContact ? finalAmplitude : equalAmplitude
+      index === activeContact ? finalAmplitude : equalAmplitude,
     );
     console.log(updatedV);
     setPlotNiiCoords(reducedL);
@@ -2948,7 +2727,11 @@ function PlyViewer({
 
     // // Clean up the URL object
     // URL.revokeObjectURL(url);
-    const outputV = optimizeSphereValues(sphereCoords, updatedV, normalizedPlotNiiCoords);
+    const outputV = optimizeSphereValues(
+      sphereCoords,
+      updatedV,
+      normalizedPlotNiiCoords,
+    );
     console.log(outputV);
     // setNiiSolution(outputV);
   };
