@@ -89,6 +89,8 @@ function PlyViewer({
     );
   };
 
+
+
   // Current working model
   // useEffect(() => {
   //   const loadNiftiFile = async () => {
@@ -1077,6 +1079,74 @@ function PlyViewer({
       updatedQuantities[key] = (updatedQuantities[key] * 100) / amplitude;
     });
     return updatedQuantities;
+  };
+
+  const savedSpheres = useRef([]);
+
+  const saveCurrentSpheres = () => {
+    // Ensure VTASpheresRef is valid and contains spheres
+    const sphereData = Object.keys(VTASpheresRef).reduce((acc, contactId) => {
+      const sphere = VTASpheresRef[contactId];
+      // Validate sphere and its position before saving
+      if (sphere && sphere.position) {
+        acc.push({
+          id: contactId,
+          position: sphere.position.clone(), // Clone the position to avoid direct reference issues
+          radius: sphere.geometry.parameters.radius || 0, // Save amplitude, fallback to 0 if undefined
+        });
+      } else {
+        console.warn(`Sphere with contactId ${contactId} is invalid or missing.`);
+      }
+      return acc;
+    }, []);
+
+    if (sphereData.length === 0) {
+      console.error("No valid spheres to save.");
+      return;
+    }
+
+    // Save the validated sphere data
+    savedSpheres.current.push(sphereData);
+    console.log('Spheres saved:', savedSpheres.current);
+  };
+
+  const calculateOverlap = (sphere1, sphere2) => {
+    const distance = sphere1.position.distanceTo(sphere2.position);
+    const radius1 = sphere1.radius;
+    const radius2 = sphere2.radius;
+
+    if (distance >= radius1 + radius2) return 0; // No overlap
+    if (distance <= Math.abs(radius1 - radius2)) {
+      // One sphere is completely inside the other
+      return 4 / 3 * Math.PI * Math.pow(Math.min(radius1, radius2), 3);
+    }
+
+    const r1 = radius1;
+    const r2 = radius2;
+    const d = distance;
+
+    const volume1 = (Math.PI * (r1 + r2 - d) ** 2 * (d ** 2 + 2 * d * r2 - 3 * r2 ** 2 + 2 * d * r1 + 6 * r2 * r1 - 3 * r1 ** 2)) / (12 * d);
+    return volume1;
+  };
+
+  const calculatePercentOverlap = (savedSpheresData) => {
+    console.log(savedSpheresData);
+    if (savedSpheresData.length < 2) return;
+
+    const overlaps = [];
+    for (let i = 0; i < savedSpheresData.length; i++) {
+      for (let j = i + 1; j < savedSpheresData.length; j++) {
+        const overlap = calculateOverlap(savedSpheresData[i][0], savedSpheresData[j][0]);
+        overlaps.push({
+          pair: [savedSpheresData[i][0].id, savedSpheresData[j][0].id],
+          overlapPercent: (overlap / Math.min(
+            4 / 3 * Math.PI * Math.pow(savedSpheresData[i][0].radius, 3),
+            4 / 3 * Math.PI * Math.pow(savedSpheresData[j][0].radius, 3)
+          )) * 100,
+        });
+      }
+    }
+    console.log('Overlaps:', overlaps);
   };
 
   // VTA
@@ -3420,6 +3490,10 @@ function PlyViewer({
                       />
                       {/* <span>{solutionText}</span> */}
                       <span>{niiSolution}</span>
+                      <button onClick={saveCurrentSpheres}>Save Spheres</button>
+                      <button onClick={() => calculatePercentOverlap(savedSpheres.current)}>
+                        Compare Overlap
+                      </button>
                     </div>
                   </div>
                 </div>
