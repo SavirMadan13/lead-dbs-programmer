@@ -587,6 +587,185 @@ function Programmer() {
     }
   }, []);
 
+
+  // const gatherImportedDataNew = (jsonData, importedElectrode) => {
+  //   console.log(jsonData);
+
+  //   let outputIPG = handleIPG(importedElectrode);
+  //   console.log('OutputIPG: ', outputIPG);
+
+  //   const newQuantities = {};
+  //   const newSelectedValues = {};
+  //   const newTotalAmplitude = {};
+  //   const newAllQuantities = {};
+  //   const newAllVolAmpToggles = {};
+  //   const newAllTogglePositions = {};
+
+  //   console.log('Imported Amplitude: ', jsonData.amplitude);
+
+  //   for (let j = 1; j < 5; j++) {
+  //     // Handle amplitude processing with consistent error handling
+  //     try {
+  //       newTotalAmplitude[j] = jsonData.amplitude[1][j - 1];
+  //       newTotalAmplitude[j + 4] = jsonData.amplitude[0][j - 1];
+  //     } catch (error) {
+  //       console.log(`Error processing amplitude for ${j}:`, error);
+  //     }
+
+  //     const dynamicKey2 = `Ls${j}`;
+  //     const dynamicKey3 = `Rs${j}`;
+
+  //     // Handle toggles and positions
+  //     if (jsonData[dynamicKey2]?.va === 2) {
+  //       newAllVolAmpToggles[j] = 'center';
+  //       newAllTogglePositions[j] = '%';
+  //     } else if (jsonData[dynamicKey2]?.va === 1) {
+  //       newAllVolAmpToggles[j] = 'right';
+  //       newAllTogglePositions[j] = 'V';
+  //     }
+
+  //     if (jsonData[dynamicKey3]?.va === 2) {
+  //       newAllVolAmpToggles[j + 4] = 'center';
+  //       newAllTogglePositions[j + 4] = '%';
+  //     } else if (jsonData[dynamicKey3]?.va === 1) {
+  //       newAllVolAmpToggles[j + 4] = 'right';
+  //       newAllTogglePositions[j + 4] = 'V';
+  //     }
+
+  //     for (let i = 0; i < 9; i++) {
+  //       const dynamicKey = `k${i + 1}`;
+
+  //       if (jsonData[dynamicKey2]?.[dynamicKey]) {
+  //         newQuantities[j] = newQuantities[j] || {};
+  //         newQuantities[j][i + 1] = parseFloat(
+  //           jsonData[dynamicKey2][dynamicKey].perc
+  //         );
+  //         newQuantities[j][0] = parseFloat(jsonData[dynamicKey2].case.perc);
+
+  //         const { pol } = jsonData[dynamicKey2][dynamicKey];
+  //         newSelectedValues[j] = newSelectedValues[j] || {};
+  //         newSelectedValues[j][i + 1] =
+  //           pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
+
+  //         const casePol = jsonData[dynamicKey2].case.pol;
+  //         newSelectedValues[j][0] =
+  //           casePol === 0 ? 'left' : casePol === 1 ? 'center' : 'right';
+  //       }
+
+  //       if (jsonData[dynamicKey3]?.[dynamicKey]) {
+  //         newQuantities[j + 4] = newQuantities[j + 4] || {};
+  //         newQuantities[j + 4][i + 1] = parseFloat(
+  //           jsonData[dynamicKey3][dynamicKey].perc
+  //         );
+  //         newQuantities[j + 4][0] = parseFloat(jsonData[dynamicKey3].case.perc);
+
+  //         const { pol } = jsonData[dynamicKey3][dynamicKey];
+  //         newSelectedValues[j + 4] = newSelectedValues[j + 4] || {};
+  //         newSelectedValues[j + 4][i + 1] =
+  //           pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
+
+  //         const casePol = jsonData[dynamicKey3].case.pol;
+  //         newSelectedValues[j + 4][0] =
+  //           casePol === 0 ? 'left' : casePol === 1 ? 'center' : 'right';
+  //       }
+  //     }
+
+  //     newAllQuantities[j] = newQuantities[j];
+  //     newAllQuantities[j + 4] = newQuantities[j + 4];
+  //   }
+
+  //   const filteredValues = Object.keys(newSelectedValues)
+  //     .filter((key) => Object.keys(newSelectedValues[key]).length > 0)
+  //     .reduce((obj, key) => {
+  //       obj[key] = newSelectedValues[key];
+  //       return obj;
+  //     }, {});
+
+  //   const filteredQuantities = Object.keys(newQuantities)
+  //     .filter((key) => Object.keys(newQuantities[key]).length > 0)
+  //     .reduce((obj, key) => {
+  //       obj[key] = newQuantities[key];
+  //       return obj;
+  //     }, {});
+
+  //   let outputVisModel = '3';
+  //   if (jsonData.model === 'Dembek 2017') outputVisModel = '1';
+  //   else if (jsonData.model === 'Fastfield (Baniasadi 2020)') outputVisModel = '2';
+  //   else if (jsonData.model === 'Kuncel 2008') outputVisModel = '4';
+  //   else if (jsonData.model === 'Maedler 2012') outputVisModel = '5';
+  //   else if (jsonData.model === 'OSS-DBS (Butenko 2020)') outputVisModel = '6';
+
+  //   if (outputIPG.includes('Medtronic')) {
+  //     Object.keys(filteredQuantities).forEach((key) => {
+  //       Object.keys(filteredQuantities[key]).forEach((key2) => {
+  //         filteredQuantities[key][key2] =
+  //           (filteredQuantities[key][key2] / 100) * newTotalAmplitude[key];
+  //       });
+  //     });
+  //   }
+
+  //   return {
+  //     filteredQuantities,
+  //     filteredValues,
+  //     newTotalAmplitude,
+  //     outputVisModel,
+  //     newAllVolAmpToggles,
+  //     newAllTogglePositions,
+  //     outputIPG,
+  //   };
+  // };
+
+  // useEffect(() => {
+  //   if (window.electron && window.electron.ipcRenderer) {
+  //     const ipcRenderer = window.electron.ipcRenderer;
+
+  //     const handleImportFile = (arg) => {
+  //       try {
+  //         const tempPatients = arg.patientname.map((name, index) =>
+  //           `${name} (${index + 1} / ${arg.patientname.length})`
+  //         );
+  //         setPatientName(tempPatients[0]);
+
+  //         const initialStates = tempPatients.reduce((acc, patient, index) => {
+  //           const electrodes = arg.electrodeModels[index];
+  //           const processedS = arg.S[index]
+  //             ? gatherImportedDataNew(arg.S[index], electrodes)
+  //             : {
+  //                 filteredQuantities: {},
+  //                 filteredValues: {},
+  //                 newTotalAmplitude: {},
+  //                 outputVisModel: '3',
+  //                 newAllVolAmpToggles: {},
+  //               };
+
+  //           acc[patient] = {
+  //             ...initialState,
+  //             leftElectrode: electrodes,
+  //             rightElectrode: electrodes,
+  //             IPG: processedS.outputIPG,
+  //             allQuantities: processedS.filteredQuantities,
+  //             allSelectedValues: processedS.filteredValues,
+  //             allTotalAmplitudes: processedS.newTotalAmplitude,
+  //             visModel: processedS.outputVisModel,
+  //             allVolAmpToggles: processedS.newAllVolAmpToggles,
+  //             allTogglePositions: processedS.newAllTogglePositions,
+  //           };
+  //           return acc;
+  //         }, {});
+
+  //         setPatientStates(initialStates);
+  //         setPatients(tempPatients);
+  //       } catch (error) {
+  //         console.error('Error processing import-file event:', error);
+  //       }
+  //     };
+
+  //     ipcRenderer.once('import-file', handleImportFile);
+  //   } else {
+  //     console.error('ipcRenderer is not available');
+  //   }
+  // }, []);
+
   const [zoomLevel, setZoomLevel] = useState(-3);
 
   const handleZoomChange = (event, newValue) => {
