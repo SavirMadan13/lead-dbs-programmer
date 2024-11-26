@@ -24,7 +24,6 @@ import * as XLSX from 'xlsx';
 import { PatientContext } from './PatientContext';
 import DatabaseStats from './DatabaseStats';
 
-
 function PatientDatabase({ key, directoryPath }) {
   const { patients, setPatients } = useContext(PatientContext);
   const [editRowId, setEditRowId] = useState(null); // Track the row being edited
@@ -188,6 +187,42 @@ function PatientDatabase({ key, directoryPath }) {
     });
   }, [setPatients]);
 
+  useEffect(() => {
+    console.log(window.electron.ipcRenderer);
+    if (window.electron && window.electron.ipcRenderer) {
+      window.electron.ipcRenderer.once('import-inputdata-file', (arg) => {
+        try {
+          console.log('Received: ', arg);
+          if (arg.mode === 'stimulate') {
+            // navigate('/programmer');
+            console.log('stimulate');
+            let outputPatient = {};
+            let outputTimeline = '';
+            Object.keys(patients).forEach((patient) => {
+              if (patients[patient].id === arg.patientname) {
+                outputPatient = patients[patient];
+                outputTimeline = arg.labels[0];
+                let leadDBS = true;
+                navigate('/programmer', {
+                  state: {
+                    patient: outputPatient,
+                    timeline: outputTimeline,
+                    directoryPath,
+                    leadDBS,
+                  },
+                });
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Error processing import-file event:', error);
+        }
+      });
+    } else {
+      console.error('ipcRenderer is not available');
+    }
+  }, []);
+
   // Handle input changes in the form
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -258,129 +293,8 @@ function PatientDatabase({ key, directoryPath }) {
       >
         DBS Patient Database
       </Typography>
-      {/* <AppBar
-        position="static"
-        style={{ backgroundColor: '#1a73e8', marginBottom: '20px' }}
-      >
-        <Toolbar>
-          <Typography
-            variant="h3"
-            style={{
-              fontWeight: 'bold',
-              textAlign: 'center',
-              flexGrow: 1,
-              color: '#fff',
-            }}
-          >
-            DBS Database
-          </Typography>
-        </Toolbar>
-      </AppBar> */}
-
-      {/* Search Bar */}
-      {/* <div className="search-container" style={{ textAlign: 'right' }}>
-        <TextField
-          label="Search"
-          variant="outlined"
-          margin="normal"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputLabelProps={{ style: { fontSize: '14px' } }} // Label font size
-          InputProps={{ style: { fontSize: '14px' } }} // Input font size
-        />
-      </div> */}
 
       <Container style={{ display: 'flex', flexDirection: 'column' }}>
-        {/* Patient Table */}
-        {/* <div className="search-container" style={{ textAlign: 'right' }}>
-          <TextField
-            label="Search"
-            variant="outlined"
-            margin="normal"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            InputLabelProps={{ style: { fontSize: '14px' } }} // Label font size
-            InputProps={{ style: { fontSize: '14px' } }} // Input font size
-          />
-        </div> */}
-        {/* <Button
-          variant="contained"
-          color="default"
-          onClick={() => setEditMode((prev) => !prev)}
-          style={{
-            width: '100px',
-            marginLeft: '1000px',
-            marginBottom: '-60px',
-          }}
-        >
-          {editMode ? 'Close Edit Mode' : 'Edit Table'}
-        </Button>
-        {editMode && (
-          <div>
-            <TextField
-              label="New Column ID"
-              value={newColumnId}
-              onChange={(e) => setNewColumnId(e.target.value)}
-              variant="outlined"
-              size="small"
-              style={{ marginRight: '10px' }}
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                addColumn(newColumnId, newColumnId);
-                setNewColumnId('');
-                setNewColumnLabel('');
-              }}
-              style={{ marginRight: '10px' }}
-            >
-              Add Column
-            </Button>
-            <Select
-              value={columnToDelete}
-              onChange={(e) => setColumnToDelete(e.target.value)}
-              displayEmpty
-              style={{
-                marginLeft: '20px',
-                marginRight: '10px',
-                minWidth: '150px',
-              }}
-            >
-              <MenuItem value="" disabled>
-                Select column to delete
-              </MenuItem>
-              {columns.map((column) => (
-                <MenuItem key={column.id} value={column.id}>
-                  {column.label}
-                </MenuItem>
-              ))}
-            </Select>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => {
-                removeColumn(columnToDelete);
-                setColumnToDelete('');
-              }}
-            >
-              Remove Column
-            </Button>
-          </div>
-        )}
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={addPatient}
-          style={{
-            fontSize: '14px',
-            padding: '10px 20px',
-            marginBottom: '20px',
-            width: '150px',
-          }}
-        >
-          Add Patient
-        </Button> */}
         <div
           style={{
             display: 'flex',
@@ -401,17 +315,6 @@ function PatientDatabase({ key, directoryPath }) {
               InputProps={{ style: { fontSize: '14px' } }}
             />
           )}
-          {/* <TextField
-            label="Search"
-            variant="outlined"
-            margin="normal"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            InputLabelProps={{ style: { fontSize: '14px' } }}
-            InputProps={{ style: { fontSize: '14px' } }}
-          /> */}
-
-          {/* Edit Mode Button */}
           <Button
             // variant="contained"
             // color="default"
@@ -420,8 +323,6 @@ function PatientDatabase({ key, directoryPath }) {
           >
             {editMode ? 'Close Edit Mode' : 'Edit Table Columns'}
           </Button>
-
-          {/* Conditionally Rendered New Column Controls */}
           {editMode && (
             <>
               <TextField
@@ -515,18 +416,6 @@ function PatientDatabase({ key, directoryPath }) {
               />
             </div>
           )}
-          {/* <Button
-            variant="contained"
-            color="primary"
-            onClick={addPatient}
-            style={{
-              fontSize: '14px',
-              padding: '10px 20px',
-              marginLeft: 'auto',
-            }}
-          >
-            Add Patient
-          </Button> */}
         </div>
         <TableContainer
           component={Paper}

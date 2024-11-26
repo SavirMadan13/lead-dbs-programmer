@@ -56,6 +56,7 @@ function StimulationSettings({
   importNewS,
   selectedPatient,
   historical,
+  mode,
 }) {
   // const [IPG, setIPG] = useState('');
   // const [leftElectrode, setLeftElectrode] = useState('');
@@ -227,18 +228,6 @@ function StimulationSettings({
       setIPG('Abbott');
     }
   };
-  // window.electron.ipcRenderer.once('ipc-example', (arg) => {
-  //   // eslint-disable-next-line no-console
-  //   importData = arg;
-  //   const newImportData = importData.split('\\');
-  //   console.log(newImportData[2]);
-  //   window.electron.ipcRenderer.sendMessage('open-file', newImportData[2]);
-  // });
-  // window.electron.ipcRenderer.sendMessage('ipc-example', ['ping']);
-  // window.electron.ipcRenderer.on('open-file', (event, data) => {
-  //   // Handle received data
-  //   console.log(data);
-  // });
 
   const [newStim, setNewStim] = useState('');
 
@@ -260,33 +249,6 @@ function StimulationSettings({
       // Set the input field value to the placeholder text
     }
   };
-
-  // window.electron.ipcRenderer.once('import-file', (arg) => {
-  //   importData = arg;
-  //   // setTestData(importData);
-  //   console.log('Import Data', importData);
-  //   setMasterImportData(arg);
-  //   const numElectrodes = 'numElectrodes';
-  //   const selectedElectrode = importData.electrodeModel;
-  //   const stimDatasets = importData.priorStims;
-  //   const stimDatasetList = {};
-  //   Object.keys(stimDatasets).forEach((key) => {
-  //     if (key >= 2) {
-  //       stimDatasetList[key] = stimDatasets[key].name;
-  //     }
-  //   });
-  //   if (Object.keys(stimDatasetList).length === 0) {
-  //     const uniqueID = generateUniqueID();
-  //     stimDatasetList[3] = uniqueID;
-  //     // setNewStim(uniqueID);
-  //   }
-  //   setTestData(stimDatasetList);
-  //   setImportDataTest(stimDatasetList);
-  //   // setMatImportFile(stimDatasetList[3]);
-  //   // console.log('Stimdatasetlabel: ', stimDatasetList);
-  //   // console.log('masterData: ', arg);
-  //   handleImportedElectrode(selectedElectrode);
-  // });
 
   const handleDebugButton = () => {
     const stimDatasets = testData.priorStims;
@@ -475,10 +437,6 @@ function StimulationSettings({
         return obj;
       }, {});
 
-    // console.log('filtered', filteredQuantities);
-    // console.log(jsonData.S['Ls1'].case['pol']);
-    // console.log('newQuantities: ', newQuantities);
-    // console.log('newvalues: ', newSelectedValues);
     setAllSelectedValues(filteredValues);
     setAllQuantities(filteredQuantities);
   };
@@ -516,23 +474,6 @@ function StimulationSettings({
       8: {},
     };
     const newAllQuantities = {};
-    // let newSelectedValues = {};
-    // console.log(allQuantities[1][0]);
-
-    // setLeftElectrode(jsonData.S.elmodel[0]);
-    // console.log(jsonData.S.elmodel[1]);
-    // setRightElectrode(jsonData.S.elmodel[1]);
-    // const elecIPG = jsonData.S.ipg;
-    // setIPG(elecIPG);
-    // for (let a = 1)
-    // const amplitudeArray = [];
-    // amplitudeArray.push(jsonData.S.amplitude[0]);
-    // console.log(jsonData.S.amplitude['leftAmplitude']);
-    // amplitudeArray.push(jsonData.S.amplitude[0]);
-    // console.log(amplitudeArray);
-    // setAllTotalAmplitudes(amplitudeArray);
-    // console.log('AmpllitudueArray: ', amplitudeArray);
-    // console.log(allTotalAmplitudes);
 
     for (let j = 1; j < 5; j++) {
       // newTotalAmplitude[j] = jsonData.S.amplitude.leftAmplitude[j - 1];
@@ -667,40 +608,6 @@ function StimulationSettings({
     setStimChanged(true);
   };
 
-  // window.electron.ipcRenderer.on('import-previous-files-reply', (arg, arg1) => {
-  //   // console.log('hello');
-  //   const newFilePath = arg;
-  //   const newS = arg1;
-  //   setFilePath(newFilePath);
-  //   if (arg !== 'Empty') {
-  //     console.log('here');
-  //     gatherImportedDataNew(newS);
-  //   } else if (arg === 'Empty') {
-  //     const uniqueID = generateUniqueID();
-  //     setNewStim(uniqueID);
-  //   }
-  //   // Here is where I can write an if statement for if arg1 is empty, and then I can write a statement to create
-  //   // a new one and then select that one as the stimulation setting
-  //   console.log('MATIMPORTDATA: ', matImportFile);
-  //   console.log('STIMCHANGED: ', stimChanged);
-  // });
-
-  // window.electron.ipcRenderer.on('import-previous-files', (arg) => {
-  //   // console.log('hello');
-  //   const newS = arg;
-  //   if (newS !== 'Empty') {
-  //     console.log('here');
-  //     gatherImportedDataNew(newS);
-  //   } else if (newS === 'Empty') {
-  //     const uniqueID = generateUniqueID();
-  //     setNewStim(uniqueID);
-  //   }
-  //   // Here is where I can write an if statement for if arg1 is empty, and then I can write a statement to create
-  //   // a new one and then select that one as the stimulation setting
-  //   console.log('MATIMPORTDATA: ', matImportFile);
-  //   console.log('STIMCHANGED: ', stimChanged);
-  // });
-
   const handleOnAddButtonClick = () => {
     // console.log
     // newStims.push(newStim);
@@ -767,36 +674,6 @@ function StimulationSettings({
               onChange={(e) => handleLeftElectrodeChange(e)}
               // disabled
             >
-              {/* <option value="">None</option>
-              <option value="abbott_activetip_2mm">
-                Abbott ActiveTip (2mm)
-              </option>
-              <option value="abbott_activetip_3mm">
-                Abbott ActiveTip (3mm)
-              </option>
-              <option value="abbott_directed_6172">Abbott Directed 6172</option>
-              <option value="abbott_directed_6173">Abbott Directed 6173</option>
-              <option value="boston_vercise">Boston Scientific Vercise</option>
-              <option value="boston_vercise_directed">
-                Boston Scientific Vercise Directed
-              </option>
-              <option value="boston_vercise_cartesia_x">
-                Boston Scientific Vercise Cartesia X
-              </option>
-              <option value="boston_vercise_cartesia_hx">
-                Boston Scientific Vercise Cartesia HX
-              </option>
-              <option value="medtronic_3387">Medtronic 3387</option>
-              <option value="medtronic_3389">Medtronic 3389</option>
-              <option value="medtronic_3391">Medtronic 3391</option>
-              <option value="medtronic_b33005">Medtronic B33005</option>
-              <option value="medtronic_b33015">Medtronic B33015</option>
-              <option value="generic_elmodel">Generic</option> */}
-              {/* {Object.keys(electrodeModels).map((key) => (
-                <option key={key} value={key}>
-                  {formatElectrodeName(key)}
-                </option>
-              ))} */}
               {varargout.map((electrode, index) => (
                 <option key={index} value={electrode.value}>
                   {electrode.displayName}
@@ -809,36 +686,6 @@ function StimulationSettings({
               value={rightElectrode}
               onChange={(e) => handleRightElectrodeChange(e)}
             >
-              {/* <option value="">None</option>
-              <option value="abbott_activetip_2mm">
-                Abbott ActiveTip (2mm)
-              </option>
-              <option value="abbott_activetip_3mm">
-                Abbott ActiveTip (3mm)
-              </option>
-              <option value="abbott_directed_6172">Abbott Directed 6172</option>
-              <option value="abbott_directed_6173">Abbott Directed 6173</option>
-              <option value="boston_vercise">Boston Scientific Vercise</option>
-              <option value="boston_vercise_directed">
-                Boston Scientific Vercise Directed
-              </option>
-              <option value="boston_vercise_cartesia_x">
-                Boston Scientific Vercise Cartesia X
-              </option>
-              <option value="boston_vercise_cartesia_hx">
-                Boston Scientific Vercise Cartesia HX
-              </option>
-              <option value="medtronic_3387">Medtronic 3387</option>
-              <option value="medtronic_3389">Medtronic 3389</option>
-              <option value="medtronic_3391">Medtronic 3391</option>
-              <option value="medtronic_b33005">Medtronic B33005</option>
-              <option value="medtronic_b33015">Medtronic B33015</option>
-              <option value="generic_elmodel">Generic</option> */}
-              {/* {Object.keys(electrodeModels).map((key) => (
-                <option key={key} value={key}>
-                  {formatElectrodeName(key)}
-                </option>
-              ))} */}
               {varargout.map((electrode, index) => (
                 <option key={index} value={electrode.value}>
                   {electrode.displayName}
@@ -920,6 +767,7 @@ function StimulationSettings({
             namingConvention={namingConvention}
             selectedPatient={selectedPatient}
             historical={historical}
+            mode={mode}
           />
         )}
       </div>

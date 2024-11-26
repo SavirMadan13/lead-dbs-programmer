@@ -41,6 +41,7 @@ let mainWindow: BrowserWindow | null = null;
 let stimulationDirectory = '';
 const patientID = '';
 let patientMasterData = {};
+let stimulationData = {};
 
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
@@ -58,6 +59,31 @@ ipcMain.on('ipc-example', async (event, arg) => {
     if (dir === 'programmer') {
       break;
     }
+  }
+});
+
+ipcMain.on('import-inputdata-file', async (event, arg) => {
+  const msgTemplate = (pingPong: string) => `${pingPong}`;
+  const fs = require('fs');
+
+  try {
+    // Normalize the lead path
+    // let normalLeadPath = leadPath.replace(/\\\//g, '/');
+    // let filePath = path.join(normalLeadPath, 'programmer/inputData.json');
+    const filePath = inputPath;
+    console.log(filePath);
+
+    // Read the file
+    const f = fs.readFileSync(filePath);
+
+    // Parse the JSON data
+    const jsonData = JSON.parse(f);
+    stimulationData = jsonData;
+    stimulationDirectory = stimulationData.stimDir;
+    event.reply('import-inputdata-file', jsonData);
+  } catch (err) {
+    // Handle specific errors
+    console.log(err);
   }
 });
 
@@ -111,6 +137,15 @@ ipcMain.on(
       // Check if the file exists before trying to read it
       if (!fs.existsSync(filePath)) {
         if (leadDBS) {
+          if (stimulationData.mode === 'stimulate' && stimulationData.labels[0] === timeline) {
+            if (!fs.existsSync(sessionDir)) {
+              fs.mkdirSync(sessionDir, { recursive: true });
+            }
+            // Write data to the file
+            fs.writeFileSync(filePath, JSON.stringify(stimulationData.S, null, 2), 'utf8');
+            event.reply('import-file', stimulationData);
+            return;
+          }
           filePath = path.join(
             directoryPath,
             'derivatives/leaddbs',
@@ -132,7 +167,11 @@ ipcMain.on(
         event.reply('import-file', 'File Not Found');
         return;
       }
-
+      if (stimulationData.mode === 'stimulate' && stimulationData.labels[0] === timeline) {
+        event.reply('import-file', stimulationData);
+        return;
+      }
+      console.log(filePath);
       // Read the file
       const fileData = fs.readFileSync(filePath);
 
@@ -446,6 +485,23 @@ ipcMain.on('save-file', (event, file, data, historical) => {
     console.error('Error writing to file:', error);
     event.reply('file-save-error', error.message);
   }
+});
+
+ipcMain.on('save-file-stimulate', (event, file, data) => {
+  console.log('FILE: ', file);
+  const dataString = JSON.stringify(data);
+  const newStimFilePath = path.join(stimulationDirectory, 'data.json');
+  console.log(newStimFilePath);
+  console.log(dataString);
+  try {
+    // fs.writeFileSync(filePath, dataString);
+    console.log(newStimFilePath);
+    fs.writeFileSync(newStimFilePath, dataString);
+  } catch (error) {
+    // Handle the error here
+    console.error('Error writing to file:', error);
+  }
+  event.reply('file-saved', newStimFilePath);
 });
 
 ipcMain.on('save-file-clinical', (event, data, historical) => {

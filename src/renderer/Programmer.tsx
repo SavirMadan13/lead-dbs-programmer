@@ -15,9 +15,11 @@ function Programmer() {
 
   const location = useLocation();
   const { patient, timeline, directoryPath, leadDBS } = location.state || {};
+  console.log(patient);
   // Access patient and timeline from state
   console.log(location.state);
   const navigate = useNavigate(); // Initialize the navigate hook
+  const [mode, setMode] = useState('');
   // const { patient } = location.state || {}; // Retrieve patient data from navigation state
 
   const initialState = {
@@ -43,63 +45,192 @@ function Programmer() {
     stimChanged: true,
   };
 
+  const varargout = [
+    { displayName: 'Medtronic 3389', value: 'medtronic_3389' },
+    { displayName: 'Medtronic 3387', value: 'medtronic_3387' },
+    { displayName: 'Medtronic 3391', value: 'medtronic_3391' },
+    { displayName: 'Medtronic B33005', value: 'medtronic_b33005' },
+    { displayName: 'Medtronic B33015', value: 'medtronic_b33015' },
+    { displayName: 'Boston Scientific Vercise', value: 'boston_vercise' },
+    {
+      displayName: 'Boston Scientific Vercise Directed',
+      value: 'boston_vercise_directed',
+    },
+    // {
+    //   displayName: 'Boston Scientific Vercise Cartesia HX',
+    //   value: 'boston_vercise_cartesia_hx',
+    // },
+    // {
+    //   displayName: 'Boston Scientific Vercise Cartesia X',
+    //   value: 'boston_vercise_cartesia_x',
+    // },
+    {
+      displayName: 'Abbott ActiveTip (6146-6149)',
+      value: 'abbott_activetip_2mm',
+    },
+    {
+      displayName: 'Abbott ActiveTip (6142-6145)',
+      value: 'abbott_activetip_3mm',
+    },
+    {
+      displayName: 'Abbott Directed 6172 (short)',
+      value: 'abbott_directed_05',
+    },
+    { displayName: 'Abbott Directed 6173 (long)', value: 'abbott_directed_15' },
+    { displayName: 'PINS Medical L301', value: 'pins_l301' },
+    { displayName: 'PINS Medical L302', value: 'pins_l302' },
+    { displayName: 'PINS Medical L303', value: 'pins_l303' },
+    { displayName: 'SceneRay SR1200', value: 'sceneray_sr1200' },
+    { displayName: 'SceneRay SR1210', value: 'sceneray_sr1210' },
+    { displayName: 'SceneRay SR1211', value: 'sceneray_sr1211' },
+    { displayName: 'SceneRay SR1242', value: 'sceneray_sr1242' },
+    { displayName: 'SDE-08 S8 Legacy', value: 'sde_08_s8_legacy' },
+    { displayName: 'SDE-08 S10 Legacy', value: 'sde_08_s10_legacy' },
+    { displayName: 'SDE-08 S12 Legacy', value: 'sde_08_s12_legacy' },
+    { displayName: 'SDE-08 S16 Legacy', value: 'sde_08_s16_legacy' },
+    { displayName: 'SDE-08 S8', value: 'sde_08_s8' },
+    { displayName: 'SDE-08 S10', value: 'sde_08_s10' },
+    { displayName: 'SDE-08 S12', value: 'sde_08_s12' },
+    { displayName: 'SDE-08 S14', value: 'sde_08_s14' },
+    { displayName: 'SDE-08 S16', value: 'sde_08_s16' },
+    { displayName: 'PMT 2102-04-091', value: 'pmt_2102_04_091' },
+    { displayName: 'PMT 2102-06-091', value: 'pmt_2102_06_091' },
+    { displayName: 'PMT 2102-08-091', value: 'pmt_2102_08_091' },
+    { displayName: 'PMT 2102-10-091', value: 'pmt_2102_10_091' },
+    { displayName: 'PMT 2102-12-091', value: 'pmt_2102_12_091' },
+    { displayName: 'PMT 2102-14-091', value: 'pmt_2102_14_091' },
+    { displayName: 'PMT 2102-16-091', value: 'pmt_2102_16_091' },
+    { displayName: 'PMT 2102-16-092', value: 'pmt_2102_16_092' },
+    { displayName: 'PMT 2102-16-093', value: 'pmt_2102_16_093' },
+    { displayName: 'PMT 2102-16-131', value: 'pmt_2102_16_131' },
+    { displayName: 'PMT 2102-16-142', value: 'pmt_2102_16_142' },
+    { displayName: '2069-EPC-05C-35', value: 'epc_05c' },
+    { displayName: '2069-EPC-15C-35', value: 'epc_15c' },
+    { displayName: 'NeuroPace DL-344-3.5', value: 'neuropace_dl_344_35' },
+    { displayName: 'NeuroPace DL-344-10', value: 'neuropace_dl_344_10' },
+    { displayName: 'DIXI D08-05AM', value: 'dixi_d08_05am' },
+    { displayName: 'DIXI D08-08AM', value: 'dixi_d08_08am' },
+    { displayName: 'DIXI D08-10AM', value: 'dixi_d08_10am' },
+    { displayName: 'DIXI D08-12AM', value: 'dixi_d08_12am' },
+    { displayName: 'DIXI D08-15AM', value: 'dixi_d08_15am' },
+    { displayName: 'DIXI D08-18AM', value: 'dixi_d08_18am' },
+    { displayName: 'AdTech BF08R-SP05X', value: 'adtech_bf08r_sp05x' },
+    { displayName: 'AdTech BF08R-SP21X', value: 'adtech_bf08r_sp21x' },
+    { displayName: 'AdTech BF08R-SP61X', value: 'adtech_bf08r_sp61x' },
+    { displayName: 'AdTech BF09R-SP61X-0BB', value: 'adtech_bf09r_sp61x_0bb' },
+    { displayName: 'AdTech RD06R-SP05X', value: 'adtech_rd06r_sp05x' },
+    { displayName: 'AdTech RD08R-SP05X', value: 'adtech_rd08r_sp05x' },
+    { displayName: 'AdTech RD10R-SP03X', value: 'adtech_rd10r_sp03x' },
+    { displayName: 'AdTech RD10R-SP05X', value: 'adtech_rd10r_sp05x' },
+    { displayName: 'AdTech RD10R-SP06X', value: 'adtech_rd10r_sp06x' },
+    { displayName: 'AdTech RD10R-SP07X', value: 'adtech_rd10r_sp07x' },
+    { displayName: 'AdTech RD10R-SP08X', value: 'adtech_rd10r_sp08x' },
+    { displayName: 'AdTech SD06R-SP26X', value: 'adtech_sd06r_sp26x' },
+    { displayName: 'AdTech SD08R-SP05X', value: 'adtech_sd08r_sp05x' },
+    { displayName: 'AdTech SD10R-SP05X', value: 'adtech_sd10r_sp05x' },
+    {
+      displayName: 'AdTech SD10R-SP05X Choi',
+      value: 'adtech_sd10r_sp05x_choi',
+    },
+    { displayName: 'AdTech SD14R-SP05X', value: 'adtech_sd14r_sp05x' },
+    { displayName: 'ELAINE Rat Electrode', value: 'elaine_rat_electrode' },
+    { displayName: 'FHC WU Rat Electrode', value: 'fhc_wu_rat_electrode' },
+    { displayName: 'NuMed Mini Lead', value: 'numed_minilead' },
+    {
+      displayName: 'Aleva directSTIM Directed',
+      value: 'aleva_directstim_directed',
+    },
+    { displayName: 'Aleva directSTIM 11500', value: 'aleva_directstim_11500' },
+    {
+      displayName: 'SmartFlow Cannula NGS-NC-06',
+      value: 'smartflow_ngs_nc_06',
+    },
+  ];
+
+  // const handleImportedElectrode = (importedElectrode) => {
+  //   switch (importedElectrode) {
+  //     case 'Boston Scientific Vercise Directed':
+  //       return 'boston_vercise_directed';
+  //     case 'Medtronic 3389':
+  //       return 'medtronic_3389';
+  //     case 'Medtronic 3387':
+  //       return 'medtronic_3387';
+  //     case 'Medtronic 3391':
+  //       return 'medtronic_3391';
+  //     case 'Medtronic B33005':
+  //       return 'medtronic_b33005';
+  //     case 'Medtronic B33015':
+  //       return 'medtronic_b33015';
+  //     case 'Boston Scientific Vercise':
+  //       return 'boston_scientific_vercise';
+  //     case 'Boston Scientific Vercise Cartesia HX':
+  //       return 'boston_scientific_vercise_cartesia_hx';
+  //     case 'Boston Scientific Vercise Cartesia X':
+  //       return 'boston_scientific_vercise_cartesia_x';
+  //     case 'Abbott ActiveTip (6146-6149)':
+  //       return 'abott_activetip_2mm';
+  //     case 'Abbott ActiveTip (6142-6145)':
+  //       return 'abbott_activetip_3mm';
+  //     case 'Abbott Directed 6172 (short)':
+  //       return 'abbott_directed_05';
+  //     case 'Abbott Directed 6173 (long)':
+  //       return 'abott_directed_15';
+  //     default:
+  //       return '';
+  //   }
+  // };
+
   const handleImportedElectrode = (importedElectrode) => {
-    switch (importedElectrode) {
-      case 'Boston Scientific Vercise Directed':
-        return 'boston_vercise_directed';
-      case 'Medtronic 3389':
-        return 'medtronic_3389';
-      case 'Medtronic 3387':
-        return 'medtronic_3387';
-      case 'Medtronic 3391':
-        return 'medtronic_3391';
-      case 'Medtronic B33005':
-        return 'medtronic_b33005';
-      case 'Medtronic B33015':
-        return 'medtronic_b33015';
-      case 'Boston Scientific Vercise':
-        return 'boston_scientific_vercise';
-      case 'Boston Scientific Vercise Cartesia HX':
-        return 'boston_scientific_vercise_cartesia_hx';
-      case 'Boston Scientific Vercise Cartesia X':
-        return 'boston_scientific_vercise_cartesia_x';
-      case 'Abbott ActiveTip (6146-6149)':
-        return 'abott_activetip_2mm';
-      case 'Abbott ActiveTip (6142-6145)':
-        return 'abbott_activetip_3mm';
-      case 'Abbott Directed 6172 (short)':
-        return 'abbott_directed_05';
-      case 'Abbott Directed 6173 (long)':
-        return 'abott_directed_15';
-      default:
-        return '';
-    }
+    const electrodeInfo = varargout.find(
+      (item) => item.displayName === importedElectrode,
+    );
+    return electrodeInfo ? electrodeInfo.value : 'boston_vercise_directed';
   };
 
+  // const handleIPG = (importedElectrode) => {
+  //   if (
+  //     importedElectrode.includes('Boston') ||
+  //     importedElectrode.includes('boston')
+  //   ) {
+  //     return 'Boston';
+  //   }
+  //   if (
+  //     importedElectrode.includes('Abbott') ||
+  //     importedElectrode.includes('abbott')
+  //   ) {
+  //     return 'Abbott';
+  //   }
+  //   if (
+  //     importedElectrode === 'Medtronic 3387' ||
+  //     importedElectrode === 'Medtronic 3389' ||
+  //     importedElectrode === 'medtronic_3387' ||
+  //     importedElectrode === 'medtronic_3389' ||
+  //     importedElectrode === 'medtronic_3391' ||
+  //     importedElectrode === 'Medtronic 3391'
+  //   ) {
+  //     return 'Medtronic_Activa';
+  //   }
+  //   return 'Medtronic_Percept';
+  // };
+
   const handleIPG = (importedElectrode) => {
-    if (
-      importedElectrode.includes('Boston') ||
-      importedElectrode.includes('boston')
-    ) {
+    if (importedElectrode.includes('Boston')) {
       return 'Boston';
     }
-    if (
-      importedElectrode.includes('Abbott') ||
-      importedElectrode.includes('abbott')
-    ) {
+    if (importedElectrode.includes('Abbott')) {
       return 'Abbott';
     }
     if (
       importedElectrode === 'Medtronic 3387' ||
       importedElectrode === 'Medtronic 3389' ||
-      importedElectrode === 'medtronic_3387' ||
-      importedElectrode === 'medtronic_3389' ||
-      importedElectrode === 'medtronic_3391' ||
       importedElectrode === 'Medtronic 3391'
     ) {
       return 'Medtronic_Activa';
     }
-    return 'Medtronic_Percept';
+    if (importedElectrode.includes('Medtronic')) {
+      return 'Medtronic_Percept';
+    }
+    return 'Research';
   };
 
   // const [baseElec, setBaseElec] = useState(null);
@@ -294,54 +425,11 @@ function Programmer() {
     // Need to add some type of filtering here that detects whether it is Medtronic Activa, and then needs to put just mA values, not %
   };
 
+
   useEffect(() => {
     // Ensure that the ipcRenderer is available
     if (window.electron && window.electron.ipcRenderer) {
       const ipcRenderer = window.electron.ipcRenderer;
-
-      // Event listener for import-file-error
-      const handleImportFileError = (arg) => {
-        try {
-          setPatientName(patient.name);
-          console.log('Not Found');
-          const outputElectrode = 'boston_vercise_directed';
-          const outputIPG = handleIPG(outputElectrode);
-          setElectrodeMaster(outputElectrode);
-          setIpgMaster(outputIPG);
-          const S = {};
-          setImportNewS(S);
-          const tempLabel = generateUniqueID();
-          const tempPatients = [tempLabel];
-
-          const patientTmp = tempPatients[0];
-          let initialStates;
-          const processedS = {
-            filteredQuantities: {},
-            filteredValues: {},
-            newTotalAmplitude: {},
-            outputVisModel: '3',
-            newAllVolAmpToggles: {},
-          };
-          console.log(S);
-          initialStates = {
-            [patientTmp]: {
-              ...initialState,
-              leftElectrode: outputElectrode,
-              rightElectrode: outputElectrode,
-              IPG: outputIPG,
-              allQuantities: processedS.filteredQuantities,
-              allSelectedValues: processedS.filteredValues,
-              allTotalAmplitudes: processedS.newTotalAmplitude,
-              visModel: processedS.outputVisModel,
-              allVolAmpToggles: processedS.newAllVolAmpToggles,
-            },
-          };
-          setPatientStates(initialStates);
-          setPatients(tempPatients);
-        } catch (error) {
-          console.error('Error processing import-file-error event:', error);
-        }
-      };
 
       // Event listener for import-file
       const handleImportFile = (arg) => {
@@ -405,10 +493,19 @@ function Programmer() {
           try {
             setPatientName(patient.name);
             console.log(arg);
+            setMode(arg.mode);
             const { S } = arg;
-            const outputElectrode = S.elmodel[0];
-            const outputIPG = handleIPG(S.elmodel[0]);
-            console.log('Tester: ', outputIPG);
+            let outputElectrode = 'Boston';
+            let outputIPG = 'Boston';
+            try {
+              outputElectrode = handleImportedElectrode(arg.electrodeModel);
+              outputIPG = handleIPG(arg.electrodeModel);
+            } catch (err) {
+              outputElectrode = S.elmodel[0];
+              outputIPG = 'Medtronic_Percept';
+            }
+
+            console.log('Tester: 1 ', outputIPG);
             setElectrodeMaster(outputElectrode);
             setIpgMaster(outputIPG);
             setImportNewS(S);
@@ -520,6 +617,7 @@ function Programmer() {
             electrodeMaster={electrodeMaster}
             ipgMaster={ipgMaster}
             historical={location.state}
+            mode={mode}
           />
         )}
       </div>

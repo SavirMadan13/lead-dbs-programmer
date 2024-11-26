@@ -20,6 +20,8 @@ function PatientDetails({ directoryPath, leadDBS }) {
   const location = useLocation();
   const { patient } = location.state || {}; // Retrieve patient from state
   const { patients } = useContext(PatientContext); // Optional: Use context for patient data
+  console.log(patient);
+  console.log(patients);
   const navigate = useNavigate(); // Initialize the navigate hook
 
   const [timeline, setTimeline] = useState(''); // For timeline selection
