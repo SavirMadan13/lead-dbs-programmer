@@ -26,6 +26,7 @@ ipcMain.setMaxListeners(Infinity);
 // const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
 // console.log(args);
 // const inputDatasetDirectory = process.argv[1]; // Get the first argument
+const inputPath = '/Users/savirmadan/Downloads/inputData.json';
 const inputFilePath =
   '/Users/savirmadan/Documents/Localization/Output/Patient0357Output/derivatives/leaddbs/sub-CbctDbs0357/stimulations/MNI152NLin2009bAsym/inputData.json';
 class AppUpdater {
