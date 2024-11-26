@@ -1087,6 +1087,7 @@ function PlyViewer({
     console.log(recoData);
     clearAllSpheres();
 
+    const newCoords = [];
     let rotationAngle = 0;
     if (side < 5 && Object.keys(quantities).length > 6) {
       rotationAngle = recoData.directionality.roll_out_left - 60;
@@ -1176,6 +1177,7 @@ function PlyViewer({
           forward.z * directionOffset.y +
           direction.z * directionOffset.z;
 
+        newCoords.push([newPosition.x, newPosition.y, newPosition.z]);
         // Calculate amplitude based on contactQuantity
         const contactAmplitude = (contactQuantity / 100) * amplitude;
 
@@ -1915,6 +1917,46 @@ function PlyViewer({
     return data[parseInt(index, 10)].coords;
   };
 
+  const handleNiftiQuantityStateChange = (v) => {
+    console.log(stimParams);
+    const updatedQuantities = { ...quantities };
+    const updatedSelectedValues = { ...selectedValues };
+    const updatedV = v;
+    let numActive = 0;
+    let totalAmp = 0;
+    Object.keys(updatedV).forEach((key) => {
+      if (updatedV[key] >= 0.2) {
+        numActive += 1;
+        updatedV[key] = Math.round(updatedV[key] * 10) / 10;
+        totalAmp += updatedV[key];
+      } else {
+        updatedV[key] = 0;
+      }
+    });
+    Object.keys(updatedQuantities).forEach((contact) => {
+      // skipping IPG
+      if (parseFloat(contact) === 0) {
+        updatedQuantities[contact] = totalAmp;
+        updatedSelectedValues[contact] = 'right';
+        return;
+      }
+      if (updatedV[contact - 1] !== 0) {
+        updatedSelectedValues[contact] = 'center';
+        if (togglePosition === 'center') {
+          updatedQuantities[contact] = updatedV[contact - 1];
+        } else {
+          updatedQuantities[contact] = 100 * updatedV[contact - 1] / totalAmp;
+        }
+      } else {
+        updatedQuantities[contact] = 0;
+        updatedSelectedValues[contact] = 'left';
+      }
+    });
+    setAmplitude(totalAmp);
+    setQuantities(updatedQuantities);
+    setSelectedValues(updatedSelectedValues);
+  };
+
   const handleQuantityStateChange = (index, tmpAmp) => {
     console.log(stimParams);
     const updatedQuantities = { ...quantities };
@@ -2205,6 +2247,105 @@ function PlyViewer({
     console.log(event.target.value);
     setAvoidRoi(event.target.value);
   };
+
+  useEffect(() => {
+    try {
+      const newCoords = [];
+
+      let rotationAngle = 0;
+      if (side < 5 && Object.keys(quantities).length > 6) {
+        rotationAngle = recoData.directionality.roll_out_left - 60;
+      } else {
+        rotationAngle = recoData.directionality.roll_out_right - 120;
+      }
+      const rotationQuaternion = new THREE.Quaternion();
+      rotationQuaternion.setFromAxisAngle(
+        new THREE.Vector3(0, 0, 1),
+        THREE.MathUtils.degToRad(rotationAngle),
+      ); // Z-axis rotation
+
+      Object.keys(contactDirections).forEach((contactId) => {
+        console.log(togglePosition);
+        let contactQuantity = parseFloat(quantities[contactId]);
+        if (togglePosition === 'center') {
+          const newQuantities = calculatePercentageFromAmplitude();
+          contactQuantity = parseFloat(newQuantities[contactId]);
+        }
+
+        // If contactQuantity is greater than 0, add or update the sphere
+        // Check if the sphere already exists in VTASpheresRef
+        // if (!VTASpheresRef[contactId]) {
+        // Calculate position and amplitude
+        console.log('PLYViewer', quantities, keyLevels, contactDirections);
+        const vectorLevel = keyLevels[contactId];
+        const clampedLevel = Math.min(Math.max(vectorLevel, 1), 4);
+        const normalizedLevel = (clampedLevel - 1) / (4 - 1);
+
+        let startCoords = [];
+        let targetCoords = [];
+        if (side < 5) {
+          const { head2: headMarkers, tail2: tailMarkers } = recoData.markers;
+          startCoords = new THREE.Vector3(...headMarkers);
+          targetCoords = new THREE.Vector3(...tailMarkers);
+        } else {
+          const { head1: headMarkers, tail1: tailMarkers } = recoData.markers;
+          startCoords = new THREE.Vector3(...headMarkers);
+          targetCoords = new THREE.Vector3(...tailMarkers);
+        }
+
+        // Calculate the direction of the electrode
+        const direction = new THREE.Vector3()
+          .subVectors(targetCoords, startCoords)
+          .normalize();
+
+        // Create an orthogonal basis for the electrode
+        const up = new THREE.Vector3(0, 0, 1); // Assuming 'up' is along the global Z-axis
+        const right = new THREE.Vector3().crossVectors(direction, up).normalize();
+        const forward = new THREE.Vector3()
+          .crossVectors(right, direction)
+          .normalize();
+
+        // Linearly interpolate between startCoords and targetCoords based on normalizedLevel
+        const newPosition = startCoords
+          .clone()
+          .lerp(targetCoords, normalizedLevel);
+
+        // Get the direction adjustment for the contact
+        // const directionOffset = contactDirections[contactId];
+
+        // Get the direction offset for the contact
+        const directionOffset = new THREE.Vector3(
+          contactDirections[contactId].x,
+          contactDirections[contactId].y,
+          contactDirections[contactId].z,
+        );
+
+        // Apply the rotation to the directionOffset using the quaternion
+        directionOffset.applyQuaternion(rotationQuaternion);
+
+        // Apply the direction offset to the newPosition relative to the electrode’s orientation
+        newPosition.x +=
+          right.x * directionOffset.x +
+          forward.x * directionOffset.y +
+          direction.x * directionOffset.z;
+        newPosition.y +=
+          right.y * directionOffset.x +
+          forward.y * directionOffset.y +
+          direction.y * directionOffset.z;
+        newPosition.z +=
+          right.z * directionOffset.x +
+          forward.z * directionOffset.y +
+          direction.z * directionOffset.z;
+
+        newCoords.push([newPosition.x, newPosition.y, newPosition.z]);
+      });
+
+      console.log('NewCoords: ', newCoords);
+      setElecCoords(newCoords);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [recoData]);
   /**
    * Validates input parameters for the optimizeSphereValues function.
    * @param {Array} sphereCoords - Array of sphere centers, each center is an [x, y, z] coordinate.
@@ -2658,13 +2799,14 @@ function PlyViewer({
   //   return currentV;
   // };
 
-  const handleNiiMap = () => {
+  const handleNiiMap = (importedCoords) => {
     const sphereCoords = elecCoords;
     console.log(elecCoords);
     // const v = [0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75];
     const v = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5];
     // const v = [1, 1, 1, 1];
-    const L = niiCoords;
+    // const L = niiCoords;
+    const L = importedCoords;
     const { filteredL, clusters } = filterBoxAroundSphere(
       L,
       sphereCoords,
@@ -2737,6 +2879,7 @@ function PlyViewer({
       normalizedPlotNiiCoords,
     );
     console.log(outputV);
+    handleNiftiQuantityStateChange(outputV);
     // setNiiSolution(outputV);
   };
 
@@ -2829,6 +2972,7 @@ function PlyViewer({
 
           // Set the state with the transformed coordinates
           setNiiCoords(mniCoordinates);
+          handleNiiMap(mniCoordinates);
         } catch (error) {
           console.error('Error processing NIfTI file:', error);
         }
@@ -3248,31 +3392,35 @@ function PlyViewer({
                     {/* <Button variant="primary" onClick={handleSTNParameters}>
                       Provide Solution
                     </Button> */}
-                    <Button variant="primary" onClick={handleAddContacts}>
+                    {/* <Button variant="primary" onClick={handleAddContacts}>
                       Add Contact
-                    </Button>
-                    <Button variant="primary" onClick={handleAvoidance}>
-                      Avoid
-                    </Button>
-                    <Button variant="primary" onClick={handleNiiMap}>
-                      Test Nii Coords
-                    </Button>
-                    <Button
-                      variant="primary"
-                      onClick={() => document.getElementById('nifti-upload').click()}
-                      className="mb-4 mx-2"
-                    >
-                      Import NIfTI File
-                    </Button>
-                    <input
-                      id="nifti-upload"
-                      type="file"
-                      style={{ display: 'none' }}
-                      accept=".nii"
-                      onChange={(e) => handleNiiUpload(e)}
-                    />
-                    {/* <span>{solutionText}</span> */}
-                    <span>{niiSolution}</span>
+                    </Button> */}
+                    <div>
+                      <Button variant="primary" onClick={handleAvoidance}>
+                        Avoid
+                      </Button>
+                    </div>
+                    <div>
+                      {/* <Button variant="primary" onClick={handleNiiMap}>
+                        Test Nii Coords
+                      </Button> */}
+                      <Button
+                        variant="primary"
+                        onClick={() => document.getElementById('nifti-upload').click()}
+                        className="mb-4 mx-2"
+                      >
+                        Import NIfTI File and Provide Solution
+                      </Button>
+                      <input
+                        id="nifti-upload"
+                        type="file"
+                        style={{ display: 'none' }}
+                        accept=".nii"
+                        onChange={(e) => handleNiiUpload(e)}
+                      />
+                      {/* <span>{solutionText}</span> */}
+                      <span>{niiSolution}</span>
+                    </div>
                   </div>
                 </div>
               </Tab>
