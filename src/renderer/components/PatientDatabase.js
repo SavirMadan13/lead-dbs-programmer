@@ -198,10 +198,11 @@ function PatientDatabase({ key, directoryPath }) {
             console.log('stimulate');
             let outputPatient = {};
             let outputTimeline = '';
+            console.log(arg.patientname[0]);
             Object.keys(patients).forEach((patient) => {
-              if (patients[patient].id === arg.patientname) {
+              if (patients[patient].id === arg.patientname[0]) {
                 outputPatient = patients[patient];
-                outputTimeline = arg.labels[0];
+                outputTimeline = arg.labels ? arg.labels[0] : arg.label;
                 let leadDBS = true;
                 navigate('/programmer', {
                   state: {
@@ -215,7 +216,7 @@ function PatientDatabase({ key, directoryPath }) {
             });
           }
         } catch (error) {
-          console.error('Error processing import-file event:', error);
+          console.error('Error processing event:', error);
         }
       });
     } else {

@@ -26,7 +26,7 @@ ipcMain.setMaxListeners(Infinity);
 // const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
 // console.log(args);
 // const inputDatasetDirectory = process.argv[1]; // Get the first argument
-const inputPath = '/Users/savirmadan/Downloads/inputData.json';
+const inputPath = '/Users/savirmadan/Downloads/inputDataGroup.json';
 const inputFilePath =
   '/Users/savirmadan/Documents/Localization/Output/Patient0357Output/derivatives/leaddbs/sub-CbctDbs0357/stimulations/MNI152NLin2009bAsym/inputData.json';
 class AppUpdater {
@@ -137,7 +137,8 @@ ipcMain.on(
       // Check if the file exists before trying to read it
       if (!fs.existsSync(filePath)) {
         if (leadDBS) {
-          if (stimulationData.mode === 'stimulate' && stimulationData.labels[0] === timeline) {
+          if (  stimulationData.mode === 'stimulate' &&
+            (stimulationData.labels?.[0] || stimulationData.label) === timeline) {
             if (!fs.existsSync(sessionDir)) {
               fs.mkdirSync(sessionDir, { recursive: true });
             }
@@ -167,7 +168,8 @@ ipcMain.on(
         event.reply('import-file', 'File Not Found');
         return;
       }
-      if (stimulationData.mode === 'stimulate' && stimulationData.labels[0] === timeline) {
+      if (stimulationData.mode === 'stimulate' &&
+        (stimulationData.labels?.[0] || stimulationData.label) === timeline) {
         event.reply('import-file', stimulationData);
         return;
       }
