@@ -283,311 +283,6 @@ function Programmer() {
     return `${year}${month}${day}${randomNums}`;
   }
 
-  // const gatherImportedDataNew = (jsonData, outputIPG) => {
-  //   console.log(jsonData);
-
-  //   const newQuantities = {};
-  //   const newSelectedValues = {};
-  //   const newTotalAmplitude = {};
-  //   const newAllQuantities = {};
-  //   const newAllVolAmpToggles = {};
-
-  //   console.log('Imported Amplitude: ', jsonData.amplitude);
-
-  //   for (let j = 1; j < 5; j++) {
-  //     try {
-  //       newTotalAmplitude[j] = jsonData.amplitude[1][j - 1];
-  //       newTotalAmplitude[j + 4] = jsonData.amplitude[0][j - 1];
-  //     } catch {
-  //       console.log('');
-  //     }
-
-  //     try {
-  //       newTotalAmplitude[j] = jsonData.amplitude.leftAmplitude[j - 1];
-  //       newTotalAmplitude[j + 4] = jsonData.amplitude.rightAmplitude[j - 1];
-  //     } catch {
-  //       console.log('');
-  //     }
-
-  //     console.log('newTotalAmplitude: ', newTotalAmplitude);
-
-  //     const dynamicKey2 = `Ls${j}`;
-  //     const dynamicKey3 = `Rs${j}`;
-  //     if (jsonData[dynamicKey2].va === 2) {
-  //       newAllVolAmpToggles[j] = 'center';
-  //     } else if (jsonData[dynamicKey2].va === 1) {
-  //       newAllVolAmpToggles[j] = 'right';
-  //     }
-
-  //     if (jsonData[dynamicKey3].va === 2) {
-  //       newAllVolAmpToggles[j + 4] = 'center';
-  //     } else if (jsonData[dynamicKey3].va === 1) {
-  //       newAllVolAmpToggles[j + 4] = 'right';
-  //     }
-
-  //     for (let i = 0; i < 9; i++) {
-  //       const dynamicKey = `k${i + 7}`;
-  //       const dynamicKey1 = `k${i}`;
-
-  //       if (jsonData[dynamicKey2] && jsonData[dynamicKey2][dynamicKey]) {
-  //         newQuantities[j] = newQuantities[j] || {};
-  //         newQuantities[j][i] = parseFloat(
-  //           jsonData[dynamicKey2][dynamicKey].perc,
-  //         );
-  //         newQuantities[j][0] = parseFloat(jsonData[dynamicKey2].case.perc);
-
-  //         const { pol } = jsonData[dynamicKey2][dynamicKey];
-  //         newSelectedValues[j] = newSelectedValues[j] || {};
-  //         newSelectedValues[j][i] =
-  //           pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
-
-  //         const casePol = jsonData[dynamicKey2].case.pol;
-  //         newSelectedValues[j][0] =
-  //           casePol === 0 ? 'left' : casePol === 1 ? 'center' : 'right';
-  //       }
-
-  //       if (jsonData[dynamicKey3] && jsonData[dynamicKey3][dynamicKey1]) {
-  //         newQuantities[j + 4] = newQuantities[j + 4] || {};
-  //         newQuantities[j + 4][i + 1] = parseFloat(
-  //           jsonData[dynamicKey3][dynamicKey1].perc,
-  //         );
-  //         newQuantities[j + 4][0] = parseFloat(jsonData[dynamicKey3].case.perc);
-
-  //         const { pol } = jsonData[dynamicKey3][dynamicKey1];
-  //         newSelectedValues[j + 4] = newSelectedValues[j + 4] || {};
-  //         newSelectedValues[j + 4][i + 1] =
-  //           pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
-
-  //         const casePol = jsonData[dynamicKey3].case.pol;
-  //         newSelectedValues[j + 4][0] =
-  //           casePol === 0 ? 'left' : casePol === 1 ? 'center' : 'right';
-  //       }
-  //     }
-
-  //     newAllQuantities[j] = newQuantities[j];
-  //     newAllQuantities[j + 4] = newQuantities[j + 4];
-  //   }
-
-  //   const filteredValues = Object.keys(newSelectedValues)
-  //     .filter((key) => Object.keys(newSelectedValues[key]).length > 0)
-  //     .reduce((obj, key) => {
-  //       obj[key] = newSelectedValues[key];
-  //       return obj;
-  //     }, {});
-
-  //   const filteredQuantities = Object.keys(newQuantities)
-  //     .filter((key) => Object.keys(newQuantities[key]).length > 0)
-  //     .reduce((obj, key) => {
-  //       obj[key] = newQuantities[key];
-  //       return obj;
-  //     }, {});
-
-  //   console.log('filtered', filteredQuantities);
-  //   let outputVisModel = '3';
-  //   if (jsonData.model === 'Dembek 2017') {
-  //     outputVisModel = '1';
-  //   } else if (jsonData.model === 'Fastfield (Baniasadi 2020)') {
-  //     outputVisModel = '2';
-  //   } else if (jsonData.model === 'Kuncel 2008') {
-  //     outputVisModel = '4';
-  //   } else if (jsonData.model === 'Maedler 2012') {
-  //     outputVisModel = '5';
-  //   } else if (jsonData.model === 'OSS-DBS (Butenko 2020)') {
-  //     outputVisModel = '6';
-  //   }
-
-  //   console.log('TEST!L: ', outputIPG);
-  //   if (outputIPG.includes('Medtronic')) {
-  //     Object.keys(filteredQuantities).forEach((key) => {
-  //       console.log('Test: ', filteredQuantities[key]);
-  //       Object.keys(filteredQuantities[key]).forEach((key2) => {
-  //         filteredQuantities[key][key2] =
-  //           (filteredQuantities[key][key2] / 100) * newTotalAmplitude[key];
-  //       });
-  //     });
-  //   }
-
-  //   Object.keys(newAllVolAmpToggles).forEach((key) => {
-  //     if (newAllVolAmpToggles[key] === 1) {
-  //       setIpgMaster('Medtronic_Activa');
-  //       return '';
-  //     }
-  //   });
-
-  //   return {
-  //     filteredQuantities,
-  //     filteredValues,
-  //     newTotalAmplitude,
-  //     outputVisModel,
-  //     newAllVolAmpToggles,
-  //   };
-
-  //   // Need to add some type of filtering here that detects whether it is Medtronic Activa, and then needs to put just mA values, not %
-  // };
-
-
-  // useEffect(() => {
-  //   // Ensure that the ipcRenderer is available
-  //   if (window.electron && window.electron.ipcRenderer) {
-  //     const ipcRenderer = window.electron.ipcRenderer;
-
-  //     // Event listener for import-file
-  //     const handleImportFile = (arg) => {
-  //       console.log(arg);
-  //       if (arg === 'File not found' || arg.directionality) {
-  //         try {
-  //           setPatientName(patient.name);
-  //           console.log('Not Found');
-  //           let outputElectrode = 'boston_vercise_directed';
-  //           try {
-  //             outputElectrode = handleImportedElectrode(arg.elmodel);
-  //           } catch (err) {
-  //             console.log(err);
-  //           }
-  //           // while (!baseElec) {
-  //           //   // Waiting for baseElec to exist
-  //           // }
-  //           // console.log(baseElec);
-  //           // if (baseElec) {
-  //           //   outputElectrode = handleImportedElectrode(baseElec);
-  //           //   console.log(outputElectrode);
-  //           // }
-  //           const outputIPG = handleIPG(outputElectrode);
-  //           console.log(outputIPG);
-  //           setElectrodeMaster(outputElectrode);
-  //           setIpgMaster(outputIPG);
-  //           const S = {};
-  //           setImportNewS(S);
-  //           const tempLabel = generateUniqueID();
-  //           const tempPatients = [tempLabel];
-
-  //           const patientTmp = tempPatients[0];
-  //           let initialStates;
-  //           const processedS = {
-  //             filteredQuantities: {},
-  //             filteredValues: {},
-  //             newTotalAmplitude: {},
-  //             outputVisModel: '3',
-  //             newAllVolAmpToggles: {},
-  //           };
-  //           console.log(S);
-  //           initialStates = {
-  //             [patientTmp]: {
-  //               ...initialState,
-  //               leftElectrode: outputElectrode,
-  //               rightElectrode: outputElectrode,
-  //               IPG: outputIPG,
-  //               allQuantities: processedS.filteredQuantities,
-  //               allSelectedValues: processedS.filteredValues,
-  //               allTotalAmplitudes: processedS.newTotalAmplitude,
-  //               visModel: processedS.outputVisModel,
-  //               allVolAmpToggles: processedS.newAllVolAmpToggles,
-  //             },
-  //           };
-  //           setPatientStates(initialStates);
-  //           setPatients(tempPatients);
-  //         } catch (error) {
-  //           console.error('Error processing import-file-error event:', error);
-  //         }
-  //       } else {
-  //         try {
-  //           setPatientName(patient.name);
-  //           console.log(arg);
-  //           setMode(arg.mode);
-  //           const { S } = arg;
-  //           let outputElectrode = 'Boston';
-  //           let outputIPG = 'Boston';
-  //           try {
-  //             outputElectrode = handleImportedElectrode(arg.electrodeModel);
-  //             outputIPG = handleIPG(arg.electrodeModel);
-  //           } catch (err) {
-  //             outputElectrode = S.elmodel[0];
-  //             outputIPG = 'Medtronic_Percept';
-  //           }
-
-  //           console.log('Tester: 1 ', outputIPG);
-  //           setElectrodeMaster(outputElectrode);
-  //           setIpgMaster(outputIPG);
-  //           setImportNewS(S);
-
-  //           const tempPatients = [S.label];
-  //           console.log('TEMPPatients', tempPatients[0]);
-
-  //           let initialStates;
-
-  //           if (tempPatients.length === 1) {
-  //             const patientTmp = tempPatients[0];
-  //             const processedS =
-  //               Array.isArray(S) && S.length === 0
-  //                 ? {
-  //                     filteredQuantities: {},
-  //                     filteredValues: {},
-  //                     newTotalAmplitude: {},
-  //                     outputVisModel: '3',
-  //                     newAllVolAmpToggles: {},
-  //                   }
-  //                 : gatherImportedDataNew(S, outputIPG);
-  //             console.log(S);
-  //             initialStates = {
-  //               [patientTmp]: {
-  //                 ...initialState,
-  //                 leftElectrode: outputElectrode,
-  //                 rightElectrode: outputElectrode,
-  //                 IPG: outputIPG,
-  //                 allQuantities: processedS.filteredQuantities,
-  //                 allSelectedValues: processedS.filteredValues,
-  //                 allTotalAmplitudes: processedS.newTotalAmplitude,
-  //                 visModel: processedS.outputVisModel,
-  //                 allVolAmpToggles: processedS.newAllVolAmpToggles,
-  //               },
-  //             };
-  //           } else {
-  //             initialStates = tempPatients.reduce((acc, patient, index) => {
-  //               console.log(`Processing patient ${index + 1}`);
-  //               const electrodes = electrodeList[index];
-  //               const processedS = arg.S[index]
-  //                 ? gatherImportedDataNew(arg.S[index], outputIPG)
-  //                 : {
-  //                     filteredQuantities: {},
-  //                     filteredValues: {},
-  //                     newTotalAmplitude: {},
-  //                     outputVisModel: '3',
-  //                     newAllVolAmpToggles: {},
-  //                   };
-  //               acc[patient] = {
-  //                 ...initialState,
-  //                 leftElectrode: outputElectrode,
-  //                 rightElectrode: outputElectrode,
-  //                 IPG: outputIPG,
-  //                 allQuantities: processedS.filteredQuantities,
-  //                 allSelectedValues: processedS.filteredValues,
-  //                 allTotalAmplitudes: processedS.newTotalAmplitude,
-  //                 visModel: processedS.outputVisModel,
-  //                 allVolAmpToggles: processedS.newAllVolAmpToggles,
-  //               };
-  //               return acc;
-  //             }, {});
-  //           }
-
-  //           console.log('Patients:', initialStates);
-  //           setPatientStates(initialStates);
-  //           setPatients(tempPatients);
-  //         } catch (error) {
-  //           console.error('Error processing import-file event:', error);
-  //         }
-  //       }
-  //     };
-
-  //     // Attach listeners using 'once' so that it only listens for the event once
-  //     // ipcRenderer.once('import-file-error', handleImportFileError);
-  //     ipcRenderer.once('import-file', handleImportFile);
-
-  //   } else {
-  //     console.error('ipcRenderer is not available');
-  //   }
-  // }, []);
-
-
   const gatherImportedDataNew = (jsonData, outputIPG) => {
     console.log(jsonData);
 
@@ -600,73 +295,75 @@ function Programmer() {
     console.log('Imported Amplitude: ', jsonData.amplitude);
 
     for (let j = 1; j < 5; j++) {
-      newTotalAmplitude[j] = jsonData.amplitude[1][j - 1];
-      newTotalAmplitude[j + 4] = jsonData.amplitude[0][j - 1];
+      try {
+        newTotalAmplitude[j] = jsonData.amplitude[1][j - 1];
+        newTotalAmplitude[j + 4] = jsonData.amplitude[0][j - 1];
+      } catch {
+        console.log('');
+      }
+
+      try {
+        newTotalAmplitude[j] = jsonData.amplitude.leftAmplitude[j - 1];
+        newTotalAmplitude[j + 4] = jsonData.amplitude.rightAmplitude[j - 1];
+      } catch {
+        console.log('');
+      }
 
       console.log('newTotalAmplitude: ', newTotalAmplitude);
 
       const dynamicKey2 = `Ls${j}`;
       const dynamicKey3 = `Rs${j}`;
-      if (jsonData[dynamicKey2]['va'] === 2) {
+      if (jsonData[dynamicKey2].va === 2) {
         newAllVolAmpToggles[j] = 'center';
-      } else if (jsonData[dynamicKey2]['va'] === 1) {
+      } else if (jsonData[dynamicKey2].va === 1) {
         newAllVolAmpToggles[j] = 'right';
       }
 
-      if (jsonData[dynamicKey3]['va'] === 2) {
-        newAllVolAmpToggles[j+4] = 'center';
-      } else if (jsonData[dynamicKey3]['va'] === 1) {
-        newAllVolAmpToggles[j+4] = 'right';
+      if (jsonData[dynamicKey3].va === 2) {
+        newAllVolAmpToggles[j + 4] = 'center';
+      } else if (jsonData[dynamicKey3].va === 1) {
+        newAllVolAmpToggles[j + 4] = 'right';
       }
 
       for (let i = 0; i < 9; i++) {
-        const dynamicKey = `k${i+1}`;
-        const dynamicKey1 = `k${i+1}`;
+        const dynamicKey = `k${i + 7}`;
+        const dynamicKey1 = `k${i}`;
 
-        // Running it for left side
         if (jsonData[dynamicKey2] && jsonData[dynamicKey2][dynamicKey]) {
           newQuantities[j] = newQuantities[j] || {};
-          // Setting quantities for contacts
-          newQuantities[j][i+1] = parseFloat(
+          newQuantities[j][i] = parseFloat(
             jsonData[dynamicKey2][dynamicKey].perc,
           );
-          // Setting quantity for case
           newQuantities[j][0] = parseFloat(jsonData[dynamicKey2].case.perc);
 
           const { pol } = jsonData[dynamicKey2][dynamicKey];
           newSelectedValues[j] = newSelectedValues[j] || {};
-          // Setting polarity for contacts
-          newSelectedValues[j][i+1] =
+          newSelectedValues[j][i] =
             pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
 
-          // Setting polarity for case
           const casePol = jsonData[dynamicKey2].case.pol;
           newSelectedValues[j][0] =
             casePol === 0 ? 'left' : casePol === 1 ? 'center' : 'right';
         }
-        // Rerun code for right side
+
         if (jsonData[dynamicKey3] && jsonData[dynamicKey3][dynamicKey1]) {
-          // Setting quantities for contacts
           newQuantities[j + 4] = newQuantities[j + 4] || {};
-          newQuantities[j + 4][i+1] = parseFloat(
+          newQuantities[j + 4][i + 1] = parseFloat(
             jsonData[dynamicKey3][dynamicKey1].perc,
           );
-          // Setting quantities for case
           newQuantities[j + 4][0] = parseFloat(jsonData[dynamicKey3].case.perc);
 
           const { pol } = jsonData[dynamicKey3][dynamicKey1];
-          // Setting polarity for contacts
           newSelectedValues[j + 4] = newSelectedValues[j + 4] || {};
-          newSelectedValues[j + 4][i+1] =
+          newSelectedValues[j + 4][i + 1] =
             pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
 
-            // Setting polarity for case
           const casePol = jsonData[dynamicKey3].case.pol;
           newSelectedValues[j + 4][0] =
             casePol === 0 ? 'left' : casePol === 1 ? 'center' : 'right';
         }
       }
-      // Combining left and right sides
+
       newAllQuantities[j] = newQuantities[j];
       newAllQuantities[j + 4] = newQuantities[j + 4];
     }
@@ -678,7 +375,7 @@ function Programmer() {
         return obj;
       }, {});
 
-    let filteredQuantities = Object.keys(newQuantities)
+    const filteredQuantities = Object.keys(newQuantities)
       .filter((key) => Object.keys(newQuantities[key]).length > 0)
       .reduce((obj, key) => {
         obj[key] = newQuantities[key];
@@ -704,13 +401,14 @@ function Programmer() {
       Object.keys(filteredQuantities).forEach((key) => {
         console.log('Test: ', filteredQuantities[key]);
         Object.keys(filteredQuantities[key]).forEach((key2) => {
-          filteredQuantities[key][key2] = (filteredQuantities[key][key2] / 100) * newTotalAmplitude[key];
+          filteredQuantities[key][key2] =
+            (filteredQuantities[key][key2] / 100) * newTotalAmplitude[key];
         });
       });
     }
 
     Object.keys(newAllVolAmpToggles).forEach((key) => {
-      if (newAllVolAmpToggles[key] === 'right') {
+      if (newAllVolAmpToggles[key] === 1) {
         setIpgMaster('Medtronic_Activa');
         return '';
       }
@@ -727,53 +425,54 @@ function Programmer() {
     // Need to add some type of filtering here that detects whether it is Medtronic Activa, and then needs to put just mA values, not %
   };
 
+
   useEffect(() => {
-    console.log(window.electron.ipcRenderer);
+    // Ensure that the ipcRenderer is available
     if (window.electron && window.electron.ipcRenderer) {
-      window.electron.ipcRenderer.once('import-file', (arg) => {
-        try {
-          console.log('Received import-file event');
-          console.log('Import Data:', arg.patientname);
-          setPatientName(patient.name);
-          console.log(arg);
-          const electrodeList = arg.electrodeModels;
-          const outputElectrode = handleImportedElectrode(electrodeList[0]);
-          const outputIPG = handleIPG(electrodeList[0]);
-          console.log('Tester: ', outputIPG);
-          setElectrodeMaster(outputElectrode);
-          setIpgMaster(outputIPG);
-          setImportNewS(arg.S);
-          const activeArray = arg.S.active;
-          const tempPatients = arg.label;
-          console.log('TEMPPAtients', tempPatients);
+      const ipcRenderer = window.electron.ipcRenderer;
 
-          let initialStates;
+      // Event listener for import-file
+      const handleImportFile = (arg) => {
+        console.log(arg);
+        if (arg === 'File not found' || arg.directionality) {
+          try {
+            setPatientName(patient.name);
+            console.log('Not Found');
+            let outputElectrode = 'boston_vercise_directed';
+            try {
+              outputElectrode = handleImportedElectrode(arg.elmodel);
+            } catch (err) {
+              console.log(err);
+            }
+            // while (!baseElec) {
+            //   // Waiting for baseElec to exist
+            // }
+            // console.log(baseElec);
+            // if (baseElec) {
+            //   outputElectrode = handleImportedElectrode(baseElec);
+            //   console.log(outputElectrode);
+            // }
+            const outputIPG = handleIPG(outputElectrode);
+            console.log(outputIPG);
+            setElectrodeMaster(outputElectrode);
+            setIpgMaster(outputIPG);
+            const S = {};
+            setImportNewS(S);
+            const tempLabel = generateUniqueID();
+            const tempPatients = [tempLabel];
 
-          if (arg.patientname.length === 1) {
-            const patient = tempPatients;
-            const electrodes = electrodeList[0];
-            console.log(arg.S);
-            // const processedS = arg.S
-            //   ? gatherImportedDataNew(arg.S)
-            //   : {
-            //       filteredQuantities: {},
-            //       filteredValues: {},
-            //       newTotalAmplitude: {},
-            //     };
-            const processedS =
-              Array.isArray(arg.S) && arg.S.length === 0
-                ? {
-                    filteredQuantities: {},
-                    filteredValues: {},
-                    newTotalAmplitude: {},
-                    outputVisModel: '3',
-                    newAllVolAmpToggles: {},
-                    active: activeArray,
-                  }
-                : gatherImportedDataNew(arg.S, outputIPG);
-            console.log(arg.S);
+            const patientTmp = tempPatients[0];
+            let initialStates;
+            const processedS = {
+              filteredQuantities: {},
+              filteredValues: {},
+              newTotalAmplitude: {},
+              outputVisModel: '3',
+              newAllVolAmpToggles: {},
+            };
+            console.log(S);
             initialStates = {
-              [patient]: {
+              [patientTmp]: {
                 ...initialState,
                 leftElectrode: outputElectrode,
                 rightElectrode: outputElectrode,
@@ -783,46 +482,106 @@ function Programmer() {
                 allTotalAmplitudes: processedS.newTotalAmplitude,
                 visModel: processedS.outputVisModel,
                 allVolAmpToggles: processedS.newAllVolAmpToggles,
-                active: activeArray,
               },
             };
-          } else {
-            initialStates = arg.patientname.reduce((acc, patient, index) => {
-              console.log(`Processing patient ${index + 1}`);
-              const electrodes = electrodeList[index];
-              const processedS = arg.S[index]
-                ? gatherImportedDataNew(arg.S[index], outputIPG)
-                : {
-                    filteredQuantities: {},
-                    filteredValues: {},
-                    newTotalAmplitude: {},
-                    outputVisModel: '3',
-                    newAllVolAmpToggles: {},
-                    active: activeArray,
-                  };
-              acc[patient] = {
-                ...initialState,
-                leftElectrode: outputElectrode,
-                rightElectrode: outputElectrode,
-                IPG: outputIPG,
-                allQuantities: processedS.filteredQuantities,
-                allSelectedValues: processedS.filteredValues,
-                allTotalAmplitudes: processedS.newTotalAmplitude,
-                visModel: processedS.outputVisModel,
-                allVolAmpToggles: processedS.newAllVolAmpToggles,
-                active: activeArray,
-              };
-              return acc;
-            }, {});
+            setPatientStates(initialStates);
+            setPatients(tempPatients);
+          } catch (error) {
+            console.error('Error processing import-file-error event:', error);
           }
+        } else {
+          try {
+            setPatientName(patient.name);
+            console.log(arg);
+            setMode(arg.mode);
+            const { S } = arg;
+            let outputElectrode = 'Boston';
+            let outputIPG = 'Boston';
+            try {
+              outputElectrode = handleImportedElectrode(arg.electrodeModel);
+              outputIPG = handleIPG(arg.electrodeModel);
+            } catch (err) {
+              outputElectrode = S.elmodel[0];
+              outputIPG = 'Medtronic_Percept';
+            }
 
-          console.log('Patients:', initialStates);
-          setPatientStates(initialStates);
-          setPatients(initialStates);
-        } catch (error) {
-          console.error('Error processing import-file event:', error);
+            console.log('Tester: 1 ', outputIPG);
+            setElectrodeMaster(outputElectrode);
+            setIpgMaster(outputIPG);
+            setImportNewS(S);
+
+            const tempPatients = [S.label];
+            console.log('TEMPPatients', tempPatients[0]);
+
+            let initialStates;
+
+            if (tempPatients.length === 1) {
+              const patientTmp = tempPatients[0];
+              const processedS =
+                Array.isArray(S) && S.length === 0
+                  ? {
+                      filteredQuantities: {},
+                      filteredValues: {},
+                      newTotalAmplitude: {},
+                      outputVisModel: '3',
+                      newAllVolAmpToggles: {},
+                    }
+                  : gatherImportedDataNew(S, outputIPG);
+              console.log(S);
+              initialStates = {
+                [patientTmp]: {
+                  ...initialState,
+                  leftElectrode: outputElectrode,
+                  rightElectrode: outputElectrode,
+                  IPG: outputIPG,
+                  allQuantities: processedS.filteredQuantities,
+                  allSelectedValues: processedS.filteredValues,
+                  allTotalAmplitudes: processedS.newTotalAmplitude,
+                  visModel: processedS.outputVisModel,
+                  allVolAmpToggles: processedS.newAllVolAmpToggles,
+                },
+              };
+            } else {
+              initialStates = tempPatients.reduce((acc, patient, index) => {
+                console.log(`Processing patient ${index + 1}`);
+                const electrodes = electrodeList[index];
+                const processedS = arg.S[index]
+                  ? gatherImportedDataNew(arg.S[index], outputIPG)
+                  : {
+                      filteredQuantities: {},
+                      filteredValues: {},
+                      newTotalAmplitude: {},
+                      outputVisModel: '3',
+                      newAllVolAmpToggles: {},
+                    };
+                acc[patient] = {
+                  ...initialState,
+                  leftElectrode: outputElectrode,
+                  rightElectrode: outputElectrode,
+                  IPG: outputIPG,
+                  allQuantities: processedS.filteredQuantities,
+                  allSelectedValues: processedS.filteredValues,
+                  allTotalAmplitudes: processedS.newTotalAmplitude,
+                  visModel: processedS.outputVisModel,
+                  allVolAmpToggles: processedS.newAllVolAmpToggles,
+                };
+                return acc;
+              }, {});
+            }
+
+            console.log('Patients:', initialStates);
+            setPatientStates(initialStates);
+            setPatients(tempPatients);
+          } catch (error) {
+            console.error('Error processing import-file event:', error);
+          }
         }
-      });
+      };
+
+      // Attach listeners using 'once' so that it only listens for the event once
+      // ipcRenderer.once('import-file-error', handleImportFileError);
+      ipcRenderer.once('import-file', handleImportFile);
+
     } else {
       console.error('ipcRenderer is not available');
     }
