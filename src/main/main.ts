@@ -199,6 +199,49 @@ ipcMain.on(
   },
 );
 
+ipcMain.handle(
+  'import-file-2',
+  async (_, id, timeline, directoryPath, leadDBS) => {
+    try {
+      if (!id || !timeline || !directoryPath) {
+        throw new Error('Missing patient ID, timeline, or directoryPath');
+      }
+
+      // Construct the file path dynamically
+      let patientDir = path.join(directoryPath, `sub-${id}`);
+      let sessionDir = path.join(patientDir, `ses-${timeline}`);
+      let fileName = `sub-${id}_ses-${timeline}_stim.json`;
+      let filePath = path.join(sessionDir, fileName);
+
+      if (leadDBS) {
+        const newDirectoryPath = path.join(
+          directoryPath,
+          'derivatives/leaddbs',
+          id,
+          'clinical',
+        );
+        patientDir = newDirectoryPath;
+        sessionDir = path.join(patientDir, `ses-${timeline}`);
+        fileName = `${id}_ses-${timeline}_stimparameters.json`;
+        filePath = path.join(sessionDir, fileName);
+      }
+      console.log('File Path: ', filePath);
+      if (!fs.existsSync(filePath)) {
+        throw new Error('File not found');
+      }
+
+      // Read the file and parse the data
+      const fileData = fs.readFileSync(filePath, 'utf8');
+      const jsonData = JSON.parse(fileData);
+
+      return jsonData;
+    } catch (error) {
+      console.error('Error in import-file:', error.message);
+      throw error; // This propagates the error back to the renderer process
+    }
+  }
+);
+
 ipcMain.on(
   'import-file-clinical',
   async (event, id, timeline, directoryPath, leadDBS) => {

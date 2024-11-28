@@ -425,6 +425,61 @@ function Programmer() {
     // Need to add some type of filtering here that detects whether it is Medtronic Activa, and then needs to put just mA values, not %
   };
 
+  useEffect(() => {
+    if (directoryPath && patient) {
+      window.electron.ipcRenderer
+        .invoke('get-timelines', directoryPath, patient.id, leadDBS)
+        .then(async (receivedTimelines) => {
+          console.log('Received timelines:', receivedTimelines);
+
+          // Filter timelines with stimulation
+          const stimulationTimelines = receivedTimelines.filter(
+            (timelineData) => timelineData.hasStimulation
+          );
+
+          console.log('Timelines with stimulation:', stimulationTimelines);
+
+          // Process timelines with stimulation
+          const timelineResults = await Promise.all(
+            stimulationTimelines.map(async (timelineData) => {
+              const timeline = timelineData.timeline;
+              try {
+                const importResult = await window.electron.ipcRenderer.invoke(
+                  'import-file-2',
+                  directoryPath,
+                  patient.id,
+                  timeline,
+                  leadDBS
+                );
+                return { timeline, data: importResult };
+              } catch (error) {
+                console.error(`Error importing timeline ${timeline}:`, error);
+                return { timeline, data: null }; // Handle errors gracefully
+              }
+            })
+          );
+
+          console.log('Processed timeline results:', timelineResults);
+
+          // Aggregate results into a structured format
+          const timelineOutput = timelineResults.reduce((acc, result) => {
+            if (result.data) {
+              acc[result.timeline] = result.data;
+            }
+            return acc;
+          }, {});
+
+          console.log('Final timeline output:', timelineOutput);
+
+          // You can now set this to state or use it as needed
+          // setTimelineOutput(timelineOutput);
+        })
+        .catch((error) => {
+          console.error('Error fetching timelines:', error);
+        });
+    }
+  }, [directoryPath, patient, leadDBS]);
+
 
   useEffect(() => {
     // Ensure that the ipcRenderer is available
