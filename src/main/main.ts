@@ -201,7 +201,7 @@ ipcMain.on(
 
 ipcMain.handle(
   'import-file-2',
-  async (_, id, timeline, directoryPath, leadDBS) => {
+  async (_, directoryPath, id, timeline, leadDBS) => {
     try {
       if (!id || !timeline || !directoryPath) {
         throw new Error('Missing patient ID, timeline, or directoryPath');
@@ -215,7 +215,8 @@ ipcMain.handle(
 
       if (leadDBS) {
         const newDirectoryPath = path.join(
-          directoryPath,
+          // directoryPath,
+          stimulationData.filepath,
           'derivatives/leaddbs',
           id,
           'clinical',
@@ -224,7 +225,10 @@ ipcMain.handle(
         sessionDir = path.join(patientDir, `ses-${timeline}`);
         fileName = `${id}_ses-${timeline}_stimparameters.json`;
         filePath = path.join(sessionDir, fileName);
+        console.log(patientDir, timeline, sessionDir, fileName);
       }
+      console.log(stimulationData.filepath);
+      console.log(sessionDir);
       console.log('File Path: ', filePath);
       if (!fs.existsSync(filePath)) {
         throw new Error('File not found');

@@ -283,31 +283,164 @@ function Programmer() {
     return `${year}${month}${day}${randomNums}`;
   }
 
-  const gatherImportedDataNew = (jsonData, outputIPG) => {
-    console.log(jsonData);
+  // const gatherImportedDataNew = (jsonData, outputIPG) => {
+  //   console.log(jsonData);
 
+  //   const newQuantities = {};
+  //   const newSelectedValues = {};
+  //   const newTotalAmplitude = {};
+  //   const newAllQuantities = {};
+  //   const newAllVolAmpToggles = {};
+
+  //   console.log('Imported Amplitude: ', jsonData.amplitude);
+
+  //   for (let j = 1; j < 5; j++) {
+  //     try {
+  //       newTotalAmplitude[j] = jsonData.amplitude[1][j - 1];
+  //       newTotalAmplitude[j + 4] = jsonData.amplitude[0][j - 1];
+  //     } catch {
+  //       console.log('');
+  //     }
+
+  //     try {
+  //       newTotalAmplitude[j] = jsonData.amplitude.leftAmplitude[j - 1];
+  //       newTotalAmplitude[j + 4] = jsonData.amplitude.rightAmplitude[j - 1];
+  //     } catch {
+  //       console.log('');
+  //     }
+
+  //     console.log('newTotalAmplitude: ', newTotalAmplitude);
+
+  //     const dynamicKey2 = `Ls${j}`;
+  //     const dynamicKey3 = `Rs${j}`;
+  //     if (jsonData[dynamicKey2].va === 2) {
+  //       newAllVolAmpToggles[j] = 'center';
+  //     } else if (jsonData[dynamicKey2].va === 1) {
+  //       newAllVolAmpToggles[j] = 'right';
+  //     }
+
+  //     if (jsonData[dynamicKey3].va === 2) {
+  //       newAllVolAmpToggles[j + 4] = 'center';
+  //     } else if (jsonData[dynamicKey3].va === 1) {
+  //       newAllVolAmpToggles[j + 4] = 'right';
+  //     }
+
+  //     for (let i = 0; i < 9; i++) {
+  //       const dynamicKey = `k${i + 7}`;
+  //       const dynamicKey1 = `k${i}`;
+
+  //       if (jsonData[dynamicKey2] && jsonData[dynamicKey2][dynamicKey]) {
+  //         newQuantities[j] = newQuantities[j] || {};
+  //         newQuantities[j][i] = parseFloat(
+  //           jsonData[dynamicKey2][dynamicKey].perc,
+  //         );
+  //         newQuantities[j][0] = parseFloat(jsonData[dynamicKey2].case.perc);
+
+  //         const { pol } = jsonData[dynamicKey2][dynamicKey];
+  //         newSelectedValues[j] = newSelectedValues[j] || {};
+  //         newSelectedValues[j][i] =
+  //           pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
+
+  //         const casePol = jsonData[dynamicKey2].case.pol;
+  //         newSelectedValues[j][0] =
+  //           casePol === 0 ? 'left' : casePol === 1 ? 'center' : 'right';
+  //       }
+
+  //       if (jsonData[dynamicKey3] && jsonData[dynamicKey3][dynamicKey1]) {
+  //         newQuantities[j + 4] = newQuantities[j + 4] || {};
+  //         newQuantities[j + 4][i + 1] = parseFloat(
+  //           jsonData[dynamicKey3][dynamicKey1].perc,
+  //         );
+  //         newQuantities[j + 4][0] = parseFloat(jsonData[dynamicKey3].case.perc);
+
+  //         const { pol } = jsonData[dynamicKey3][dynamicKey1];
+  //         newSelectedValues[j + 4] = newSelectedValues[j + 4] || {};
+  //         newSelectedValues[j + 4][i + 1] =
+  //           pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
+
+  //         const casePol = jsonData[dynamicKey3].case.pol;
+  //         newSelectedValues[j + 4][0] =
+  //           casePol === 0 ? 'left' : casePol === 1 ? 'center' : 'right';
+  //       }
+  //     }
+
+  //     newAllQuantities[j] = newQuantities[j];
+  //     newAllQuantities[j + 4] = newQuantities[j + 4];
+  //   }
+
+  //   const filteredValues = Object.keys(newSelectedValues)
+  //     .filter((key) => Object.keys(newSelectedValues[key]).length > 0)
+  //     .reduce((obj, key) => {
+  //       obj[key] = newSelectedValues[key];
+  //       return obj;
+  //     }, {});
+
+  //   const filteredQuantities = Object.keys(newQuantities)
+  //     .filter((key) => Object.keys(newQuantities[key]).length > 0)
+  //     .reduce((obj, key) => {
+  //       obj[key] = newQuantities[key];
+  //       return obj;
+  //     }, {});
+
+  //   console.log('filtered', filteredQuantities);
+  //   let outputVisModel = '3';
+  //   if (jsonData.model === 'Dembek 2017') {
+  //     outputVisModel = '1';
+  //   } else if (jsonData.model === 'Fastfield (Baniasadi 2020)') {
+  //     outputVisModel = '2';
+  //   } else if (jsonData.model === 'Kuncel 2008') {
+  //     outputVisModel = '4';
+  //   } else if (jsonData.model === 'Maedler 2012') {
+  //     outputVisModel = '5';
+  //   } else if (jsonData.model === 'OSS-DBS (Butenko 2020)') {
+  //     outputVisModel = '6';
+  //   }
+
+  //   console.log('TEST!L: ', outputIPG);
+  //   if (outputIPG.includes('Medtronic')) {
+  //     Object.keys(filteredQuantities).forEach((key) => {
+  //       console.log('Test: ', filteredQuantities[key]);
+  //       Object.keys(filteredQuantities[key]).forEach((key2) => {
+  //         filteredQuantities[key][key2] =
+  //           (filteredQuantities[key][key2] / 100) * newTotalAmplitude[key];
+  //       });
+  //     });
+  //   }
+
+  //   Object.keys(newAllVolAmpToggles).forEach((key) => {
+  //     if (newAllVolAmpToggles[key] === 1) {
+  //       setIpgMaster('Medtronic_Activa');
+  //       return '';
+  //     }
+  //   });
+
+  //   return {
+  //     filteredQuantities,
+  //     filteredValues,
+  //     newTotalAmplitude,
+  //     outputVisModel,
+  //     newAllVolAmpToggles,
+  //   };
+
+  //   // Need to add some type of filtering here that detects whether it is Medtronic Activa, and then needs to put just mA values, not %
+  // };
+
+  const gatherImportedDataNew = (jsonData, importedElectrode) => {
+    console.log(jsonData);
+    let outputIPG = handleIPG(importedElectrode);
+    console.log('OutputIPG: ', outputIPG);
     const newQuantities = {};
     const newSelectedValues = {};
     const newTotalAmplitude = {};
     const newAllQuantities = {};
     const newAllVolAmpToggles = {};
+    const newAllTogglePositions = {};
 
     console.log('Imported Amplitude: ', jsonData.amplitude);
 
     for (let j = 1; j < 5; j++) {
-      try {
-        newTotalAmplitude[j] = jsonData.amplitude[1][j - 1];
-        newTotalAmplitude[j + 4] = jsonData.amplitude[0][j - 1];
-      } catch {
-        console.log('');
-      }
-
-      try {
-        newTotalAmplitude[j] = jsonData.amplitude.leftAmplitude[j - 1];
-        newTotalAmplitude[j + 4] = jsonData.amplitude.rightAmplitude[j - 1];
-      } catch {
-        console.log('');
-      }
+      newTotalAmplitude[j] = jsonData.amplitude[1][j - 1];
+      newTotalAmplitude[j + 4] = jsonData.amplitude[0][j - 1];
 
       console.log('newTotalAmplitude: ', newTotalAmplitude);
 
@@ -315,30 +448,34 @@ function Programmer() {
       const dynamicKey3 = `Rs${j}`;
       if (jsonData[dynamicKey2].va === 2) {
         newAllVolAmpToggles[j] = 'center';
+        newAllTogglePositions[j] = '%';
       } else if (jsonData[dynamicKey2].va === 1) {
         newAllVolAmpToggles[j] = 'right';
+        newAllTogglePositions[j] = 'V';
       }
 
       if (jsonData[dynamicKey3].va === 2) {
         newAllVolAmpToggles[j + 4] = 'center';
+        newAllTogglePositions[j + 4] = '%';
       } else if (jsonData[dynamicKey3].va === 1) {
         newAllVolAmpToggles[j + 4] = 'right';
+        newAllTogglePositions[j + 4] = 'V';
       }
 
       for (let i = 0; i < 9; i++) {
-        const dynamicKey = `k${i + 7}`;
-        const dynamicKey1 = `k${i}`;
+        const dynamicKey = `k${i + 1}`;
+        const dynamicKey1 = `k${i + 1}`;
 
         if (jsonData[dynamicKey2] && jsonData[dynamicKey2][dynamicKey]) {
           newQuantities[j] = newQuantities[j] || {};
-          newQuantities[j][i] = parseFloat(
+          newQuantities[j][i + 1] = parseFloat(
             jsonData[dynamicKey2][dynamicKey].perc,
           );
           newQuantities[j][0] = parseFloat(jsonData[dynamicKey2].case.perc);
 
           const { pol } = jsonData[dynamicKey2][dynamicKey];
           newSelectedValues[j] = newSelectedValues[j] || {};
-          newSelectedValues[j][i] =
+          newSelectedValues[j][i + 1] =
             pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
 
           const casePol = jsonData[dynamicKey2].case.pol;
@@ -408,11 +545,14 @@ function Programmer() {
     }
 
     Object.keys(newAllVolAmpToggles).forEach((key) => {
-      if (newAllVolAmpToggles[key] === 1) {
-        setIpgMaster('Medtronic_Activa');
+      if (newAllVolAmpToggles[key] === 'right') {
+        outputIPG = 'Medtronic_Activa';
+        // setIpgMaster('Medtronic_Activa');
         return '';
       }
     });
+
+    console.log('OutputIPG, 2: ', outputIPG);
 
     return {
       filteredQuantities,
@@ -420,9 +560,57 @@ function Programmer() {
       newTotalAmplitude,
       outputVisModel,
       newAllVolAmpToggles,
+      outputIPG,
+      newAllTogglePositions,
     };
 
     // Need to add some type of filtering here that detects whether it is Medtronic Activa, and then needs to put just mA values, not %
+  };
+
+  const handleTimelines = (timelineOutput) => {
+    console.log("Processing timelines:", timelineOutput);
+
+    let initialStates = {}; // Initialize the object to store the processed states
+
+    // Iterate over each key in the timelineOutput object
+    Object.keys(timelineOutput).forEach((key, index) => {
+      console.log(`Processing timeline for patient ${key}`);
+
+      const currentTimeline = key;
+      const electrodes = 'Medtronic B33005';
+      const patientData = timelineOutput[key].S;
+
+      const outputElectrode = handleImportedElectrode(electrodes);
+
+      const processedS = patientData
+        ? gatherImportedDataNew(patientData, electrodes)
+        : {
+            filteredQuantities: {},
+            filteredValues: {},
+            newTotalAmplitude: {},
+            outputVisModel: '3',
+            newAllVolAmpToggles: {},
+            outputIPG: handleIPG(electrodes),
+            newAllTogglePositions: {},
+          };
+
+      // Store the processed state for each patient
+      initialStates[currentTimeline] = {
+        ...initialState,
+        leftElectrode: outputElectrode,
+        rightElectrode: outputElectrode,
+        IPG: processedS.outputIPG,
+        allQuantities: processedS.filteredQuantities,
+        allSelectedValues: processedS.filteredValues,
+        allTotalAmplitudes: processedS.newTotalAmplitude,
+        visModel: processedS.outputVisModel,
+        allVolAmpToggles: processedS.newAllVolAmpToggles,
+        allTogglePositions: processedS.newAllTogglePositions,
+      };
+    });
+
+    console.log("Final initialStates:", initialStates);
+    return initialStates;
   };
 
   useEffect(() => {
@@ -470,7 +658,7 @@ function Programmer() {
           }, {});
 
           console.log('Final timeline output:', timelineOutput);
-
+          const initialStates = handleTimelines(timelineOutput);
           // You can now set this to state or use it as needed
           // setTimelineOutput(timelineOutput);
         })
@@ -479,7 +667,6 @@ function Programmer() {
         });
     }
   }, [directoryPath, patient, leadDBS]);
-
 
   useEffect(() => {
     // Ensure that the ipcRenderer is available
