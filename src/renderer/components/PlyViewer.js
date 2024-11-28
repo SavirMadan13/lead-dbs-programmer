@@ -2873,7 +2873,7 @@ function PlyViewer({
     const sphereCoords = elecCoords;
     console.log(elecCoords);
     // const v = [0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75];
-    const v = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5];
+    const v = [0.5, 0.5, 0.5, 0.5];
     // const v = [1, 1, 1, 1];
     // const L = niiCoords;
     const L = importedCoords;
