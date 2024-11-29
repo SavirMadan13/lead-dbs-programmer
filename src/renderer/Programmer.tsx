@@ -659,6 +659,10 @@ function Programmer() {
 
           console.log('Final timeline output:', timelineOutput);
           const initialStates = handleTimelines(timelineOutput);
+          console.log('Initial States: ', initialStates);
+          setPatientStates(initialStates);
+          const tmppatients = Object.keys(initialStates);
+          setPatients(tmppatients);
           // You can now set this to state or use it as needed
           // setTimelineOutput(timelineOutput);
         })
@@ -675,7 +679,7 @@ function Programmer() {
 
       // Event listener for import-file
       const handleImportFile = (arg) => {
-        console.log(arg);
+        console.log('File: ', arg);
         if (arg === 'File not found' || arg.directionality) {
           try {
             setPatientName(patient.name);
@@ -698,7 +702,136 @@ function Programmer() {
             console.log(outputIPG);
             setElectrodeMaster(outputElectrode);
             setIpgMaster(outputIPG);
-            const S = {};
+            const S = {
+              label: "",
+              Rs1: {
+                k1: { perc: 0, pol: 0, imp: 0 },
+                k2: { perc: 0, pol: 0, imp: 0 },
+                k3: { perc: 0, pol: 0, imp: 0 },
+                k4: { perc: 0, pol: 0, imp: 0 },
+                k5: { perc: 0, pol: 0, imp: 0 },
+                k6: { perc: 0, pol: 0, imp: 0 },
+                k7: { perc: 0, pol: 0, imp: 0 },
+                k8: { perc: 0, pol: 0, imp: 0 },
+                case: { perc: 0, pol: 0 },
+                amp: 0,
+                va: 0,
+                pulseWidth: 0,
+              },
+              Rs2: {
+                k1: { perc: 0, pol: 0, imp: 0 },
+                k2: { perc: 0, pol: 0, imp: 0 },
+                k3: { perc: 0, pol: 0, imp: 0 },
+                k4: { perc: 0, pol: 0, imp: 0 },
+                k5: { perc: 0, pol: 0, imp: 0 },
+                k6: { perc: 0, pol: 0, imp: 0 },
+                k7: { perc: 0, pol: 0, imp: 0 },
+                k8: { perc: 0, pol: 0, imp: 0 },
+                case: { perc: 0, pol: 0 },
+                amp: 0,
+                va: 0,
+                pulseWidth: 0,
+              },
+              Rs3: {
+                k1: { perc: 0, pol: 0, imp: 0 },
+                k2: { perc: 0, pol: 0, imp: 0 },
+                k3: { perc: 0, pol: 0, imp: 0 },
+                k4: { perc: 0, pol: 0, imp: 0 },
+                k5: { perc: 0, pol: 0, imp: 0 },
+                k6: { perc: 0, pol: 0, imp: 0 },
+                k7: { perc: 0, pol: 0, imp: 0 },
+                k8: { perc: 0, pol: 0, imp: 0 },
+                case: { perc: 0, pol: 0 },
+                amp: 0,
+                va: 0,
+                pulseWidth: 0,
+              },
+              Rs4: {
+                k1: { perc: 0, pol: 0, imp: 0 },
+                k2: { perc: 0, pol: 0, imp: 0 },
+                k3: { perc: 0, pol: 0, imp: 0 },
+                k4: { perc: 0, pol: 0, imp: 0 },
+                k5: { perc: 0, pol: 0, imp: 0 },
+                k6: { perc: 0, pol: 0, imp: 0 },
+                k7: { perc: 0, pol: 0, imp: 0 },
+                k8: { perc: 0, pol: 0, imp: 0 },
+                case: { perc: 0, pol: 0 },
+                amp: 0,
+                va: 0,
+                pulseWidth: 0,
+              },
+              Ls1: {
+                k1: { perc: 0, pol: 0, imp: 0 },
+                k2: { perc: 0, pol: 0, imp: 0 },
+                k3: { perc: 0, pol: 0, imp: 0 },
+                k4: { perc: 0, pol: 0, imp: 0 },
+                k5: { perc: 0, pol: 0, imp: 0 },
+                k6: { perc: 0, pol: 0, imp: 0 },
+                k7: { perc: 0, pol: 0, imp: 0 },
+                k8: { perc: 0, pol: 0, imp: 0 },
+                case: { perc: 0, pol: 0 },
+                amp: 0,
+                va: 0,
+                pulseWidth: 0,
+              },
+              Ls2: {
+                k1: { perc: 0, pol: 0, imp: 0 },
+                k2: { perc: 0, pol: 0, imp: 0 },
+                k3: { perc: 0, pol: 0, imp: 0 },
+                k4: { perc: 0, pol: 0, imp: 0 },
+                k5: { perc: 0, pol: 0, imp: 0 },
+                k6: { perc: 0, pol: 0, imp: 0 },
+                k7: { perc: 0, pol: 0, imp: 0 },
+                k8: { perc: 0, pol: 0, imp: 0 },
+                case: { perc: 0, pol: 0 },
+                amp: 0,
+                va: 0,
+                pulseWidth: 0,
+              },
+              Ls3: {
+                k1: { perc: 0, pol: 0, imp: 0 },
+                k2: { perc: 0, pol: 0, imp: 0 },
+                k3: { perc: 0, pol: 0, imp: 0 },
+                k4: { perc: 0, pol: 0, imp: 0 },
+                k5: { perc: 0, pol: 0, imp: 0 },
+                k6: { perc: 0, pol: 0, imp: 0 },
+                k7: { perc: 0, pol: 0, imp: 0 },
+                k8: { perc: 0, pol: 0, imp: 0 },
+                case: { perc: 0, pol: 0 },
+                amp: 0,
+                va: 0,
+                pulseWidth: 0,
+              },
+              Ls4: {
+                k1: { perc: 0, pol: 0, imp: 0 },
+                k2: { perc: 0, pol: 0, imp: 0 },
+                k3: { perc: 0, pol: 0, imp: 0 },
+                k4: { perc: 0, pol: 0, imp: 0 },
+                k5: { perc: 0, pol: 0, imp: 0 },
+                k6: { perc: 0, pol: 0, imp: 0 },
+                k7: { perc: 0, pol: 0, imp: 0 },
+                k8: { perc: 0, pol: 0, imp: 0 },
+                case: { perc: 0, pol: 0 },
+                amp: 0,
+                va: 0,
+                pulseWidth: 0,
+              },
+              active: [0, 0],
+              model: "",
+              monopolarmodel: 0,
+              amplitude: [
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+              ],
+              numContacts: 0,
+              activecontacts: [
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+              ],
+              sources: [],
+              volume: [],
+              ver: "",
+            };
             setImportNewS(S);
             const tempLabel = generateUniqueID();
             const tempPatients = [tempLabel];
@@ -726,8 +859,8 @@ function Programmer() {
                 allVolAmpToggles: processedS.newAllVolAmpToggles,
               },
             };
-            setPatientStates(initialStates);
-            setPatients(tempPatients);
+            // setPatientStates(initialStates);
+            // setPatients(tempPatients);
           } catch (error) {
             console.error('Error processing import-file-error event:', error);
           }
@@ -740,8 +873,8 @@ function Programmer() {
             let outputElectrode = 'Boston';
             let outputIPG = 'Boston';
             try {
-              outputElectrode = handleImportedElectrode(arg.electrodeModel);
-              outputIPG = handleIPG(arg.electrodeModel);
+              outputElectrode = handleImportedElectrode(arg.electrodeModels);
+              outputIPG = handleIPG(arg.electrodeModels);
             } catch (err) {
               outputElectrode = S.elmodel[0];
               outputIPG = 'Medtronic_Percept';
@@ -812,8 +945,8 @@ function Programmer() {
             }
 
             console.log('Patients:', initialStates);
-            setPatientStates(initialStates);
-            setPatients(tempPatients);
+            // setPatientStates(initialStates);
+            // setPatients(tempPatients);
           } catch (error) {
             console.error('Error processing import-file event:', error);
           }

@@ -70,6 +70,7 @@ function TabbedElectrodeIPGSelection({
   selectedPatient,
   historical,
   mode,
+  templateS,
 }) {
   const testElectrodeRef = React.createRef();
   // const [selectedElectrode, setSelectedElectrode] = useState('');
@@ -892,6 +893,252 @@ function TabbedElectrodeIPGSelection({
     return data;
   };
 
+  const gatherExportedData6 = () => {
+    // handleFileChange('1');
+    saveQuantitiesandValues();
+    let updatedOutputQuantity = {};
+    updatedOutputQuantity = handleTogglePositions();
+    console.log('Updated output quantity: ', updatedOutputQuantity);
+    // parseAllVariables();
+    const exportAmplitudeData = handleExportAmplitude(allTotalAmplitudes);
+    // console.log(exportAmplitudeData);
+    const leftHemiArr = [];
+    const rightHemiArr = [];
+    // const data = {
+    //   S: {
+    //     label: selectedPatient,
+    //     Rs1: {},
+    //     Rs2: {},
+    //     Rs3: {},
+    //     Rs4: {},
+    //     Ls1: {},
+    //     Ls2: {},
+    //     Ls3: {},
+    //     Ls4: {},
+    //     active: {},
+    //     model: '',
+    //     monopolarmodel: 0,
+    //     amplitude: {},
+    //     activecontacts: [],
+    //     template: 'warp',
+    //     sources: {},
+    //     ver: '2.0',
+    //   },
+    // };
+    const data = {
+      S: {
+        ...templateS,
+      },
+    };
+    console.log(data);
+
+    // data.S.elmodel = [selectedElectrodeLeft, selectedElectrodeRight];
+    const programs = Object.keys(allQuantities);
+    const firstProgram = programs[0];
+    console.log('Programs: ', programs);
+    console.log('length', programs[0]);
+
+    const loopSize = Object.keys(allQuantities[firstProgram]).length;
+    // console.log('loopSize: ', loopSize);
+    // data.S.label = 'Num1';
+    const activeArray = [];
+    const leftAmpArray = [];
+
+    for (let j = 1; j < 5; j++) {
+      let dynamicKey2 = `Ls${j}`;
+      if (allSelectedValues[j] && updatedOutputQuantity[j]) {
+        // Need to change the i = 9 to number of electrodes to accomodate for 16 contact electrodes
+        for (let i = 1; i < loopSize; i++) {
+          let polarity = 0;
+          if (allSelectedValues[j][i] === 'left') {
+            polarity = 0;
+          } else if (allSelectedValues[j][i] === 'center') {
+            polarity = 1;
+          } else if (allSelectedValues[j][i] === 'right') {
+            polarity = 2;
+          }
+          let dynamicKey = `k${i}`;
+          data.S[dynamicKey2][dynamicKey] = {
+            perc: parseFloat(updatedOutputQuantity[j][i]),
+            pol: polarity,
+            imp: 1,
+          };
+        }
+        data.S[dynamicKey2].case = {
+          perc: parseFloat(updatedOutputQuantity[j][0]),
+          pol: translatePolarity(allSelectedValues[j][0]),
+        };
+        data.S[dynamicKey2].amp = parseFloat(allTotalAmplitudes[j]);
+        // data.S[dynamicKey2].frequency = parseFloat(
+        //   allStimulationParameters[j].parameter2,
+        // );
+        // data.S[dynamicKey2].pulseWidth = parseFloat(
+        //   allStimulationParameters[j].parameter1,
+        // );
+        data.S[dynamicKey2].va = 2;
+        if (allPercAmpToggles[j] === 'V') {
+          data.S[dynamicKey2].va = 1;
+        }
+        activeArray.push(j);
+        leftAmpArray[j] = parseFloat(allTotalAmplitudes[j]);
+        // console.log(activeContacts(allSelectedValues[j]));
+        leftHemiArr[j - 1] = activeContacts(allSelectedValues[j]);
+        data.S.activecontacts[j - 1] = activeContacts(allSelectedValues[j]);
+        // console.log(data.S.activecontacts);
+      } else {
+        for (let i = 1; i < loopSize; i++) {
+          let dynamicKey = `k${i}`;
+          data.S[dynamicKey2][dynamicKey] = {
+            perc: 0,
+            pol: 0,
+            imp: 1,
+          };
+        }
+        data.S[dynamicKey2].case = {
+          perc: 0,
+          pol: 0,
+        };
+        data.S[dynamicKey2].amp = 0;
+        data.S[dynamicKey2].frequency = 0;
+        data.S[dynamicKey2].pulseWidth = 0;
+        data.S[dynamicKey2].va = 0;
+      }
+    }
+    const leftLength = activeArray.length;
+    const newActiveArray = [];
+    const rightAmpArray = [];
+
+    for (let j = 1; j < 5; j++) {
+      let dynamicKey2 = `Rs${j}`;
+      if (allSelectedValues[j + 4] && updatedOutputQuantity[j + 4]) {
+        for (let i = 1; i < loopSize; i++) {
+          let polarity = 0;
+          if (allSelectedValues[j + 4][i] === 'left') {
+            polarity = 0;
+          } else if (allSelectedValues[j + 4][i] === 'center') {
+            polarity = 1;
+          } else if (allSelectedValues[j + 4][i] === 'right') {
+            polarity = 2;
+          }
+          let dynamicKey = `k${i}`;
+          data.S[dynamicKey2][dynamicKey] = {
+            perc: parseFloat(updatedOutputQuantity[j + 4][i]),
+            pol: polarity,
+            imp: 1,
+          };
+        }
+        data.S[dynamicKey2].case = {
+          perc: parseFloat(updatedOutputQuantity[j + 4][0]),
+          pol: translatePolarity(allSelectedValues[j + 4][0]),
+        };
+        data.S[dynamicKey2].amp = parseFloat(allTotalAmplitudes[j + 4]);
+        // data.S[dynamicKey2].frequency = parseFloat(
+        //   allStimulationParameters[j + 4].parameter2,
+        // );
+        // data.S[dynamicKey2].pulseWidth = parseFloat(
+        //   allStimulationParameters[j + 4].parameter1,
+        // );
+        data.S[dynamicKey2].va = 2;
+        if (allPercAmpToggles[j + 4] === 'V') {
+          data.S[dynamicKey2].va = 1;
+        }
+        activeArray.push(j + 4);
+        newActiveArray.push(j);
+        console.log('All Selected Values: ', j);
+        // rightHemiArr[j - 1] = activeContacts(allSelectedValues[j]);
+        data.S.activecontacts[j + 3] = activeContacts(allSelectedValues[j + 4]);
+        // rightAmpArray[j + 4] = parseFloat(allTotalAmplitudes[j + 4]);
+      } else {
+        for (let i = 1; i < loopSize; i++) {
+          let dynamicKey = `k${i}`;
+          data.S[dynamicKey2][dynamicKey] = {
+            perc: 0,
+            pol: 0,
+            imp: 1,
+          };
+        }
+        data.S[dynamicKey2].case = {
+          perc: 0,
+          pol: 0,
+        };
+        data.S[dynamicKey2].amp = 0;
+        data.S[dynamicKey2].frequency = 0;
+        data.S[dynamicKey2].pulseWidth = 0;
+        data.S[dynamicKey2].va = 0;
+      }
+    }
+    // data.S.activecontacts.push(rightHemiArr);
+    // data.S.activecontacts.push(leftHemiArr);
+    // const totalAmpArray = leftAmpArray.push(rightAmpArray);
+    // data.S.amplitude{1} = leftAmpArray;
+    // data.S.amplitude{2} = rightAmpArray;
+    const leftAmplitude = [];
+    const rightAmplitude = [];
+    for (let i = 1; i < 5; i++) {
+      if (allTotalAmplitudes[i]) {
+        leftAmplitude.push(parseFloat(allTotalAmplitudes[i]));
+      } else {
+        leftAmplitude.push(0);
+      }
+    }
+    for (let i = 5; i < 9; i++) {
+      if (allTotalAmplitudes[i]) {
+        rightAmplitude.push(parseFloat(allTotalAmplitudes[i]));
+      } else {
+        rightAmplitude.push(0);
+      }
+    }
+    data.S.amplitude = { rightAmplitude, leftAmplitude };
+    // data.S.amplitude = exportAmplitudeData;
+    // console.log(exportAmplitudeData);
+    const sourcesArray = activeArray;
+    const rightLength = newActiveArray.length;
+    data.S.sources = sourcesArray;
+    // data.S.active = [leftLength, rightLength];
+    data.S.active = [1, 1];
+    // data.S.activecontacts = activeContacts(allSelectedValues[1]);
+
+    for (let i = 1; i < 9; i++) {
+      const zerosArr = [];
+      for (let j = 1; j < loopSize; j++) {
+        zerosArr.push(0);
+      }
+      if (data.S.activecontacts[i - 1]) {
+        if (data.S.activecontacts[i - 1] === null) {
+          data.S.activecontacts[i - 1] = zerosArr;
+        }
+      } else {
+        data.S.activecontacts[i - 1] = zerosArr;
+      }
+    }
+
+    let exportVisModel = '';
+    // visModel[1] = visModel;
+    // console.log(visModel[1]);
+    if (visModel === '1') {
+      console.log('here');
+      exportVisModel = 'Dembek 2017';
+    } else if (visModel === '2') {
+      exportVisModel = 'Fastfield (Baniasadi 2020)';
+    } else if (visModel === '3') {
+      exportVisModel = 'SimBio/FieldTrip (see Horn 2017)';
+    } else if (visModel === '4') {
+      exportVisModel = 'Kuncel 2008';
+    } else if (visModel === '5') {
+      exportVisModel = 'Maedler 2012';
+    } else if (visModel === '6') {
+      exportVisModel = 'OSS-DBS (Butenko 2020)';
+    }
+    // console.log('export vis model', exportVisModel);
+    data.S.model = exportVisModel;
+    // data.S.estimateInTemplate = exportTemplateSpace;
+    // if (Array.isArray(data.S.activecontacts) && data.S.activecontacts.length > 0 && data.S.activecontacts[0] === undefined) {
+    //   data.S.activecontacts.shift();
+    // }
+    console.log(data.S.activecontacts);
+    return data;
+  };
+
   const [responseData, setResponseData] = useState('');
 
   // Define a function to handle button click event
@@ -913,7 +1160,7 @@ function TabbedElectrodeIPGSelection({
   };
 
   const sendDataToMain = () => {
-    const outputData = gatherExportedData5();
+    const outputData = gatherExportedData6();
     console.log('OUTPUTDATA: ', outputData);
     console.log('Historical: ', historical);
     if (mode === 'stimulate') {

@@ -768,6 +768,7 @@ function StimulationSettings({
             selectedPatient={selectedPatient}
             historical={historical}
             mode={mode}
+            templateS={importNewS}
           />
         )}
       </div>
