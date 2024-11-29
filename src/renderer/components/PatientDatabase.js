@@ -200,7 +200,7 @@ function PatientDatabase({ key, directoryPath }) {
             let outputTimeline = '';
             console.log(arg.patientname[0]);
             Object.keys(patients).forEach((patient) => {
-              if (patients[patient].id === arg.patientname[0]) {
+              if (patients[patient].id === arg.patientname) {
                 outputPatient = patients[patient];
                 outputTimeline = arg.labels ? arg.labels[0] : arg.label;
                 let leadDBS = true;
