@@ -70,16 +70,76 @@ ipcMain.on('import-inputdata-file', async (event, arg) => {
     // Normalize the lead path
     // let normalLeadPath = leadPath.replace(/\\\//g, '/');
     // let filePath = path.join(normalLeadPath, 'programmer/inputData.json');
-    const filePath = inputPath;
-    console.log(filePath);
+    const filePath2 = inputPath;
+    console.log(filePath2);
 
     // Read the file
-    const f = fs.readFileSync(filePath);
+    const f = fs.readFileSync(filePath2);
 
     // Parse the JSON data
     const jsonData = JSON.parse(f);
     stimulationData = jsonData;
     stimulationDirectory = stimulationData.stimDir;
+    const leadDBS = true;
+
+
+    stimulationData.labels.forEach((label) => {
+      let patientDir = path.join(stimulationData.filepath, `sub-${stimulationData.patientname}`);
+      let sessionDir = path.join(patientDir, `ses-${label}`);
+      let fileName = `sub-${stimulationData.patientname}_ses-${label}_stim.json`;
+      let filePath = path.join(sessionDir, fileName);
+
+      if (leadDBS) {
+        const newDirectoryPath = path.join(
+          stimulationData.filepath,
+          'derivatives/leaddbs',
+          stimulationData.patientname,
+          'clinical',
+        );
+        patientDir = path.join(newDirectoryPath);
+        sessionDir = path.join(patientDir, `ses-${label}`);
+        fileName = `${stimulationData.patientname}_ses-${label}_stimparameters.json`;
+        filePath = path.join(sessionDir, fileName);
+      }
+      console.log(filePath);
+      if (!fs.existsSync(filePath)) {
+        if (!fs.existsSync(sessionDir)) {
+          fs.mkdirSync(sessionDir, { recursive: true });
+        }
+        // Write data to the file
+      }
+      fs.writeFileSync(
+        filePath,
+        JSON.stringify({ S: stimulationData.S }, null, 2),
+        'utf8',
+      );
+    });
+
+    // let patientDir = path.join(stimulationData.filepath, `sub-${stimulationData.patientname}`);
+    // let sessionDir = path.join(patientDir, `ses-${stimulationData.labels[0]}`);
+    // let fileName = `sub-${stimulationData.patientname}_ses-${stimulationData.labels[0]}_stim.json`;
+    // let filePath = path.join(sessionDir, fileName);
+
+    // if (leadDBS) {
+    //   const newDirectoryPath = path.join(
+    //     stimulationData.filepath,
+    //     'derivatives/leaddbs',
+    //     stimulationData.patientname,
+    //     'clinical',
+    //   );
+    //   patientDir = path.join(newDirectoryPath);
+    //   sessionDir = path.join(patientDir, `ses-${stimulationData.labels[0]}`);
+    //   fileName = `${stimulationData.patientname}_ses-${stimulationData.labels[0]}_stimparameters.json`;
+    //   filePath = path.join(sessionDir, fileName);
+    // }
+    // if (!fs.existsSync(filePath)) {
+    //   if (!fs.existsSync(sessionDir)) {
+    //     fs.mkdirSync(sessionDir, { recursive: true });
+    //   }
+    //   // Write data to the file
+    // }
+    // const outputData = { S: stimulationData.S };
+    // fs.writeFileSync(filePath, JSON.stringify(outputData, null, 2), 'utf8');
     event.reply('import-inputdata-file', jsonData);
   } catch (err) {
     // Handle specific errors

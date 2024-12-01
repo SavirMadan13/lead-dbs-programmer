@@ -575,7 +575,7 @@ function Programmer() {
     // Iterate over each key in the timelineOutput object
     Object.keys(timelineOutput).forEach((key, index) => {
       console.log(`Processing timeline for patient ${key}`);
-
+      console.log('Timeline Output: ', timelineOutput);
       const currentTimeline = key;
       const electrodes = 'Medtronic B33005';
       const patientData = timelineOutput[key].S;
@@ -622,7 +622,7 @@ function Programmer() {
 
           // Filter timelines with stimulation
           const stimulationTimelines = receivedTimelines.filter(
-            (timelineData) => timelineData.hasStimulation
+            (timelineData) => timelineData.hasStimulation,
           );
 
           console.log('Timelines with stimulation:', stimulationTimelines);
@@ -630,21 +630,21 @@ function Programmer() {
           // Process timelines with stimulation
           const timelineResults = await Promise.all(
             stimulationTimelines.map(async (timelineData) => {
-              const timeline = timelineData.timeline;
+              const { timeline } = timelineData;
               try {
                 const importResult = await window.electron.ipcRenderer.invoke(
                   'import-file-2',
                   directoryPath,
                   patient.id,
                   timeline,
-                  leadDBS
+                  leadDBS,
                 );
                 return { timeline, data: importResult };
               } catch (error) {
                 console.error(`Error importing timeline ${timeline}:`, error);
                 return { timeline, data: null }; // Handle errors gracefully
               }
-            })
+            }),
           );
 
           console.log('Processed timeline results:', timelineResults);
@@ -662,6 +662,7 @@ function Programmer() {
           console.log('Initial States: ', initialStates);
           setPatientStates(initialStates);
           const tmppatients = Object.keys(initialStates);
+          console.log('TEMPPatients: ', tmppatients);
           setPatients(tmppatients);
           // You can now set this to state or use it as needed
           // setTimelineOutput(timelineOutput);
@@ -993,6 +994,7 @@ function Programmer() {
             ipgMaster={ipgMaster}
             historical={location.state}
             mode={mode}
+            timeline={timeline}
           />
         )}
       </div>

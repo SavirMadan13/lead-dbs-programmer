@@ -25,6 +25,7 @@ function GroupArchitecture({
   ipgMaster,
   historical,
   mode,
+  timeline,
 }) {
   const [selectedPatient, setSelectedPatient] = useState(null);
   console.log(patients);
@@ -53,10 +54,12 @@ function GroupArchitecture({
   };
 
   const [renderKey, setRenderKey] = useState(0); // Added state for forcing re-render
-
+  console.log('Timeline: ', timeline);
+  console.log('Patients: ', patients);
   useEffect(() => {
     if (patients.length > 0 && !selectedPatient) {
-      setSelectedPatient(patients[0]);
+      // setSelectedPatient(patients[0]);
+      setSelectedPatient(timeline);
     }
   }, [selectedPatient]);
 

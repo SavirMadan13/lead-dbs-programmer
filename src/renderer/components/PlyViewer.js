@@ -3080,6 +3080,67 @@ function PlyViewer({
   //   window.electron.zoom.setZoomLevel(-3);
   // }, []);
 
+  const [searchCoordinate, setSearchCoordinate] = useState("");
+  const [matchingAtlases, setMatchingAtlases] = useState([]);
+
+  const handleCoordinateSearch = async () => {
+    if (!searchCoordinate) {
+      alert("Please enter a valid coordinate.");
+      return;
+    }
+
+    // Parse the coordinate input (assuming comma-separated x, y, z)
+    const [x, y, z] = searchCoordinate.split(",").map(Number);
+    if ([x, y, z].some(isNaN)) {
+      alert("Please enter valid numeric coordinates in the format x,y,z.");
+      return;
+    }
+
+    const loader = new PLYLoader();
+    const matchingFiles = [];
+
+    for (const file of plyFiles) {
+      const { path, name } = file;
+
+      try {
+        // Load and parse the PLY file
+        const fileData = await window.electron.ipcRenderer.invoke(
+          "load-ply-file-2",
+          path
+        );
+        const geometry = loader.parse(fileData);
+
+        // Check if the coordinate lies in this PLY file
+        if (isCoordinateInGeometry(x, y, z, geometry)) {
+          matchingFiles.push(name);
+        }
+      } catch (error) {
+        console.error(`Error loading PLY file (${name}):`, error);
+      }
+    }
+    console.log(matchingFiles);
+    setMatchingAtlases(matchingFiles);
+  };
+
+  const isCoordinateInGeometry = (x, y, z, geometry) => {
+    const vertices = geometry.attributes.position.array;
+
+    // Check if the input coordinate is near any vertex
+    for (let i = 0; i < vertices.length; i += 3) {
+      const [vx, vy, vz] = [vertices[i], vertices[i + 1], vertices[i + 2]];
+      const tolerance = 0.3; // Adjust tolerance as needed
+      if (
+        Math.abs(vx - x) <= tolerance &&
+        Math.abs(vy - y) <= tolerance &&
+        Math.abs(vz - z) <= tolerance
+      ) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+
   return (
     <div>
       {/* {!plyFile && (
@@ -3148,6 +3209,26 @@ function PlyViewer({
               {/* Tab for Atlases */}
               <Tab eventKey="atlases" title="Atlases">
                 <div style={controlPanelStyle2}>
+                <input
+                  type="text"
+                  placeholder="Enter coordinates (x,y,z)"
+                  value={searchCoordinate}
+                  onChange={(e) => setSearchCoordinate(e.target.value)}
+                  style={{ marginBottom: "10px", width: "300px" }}
+                />
+                <button onClick={handleCoordinateSearch}>Search</button>
+                <div style={{ marginTop: "20px" }}>
+                  <h4>Matching Atlases:</h4>
+                  {matchingAtlases.length > 0 ? (
+                    <ul>
+                      {matchingAtlases.map((file, index) => (
+                        <li key={index}>{file.name}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>No matching atlases found.</p>
+                  )}
+                </div>
                   <select
                     onChange={handleFileChange}
                     multiple
