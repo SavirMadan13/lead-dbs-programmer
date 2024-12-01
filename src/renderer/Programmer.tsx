@@ -1,8 +1,10 @@
+/* eslint-disable promise/always-return */
 import { useLocation, useNavigate } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import GroupArchitecture from './components/GroupArchitecture';
+import { PatientContext } from './components/PatientContext';
 
 function Programmer() {
   const electrodeList: any[] = [];
@@ -12,6 +14,8 @@ function Programmer() {
   const [importNewS, setImportNewS] = useState({});
   const [electrodeMaster, setElectrodeMaster] = useState('');
   const [ipgMaster, setIpgMaster] = useState('');
+  const allPatients = useContext(PatientContext);
+  console.log('All Patients: ', allPatients);
 
   const location = useLocation();
   const { patient, timeline, directoryPath, leadDBS } = location.state || {};
@@ -567,401 +571,201 @@ function Programmer() {
     // Need to add some type of filtering here that detects whether it is Medtronic Activa, and then needs to put just mA values, not %
   };
 
-  const handleTimelines = (timelineOutput) => {
-    console.log("Processing timelines:", timelineOutput);
-
+  const handleTimelines = (timelineOutput, stimulationData) => {
+    console.log('Processing timelines:', timelineOutput);
+    console.log('Processing stimulation data: ', stimulationData);
+    setMode(stimulationData.mode);
     let initialStates = {}; // Initialize the object to store the processed states
+    if (stimulationData.type === 'leaddbs') {
+      // Iterate over each key in the timelineOutput object
+      Object.keys(timelineOutput).forEach((key, index) => {
+        console.log(`Processing timeline for patient ${key}`);
+        console.log('Timeline Output: ', timelineOutput);
+        const currentTimeline = key;
+        const electrodes = stimulationData.electrodeModels;
+        const patientData = timelineOutput[key].S;
 
-    // Iterate over each key in the timelineOutput object
-    Object.keys(timelineOutput).forEach((key, index) => {
-      console.log(`Processing timeline for patient ${key}`);
-      console.log('Timeline Output: ', timelineOutput);
-      const currentTimeline = key;
-      const electrodes = 'Medtronic B33005';
-      const patientData = timelineOutput[key].S;
+        const outputElectrode = handleImportedElectrode(electrodes);
 
-      const outputElectrode = handleImportedElectrode(electrodes);
+        const processedS = patientData
+          ? gatherImportedDataNew(patientData, electrodes)
+          : {
+              filteredQuantities: {},
+              filteredValues: {},
+              newTotalAmplitude: {},
+              outputVisModel: '3',
+              newAllVolAmpToggles: {},
+              outputIPG: handleIPG(electrodes),
+              newAllTogglePositions: {},
+            };
 
-      const processedS = patientData
-        ? gatherImportedDataNew(patientData, electrodes)
-        : {
-            filteredQuantities: {},
-            filteredValues: {},
-            newTotalAmplitude: {},
-            outputVisModel: '3',
-            newAllVolAmpToggles: {},
-            outputIPG: handleIPG(electrodes),
-            newAllTogglePositions: {},
-          };
+        // Store the processed state for each patient
+        initialStates[currentTimeline] = {
+          ...initialState,
+          leftElectrode: outputElectrode,
+          rightElectrode: outputElectrode,
+          IPG: processedS.outputIPG,
+          allQuantities: processedS.filteredQuantities,
+          allSelectedValues: processedS.filteredValues,
+          allTotalAmplitudes: processedS.newTotalAmplitude,
+          visModel: processedS.outputVisModel,
+          allVolAmpToggles: processedS.newAllVolAmpToggles,
+          allTogglePositions: processedS.newAllTogglePositions,
+        };
+      });
+    }
 
-      // Store the processed state for each patient
-      initialStates[currentTimeline] = {
-        ...initialState,
-        leftElectrode: outputElectrode,
-        rightElectrode: outputElectrode,
-        IPG: processedS.outputIPG,
-        allQuantities: processedS.filteredQuantities,
-        allSelectedValues: processedS.filteredValues,
-        allTotalAmplitudes: processedS.newTotalAmplitude,
-        visModel: processedS.outputVisModel,
-        allVolAmpToggles: processedS.newAllVolAmpToggles,
-        allTogglePositions: processedS.newAllTogglePositions,
-      };
-    });
-
-    console.log("Final initialStates:", initialStates);
+    console.log('Final initialStates:', initialStates);
     return initialStates;
   };
 
+  // useEffect(() => {
+  //   if (directoryPath && patient) {
+  //     window.electron.ipcRenderer
+  //       .invoke('get-timelines', directoryPath, patient.id, leadDBS)
+  //       .then(async (receivedTimelines) => {
+  //         console.log('Received timelines:', receivedTimelines);
+
+  //         // Filter timelines with stimulation
+  //         const stimulationTimelines = receivedTimelines.filter(
+  //           (timelineData) => timelineData.hasStimulation,
+  //         );
+
+  //         console.log('Timelines with stimulation:', stimulationTimelines);
+
+  //         // Process timelines with stimulation
+  //         const timelineResults = await Promise.all(
+  //           stimulationTimelines.map(async (timelineData) => {
+  //             const { timeline } = timelineData;
+  //             try {
+  //               const importResult = await window.electron.ipcRenderer.invoke(
+  //                 'import-file-2',
+  //                 directoryPath,
+  //                 patient.id,
+  //                 timeline,
+  //                 leadDBS,
+  //               );
+  //               return { timeline, data: importResult };
+  //             } catch (error) {
+  //               console.error(`Error importing timeline ${timeline}:`, error);
+  //               return { timeline, data: null }; // Handle errors gracefully
+  //             }
+  //           }),
+  //         );
+
+  //         console.log('Processed timeline results:', timelineResults);
+
+  //         // Aggregate results into a structured format
+  //         const timelineOutput = timelineResults.reduce((acc, result) => {
+  //           if (result.data) {
+  //             acc[result.timeline] = result.data;
+  //           }
+  //           return acc;
+  //         }, {});
+
+  //         const stimulationData = await window.electron.ipcRenderer.invoke(
+  //           'get-stimulation-data',
+  //           ''
+  //         );
+  //         console.log('Final timeline output:', timelineOutput);
+  //         const initialStates = handleTimelines(timelineOutput, stimulationData);
+  //         console.log('Initial States: ', initialStates);
+  //         setPatientStates(initialStates);
+  //         const tmppatients = Object.keys(initialStates);
+  //         console.log('TEMPPatients: ', tmppatients);
+  //         setPatients(tmppatients);
+  //         // You can now set this to state or use it as needed
+  //         // setTimelineOutput(timelineOutput);
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error fetching timelines:', error);
+  //       });
+  //   }
+  // }, [directoryPath, patient, leadDBS]);
+
   useEffect(() => {
     if (directoryPath && patient) {
+      // Fetch stimulationData first
       window.electron.ipcRenderer
-        .invoke('get-timelines', directoryPath, patient.id, leadDBS)
-        .then(async (receivedTimelines) => {
-          console.log('Received timelines:', receivedTimelines);
+        .invoke('get-stimulation-data', '')
+        .then((stimulationData) => {
+          // Check if stimulationData.type is "leaddbs"
+          if (stimulationData.type === 'leaddbs') {
+            console.log(
+              "Stimulation data is of type 'leaddbs':",
+              stimulationData,
+            );
 
-          // Filter timelines with stimulation
-          const stimulationTimelines = receivedTimelines.filter(
-            (timelineData) => timelineData.hasStimulation,
-          );
+            // Proceed with fetching timelines
+            return window.electron.ipcRenderer
+              .invoke('get-timelines', directoryPath, patient.id, leadDBS)
+              .then(async (receivedTimelines) => {
+                console.log('Received timelines:', receivedTimelines);
 
-          console.log('Timelines with stimulation:', stimulationTimelines);
-
-          // Process timelines with stimulation
-          const timelineResults = await Promise.all(
-            stimulationTimelines.map(async (timelineData) => {
-              const { timeline } = timelineData;
-              try {
-                const importResult = await window.electron.ipcRenderer.invoke(
-                  'import-file-2',
-                  directoryPath,
-                  patient.id,
-                  timeline,
-                  leadDBS,
+                // Filter timelines with stimulation
+                const stimulationTimelines = receivedTimelines.filter(
+                  (timelineData) => timelineData.hasStimulation,
                 );
-                return { timeline, data: importResult };
-              } catch (error) {
-                console.error(`Error importing timeline ${timeline}:`, error);
-                return { timeline, data: null }; // Handle errors gracefully
-              }
-            }),
-          );
 
-          console.log('Processed timeline results:', timelineResults);
+                console.log(
+                  'Timelines with stimulation:',
+                  stimulationTimelines,
+                );
 
-          // Aggregate results into a structured format
-          const timelineOutput = timelineResults.reduce((acc, result) => {
-            if (result.data) {
-              acc[result.timeline] = result.data;
-            }
-            return acc;
-          }, {});
+                // Process timelines with stimulation
+                const timelineResults = await Promise.all(
+                  stimulationTimelines.map(async (timelineData) => {
+                    const { timeline } = timelineData;
+                    try {
+                      const importResult =
+                        await window.electron.ipcRenderer.invoke(
+                          'import-file-2',
+                          directoryPath,
+                          patient.id,
+                          timeline,
+                          leadDBS,
+                        );
+                      return { timeline, data: importResult };
+                    } catch (error) {
+                      console.error(
+                        `Error importing timeline ${timeline}:`,
+                        error,
+                      );
+                      return { timeline, data: null }; // Handle errors gracefully
+                    }
+                  }),
+                );
 
-          console.log('Final timeline output:', timelineOutput);
-          const initialStates = handleTimelines(timelineOutput);
-          console.log('Initial States: ', initialStates);
-          setPatientStates(initialStates);
-          const tmppatients = Object.keys(initialStates);
-          console.log('TEMPPatients: ', tmppatients);
-          setPatients(tmppatients);
-          // You can now set this to state or use it as needed
-          // setTimelineOutput(timelineOutput);
+                console.log('Processed timeline results:', timelineResults);
+
+                // Aggregate results into a structured format
+                const timelineOutput = timelineResults.reduce((acc, result) => {
+                  if (result.data) {
+                    acc[result.timeline] = result.data;
+                  }
+                  return acc;
+                }, {});
+
+                console.log('Final timeline output:', timelineOutput);
+                const initialStates = handleTimelines(
+                  timelineOutput,
+                  stimulationData,
+                );
+                console.log('Initial States: ', initialStates);
+                setPatientStates(initialStates);
+                const tmppatients = Object.keys(initialStates);
+                console.log('TEMPPatients: ', tmppatients);
+                setPatients(tmppatients);
+              });
+          } else if (stimulationData === 'leadgroup') {
+            console.log("Stimulation data type is not 'leaddbs'. Skipping...");
+          }
         })
         .catch((error) => {
-          console.error('Error fetching timelines:', error);
+          console.error('Error fetching stimulation data or timelines:', error);
         });
     }
   }, [directoryPath, patient, leadDBS]);
-
-  // useEffect(() => {
-  //   // Ensure that the ipcRenderer is available
-  //   if (window.electron && window.electron.ipcRenderer) {
-  //     const ipcRenderer = window.electron.ipcRenderer;
-
-  //     // Event listener for import-file
-  //     const handleImportFile = (arg) => {
-  //       console.log('File: ', arg);
-  //       if (arg === 'File not found' || arg.directionality) {
-  //         try {
-  //           setPatientName(patient.name);
-  //           console.log('Not Found');
-  //           let outputElectrode = 'boston_vercise_directed';
-  //           try {
-  //             outputElectrode = handleImportedElectrode(arg.elmodel);
-  //           } catch (err) {
-  //             console.log(err);
-  //           }
-  //           // while (!baseElec) {
-  //           //   // Waiting for baseElec to exist
-  //           // }
-  //           // console.log(baseElec);
-  //           // if (baseElec) {
-  //           //   outputElectrode = handleImportedElectrode(baseElec);
-  //           //   console.log(outputElectrode);
-  //           // }
-  //           const outputIPG = handleIPG(outputElectrode);
-  //           console.log(outputIPG);
-  //           setElectrodeMaster(outputElectrode);
-  //           setIpgMaster(outputIPG);
-  //           const S = {
-  //             label: "",
-  //             Rs1: {
-  //               k1: { perc: 0, pol: 0, imp: 0 },
-  //               k2: { perc: 0, pol: 0, imp: 0 },
-  //               k3: { perc: 0, pol: 0, imp: 0 },
-  //               k4: { perc: 0, pol: 0, imp: 0 },
-  //               k5: { perc: 0, pol: 0, imp: 0 },
-  //               k6: { perc: 0, pol: 0, imp: 0 },
-  //               k7: { perc: 0, pol: 0, imp: 0 },
-  //               k8: { perc: 0, pol: 0, imp: 0 },
-  //               case: { perc: 0, pol: 0 },
-  //               amp: 0,
-  //               va: 0,
-  //               pulseWidth: 0,
-  //             },
-  //             Rs2: {
-  //               k1: { perc: 0, pol: 0, imp: 0 },
-  //               k2: { perc: 0, pol: 0, imp: 0 },
-  //               k3: { perc: 0, pol: 0, imp: 0 },
-  //               k4: { perc: 0, pol: 0, imp: 0 },
-  //               k5: { perc: 0, pol: 0, imp: 0 },
-  //               k6: { perc: 0, pol: 0, imp: 0 },
-  //               k7: { perc: 0, pol: 0, imp: 0 },
-  //               k8: { perc: 0, pol: 0, imp: 0 },
-  //               case: { perc: 0, pol: 0 },
-  //               amp: 0,
-  //               va: 0,
-  //               pulseWidth: 0,
-  //             },
-  //             Rs3: {
-  //               k1: { perc: 0, pol: 0, imp: 0 },
-  //               k2: { perc: 0, pol: 0, imp: 0 },
-  //               k3: { perc: 0, pol: 0, imp: 0 },
-  //               k4: { perc: 0, pol: 0, imp: 0 },
-  //               k5: { perc: 0, pol: 0, imp: 0 },
-  //               k6: { perc: 0, pol: 0, imp: 0 },
-  //               k7: { perc: 0, pol: 0, imp: 0 },
-  //               k8: { perc: 0, pol: 0, imp: 0 },
-  //               case: { perc: 0, pol: 0 },
-  //               amp: 0,
-  //               va: 0,
-  //               pulseWidth: 0,
-  //             },
-  //             Rs4: {
-  //               k1: { perc: 0, pol: 0, imp: 0 },
-  //               k2: { perc: 0, pol: 0, imp: 0 },
-  //               k3: { perc: 0, pol: 0, imp: 0 },
-  //               k4: { perc: 0, pol: 0, imp: 0 },
-  //               k5: { perc: 0, pol: 0, imp: 0 },
-  //               k6: { perc: 0, pol: 0, imp: 0 },
-  //               k7: { perc: 0, pol: 0, imp: 0 },
-  //               k8: { perc: 0, pol: 0, imp: 0 },
-  //               case: { perc: 0, pol: 0 },
-  //               amp: 0,
-  //               va: 0,
-  //               pulseWidth: 0,
-  //             },
-  //             Ls1: {
-  //               k1: { perc: 0, pol: 0, imp: 0 },
-  //               k2: { perc: 0, pol: 0, imp: 0 },
-  //               k3: { perc: 0, pol: 0, imp: 0 },
-  //               k4: { perc: 0, pol: 0, imp: 0 },
-  //               k5: { perc: 0, pol: 0, imp: 0 },
-  //               k6: { perc: 0, pol: 0, imp: 0 },
-  //               k7: { perc: 0, pol: 0, imp: 0 },
-  //               k8: { perc: 0, pol: 0, imp: 0 },
-  //               case: { perc: 0, pol: 0 },
-  //               amp: 0,
-  //               va: 0,
-  //               pulseWidth: 0,
-  //             },
-  //             Ls2: {
-  //               k1: { perc: 0, pol: 0, imp: 0 },
-  //               k2: { perc: 0, pol: 0, imp: 0 },
-  //               k3: { perc: 0, pol: 0, imp: 0 },
-  //               k4: { perc: 0, pol: 0, imp: 0 },
-  //               k5: { perc: 0, pol: 0, imp: 0 },
-  //               k6: { perc: 0, pol: 0, imp: 0 },
-  //               k7: { perc: 0, pol: 0, imp: 0 },
-  //               k8: { perc: 0, pol: 0, imp: 0 },
-  //               case: { perc: 0, pol: 0 },
-  //               amp: 0,
-  //               va: 0,
-  //               pulseWidth: 0,
-  //             },
-  //             Ls3: {
-  //               k1: { perc: 0, pol: 0, imp: 0 },
-  //               k2: { perc: 0, pol: 0, imp: 0 },
-  //               k3: { perc: 0, pol: 0, imp: 0 },
-  //               k4: { perc: 0, pol: 0, imp: 0 },
-  //               k5: { perc: 0, pol: 0, imp: 0 },
-  //               k6: { perc: 0, pol: 0, imp: 0 },
-  //               k7: { perc: 0, pol: 0, imp: 0 },
-  //               k8: { perc: 0, pol: 0, imp: 0 },
-  //               case: { perc: 0, pol: 0 },
-  //               amp: 0,
-  //               va: 0,
-  //               pulseWidth: 0,
-  //             },
-  //             Ls4: {
-  //               k1: { perc: 0, pol: 0, imp: 0 },
-  //               k2: { perc: 0, pol: 0, imp: 0 },
-  //               k3: { perc: 0, pol: 0, imp: 0 },
-  //               k4: { perc: 0, pol: 0, imp: 0 },
-  //               k5: { perc: 0, pol: 0, imp: 0 },
-  //               k6: { perc: 0, pol: 0, imp: 0 },
-  //               k7: { perc: 0, pol: 0, imp: 0 },
-  //               k8: { perc: 0, pol: 0, imp: 0 },
-  //               case: { perc: 0, pol: 0 },
-  //               amp: 0,
-  //               va: 0,
-  //               pulseWidth: 0,
-  //             },
-  //             active: [0, 0],
-  //             model: "",
-  //             monopolarmodel: 0,
-  //             amplitude: [
-  //               [0, 0, 0, 0],
-  //               [0, 0, 0, 0],
-  //             ],
-  //             numContacts: 0,
-  //             activecontacts: [
-  //               [0, 0, 0, 0, 0, 0, 0, 0],
-  //               [0, 0, 0, 0, 0, 0, 0, 0],
-  //             ],
-  //             sources: [],
-  //             volume: [],
-  //             ver: "",
-  //           };
-  //           setImportNewS(S);
-  //           const tempLabel = generateUniqueID();
-  //           const tempPatients = [tempLabel];
-
-  //           const patientTmp = tempPatients[0];
-  //           let initialStates;
-  //           const processedS = {
-  //             filteredQuantities: {},
-  //             filteredValues: {},
-  //             newTotalAmplitude: {},
-  //             outputVisModel: '3',
-  //             newAllVolAmpToggles: {},
-  //           };
-  //           console.log(S);
-  //           initialStates = {
-  //             [patientTmp]: {
-  //               ...initialState,
-  //               leftElectrode: outputElectrode,
-  //               rightElectrode: outputElectrode,
-  //               IPG: outputIPG,
-  //               allQuantities: processedS.filteredQuantities,
-  //               allSelectedValues: processedS.filteredValues,
-  //               allTotalAmplitudes: processedS.newTotalAmplitude,
-  //               visModel: processedS.outputVisModel,
-  //               allVolAmpToggles: processedS.newAllVolAmpToggles,
-  //             },
-  //           };
-  //           // setPatientStates(initialStates);
-  //           // setPatients(tempPatients);
-  //         } catch (error) {
-  //           console.error('Error processing import-file-error event:', error);
-  //         }
-  //       } else {
-  //         try {
-  //           setPatientName(patient.name);
-  //           console.log(arg);
-  //           setMode(arg.mode);
-  //           const { S } = arg;
-  //           let outputElectrode = 'Boston';
-  //           let outputIPG = 'Boston';
-  //           try {
-  //             outputElectrode = handleImportedElectrode(arg.electrodeModels);
-  //             outputIPG = handleIPG(arg.electrodeModels);
-  //           } catch (err) {
-  //             outputElectrode = S.elmodel[0];
-  //             outputIPG = 'Medtronic_Percept';
-  //           }
-
-  //           console.log('Tester: 1 ', outputIPG);
-  //           setElectrodeMaster(outputElectrode);
-  //           setIpgMaster(outputIPG);
-  //           setImportNewS(S);
-
-  //           const tempPatients = [S.label];
-  //           console.log('TEMPPatients', tempPatients[0]);
-
-  //           let initialStates;
-
-  //           if (tempPatients.length === 1) {
-  //             const patientTmp = tempPatients[0];
-  //             const processedS =
-  //               Array.isArray(S) && S.length === 0
-  //                 ? {
-  //                     filteredQuantities: {},
-  //                     filteredValues: {},
-  //                     newTotalAmplitude: {},
-  //                     outputVisModel: '3',
-  //                     newAllVolAmpToggles: {},
-  //                   }
-  //                 : gatherImportedDataNew(S, outputIPG);
-  //             console.log(S);
-  //             initialStates = {
-  //               [patientTmp]: {
-  //                 ...initialState,
-  //                 leftElectrode: outputElectrode,
-  //                 rightElectrode: outputElectrode,
-  //                 IPG: outputIPG,
-  //                 allQuantities: processedS.filteredQuantities,
-  //                 allSelectedValues: processedS.filteredValues,
-  //                 allTotalAmplitudes: processedS.newTotalAmplitude,
-  //                 visModel: processedS.outputVisModel,
-  //                 allVolAmpToggles: processedS.newAllVolAmpToggles,
-  //               },
-  //             };
-  //           } else {
-  //             initialStates = tempPatients.reduce((acc, patient, index) => {
-  //               console.log(`Processing patient ${index + 1}`);
-  //               const electrodes = electrodeList[index];
-  //               const processedS = arg.S[index]
-  //                 ? gatherImportedDataNew(arg.S[index], outputIPG)
-  //                 : {
-  //                     filteredQuantities: {},
-  //                     filteredValues: {},
-  //                     newTotalAmplitude: {},
-  //                     outputVisModel: '3',
-  //                     newAllVolAmpToggles: {},
-  //                   };
-  //               acc[patient] = {
-  //                 ...initialState,
-  //                 leftElectrode: outputElectrode,
-  //                 rightElectrode: outputElectrode,
-  //                 IPG: outputIPG,
-  //                 allQuantities: processedS.filteredQuantities,
-  //                 allSelectedValues: processedS.filteredValues,
-  //                 allTotalAmplitudes: processedS.newTotalAmplitude,
-  //                 visModel: processedS.outputVisModel,
-  //                 allVolAmpToggles: processedS.newAllVolAmpToggles,
-  //               };
-  //               return acc;
-  //             }, {});
-  //           }
-
-  //           console.log('Patients:', initialStates);
-  //           // setPatientStates(initialStates);
-  //           // setPatients(tempPatients);
-  //         } catch (error) {
-  //           console.error('Error processing import-file event:', error);
-  //         }
-  //       }
-  //     };
-
-  //     // Attach listeners using 'once' so that it only listens for the event once
-  //     // ipcRenderer.once('import-file-error', handleImportFileError);
-  //     ipcRenderer.once('import-file', handleImportFile);
-
-  //   } else {
-  //     console.error('ipcRenderer is not available');
-  //   }
-  // }, []);
 
   const [zoomLevel, setZoomLevel] = useState(-3);
 
@@ -976,11 +780,13 @@ function Programmer() {
 
   return (
     <div>
-      <div
-        style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '20px' }}
-      >
-        Patient: {patientName}
-      </div>
+      {patientName && (
+        <div
+          style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '20px' }}
+        >
+          Patient: {patientName}
+        </div>
+      )}
       <div>
         {patients.length > 0 && (
           <GroupArchitecture
@@ -998,10 +804,10 @@ function Programmer() {
           />
         )}
       </div>
-      <div style={{paddingLeft: '150px', marginTop: '-80px'}}>
-      <button className="export-button" onClick={() => navigate(-1)}>
-        Back to Patient Details
-      </button>
+      <div style={{ paddingLeft: '150px', marginTop: '-80px' }}>
+        <button className="export-button" onClick={() => navigate(-1)}>
+          Back to Patient Details
+        </button>
       </div>
     </div>
   );

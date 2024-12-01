@@ -303,8 +303,12 @@ ipcMain.handle(
       console.error('Error in import-file:', error.message);
       throw error; // This propagates the error back to the renderer process
     }
-  }
+  },
 );
+
+ipcMain.handle('get-stimulation-data', async (_, message) => {
+  return stimulationData;
+});
 
 ipcMain.on(
   'import-file-clinical',
