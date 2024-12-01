@@ -613,6 +613,43 @@ function Programmer() {
           allTogglePositions: processedS.newAllTogglePositions,
         };
       });
+    } else if (stimulationData.type === 'leadgroup') {
+      Object.keys(timelineOutput).forEach((key, index) => {
+        console.log(`Processing timeline for patient ${key}`);
+        console.log('Timeline Output: ', timelineOutput);
+        // Patient here is the timeline
+        const currentTimeline = key;
+        const electrodes = stimulationData.electrodeModels[index];
+        const patientData = timelineOutput[key].S;
+
+        const outputElectrode = handleImportedElectrode(electrodes);
+
+        const processedS = patientData
+          ? gatherImportedDataNew(patientData, electrodes)
+          : {
+              filteredQuantities: {},
+              filteredValues: {},
+              newTotalAmplitude: {},
+              outputVisModel: '3',
+              newAllVolAmpToggles: {},
+              outputIPG: handleIPG(electrodes),
+              newAllTogglePositions: {},
+            };
+
+        // Store the processed state for each patient
+        initialStates[currentTimeline] = {
+          ...initialState,
+          leftElectrode: outputElectrode,
+          rightElectrode: outputElectrode,
+          IPG: processedS.outputIPG,
+          allQuantities: processedS.filteredQuantities,
+          allSelectedValues: processedS.filteredValues,
+          allTotalAmplitudes: processedS.newTotalAmplitude,
+          visModel: processedS.outputVisModel,
+          allVolAmpToggles: processedS.newAllVolAmpToggles,
+          allTogglePositions: processedS.newAllTogglePositions,
+        };
+      });
     }
 
     console.log('Final initialStates:', initialStates);
@@ -621,151 +658,235 @@ function Programmer() {
 
   // useEffect(() => {
   //   if (directoryPath && patient) {
+  //     // Fetch stimulationData first
   //     window.electron.ipcRenderer
-  //       .invoke('get-timelines', directoryPath, patient.id, leadDBS)
-  //       .then(async (receivedTimelines) => {
-  //         console.log('Received timelines:', receivedTimelines);
+  //       .invoke('get-stimulation-data', '')
+  //       .then((stimulationData) => {
+  //         // Check if stimulationData.type is "leaddbs"
+  //         if (stimulationData.type === 'leaddbs') {
+  //           console.log(
+  //             "Stimulation data is of type 'leaddbs':",
+  //             stimulationData,
+  //           );
 
-  //         // Filter timelines with stimulation
-  //         const stimulationTimelines = receivedTimelines.filter(
-  //           (timelineData) => timelineData.hasStimulation,
-  //         );
+  //           // Proceed with fetching timelines
+  //           return window.electron.ipcRenderer
+  //             .invoke('get-timelines', directoryPath, patient.id, leadDBS)
+  //             .then(async (receivedTimelines) => {
+  //               console.log('Received timelines:', receivedTimelines);
 
-  //         console.log('Timelines with stimulation:', stimulationTimelines);
-
-  //         // Process timelines with stimulation
-  //         const timelineResults = await Promise.all(
-  //           stimulationTimelines.map(async (timelineData) => {
-  //             const { timeline } = timelineData;
-  //             try {
-  //               const importResult = await window.electron.ipcRenderer.invoke(
-  //                 'import-file-2',
-  //                 directoryPath,
-  //                 patient.id,
-  //                 timeline,
-  //                 leadDBS,
+  //               // Filter timelines with stimulation
+  //               const stimulationTimelines = receivedTimelines.filter(
+  //                 (timelineData) => timelineData.hasStimulation,
   //               );
-  //               return { timeline, data: importResult };
-  //             } catch (error) {
-  //               console.error(`Error importing timeline ${timeline}:`, error);
-  //               return { timeline, data: null }; // Handle errors gracefully
-  //             }
-  //           }),
-  //         );
 
-  //         console.log('Processed timeline results:', timelineResults);
+  //               console.log(
+  //                 'Timelines with stimulation:',
+  //                 stimulationTimelines,
+  //               );
 
-  //         // Aggregate results into a structured format
-  //         const timelineOutput = timelineResults.reduce((acc, result) => {
-  //           if (result.data) {
-  //             acc[result.timeline] = result.data;
-  //           }
-  //           return acc;
-  //         }, {});
+  //               // Process timelines with stimulation
+  //               const timelineResults = await Promise.all(
+  //                 stimulationTimelines.map(async (timelineData) => {
+  //                   const { timeline } = timelineData;
+  //                   try {
+  //                     const importResult =
+  //                       await window.electron.ipcRenderer.invoke(
+  //                         'import-file-2',
+  //                         directoryPath,
+  //                         patient.id,
+  //                         timeline,
+  //                         leadDBS,
+  //                       );
+  //                     return { timeline, data: importResult };
+  //                   } catch (error) {
+  //                     console.error(
+  //                       `Error importing timeline ${timeline}:`,
+  //                       error,
+  //                     );
+  //                     return { timeline, data: null }; // Handle errors gracefully
+  //                   }
+  //                 }),
+  //               );
 
-  //         const stimulationData = await window.electron.ipcRenderer.invoke(
-  //           'get-stimulation-data',
-  //           ''
-  //         );
-  //         console.log('Final timeline output:', timelineOutput);
-  //         const initialStates = handleTimelines(timelineOutput, stimulationData);
-  //         console.log('Initial States: ', initialStates);
-  //         setPatientStates(initialStates);
-  //         const tmppatients = Object.keys(initialStates);
-  //         console.log('TEMPPatients: ', tmppatients);
-  //         setPatients(tmppatients);
-  //         // You can now set this to state or use it as needed
-  //         // setTimelineOutput(timelineOutput);
+  //               console.log('Processed timeline results:', timelineResults);
+
+  //               // Aggregate results into a structured format
+  //               const timelineOutput = timelineResults.reduce((acc, result) => {
+  //                 if (result.data) {
+  //                   acc[result.timeline] = result.data;
+  //                 }
+  //                 return acc;
+  //               }, {});
+
+  //               console.log('Final timeline output:', timelineOutput);
+  //               const initialStates = handleTimelines(
+  //                 timelineOutput,
+  //                 stimulationData,
+  //               );
+  //               console.log('Initial States: ', initialStates);
+  //               setPatientStates(initialStates);
+  //               const tmppatients = Object.keys(initialStates);
+  //               console.log('TEMPPatients: ', tmppatients);
+  //               setPatients(tmppatients);
+  //             });
+  //         } else if (stimulationData.type === 'leadgroup') {
+  //           const patientIds = allPatients.patients.map((patient) => patient.id);
+  //           console.log('patient ids: ', patientIds);
+  //           console.log("Stimulation data type is not 'leaddbs'. Skipping...");
+  //           const timelineResults = await Promise.all(
+  //             patientIds.map(async (timelineData) => {
+  //               const { patientId } = timelineData;
+  //               try {
+  //                 const importResult =
+  //                   await window.electron.ipcRenderer.invoke(
+  //                     'import-file-2',
+  //                     directoryPath,
+  //                     patientId,
+  //                     stimulationData.label,
+  //                     leadDBS,
+  //                   );
+  //                 return { patientId, data: importResult };
+  //               } catch (error) {
+  //                 console.error(
+  //                   `Error importing timeline ${patientId}:`,
+  //                   error,
+  //                 );
+  //                 return { patientId, data: null }; // Handle errors gracefully
+  //               }
+  //             }),
+  //           );
+  //         }
   //       })
   //       .catch((error) => {
-  //         console.error('Error fetching timelines:', error);
+  //         console.error('Error fetching stimulation data or timelines:', error);
   //       });
   //   }
   // }, [directoryPath, patient, leadDBS]);
 
   useEffect(() => {
-    if (directoryPath && patient) {
-      // Fetch stimulationData first
-      window.electron.ipcRenderer
-        .invoke('get-stimulation-data', '')
-        .then((stimulationData) => {
-          // Check if stimulationData.type is "leaddbs"
-          if (stimulationData.type === 'leaddbs') {
-            console.log(
-              "Stimulation data is of type 'leaddbs':",
-              stimulationData,
-            );
+    const fetchData = async () => {
+      if (!directoryPath || !patient) return;
 
-            // Proceed with fetching timelines
-            return window.electron.ipcRenderer
-              .invoke('get-timelines', directoryPath, patient.id, leadDBS)
-              .then(async (receivedTimelines) => {
-                console.log('Received timelines:', receivedTimelines);
+      try {
+        // Fetch stimulation data
+        const stimulationData = await window.electron.ipcRenderer.invoke(
+          'get-stimulation-data',
+          '',
+        );
 
-                // Filter timelines with stimulation
-                const stimulationTimelines = receivedTimelines.filter(
-                  (timelineData) => timelineData.hasStimulation,
+        if (stimulationData.type === 'leaddbs') {
+          console.log(
+            "Stimulation data is of type 'leaddbs':",
+            stimulationData,
+          );
+
+          // Fetch timelines
+          const receivedTimelines = await window.electron.ipcRenderer.invoke(
+            'get-timelines',
+            directoryPath,
+            patient.id,
+            leadDBS,
+          );
+
+          console.log('Received timelines:', receivedTimelines);
+
+          // Filter timelines with stimulation
+          const stimulationTimelines = receivedTimelines.filter(
+            (timelineData) => timelineData.hasStimulation,
+          );
+
+          console.log('Timelines with stimulation:', stimulationTimelines);
+
+          // Process timelines with stimulation
+          const timelineResults = await Promise.all(
+            stimulationTimelines.map(async (timelineData) => {
+              const { timeline } = timelineData;
+              try {
+                const importResult = await window.electron.ipcRenderer.invoke(
+                  'import-file-2',
+                  directoryPath,
+                  patient.id,
+                  timeline,
+                  leadDBS,
                 );
+                return { timeline, data: importResult };
+              } catch (error) {
+                console.error(`Error importing timeline ${timeline}:`, error);
+                return { timeline, data: null }; // Handle errors gracefully
+              }
+            }),
+          );
 
-                console.log(
-                  'Timelines with stimulation:',
-                  stimulationTimelines,
+          console.log('Processed timeline results:', timelineResults);
+
+          // Aggregate results into a structured format
+          const timelineOutput = timelineResults.reduce((acc, result) => {
+            if (result.data) {
+              acc[result.timeline] = result.data;
+            }
+            return acc;
+          }, {});
+
+          console.log('Final timeline output:', timelineOutput);
+          const initialStates = handleTimelines(
+            timelineOutput,
+            stimulationData,
+          );
+          console.log('Initial States: ', initialStates);
+          setPatientStates(initialStates);
+          const tmppatients = Object.keys(initialStates);
+          console.log('TEMPPatients: ', tmppatients);
+          setPatients(tmppatients);
+        } else if (stimulationData.type === 'leadgroup') {
+          const patientIds = allPatients.patients.map((patient) => patient.id);
+          console.log('Patient IDs: ', patientIds);
+
+          console.log("Stimulation data type is not 'leaddbs'. Skipping...");
+          const timelineResults = await Promise.all(
+            patientIds.map(async (patientId) => {
+              try {
+                const importResult = await window.electron.ipcRenderer.invoke(
+                  'import-file-2',
+                  directoryPath,
+                  patientId,
+                  stimulationData.label,
+                  leadDBS,
                 );
+                return { patientId, data: importResult };
+              } catch (error) {
+                console.error(`Error importing timeline ${patientId}:`, error);
+                return { patientId, data: null }; // Handle errors gracefully
+              }
+            }),
+          );
+          // Aggregate results into a structured format
+          const timelineOutput = timelineResults.reduce((acc, result) => {
+            if (result.data) {
+              acc[result.patientId] = result.data;
+            }
+            return acc;
+          }, {});
+          const initialStates = handleTimelines(
+            timelineOutput,
+            // timelineResults,
+            stimulationData,
+          );
+          setPatientStates(initialStates);
+          setPatients(patientIds);
 
-                // Process timelines with stimulation
-                const timelineResults = await Promise.all(
-                  stimulationTimelines.map(async (timelineData) => {
-                    const { timeline } = timelineData;
-                    try {
-                      const importResult =
-                        await window.electron.ipcRenderer.invoke(
-                          'import-file-2',
-                          directoryPath,
-                          patient.id,
-                          timeline,
-                          leadDBS,
-                        );
-                      return { timeline, data: importResult };
-                    } catch (error) {
-                      console.error(
-                        `Error importing timeline ${timeline}:`,
-                        error,
-                      );
-                      return { timeline, data: null }; // Handle errors gracefully
-                    }
-                  }),
-                );
+          console.log(
+            'Processed timeline results for leadgroup:',
+            timelineResults,
+          );
+        }
+      } catch (error) {
+        console.error('Error fetching stimulation data or timelines:', error);
+      }
+    };
 
-                console.log('Processed timeline results:', timelineResults);
-
-                // Aggregate results into a structured format
-                const timelineOutput = timelineResults.reduce((acc, result) => {
-                  if (result.data) {
-                    acc[result.timeline] = result.data;
-                  }
-                  return acc;
-                }, {});
-
-                console.log('Final timeline output:', timelineOutput);
-                const initialStates = handleTimelines(
-                  timelineOutput,
-                  stimulationData,
-                );
-                console.log('Initial States: ', initialStates);
-                setPatientStates(initialStates);
-                const tmppatients = Object.keys(initialStates);
-                console.log('TEMPPatients: ', tmppatients);
-                setPatients(tmppatients);
-              });
-          } else if (stimulationData === 'leadgroup') {
-            console.log("Stimulation data type is not 'leaddbs'. Skipping...");
-          }
-        })
-        .catch((error) => {
-          console.error('Error fetching stimulation data or timelines:', error);
-        });
-    }
-  }, [directoryPath, patient, leadDBS]);
+    fetchData();
+  }, [directoryPath, patient, leadDBS, allPatients]);
 
   const [zoomLevel, setZoomLevel] = useState(-3);
 
