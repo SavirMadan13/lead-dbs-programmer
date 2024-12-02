@@ -26,8 +26,9 @@ ipcMain.setMaxListeners(Infinity);
 // const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
 // console.log(args);
 // const inputDatasetDirectory = process.argv[1]; // Get the first argument
-// const inputPath = '/Users/savirmadan/Downloads/inputData.json';
-const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
+const inputPath = '/Users/savirmadan/Downloads/inputDataNew.json';
+// const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
+// const inputPath = process.argv[1];
 const inputFilePath =
   '/Users/savirmadan/Documents/Localization/Output/Patient0357Output/derivatives/leaddbs/sub-CbctDbs0357/stimulations/MNI152NLin2009bAsym/inputData.json';
 class AppUpdater {
@@ -870,7 +871,7 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1100 * (1 + -3 * 0.15),
+    width: 1870 * (1 + -3 * 0.15),
     height: 1100 * (1 + -3 * 0.1),
     // maxWidth: 1100, // Maximum width of the window
     // // maxHeight: 1200, // Maximum height of the window
@@ -1698,8 +1699,8 @@ const createWindow = async () => {
   // }
 
   app.on('window-all-closed', function () {
-    if (process.platform !== 'darwin') app.quit();
-    // app.quit();
+    // if (process.platform !== 'darwin') app.quit();
+    app.quit();
   });
 
   const menuBuilder = new MenuBuilder(mainWindow);
@@ -1723,9 +1724,10 @@ const createWindow = async () => {
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  // if (process.platform !== 'darwin') {
+  //   app.quit();
+  // }
+  app.quit();
 });
 
 app
@@ -1742,7 +1744,7 @@ app
 
 ipcMain.on('zoom-level-changed', (event, zoomLevel) => {
   if (mainWindow) {
-    const newWidth = 1100 * (1 + zoomLevel * 0.1); // Adjust the scale factor as needed
+    const newWidth = 2000 * (1 + zoomLevel * 0.1); // Adjust the scale factor as needed
     const newHeight = 1100 * (1 + zoomLevel * 0.1); // Adjust the scale factor as needed
     mainWindow.setSize(newWidth, newHeight);
   }
