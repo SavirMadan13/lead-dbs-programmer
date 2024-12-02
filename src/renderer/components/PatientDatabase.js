@@ -189,31 +189,48 @@ function PatientDatabase({ key, directoryPath }) {
 
   useEffect(() => {
     console.log(window.electron.ipcRenderer);
-    if (window.electron && window.electron.ipcRenderer) {
+    if (window.electron && window.electron.ipcRenderer && patients.length > 0) {
       window.electron.ipcRenderer.once('import-inputdata-file', (arg) => {
         try {
           console.log('Received: ', arg);
           if (arg.mode === 'stimulate') {
+            console.log('LeadDBS Patients: ', patients);
+
             // navigate('/programmer');
             console.log('stimulate');
-            let outputPatient = {};
-            let outputTimeline = '';
-            console.log(arg.patientname[0]);
-            Object.keys(patients).forEach((patient) => {
-              if (patients[patient].id === arg.patientname) {
-                outputPatient = patients[patient];
-                outputTimeline = arg.labels ? arg.labels[0] : arg.label;
-                let leadDBS = true;
-                navigate('/programmer', {
-                  state: {
-                    patient: outputPatient,
-                    timeline: outputTimeline,
-                    directoryPath,
-                    leadDBS,
-                  },
-                });
-              }
-            });
+            if (arg.type === 'leaddbs') {
+              let outputPatient = {};
+              let outputTimeline = '';
+              console.log(arg.patientname[0]);
+              Object.keys(patients).forEach((patient) => {
+                if (patients[patient].id === arg.patientname) {
+                  outputPatient = patients[patient];
+                  outputTimeline = arg.labels ? arg.labels[0] : arg.label;
+                  let leadDBS = true;
+                  navigate('/programmer', {
+                    state: {
+                      patient: outputPatient,
+                      timeline: outputTimeline,
+                      directoryPath,
+                      leadDBS,
+                    },
+                  });
+                }
+              });
+            } else if (arg.type === 'leadgroup') {
+              const leadDBS = true;
+              console.log('patients: ', patients);
+              const firstKey = Object.keys(patients)[0]; // Get the first key
+              const firstPatient = patients[firstKey]; // Access the first valu
+              navigate('/programmer', {
+                state: {
+                  patient: firstPatient,
+                  timeline: arg.patientname[0],
+                  directoryPath,
+                  leadDBS,
+                },
+              });
+            }
           }
         } catch (error) {
           console.error('Error processing event:', error);
@@ -222,7 +239,7 @@ function PatientDatabase({ key, directoryPath }) {
     } else {
       console.error('ipcRenderer is not available');
     }
-  }, []);
+  }, [patients]);
 
   // Handle input changes in the form
   const handleInputChange = (e) => {
