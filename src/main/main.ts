@@ -344,6 +344,11 @@ ipcMain.handle('get-stimulation-data', async (_, message) => {
   return stimulationData;
 });
 
+ipcMain.on('revert-to-standard', async (event, arg) => {
+  stimulationData.type = 'leaddbs';
+  stimulationData.mode = 'explore';
+});
+
 ipcMain.on(
   'import-file-clinical',
   async (event, id, timeline, directoryPath, leadDBS) => {

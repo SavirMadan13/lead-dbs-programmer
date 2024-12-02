@@ -575,6 +575,7 @@ function Programmer() {
     console.log('Processing timelines:', timelineOutput);
     console.log('Processing stimulation data: ', stimulationData);
     setMode(stimulationData.mode);
+    window.electron.ipcRenderer.sendMessage('revert-to-standard', '');
     let initialStates = {}; // Initialize the object to store the processed states
     if (stimulationData.type === 'leaddbs') {
       // Iterate over each key in the timelineOutput object

@@ -1422,3 +1422,18 @@ button:active {
   z-index: 2;
 }
 
+.sticky-buttons-container {
+  position: fixed;
+  z-index: 10;
+  top: 78%;
+  width: 60%;
+  margin-left: 20%;
+  display: flex;
+  justify-content: space-between;
+  transform: translateY(-50%);
+  pointer-events: none; /* This makes sure the container itself doesn't block clicks */
+}
+
+.sticky-button {
+  pointer-events: auto; /* This makes sure the buttons are clickable */
+}

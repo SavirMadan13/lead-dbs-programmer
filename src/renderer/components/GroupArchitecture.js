@@ -13,6 +13,7 @@ import { ButtonGroup, Button } from 'react-bootstrap';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
 import { render } from '@testing-library/react';
+import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 
 function GroupArchitecture({
   patients,
@@ -186,6 +187,21 @@ function GroupArchitecture({
     );
   }
 
+  const handlePreviousPatient = () => {
+    const currentIndex = patients.indexOf(selectedPatient);
+    const previousIndex =
+      (currentIndex - 1 + patients.length) % patients.length;
+    setSelectedPatient(patients[previousIndex]);
+    setRenderKey(renderKey + 1);
+  };
+
+  const handleNextPatient = () => {
+    const currentIndex = patients.indexOf(selectedPatient);
+    const nextIndex = (currentIndex + 1) % patients.length;
+    setSelectedPatient(patients[nextIndex]);
+    setRenderKey(renderKey + 1);
+  };
+
   return (
     <div>
       <div style={{ paddingLeft: '45px', marginBottom: '-100px' }}>
@@ -283,6 +299,20 @@ function GroupArchitecture({
           mode={mode}
         />
       )}
+      <div className="sticky-buttons-container">
+        <button
+          className="export-button sticky-button left-button"
+          onClick={handlePreviousPatient}
+        >
+          ←
+        </button>
+        <button
+          className="export-button sticky-button right-button"
+          onClick={handleNextPatient}
+        >
+          →
+        </button>
+      </div>
     </div>
   );
 }
