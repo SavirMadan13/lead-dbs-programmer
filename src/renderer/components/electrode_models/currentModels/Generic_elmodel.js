@@ -651,48 +651,48 @@ function Generic_elmodel(props, ref) {
     // Update the state with the new quantities
   };
 
-  const calculateQuantitiesWithDistributionAbbott = () => {
-    // Calculate the quantity increment for 'center' and 'right' values
-    const total = totalAmplitude;
+  // const calculateQuantitiesWithDistributionAbbott = () => {
+  //   // Calculate the quantity increment for 'center' and 'right' values
+  //   const total = totalAmplitude;
 
-    // total = totalAmplitude;
-    console.log('total: ', total);
-    const centerCount = Object.values(selectedValues).filter(
-      (value) => value === 'center',
-    ).length;
-    const centerQuantityIncrement = centerCount > 0 ? total / centerCount : 0;
-    // console.log('CenterCount: ', centerCount);
+  //   // total = totalAmplitude;
+  //   console.log('total: ', total);
+  //   const centerCount = Object.values(selectedValues).filter(
+  //     (value) => value === 'center',
+  //   ).length;
+  //   const centerQuantityIncrement = centerCount > 0 ? total / centerCount : 0;
+  //   // console.log('CenterCount: ', centerCount);
 
-    const rightCount = Object.values(selectedValues).filter(
-      (value) => value === 'right',
-    ).length;
-    const rightQuantityIncrement = rightCount > 0 ? total / rightCount : 0;
+  //   const rightCount = Object.values(selectedValues).filter(
+  //     (value) => value === 'right',
+  //   ).length;
+  //   const rightQuantityIncrement = rightCount > 0 ? total / rightCount : 0;
 
-    const updatedQuantities = { ...quantities }; // Create a copy of the quantities object
+  //   const updatedQuantities = { ...quantities }; // Create a copy of the quantities object
 
-    // Update the quantities based on selected values
-    Object.keys(selectedValues).forEach((key) => {
-      const value = selectedValues[key];
-      // console.log("key="+key + ", value=" + value);
-      if (value === 'left') {
-        updatedQuantities[key] = 0;
-      } else if (value === 'center') {
-        console.log('CENTER: ', centerQuantityIncrement);
-        updatedQuantities[key] = centerQuantityIncrement;
-        console.log('updated: ', updatedQuantities);
-      } else if (value === 'right') {
-        updatedQuantities[key] = rightQuantityIncrement;
-      }
-      // updatedQuantities[key] = 20;
-    });
+  //   // Update the quantities based on selected values
+  //   Object.keys(selectedValues).forEach((key) => {
+  //     const value = selectedValues[key];
+  //     // console.log("key="+key + ", value=" + value);
+  //     if (value === 'left') {
+  //       updatedQuantities[key] = 0;
+  //     } else if (value === 'center') {
+  //       console.log('CENTER: ', centerQuantityIncrement);
+  //       updatedQuantities[key] = centerQuantityIncrement;
+  //       console.log('updated: ', updatedQuantities);
+  //     } else if (value === 'right') {
+  //       updatedQuantities[key] = rightQuantityIncrement;
+  //     }
+  //     // updatedQuantities[key] = 20;
+  //   });
 
-    // console.log(quantities);
-    setQuantities(updatedQuantities);
-    // setSelectedValues(selectedValue);
+  //   // console.log(quantities);
+  //   setQuantities(updatedQuantities);
+  //   // setSelectedValues(selectedValue);
 
-    console.log(quantities);
-    // Update the state with the new quantities
-  };
+  //   console.log(quantities);
+  //   // Update the state with the new quantities
+  // };
 
   const handleIPGLogic = () => {
     if (props.IPG === 'Abbott') {
@@ -2566,53 +2566,53 @@ function Generic_elmodel(props, ref) {
     // Return the modified quantities
   }
 
-  const semiAssist = useCallback(() => {
-    // Function implementation
-    const updatedQuantities = { ...quantities };
-    let total = totalAmplitude;
-    if (props.IPG === 'Boston') {
-      if (percAmpToggle === 'left') {
-        total = 100;
-      }
-    }
-    if (props.IPG === 'Research') {
-      if (researchToggle === 'left') {
-        total = 100;
-      }
-    }
-    // const updatedSelectedValues = { ...selectedValues };
-    let count = 0;
-    const lastKey = [];
-    Object.keys(updatedQuantities).forEach((key) => {
-      if (key !== 0 && selectedValues[key] === 'center') {
-        count += 1;
-        lastKey.push(key);
-      }
-    });
-    if (count === 1) {
-      updatedQuantities[lastKey[0]] = total;
-    }
+  // const semiAssist = useCallback(() => {
+  //   // Function implementation
+  //   const updatedQuantities = { ...quantities };
+  //   let total = totalAmplitude;
+  //   if (props.IPG === 'Boston') {
+  //     if (percAmpToggle === 'left') {
+  //       total = 100;
+  //     }
+  //   }
+  //   if (props.IPG === 'Research') {
+  //     if (researchToggle === 'left') {
+  //       total = 100;
+  //     }
+  //   }
+  //   // const updatedSelectedValues = { ...selectedValues };
+  //   let count = 0;
+  //   const lastKey = [];
+  //   Object.keys(updatedQuantities).forEach((key) => {
+  //     if (key !== 0 && selectedValues[key] === 'center') {
+  //       count += 1;
+  //       lastKey.push(key);
+  //     }
+  //   });
+  //   if (count === 1) {
+  //     updatedQuantities[lastKey[0]] = total;
+  //   }
 
-    let rightCount = 0;
-    const rightLastKey = [];
-    Object.keys(updatedQuantities).forEach((key) => {
-      if (selectedValues[key] === 'right') {
-        rightCount += 1;
-        rightLastKey.push(key);
-      }
-    });
-    if (rightCount === 1) {
-      updatedQuantities[rightLastKey[0]] = total;
-    }
-    setQuantities(updatedQuantities);
-  }, [
-    percAmpToggle,
-    props.IPG,
-    quantities,
-    researchToggle,
-    selectedValues,
-    totalAmplitude,
-  ]);
+  //   let rightCount = 0;
+  //   const rightLastKey = [];
+  //   Object.keys(updatedQuantities).forEach((key) => {
+  //     if (selectedValues[key] === 'right') {
+  //       rightCount += 1;
+  //       rightLastKey.push(key);
+  //     }
+  //   });
+  //   if (rightCount === 1) {
+  //     updatedQuantities[rightLastKey[0]] = total;
+  //   }
+  //   setQuantities(updatedQuantities);
+  // }, [
+  //   percAmpToggle,
+  //   props.IPG,
+  //   quantities,
+  //   researchToggle,
+  //   selectedValues,
+  //   totalAmplitude,
+  // ]);
 
   function assist() {
     isAssisted = !isAssisted;
@@ -2877,15 +2877,15 @@ function Generic_elmodel(props, ref) {
 
   // const [totalAmplitude, setTotalAmplitude] = useState(0);
 
-  const handleActivaVoltage = () => {
-    const updatedQuantities = { ...quantities };
-    Object.keys(updatedQuantities).forEach((key) => {
-      if (selectedValues[key] !== 'left') {
-        updatedQuantities[key] = totalAmplitude;
-      }
-    });
-    setQuantities(updatedQuantities);
-  };
+  // const handleActivaVoltage = () => {
+  //   const updatedQuantities = { ...quantities };
+  //   Object.keys(updatedQuantities).forEach((key) => {
+  //     if (selectedValues[key] !== 'left') {
+  //       updatedQuantities[key] = totalAmplitude;
+  //     }
+  //   });
+  //   setQuantities(updatedQuantities);
+  // };
 
   const handleActivaAmplitude = () => {
     const updatedQuantities = { ...quantities };
@@ -3382,27 +3382,135 @@ function Generic_elmodel(props, ref) {
   //   }
   // }, [showViewer]);
 
+  // useEffect(() => {
+  //   if (props.IPG === 'Abbott') {
+  //     // const newQuantities = { ...quantities };
+  //     calculateQuantitiesWithDistributionAbbott();
+  //   }
+  //   if (radioValue === '1' && props.IPG !== 'Abbott') {
+  //     semiAssist();
+  //   }
+  //   if (currentLabel === 'V' && props.IPG === 'Medtronic_Activa') {
+  //     // console.log('here');
+  //     handleActivaVoltage();
+  //   }
+  // }, [
+  //   currentLabel,
+  //   props.IPG,
+  //   radioValue,
+  //   outputTogglePosition,
+  //   calculateQuantitiesWithDistributionAbbott,
+  //   semiAssist,
+  //   handleActivaVoltage,
+  // ]);
+
   useEffect(() => {
+    const calculateQuantitiesWithDistributionAbbott = () => {
+      // Calculate the quantity increment for 'center' and 'right' values
+      const total = totalAmplitude;
+
+      // total = totalAmplitude;
+      console.log('total: ', total);
+      const centerCount = Object.values(selectedValues).filter(
+        (value) => value === 'center',
+      ).length;
+      const centerQuantityIncrement = centerCount > 0 ? total / centerCount : 0;
+      // console.log('CenterCount: ', centerCount);
+
+      const rightCount = Object.values(selectedValues).filter(
+        (value) => value === 'right',
+      ).length;
+      const rightQuantityIncrement = rightCount > 0 ? total / rightCount : 0;
+
+      const updatedQuantities = { ...quantities }; // Create a copy of the quantities object
+
+      // Update the quantities based on selected values
+      Object.keys(selectedValues).forEach((key) => {
+        const value = selectedValues[key];
+        // console.log("key="+key + ", value=" + value);
+        if (value === 'left') {
+          updatedQuantities[key] = 0;
+        } else if (value === 'center') {
+          console.log('CENTER: ', centerQuantityIncrement);
+          updatedQuantities[key] = centerQuantityIncrement;
+          console.log('updated: ', updatedQuantities);
+        } else if (value === 'right') {
+          updatedQuantities[key] = rightQuantityIncrement;
+        }
+        // updatedQuantities[key] = 20;
+      });
+
+      // console.log(quantities);
+      setQuantities(updatedQuantities);
+      // setSelectedValues(selectedValue);
+
+      console.log(quantities);
+      // Update the state with the new quantities
+    };
     if (props.IPG === 'Abbott') {
-      // const newQuantities = { ...quantities };
       calculateQuantitiesWithDistributionAbbott();
     }
+  }, [props.IPG, selectedValues, totalAmplitude]);
+
+  useEffect(() => {
+    const semiAssist = () => {
+      const updatedQuantities = { ...quantities };
+      let total = totalAmplitude;
+      if (props.IPG === 'Boston') {
+        if (percAmpToggle === 'left') {
+          total = 100;
+        }
+      }
+      if (props.IPG === 'Research') {
+        if (researchToggle === 'left') {
+          total = 100;
+        }
+      }
+      // const updatedSelectedValues = { ...selectedValues };
+      let count = 0;
+      const lastKey = [];
+      Object.keys(updatedQuantities).forEach((key) => {
+        if (key !== 0 && selectedValues[key] === 'center') {
+          count += 1;
+          lastKey.push(key);
+        }
+      });
+      if (count === 1) {
+        updatedQuantities[lastKey[0]] = total;
+      }
+
+      let rightCount = 0;
+      const rightLastKey = [];
+      Object.keys(updatedQuantities).forEach((key) => {
+        if (selectedValues[key] === 'right') {
+          rightCount += 1;
+          rightLastKey.push(key);
+        }
+      });
+      if (rightCount === 1) {
+        updatedQuantities[rightLastKey[0]] = total;
+      }
+      setQuantities(updatedQuantities);
+    };
     if (radioValue === '1' && props.IPG !== 'Abbott') {
       semiAssist();
     }
+  }, [radioValue, props.IPG, totalAmplitude, selectedValues]);
+
+  useEffect(() => {
+    const handleActivaVoltage = () => {
+      const updatedQuantities = { ...quantities };
+      Object.keys(updatedQuantities).forEach((key) => {
+        if (selectedValues[key] !== 'left') {
+          updatedQuantities[key] = totalAmplitude;
+        }
+      });
+      setQuantities(updatedQuantities);
+    };
     if (currentLabel === 'V' && props.IPG === 'Medtronic_Activa') {
-      // console.log('here');
       handleActivaVoltage();
     }
-  }, [
-    currentLabel,
-    props.IPG,
-    radioValue,
-    outputTogglePosition,
-    calculateQuantitiesWithDistributionAbbott,
-    semiAssist,
-    handleActivaVoltage,
-  ]);
+  }, [currentLabel, props.IPG, totalAmplitude, selectedValues]);
 
   /// //////////////////////////////////////////////////////////////////////////////////////////////////////////
 

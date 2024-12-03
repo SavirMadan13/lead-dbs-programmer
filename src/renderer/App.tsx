@@ -75,10 +75,13 @@ export default function App() {
         'check-folder-exists',
         `${path}/sourcedata`,
       );
+      const isLeadGroup = path.includes('leadgroup');
 
       // Set the state if all required folders are present
       if (derivativesExists && rawdataExists && sourcedataExists) {
         console.log('TRUE');
+        setIsLeadDBSFolder(true);
+      } else if (isLeadGroup) {
         setIsLeadDBSFolder(true);
       } else {
         setIsLeadDBSFolder(false);

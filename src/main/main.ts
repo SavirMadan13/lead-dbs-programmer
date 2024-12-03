@@ -26,9 +26,12 @@ ipcMain.setMaxListeners(Infinity);
 // const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
 // console.log(args);
 // const inputDatasetDirectory = process.argv[1]; // Get the first argument
-const inputPath = '/Users/savirmadan/Downloads/inputDataNew.json';
+// const inputPath = '/Users/savirmadan/Downloads/inputData.json';
+// const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0374Output/derivatives/leaddbs/sub-CbctDbs0374/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
 // const inputPath = process.argv[1];
+// const inputPath = '/Users/savirmadan/Documents/SanteGroup/derivatives/leadgroup/2024nov5V2/inputData.json';
+const inputPath = '/Users/savirmadan/Documents/LeadGroupDemo/derivatives/leadgroup/20241007203440/inputData.json';
 const inputFilePath =
   '/Users/savirmadan/Documents/Localization/Output/Patient0357Output/derivatives/leaddbs/sub-CbctDbs0357/stimulations/MNI152NLin2009bAsym/inputData.json';
 class AppUpdater {
@@ -63,6 +66,34 @@ ipcMain.on('ipc-example', async (event, arg) => {
     }
   }
 });
+
+const getPatientFolder = (directoryPath, patientId, leadDBS) => {
+  let newFolderPath = ''; // Declare newFolderPath with a default value
+  console.log('Stimulation Data: ', stimulationData.type);
+  console.log('Directory Path: ', directoryPath);
+  console.log('LeadDBS: ', leadDBS);
+  console.log('Check: ', stimulationData.filepath.includes('leadgroup'));
+  if (stimulationData.type === 'leadgroup' || stimulationData.filepath.includes('leadgroup')) {
+    // Ensure patientname is an array
+    const patientIndex = stimulationData.patientname.findIndex((name) => name === patientId);
+    console.log('Patient Index: ', patientIndex);
+    // Check if patientIndex is valid
+    newFolderPath = stimulationData.patientfolders[patientIndex][0];
+  }
+  let patientFolder = '';
+  if (leadDBS) {
+    if (stimulationData.type === 'leadgroup' || stimulationData.filepath.includes('leadgroup')) {
+      patientFolder = path.join(newFolderPath, 'clinical');
+    } else {
+      console.log('Made it here');
+      patientFolder = path.join(directoryPath, 'derivatives', 'leaddbs', `${patientId}`, 'clinical');
+      console.log('Pt Folder: ', patientFolder);
+    }
+  } else {
+    patientFolder = path.join(directoryPath, `sub-${patientId}`);
+  }
+  return patientFolder;
+};
 
 ipcMain.on('import-inputdata-file', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `${pingPong}`;
@@ -317,6 +348,7 @@ ipcMain.handle(
           'clinical',
         );
         patientDir = newDirectoryPath;
+        // patientDir = getPatientFolder(directoryPath, id, leadDBS);
         sessionDir = path.join(patientDir, `ses-${timeline}`);
         fileName = `${id}_ses-${timeline}_stimparameters.json`;
         filePath = path.join(sessionDir, fileName);
@@ -939,17 +971,44 @@ const createWindow = async () => {
   const loadDirectoryPath = () => {
     if (fs.existsSync(jsonFilePath)) {
       const data = fs.readFileSync(jsonFilePath, 'utf-8');
-      return JSON.parse(data).directoryPath;
+      // return JSON.parse(data).directoryPath;
+      // console.log(stimulationData.filepath);
+      return stimulationData.filepath;
     }
     return null;
   };
 
   // Helper function to check if the folder has the Lead-DBS structure
+  // const isLeadDBSFolder = (directoryPath) => {
+  //   const requiredFolders = ['derivatives/leaddbs', 'rawdata', 'sourcedata'];
+  //   return requiredFolders.every((folder) =>
+  //     fs.existsSync(path.join(directoryPath, folder)),
+  //   );
+  // };
+
   const isLeadDBSFolder = (directoryPath) => {
-    const requiredFolders = ['derivatives/leaddbs', 'rawdata', 'sourcedata'];
-    return requiredFolders.every((folder) =>
+    const requiredFolders = ['leaddbs', 'leadgroup'];
+    if (directoryPath.includes('leadgroup')) {
+      return true;
+    }
+    return requiredFolders.some((folder) =>
       fs.existsSync(path.join(directoryPath, folder)),
     );
+  };
+
+  const loadLeadGroupPatients = (directoryPath) => {
+
+    const patients = directoryPath.map((folder) => {
+      const patientId = folder;
+      const patientData = null;
+
+      return {
+        id: patientId,
+        ...patientData,
+      };
+    });
+
+    return patients;
   };
 
   const loadLeadDBSPatients = (directoryPath) => {
@@ -984,20 +1043,23 @@ const createWindow = async () => {
     return patients;
   };
 
+
   ipcMain.handle(
     'get-timelines',
     async (event, directoryPath, patientId, leadDBS) => {
       // Determine the path to the patient's folder based on leadDBS flag
-      const patientFolder = leadDBS
-        ? path.join(
-            directoryPath,
-            'derivatives',
-            'leaddbs',
-            `${patientId}`,
-            'clinical',
-            // 'MNI152NLin2009bAsym',
-          )
-        : path.join(directoryPath, `sub-${patientId}`);
+      const patientFolder = getPatientFolder(directoryPath, patientId, leadDBS);
+
+      // const patientFolder = leadDBS
+      //   ? path.join(
+      //       stimulationData.type === 'leadgroup' && newFolderPath ? newFolderPath : directoryPath,
+      //       'derivatives',
+      //       'leaddbs',
+      //       `${patientId}`,
+      //       'clinical',
+      //       // 'MNI152NLin2009bAsym',
+      //     )
+      //   : path.join(directoryPath, `sub-${patientId}`);
       console.log('Patient Folder: ', patientFolder);
       try {
         // If leadDBS is false, the process remains as before
@@ -1205,6 +1267,31 @@ const createWindow = async () => {
           directoryPath,
           'participants.json',
         );
+        if (stimulationData.type = 'leadgroup') {
+          if (fs.existsSync(participantsFilePath)) {
+            fs.readFile(participantsFilePath, 'utf-8', (err, data) => {
+              if (err) {
+                console.error('Error reading JSON file:', err);
+                event.sender.send('file-read-error', 'Error reading JSON file');
+              } else {
+                try {
+                  const patients = JSON.parse(data);
+                  console.log('PATIENTS: ', patients);
+                  event.sender.send('folder-selected', directoryPath, patients);
+                  handleMasterDataFill(directoryPath, patients);
+                  event.sender.send('file-read-success', patients);
+                } catch (error) {
+                  console.error('Error parsing JSON file:', error);
+                  event.sender.send('file-read-error', 'Error parsing JSON file');
+                }
+              }
+            });
+          }
+          const patients = loadLeadGroupPatients(stimulationData.patientname);
+          console.log('PATIENTS: ', patients);
+          event.sender.send('folder-selected', directoryPath, patients);
+          event.sender.send('file-read-success', patients);
+        }
         if (fs.existsSync(participantsFilePath)) {
           fs.readFile(participantsFilePath, 'utf-8', (err, data) => {
             if (err) {
