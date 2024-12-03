@@ -78,7 +78,8 @@ const getPatientFolder = (directoryPath, patientId, leadDBS) => {
     const patientIndex = stimulationData.patientname.findIndex((name) => name === patientId);
     console.log('Patient Index: ', patientIndex);
     // Check if patientIndex is valid
-    newFolderPath = stimulationData.patientfolders[patientIndex][0];
+    console.log(stimulationData.patientfolders[0][patientIndex]);
+    newFolderPath = stimulationData.patientfolders[0][patientIndex];
   }
   let patientFolder = '';
   if (leadDBS) {
@@ -149,16 +150,18 @@ ipcMain.on('import-inputdata-file', async (event, arg) => {
       });
     } else if (stimulationData.type === 'leadgroup') {
       stimulationData.patientname.forEach((name, index) => {
-        let patientDir = path.join(stimulationData.filepath, name);
+        // let patientDir = path.join(stimulationData.filepath, name);
+        console.log(stimulationData.patientfolders[index]);
+        let patientDir = path.join(stimulationData.patientfolders[0][index], name);
+
         let sessionDir = path.join(patientDir, `ses-${stimulationData.label}`);
         let fileName = `sub-${name}_ses-${stimulationData.label}_stim.json`;
         let filePath = path.join(sessionDir, fileName);
 
         if (leadDBS) {
           const newDirectoryPath = path.join(
-            stimulationData.filepath,
-            'derivatives/leaddbs',
-            name,
+            // stimulationData.filepath,
+            stimulationData.patientfolders[0][index],
             'clinical',
           );
           patientDir = path.join(newDirectoryPath);
@@ -348,7 +351,7 @@ ipcMain.handle(
           'clinical',
         );
         patientDir = newDirectoryPath;
-        // patientDir = getPatientFolder(directoryPath, id, leadDBS);
+        patientDir = getPatientFolder(directoryPath, id, leadDBS);
         sessionDir = path.join(patientDir, `ses-${timeline}`);
         fileName = `${id}_ses-${timeline}_stimparameters.json`;
         filePath = path.join(sessionDir, fileName);

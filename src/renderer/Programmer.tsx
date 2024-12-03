@@ -582,8 +582,14 @@ function Programmer() {
       Object.keys(timelineOutput).forEach((key, index) => {
         console.log(`Processing timeline for patient ${key}`);
         console.log('Timeline Output: ', timelineOutput);
+        let electrodes = stimulationData.electrodeModels;
+        if (stimulationData.filepath.includes('leadgroup')) {
+          const patientIndex = stimulationData.patientname.findIndex((name) => name === patient.id);
+          const electrodeModel = stimulationData.electrodeModels[patientIndex];
+          console.log('Electrode model: ', electrodeModel);
+          electrodes = electrodeModel;
+        }
         const currentTimeline = key;
-        const electrodes = stimulationData.electrodeModels;
         const patientData = timelineOutput[key].S;
 
         const outputElectrode = handleImportedElectrode(electrodes);
