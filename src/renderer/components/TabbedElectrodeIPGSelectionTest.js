@@ -925,6 +925,7 @@ function TabbedElectrodeIPGSelection({
     //     ver: '2.0',
     //   },
     // };
+    console.log('Template S: ', templateS);
     const data = {
       S: {
         ...templateS,

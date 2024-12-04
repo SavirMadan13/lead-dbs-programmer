@@ -430,7 +430,8 @@ function Programmer() {
   // };
 
   const gatherImportedDataNew = (jsonData, importedElectrode) => {
-    console.log(jsonData);
+    console.log('S: ', jsonData);
+    setImportNewS(jsonData);
     let outputIPG = handleIPG(importedElectrode);
     console.log('OutputIPG: ', outputIPG);
     const newQuantities = {};

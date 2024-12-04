@@ -188,7 +188,7 @@ function PatientDatabase({ key, directoryPath }) {
   }, [setPatients]);
 
   useEffect(() => {
-    console.log(window.electron.ipcRenderer);
+    // console.log(window.electron.ipcRenderer);
     if (window.electron && window.electron.ipcRenderer && patients.length > 0) {
       window.electron.ipcRenderer.once('import-inputdata-file', (arg) => {
         try {

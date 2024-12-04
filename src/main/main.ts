@@ -29,9 +29,10 @@ ipcMain.setMaxListeners(Infinity);
 // const inputPath = '/Users/savirmadan/Downloads/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0374Output/derivatives/leaddbs/sub-CbctDbs0374/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
-// const inputPath = process.argv[1];
+const inputPath = process.argv[1];
 // const inputPath = '/Users/savirmadan/Documents/SanteGroup/derivatives/leadgroup/2024nov5V2/inputData.json';
-const inputPath = '/Users/savirmadan/Documents/LeadGroupDemo/derivatives/leadgroup/20241007203440/inputData.json';
+// const inputPath = '/Users/savirmadan/Documents/LeadGroupDemo/derivatives/leadgroup/20241007203440/inputData.json';
+// const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0362Output/derivatives/leaddbs/sub-CbctDbs0362/stimulations/MNI152NLin2009bAsym/inputData.json';
 const inputFilePath =
   '/Users/savirmadan/Documents/Localization/Output/Patient0357Output/derivatives/leaddbs/sub-CbctDbs0357/stimulations/MNI152NLin2009bAsym/inputData.json';
 class AppUpdater {
@@ -75,7 +76,9 @@ const getPatientFolder = (directoryPath, patientId, leadDBS) => {
   console.log('Check: ', stimulationData.filepath.includes('leadgroup'));
   if (stimulationData.type === 'leadgroup' || stimulationData.filepath.includes('leadgroup')) {
     // Ensure patientname is an array
-    const patientIndex = stimulationData.patientname.findIndex((name) => name === patientId);
+    const patientIndex = stimulationData.patientname.findIndex(
+      (name) => name === patientId,
+    );
     console.log('Patient Index: ', patientIndex);
     // Check if patientIndex is valid
     console.log(stimulationData.patientfolders[0][patientIndex]);
@@ -678,7 +681,8 @@ ipcMain.on('save-file', (event, file, data, historical) => {
 ipcMain.on('save-file-stimulate', (event, file, data) => {
   console.log('FILE: ', file);
   const dataString = JSON.stringify(data);
-  const newStimFilePath = path.join(stimulationDirectory, 'data.json');
+  // const newStimFilePath = path.join(stimulationDirectory, 'data.json');
+  const newStimFilePath = path.join(stimulationData.stimDir, 'data.json');
   console.log(newStimFilePath);
   console.log(dataString);
   try {
@@ -990,7 +994,7 @@ const createWindow = async () => {
   // };
 
   const isLeadDBSFolder = (directoryPath) => {
-    const requiredFolders = ['leaddbs', 'leadgroup'];
+    const requiredFolders = ['derivatives/leaddbs', 'leadgroup'];
     if (directoryPath.includes('leadgroup')) {
       return true;
     }
@@ -1017,12 +1021,12 @@ const createWindow = async () => {
   const loadLeadDBSPatients = (directoryPath) => {
     const leadDBSPath = path.join(directoryPath, 'derivatives', 'leaddbs');
     const patientFolders = fs.readdirSync(leadDBSPath);
-
+    console.log('Made it here');
     // Filter out hidden files or folders (those starting with '.')
     const filteredFolders = patientFolders.filter(
       (folder) => !folder.startsWith('.'),
     );
-
+    console.log('Filtered folders: ', filteredFolders);
     const patients = filteredFolders.map((folder) => {
       const patientId = folder;
       const patientFilePath = path.join(
@@ -1270,7 +1274,8 @@ const createWindow = async () => {
           directoryPath,
           'participants.json',
         );
-        if (stimulationData.type = 'leadgroup') {
+        console.log('Stimulation data type: ', stimulationData.type);
+        if (stimulationData.type === 'leadgroup') {
           if (fs.existsSync(participantsFilePath)) {
             fs.readFile(participantsFilePath, 'utf-8', (err, data) => {
               if (err) {
@@ -1314,6 +1319,7 @@ const createWindow = async () => {
             }
           });
         }
+        console.log('At this step');
         const patients = loadLeadDBSPatients(directoryPath);
         console.log('PATIENTS: ', patients);
         event.sender.send('folder-selected', directoryPath, patients);
