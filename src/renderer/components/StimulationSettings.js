@@ -12,6 +12,7 @@ import { Dropdown } from 'react-bootstrap';
 import TabbedElectrodeIPGSelectionTest from './TabbedElectrodeIPGSelectionTest';
 import BostonCartesiaTest from './electrode_models/BostonCartesiaTest';
 import electrodeModels from './electrodeModels.json';
+import ManageElectrode from './ManageElectrode';
 
 function StimulationSettings({
   rightElectrode,
@@ -734,7 +735,43 @@ function StimulationSettings({
       </div>
       <div>
         {(leftElectrode || rightElectrode) && (
-          <TabbedElectrodeIPGSelectionTest
+          // <TabbedElectrodeIPGSelectionTest
+          //   selectedElectrodeLeft={leftElectrode}
+          //   selectedElectrodeRight={rightElectrode}
+          //   IPG={IPG}
+          //   key={renderKey}
+          //   // setKey={setKey}
+          //   allQuantities={allQuantities}
+          //   setAllQuantities={setAllQuantities}
+          //   allSelectedValues={allSelectedValues}
+          //   setAllSelectedValues={setAllSelectedValues}
+          //   allTotalAmplitudes={allTotalAmplitudes}
+          //   setAllTotalAmplitudes={setAllTotalAmplitudes}
+          //   allStimulationParameters={allStimulationParameters}
+          //   setAllStimulationParameters={setAllStimulationParameters}
+          //   visModel={visModel}
+          //   setVisModel={setVisModel}
+          //   sessionTitle={sessionTitle}
+          //   setSessionTitle={setSessionTitle}
+          //   allTogglePositions={allTogglePositions}
+          //   setAllTogglePositions={setAllTogglePositions}
+          //   allPercAmpToggles={allPercAmpToggles}
+          //   setAllPercAmpToggles={setAllPercAmpToggles}
+          //   allVolAmpToggles={allVolAmpToggles}
+          //   setAllVolAmpToggles={setAllVolAmpToggles}
+          //   filePath={filePath}
+          //   setFilePath={setFilePath}
+          //   matImportFile={matImportFile}
+          //   stimChanged={stimChanged}
+          //   setStimChanged={setStimChanged}
+          //   patientStates={patientStates}
+          //   namingConvention={namingConvention}
+          //   selectedPatient={selectedPatient}
+          //   historical={historical}
+          //   mode={mode}
+          //   templateS={importNewS}
+          // />
+          <ManageElectrode
             selectedElectrodeLeft={leftElectrode}
             selectedElectrodeRight={rightElectrode}
             IPG={IPG}
