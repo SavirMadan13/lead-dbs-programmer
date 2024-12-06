@@ -481,19 +481,6 @@ function Electrode({
     return zIndexMap[key] || 0;
   };
 
-  const initialQuantities = {
-    plus: 0,
-    minus: 0,
-  };
-
-  // const [totalAmplitude, setTotalAmplitude] = useState(
-  //   totalAmplitude || 0,
-  // );
-
-  // if (!totalAmplitude || totalAmplitude.length === 0) {
-  //   setTotalAmplitude(0);
-  // }
-
   const initialSelectedValues = { 0: 'right' };
   const initialQuantityBoston = { 0: 100 };
   const initialQuantity = { 0: 0 };
@@ -505,13 +492,6 @@ function Electrode({
     initialAnimation[i + 1] = null;
   }
 
-  // const [selectedValues, setSelectedValues] = useState(
-  //   selectedValues || initialSelectedValues,
-  // );
-
-  // if (!selectedValues || selectedValues.length === 0) {
-  //   setSelectedValues(initialSelectedValues);
-  // }
 
   const [animation, setAnimation] = useState(initialAnimation);
 

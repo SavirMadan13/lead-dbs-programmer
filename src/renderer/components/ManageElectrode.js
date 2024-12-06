@@ -1076,6 +1076,47 @@ function ManageElectrode({
     window.electron.ipcRenderer.sendMessage('close-window');
   };
 
+  const initializeElectrodeVariables = () => {
+    console.log(electrodeModels);
+    const elspec = electrodeModels[selectedElectrodeLeft];
+    const initialSelectedValues = { 0: 'right' };
+    const initialQuantityBoston = { 0: 100 };
+    const initialQuantity = { 0: 0 };
+    const initialAnimation = { 0: null };
+    const initialpercAmpToggle = allPercAmpToggles[key] || 'left';
+    const initialVolAmpToggle = allVolAmpToggles[key] || 'center';
+    const initialVisModel = visModel || '3';
+    for (let i = 0; i < elspec.numel; i++) {
+      initialSelectedValues[i + 1] = 'left';
+      initialQuantityBoston[i + 1] = 0;
+      initialQuantity[i + 1] = 0;
+      initialAnimation[i + 1] = null;
+    }
+
+    const newInitialQuantities =
+      IPG === 'Boston' ? initialQuantityBoston : initialQuantity;
+
+    console.log(
+      'Initialization test: ',
+      electrodeModels[selectedElectrodeLeft],
+    );
+    setAllQuantities({
+      ...allQuantities,
+      [key]: newInitialQuantities,
+    });
+    setAllSelectedValues({
+      ...allSelectedValues,
+      [key]: initialSelectedValues,
+    });
+    setAllPercAmpToggles({ ...allPercAmpToggles, [key]: initialpercAmpToggle });
+    setAllVolAmpToggles({ ...allVolAmpToggles, [key]: initialVolAmpToggle });
+    setVisModel(initialVisModel);
+  };
+
+  useEffect(() => {
+    initializeElectrodeVariables();
+  }, []);
+
   const gatherImportedData = (jsonData) => {
     const newQuantities = {
       1: {},
