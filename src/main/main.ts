@@ -26,13 +26,13 @@ ipcMain.setMaxListeners(Infinity);
 // const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
 // console.log(args);
 // const inputDatasetDirectory = process.argv[1]; // Get the first argument
-// const inputPath = '/Users/savirmadan/Downloads/inputData.json';
+const inputPath = '/Users/savirmadan/Downloads/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0374Output/derivatives/leaddbs/sub-CbctDbs0374/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
 // const inputPath = process.argv[1];
 // const inputPath = '/Users/savirmadan/Documents/SanteGroup/derivatives/leadgroup/2024nov5V2/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/LeadGroupDemo/derivatives/leadgroup/20241007203440/inputData.json';
-const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0362Output/derivatives/leaddbs/sub-CbctDbs0362/stimulations/MNI152NLin2009bAsym/inputData.json';
+// const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0362Output/derivatives/leaddbs/sub-CbctDbs0362/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0370Output/derivatives/leaddbs/sub-CbctDbs0370/stimulations/MNI152NLin2009bAsym/inputData.json';
 const inputFilePath =
   '/Users/savirmadan/Documents/Localization/Output/Patient0357Output/derivatives/leaddbs/sub-CbctDbs0357/stimulations/MNI152NLin2009bAsym/inputData.json';
@@ -1841,7 +1841,7 @@ app
 
 ipcMain.on('zoom-level-changed', (event, zoomLevel) => {
   if (mainWindow) {
-    const newWidth = 2000 * (1 + zoomLevel * 0.1); // Adjust the scale factor as needed
+    const newWidth = 2100 * (1 + zoomLevel * 0.1); // Adjust the scale factor as needed
     const newHeight = 1100 * (1 + zoomLevel * 0.1); // Adjust the scale factor as needed
     mainWindow.setSize(newWidth, newHeight);
   }
@@ -1855,14 +1855,14 @@ ipcMain.on('resize-window', (event, width, height) => {
   }
 });
 
-ipcMain.on('resize-window-2', (event, width, height) => {
-  // Optionally set a minimum or maximum size
-  const minWidth = 800; // minimum width
-  const minHeight = 600; // minimum height
+// ipcMain.on('resize-window-2', (event, width, height) => {
+//   // Optionally set a minimum or maximum size
+//   const minWidth = 800; // minimum width
+//   const minHeight = 600; // minimum height
 
-  // Adjust the window size dynamically
-  const newWidth = Math.max(width, minWidth);
-  const newHeight = Math.max(height, minHeight);
+//   // Adjust the window size dynamically
+//   const newWidth = Math.max(width, minWidth);
+//   const newHeight = Math.max(height, minHeight);
 
-  mainWindow.setSize(newWidth, newHeight);
-});
+//   mainWindow.setSize(newWidth, newHeight);
+// });
