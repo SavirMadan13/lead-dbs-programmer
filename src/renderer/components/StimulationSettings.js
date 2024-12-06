@@ -286,9 +286,9 @@ function StimulationSettings({
     }
     setRightElectrode(selectedLeftElectrode);
     setLeftElectrode(selectedLeftElectrode);
-    setAllQuantities({});
-    setAllSelectedValues({});
-    setAllTotalAmplitudes({});
+    // setAllQuantities({});
+    // setAllSelectedValues({});
+    // setAllTotalAmplitudes({});
     // console.log('IPGselection: ', IPG);
   };
 
@@ -304,19 +304,19 @@ function StimulationSettings({
       }
     }
     setRightElectrode(selectedRightElectrode);
-    setAllQuantities({});
-    setAllSelectedValues({});
+    // setAllQuantities({});
+    // setAllSelectedValues({});
   };
 
   const handleIPGChange = (e) => {
     const selectedIPG = e.target.value;
     setIPG(selectedIPG);
-    setAllQuantities({});
-    setAllSelectedValues({});
-    setAllTogglePositions({});
-    setAllPercAmpToggles({});
-    setAllVolAmpToggles({});
-    setAllTotalAmplitudes({});
+    // setAllQuantities({});
+    // setAllSelectedValues({});
+    // setAllTogglePositions({});
+    // setAllPercAmpToggles({});
+    // setAllVolAmpToggles({});
+    // setAllTotalAmplitudes({});
     // console.log('selectedIPG: ', selectedIPG);
   };
 
@@ -734,48 +734,12 @@ function StimulationSettings({
         </div>
       </div>
       <div>
-        {(leftElectrode || rightElectrode) && (
-          // <TabbedElectrodeIPGSelectionTest
-          //   selectedElectrodeLeft={leftElectrode}
-          //   selectedElectrodeRight={rightElectrode}
-          //   IPG={IPG}
-          //   key={renderKey}
-          //   // setKey={setKey}
-          //   allQuantities={allQuantities}
-          //   setAllQuantities={setAllQuantities}
-          //   allSelectedValues={allSelectedValues}
-          //   setAllSelectedValues={setAllSelectedValues}
-          //   allTotalAmplitudes={allTotalAmplitudes}
-          //   setAllTotalAmplitudes={setAllTotalAmplitudes}
-          //   allStimulationParameters={allStimulationParameters}
-          //   setAllStimulationParameters={setAllStimulationParameters}
-          //   visModel={visModel}
-          //   setVisModel={setVisModel}
-          //   sessionTitle={sessionTitle}
-          //   setSessionTitle={setSessionTitle}
-          //   allTogglePositions={allTogglePositions}
-          //   setAllTogglePositions={setAllTogglePositions}
-          //   allPercAmpToggles={allPercAmpToggles}
-          //   setAllPercAmpToggles={setAllPercAmpToggles}
-          //   allVolAmpToggles={allVolAmpToggles}
-          //   setAllVolAmpToggles={setAllVolAmpToggles}
-          //   filePath={filePath}
-          //   setFilePath={setFilePath}
-          //   matImportFile={matImportFile}
-          //   stimChanged={stimChanged}
-          //   setStimChanged={setStimChanged}
-          //   patientStates={patientStates}
-          //   namingConvention={namingConvention}
-          //   selectedPatient={selectedPatient}
-          //   historical={historical}
-          //   mode={mode}
-          //   templateS={importNewS}
-          // />
+        {/* {(leftElectrode || rightElectrode) && ( */}
           <ManageElectrode
+            IPG={IPG}
             selectedElectrodeLeft={leftElectrode}
             selectedElectrodeRight={rightElectrode}
-            IPG={IPG}
-            key={renderKey}
+            // key={renderKey}
             // setKey={setKey}
             allQuantities={allQuantities}
             setAllQuantities={setAllQuantities}
@@ -807,7 +771,7 @@ function StimulationSettings({
             mode={mode}
             templateS={importNewS}
           />
-        )}
+        {/* )} */}
       </div>
     </div>
   );

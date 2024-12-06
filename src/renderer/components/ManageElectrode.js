@@ -7,7 +7,6 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import './TabbedElectrodeIPGSelection.css';
 import electrodeModels from './electrodeModels.json';
-import Generic_elmodel from './electrode_models/currentModels/Generic_elmodel';
 import Electrode from './electrode_models/currentModels/Electrode';
 
 function ManageElectrode({
@@ -1077,8 +1076,10 @@ function ManageElectrode({
   };
 
   const initializeElectrodeVariables = () => {
+    console.log('Here');
     console.log(electrodeModels);
     const elspec = electrodeModels[selectedElectrodeLeft];
+    console.log('Elspec: ', elspec);
     const initialSelectedValues = { 0: 'right' };
     const initialQuantityBoston = { 0: 100 };
     const initialQuantity = { 0: 0 };
@@ -1092,7 +1093,7 @@ function ManageElectrode({
       initialQuantity[i + 1] = 0;
       initialAnimation[i + 1] = null;
     }
-
+    console.log('Initial quantity: ', initialQuantity);
     const newInitialQuantities =
       IPG === 'Boston' ? initialQuantityBoston : initialQuantity;
 
@@ -1111,11 +1112,12 @@ function ManageElectrode({
     setAllPercAmpToggles({ ...allPercAmpToggles, [key]: initialpercAmpToggle });
     setAllVolAmpToggles({ ...allVolAmpToggles, [key]: initialVolAmpToggle });
     setVisModel(initialVisModel);
+    console.log('All Quantities from initialize: ', newInitialQuantities);
   };
 
   useEffect(() => {
     initializeElectrodeVariables();
-  }, []);
+  }, [IPG, selectedElectrodeLeft, selectedElectrodeRight]);
 
   const gatherImportedData = (jsonData) => {
     const newQuantities = {

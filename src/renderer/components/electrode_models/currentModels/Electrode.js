@@ -71,7 +71,31 @@ function Electrode({
   elspec,
 }) {
   // const { elspec } = props;
-
+  console.log('IPG: ', IPG);
+  console.log('All variables: ',  name,
+    allQuantities,
+    quantities,
+    setQuantities,
+    selectedValues,
+    setSelectedValues,
+    IPG,
+    totalAmplitude,
+    setTotalAmplitude,
+    parameters,
+    setParameters,
+    visModel,
+    setVisModel,
+    sessionTitle,
+    togglePosition,
+    percAmpToggle,
+    setPercAmpToggle,
+    volAmpToggle,
+    setVolAmpToggle,
+    contactNaming,
+    adornment,
+    historical,
+    elspec,
+  );
   useEffect(() => {
     window.electron.zoom.setZoomLevel(-3);
   }, []);
@@ -318,7 +342,7 @@ function Electrode({
   // };
 
   const [names, setNames] = useState({
-    0: IPG,
+    0: 'IPG',
     1: 1,
     2: 2,
     3: 3,
@@ -335,7 +359,7 @@ function Electrode({
       if (contactNaming === 'clinical') {
         if (elspec.matfname.includes("boston")) {
           newNames = {
-            0: IPG,
+            0: 'IPG',
             1: '1',
             2: '2',
             3: '3',
@@ -343,7 +367,7 @@ function Electrode({
           };
         } else {
           newNames = {
-            0: IPG,
+            0: 'IPG',
             1: '0',
             2: '1',
             3: '2',
@@ -353,7 +377,7 @@ function Electrode({
       } else {
         if (name < 5) {
           newNames = {
-            0: IPG,
+            0: 'IPG',
             1: 'k1',
             2: 'k2',
             3: 'k3',
@@ -361,7 +385,7 @@ function Electrode({
           };
         } else {
           newNames = {
-            0: IPG,
+            0: 'IPG',
             1: 'k1',
             2: 'k2',
             3: 'k3',
@@ -373,7 +397,7 @@ function Electrode({
       if (contactNaming === 'clinical') {
         if (elspec.matfname.includes("boston")) {
           newNames = {
-            0: IPG,
+            0: 'IPG',
             1: '1',
             2: '2A',
             3: '2B',
@@ -385,7 +409,7 @@ function Electrode({
           };
         } else {
           newNames = {
-            0: IPG,
+            0: 'IPG',
             1: '0',
             2: '1A',
             3: '1B',
@@ -399,7 +423,7 @@ function Electrode({
       } else {
         if (name < 5) {
           newNames = {
-            0: IPG,
+            0: 'IPG',
             1: 'k1',
             2: 'k2',
             3: 'k3',
@@ -411,7 +435,7 @@ function Electrode({
           };
         } else {
           newNames = {
-            0: IPG,
+            0: 'IPG',
             1: 'k1',
             2: 'k2',
             3: 'k3',
@@ -3679,6 +3703,7 @@ function Electrode({
               name="quantity"
               pattern="[0-9]+"
               value={60}
+              disabled
               onChange={handleParameterChange('parameter1')}
             />
             <span className="input-adornment">μs</span>
@@ -3689,6 +3714,7 @@ function Electrode({
               type="number"
               name="quantity"
               pattern="[0-9]+"
+              disabled
               value={130}
               onChange={handleParameterChange('parameter2')}
             />
