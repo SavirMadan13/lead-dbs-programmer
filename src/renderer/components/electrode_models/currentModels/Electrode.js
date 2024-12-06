@@ -3691,6 +3691,30 @@ function Electrode({
             <span className="input-adornment">hz</span>
           </div>
         </div> */}
+        <div className="button-container">
+          <div className="input-wrapper">
+            <input
+              className="param-input"
+              type="number"
+              name="quantity"
+              pattern="[0-9]+"
+              value={60}
+              onChange={handleParameterChange('parameter1')}
+            />
+            <span className="input-adornment">μs</span>
+          </div>
+          <div className="input-wrapper">
+            <input
+              className="param-input"
+              type="number"
+              name="quantity"
+              pattern="[0-9]+"
+              value={130}
+              onChange={handleParameterChange('parameter2')}
+            />
+            <span className="input-adornment">hz</span>
+          </div>
+        </div>
         {(IPG === 'Boston' || IPG === 'Medtronic_Percept') && (
           <div className="button-container">
             <ButtonGroup>
@@ -3968,8 +3992,8 @@ function Electrode({
             width: '1000px',
             margin: '20px auto',
             padding: '15px',
-            border: '2px solid #ccc',
-            borderRadius: '10px',
+            // border: '2px solid #ccc',
+            // borderRadius: '10px',
             boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
             backgroundColor: '#f9f9f9',
             display: 'flex',
@@ -3987,7 +4011,7 @@ function Electrode({
             side={name}
             historical={historical}
             togglePosition={percAmpToggle}
-            tab={key}
+            tab={name}
             names={names}
             elspec={elspec}
           />

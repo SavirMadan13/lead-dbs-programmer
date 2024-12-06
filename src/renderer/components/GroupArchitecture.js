@@ -299,7 +299,7 @@ function GroupArchitecture({
           mode={mode}
         />
       )}
-      <div className="sticky-buttons-container">
+      {/* <div className="sticky-buttons-container">
         <button
           className="export-button sticky-button left-button"
           onClick={handlePreviousPatient}
@@ -312,7 +312,7 @@ function GroupArchitecture({
         >
           →
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }
