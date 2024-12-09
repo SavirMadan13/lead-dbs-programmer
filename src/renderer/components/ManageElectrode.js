@@ -420,7 +420,7 @@ function ManageElectrode({
     // }
 
     for (let j = 1; j < 5; j++) {
-      let dynamicKey2 = `Ls${j}`;
+      const dynamicKey2 = `Ls${j}`;
       if (allSelectedValues[j] && allQuantities[j]) {
         for (let i = 1; i < 9; i++) {
           let polarity = 0;
@@ -431,7 +431,7 @@ function ManageElectrode({
           } else if (allSelectedValues[j][i] === 'right') {
             polarity = 2;
           }
-          let dynamicKey = `k${i + 7}`;
+          const dynamicKey = `k${i + 7}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: parseFloat(allQuantities[j][i]),
             pol: polarity,
@@ -454,7 +454,7 @@ function ManageElectrode({
       } else {
         for (let i = 1; i < 9; i++) {
           // console.log('j: ', dynamicKey2);
-          let dynamicKey = `k${i + 7}`;
+          const dynamicKey = `k${i + 7}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: 0,
             pol: 0,
@@ -475,7 +475,7 @@ function ManageElectrode({
     const newActiveArray = [];
 
     for (let j = 1; j < 5; j++) {
-      let dynamicKey2 = `Rs${j}`;
+      const dynamicKey2 = `Rs${j}`;
       if (allSelectedValues[j + 4] && allQuantities[j + 4]) {
         for (let i = 1; i < 9; i++) {
           let polarity = 0;
@@ -486,7 +486,7 @@ function ManageElectrode({
           } else if (allSelectedValues[j + 4][i] === 'right') {
             polarity = 2;
           }
-          let dynamicKey = `k${i - 1}`;
+          const dynamicKey = `k${i - 1}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: parseFloat(allQuantities[j + 4][i]),
             pol: polarity,
@@ -507,7 +507,7 @@ function ManageElectrode({
         data.S.activecontacts[j + 4] = activeContacts(allSelectedValues[j + 4]);
       } else {
         for (let i = 1; i < 9; i++) {
-          let dynamicKey = `k${i - 1}`;
+          const dynamicKey = `k${i - 1}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: 0,
             pol: 0,
@@ -579,7 +579,7 @@ function ManageElectrode({
     const leftAmpArray = [];
 
     for (let j = 1; j < 5; j++) {
-      let dynamicKey2 = `Ls${j}`;
+      const dynamicKey2 = `Ls${j}`;
       if (allSelectedValues[j] && updatedOutputQuantity[j]) {
         // Need to change the i = 9 to number of electrodes to accomodate for 16 contact electrodes
         for (let i = 1; i < loopSize; i++) {
@@ -591,7 +591,7 @@ function ManageElectrode({
           } else if (allSelectedValues[j][i] === 'right') {
             polarity = 2;
           }
-          let dynamicKey = `k${i + loopSize - 2}`;
+          const dynamicKey = `k${i + loopSize - 2}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: parseFloat(updatedOutputQuantity[j][i]),
             pol: polarity,
@@ -621,7 +621,7 @@ function ManageElectrode({
         // console.log(data.S.activecontacts);
       } else {
         for (let i = 1; i < loopSize; i++) {
-          let dynamicKey = `k${i + loopSize - 2}`;
+          const dynamicKey = `k${i + loopSize - 2}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: 0,
             pol: 0,
@@ -643,7 +643,7 @@ function ManageElectrode({
     const rightAmpArray = [];
 
     for (let j = 1; j < 5; j++) {
-      let dynamicKey2 = `Rs${j}`;
+      const dynamicKey2 = `Rs${j}`;
       if (allSelectedValues[j + 4] && updatedOutputQuantity[j + 4]) {
         for (let i = 1; i < loopSize; i++) {
           let polarity = 0;
@@ -654,7 +654,7 @@ function ManageElectrode({
           } else if (allSelectedValues[j + 4][i] === 'right') {
             polarity = 2;
           }
-          let dynamicKey = `k${i - 1}`;
+          const dynamicKey = `k${i - 1}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: parseFloat(updatedOutputQuantity[j + 4][i]),
             pol: polarity,
@@ -684,7 +684,7 @@ function ManageElectrode({
         // rightAmpArray[j + 4] = parseFloat(allTotalAmplitudes[j + 4]);
       } else {
         for (let i = 1; i < loopSize; i++) {
-          let dynamicKey = `k${i - 1}`;
+          const dynamicKey = `k${i - 1}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: 0,
             pol: 0,
@@ -824,7 +824,7 @@ function ManageElectrode({
     const leftAmpArray = [];
 
     for (let j = 1; j < 5; j++) {
-      let dynamicKey2 = `Ls${j}`;
+      const dynamicKey2 = `Ls${j}`;
       if (allSelectedValues[j] && updatedOutputQuantity[j]) {
         // Need to change the i = 9 to number of electrodes to accomodate for 16 contact electrodes
         for (let i = 1; i < loopSize; i++) {
@@ -836,7 +836,7 @@ function ManageElectrode({
           } else if (allSelectedValues[j][i] === 'right') {
             polarity = 2;
           }
-          let dynamicKey = `k${i}`;
+          const dynamicKey = `k${i}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: parseFloat(updatedOutputQuantity[j][i]),
             pol: polarity,
@@ -866,7 +866,7 @@ function ManageElectrode({
         // console.log(data.S.activecontacts);
       } else {
         for (let i = 1; i < loopSize; i++) {
-          let dynamicKey = `k${i}`;
+          const dynamicKey = `k${i}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: 0,
             pol: 0,
@@ -888,7 +888,7 @@ function ManageElectrode({
     const rightAmpArray = [];
 
     for (let j = 1; j < 5; j++) {
-      let dynamicKey2 = `Rs${j}`;
+      const dynamicKey2 = `Rs${j}`;
       if (allSelectedValues[j + 4] && updatedOutputQuantity[j + 4]) {
         for (let i = 1; i < loopSize; i++) {
           let polarity = 0;
@@ -899,7 +899,7 @@ function ManageElectrode({
           } else if (allSelectedValues[j + 4][i] === 'right') {
             polarity = 2;
           }
-          let dynamicKey = `k${i}`;
+          const dynamicKey = `k${i}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: parseFloat(updatedOutputQuantity[j + 4][i]),
             pol: polarity,
@@ -929,7 +929,7 @@ function ManageElectrode({
         // rightAmpArray[j + 4] = parseFloat(allTotalAmplitudes[j + 4]);
       } else {
         for (let i = 1; i < loopSize; i++) {
-          let dynamicKey = `k${i}`;
+          const dynamicKey = `k${i}`;
           data.S[dynamicKey2][dynamicKey] = {
             perc: 0,
             pol: 0,
@@ -1101,18 +1101,38 @@ function ManageElectrode({
       'Initialization test: ',
       electrodeModels[selectedElectrodeLeft],
     );
-    setAllQuantities({
-      ...allQuantities,
-      [key]: newInitialQuantities,
-    });
-    setAllSelectedValues({
-      ...allSelectedValues,
-      [key]: initialSelectedValues,
-    });
-    setAllPercAmpToggles({ ...allPercAmpToggles, [key]: initialpercAmpToggle });
-    setAllVolAmpToggles({ ...allVolAmpToggles, [key]: initialVolAmpToggle });
-    setVisModel(initialVisModel);
-    console.log('All Quantities from initialize: ', newInitialQuantities);
+    if (!allQuantities[key]) {
+      setAllQuantities({
+        ...allQuantities,
+        [key]: newInitialQuantities,
+      });
+    }
+
+    if (!allSelectedValues[key]) {
+      setAllSelectedValues({
+        ...allSelectedValues,
+        [key]: initialSelectedValues,
+      });
+    }
+
+    if (!allPercAmpToggles[key]) {
+      setAllPercAmpToggles({
+        ...allPercAmpToggles,
+        [key]: initialpercAmpToggle,
+      });
+    }
+
+    if (!allVolAmpToggles[key]) {
+      setAllVolAmpToggles({
+        ...allVolAmpToggles,
+        [key]: initialVolAmpToggle,
+      });
+    }
+
+    // For visModel, ensure it's set only if it's not already set
+    if (!visModel) {
+      setVisModel(initialVisModel);
+    }    console.log('All Quantities from initialize: ', newInitialQuantities);
   };
 
   useEffect(() => {
@@ -1133,19 +1153,17 @@ function ManageElectrode({
     const newAllQuantities = {};
 
     for (let j = 1; j < 5; j++) {
-      let dynamicKey2 = `Ls${j}`;
+      const dynamicKey2 = `Ls${j}`;
       for (let i = 0; i < 9; i++) {
-        let dynamicKey = `k${i + 7}`;
+        const dynamicKey = `k${i + 7}`;
         // let nestedData = jsonData.S[dynamicKey2][dynamicKey];
-        let nestedData = jsonData.S[dynamicKey2][dynamicKey];
+        const nestedData = jsonData.S[dynamicKey2][dynamicKey];
         // console.log('nestred data: ', nestedData);
         if (jsonData.S[dynamicKey2][dynamicKey]) {
           newQuantities[j][i] = parseFloat(
             jsonData.S[dynamicKey2][dynamicKey].perc,
           );
-          newQuantities[j][0] = parseFloat(
-            jsonData.S[dynamicKey2].case['perc'],
-          );
+          newQuantities[j][0] = parseFloat(jsonData.S[dynamicKey2].case.perc);
           // console.log('perc', nestedData.perc);
           // newQuantities.S[dynamicKey2][dynamicKey]
         }
@@ -1230,7 +1248,6 @@ function ManageElectrode({
     };
     setAllVolAmpToggles(updatedAllVolAmpToggles);
   };
-
 
   return (
     <div className="TabbedIPGContainer">
@@ -1372,7 +1389,9 @@ function ManageElectrode({
                     // setTogglePosition={(updatedTogglePosition) =>
                     //   handleTogglePositionChange(updatedTogglePosition)
                     // }
-                    percAmpToggle={allPercAmpToggles[key] ? allPercAmpToggles[key] : 'left'}
+                    percAmpToggle={
+                      allPercAmpToggles[key] ? allPercAmpToggles[key] : 'left'
+                    }
                     setPercAmpToggle={(updatedPercAmpToggle) =>
                       handlePercAmpToggleChange(updatedPercAmpToggle)
                     }

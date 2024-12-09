@@ -60,9 +60,9 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 }));
 
 function ContactParameters({
-  value = 'left',
-  switchPosition = 'left',
-  quantity = 0,
+  value,
+  switchPosition,
+  quantity,
   onChange = () => {},
   onQuantityChange = () => {},
 }) {
@@ -123,7 +123,14 @@ function ContactParameters({
         </StyledToggleButton>
       </StyledToggleButtonGroup>
 
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '-30px', marginLeft: '40px' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          marginTop: '-30px',
+          marginLeft: '40px',
+        }}
+      >
         <StyledTextField
           type="number"
           inputProps={{ min: 0 }}

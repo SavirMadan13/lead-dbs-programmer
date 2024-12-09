@@ -3065,6 +3065,7 @@ function Electrode({
     // setResearchTogg
   };
 
+
   const [assistedToggle, setAssistedToggle] = useState('left');
 
   const handleAssistedToggleChange = (value) => {
@@ -3190,6 +3191,39 @@ function Electrode({
     { name: 'mA', value: 'center' },
     { name: 'V', value: 'right' },
   ];
+
+  const [stimMode, setStimMode] = useState('left');
+
+  const stimulationModes = [
+    { name: '%', value: 'left' },
+    { name: 'mA', value: 'center' },
+    { name: 'V', value: 'right' },
+  ];
+
+  const handleStimModeChange = (value) => {
+    console.log('ResearchToggle; ', researchToggle);
+    console.log('NewValue: ', value);
+    const newValue = value;
+    console.log(newValue);
+    if (newValue === 'left') {
+      calculatePercentageFromAmplitude();
+      outputTogglePosition = '%';
+      setCurrentLabel('mA');
+    } else if (newValue === 'center' && researchToggle !== 'right') {
+      calculateAmplitudeFromPercentage();
+      outputTogglePosition = 'mA';
+      setCurrentLabel('mA');
+    } else if (newValue === 'right') {
+      if (researchToggle === 'left') {
+        calculateAmplitudeFromPercentage();
+      }
+      outputTogglePosition = 'V';
+      setCurrentLabel('V');
+      console.log(outputTogglePosition);
+    }
+    setStimMode(newValue);
+    // setResearchTogg
+  };
 
   const handleVisModelChange = (event) => {
     setVisModel(event.target.value);
@@ -3658,6 +3692,24 @@ function Electrode({
                 ))}
               </ButtonGroup>
             )}
+            {/* <ButtonGroup className="button-group">
+              {stimulationModes.map((res, idx) => (
+                <ToggleButton
+                  key={idx}
+                  id={`res-${idx}`}
+                  type="radio"
+                  variant={getVariant(res.value)}
+                  name="res"
+                  value={res.value}
+                  checked={stimulationModes === res.value}
+                  onChange={(e) =>
+                    handleStimModeChange(e.currentTarget.value)
+                  }
+                >
+                  {res.name}
+                </ToggleButton>
+              ))}
+            </ButtonGroup> */}
           </div>
           <div className="input-wrapper">
             <input
