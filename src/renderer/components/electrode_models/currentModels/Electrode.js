@@ -43,6 +43,7 @@ import { ReactComponent as CenterContact } from '../images/NewUI/CenterContact.s
 import { ReactComponent as Nondirectional } from '../images/NewUI/NonDirectionalContact.svg';
 import { ReactComponent as Background } from '../images/NewUI/Background.svg';
 import PlyViewer from '../../PlyViewer';
+import ContactParameters from '../../ContactParameters';
 
 function Electrode({
   name,
@@ -72,7 +73,9 @@ function Electrode({
 }) {
   // const { elspec } = props;
   console.log('IPG: ', IPG);
-  console.log('All variables: ',  name,
+  console.log(
+    'All variables: ',
+    name,
     allQuantities,
     quantities,
     setQuantities,
@@ -357,7 +360,7 @@ function Electrode({
     let newNames = [];
     if (elspec.numel === 4) {
       if (contactNaming === 'clinical') {
-        if (elspec.matfname.includes("boston")) {
+        if (elspec.matfname.includes('boston')) {
           newNames = {
             0: 'IPG',
             1: '1',
@@ -395,7 +398,7 @@ function Electrode({
       }
     } else if (elspec.numel === 8 && elspec.isdirected === 1) {
       if (contactNaming === 'clinical') {
-        if (elspec.matfname.includes("boston")) {
+        if (elspec.matfname.includes('boston')) {
           newNames = {
             0: 'IPG',
             1: '1',
@@ -515,7 +518,6 @@ function Electrode({
     initialQuantity[i + 1] = 0;
     initialAnimation[i + 1] = null;
   }
-
 
   const [animation, setAnimation] = useState(initialAnimation);
 
@@ -3755,7 +3757,20 @@ function Electrode({
                 })}
                 {!isNaN(Number(ipg.key)) && (
                   <div className="triple-toggle-ipg-boston-test">
-                    <TripleToggleTest
+                    {/* <TripleToggleTest
+                      key={ipg.key}
+                      value={selectedValues[ipg.key]}
+                      switchPosition={selectedValues[ipg.key]}
+                      animation={animation[ipg.key]}
+                      quantity={quantities[ipg.key]}
+                      onChange={(value, anime) =>
+                        handleTripleToggleChange(value, anime, ipg.key)
+                      }
+                      onQuantityChange={(value, anime, quantity) =>
+                        handleQuantityChange(quantity, ipg.key)
+                      }
+                    /> */}
+                    <ContactParameters
                       key={ipg.key}
                       value={selectedValues[ipg.key]}
                       switchPosition={selectedValues[ipg.key]}
@@ -3786,7 +3801,7 @@ function Electrode({
                 })}
                 {!isNaN(Number(Lcon.key)) && (
                   <div className="triple-toggle-boston-test-left">
-                    <TripleToggleTest
+                    {/* <TripleToggleTest
                       key={Lcon.key}
                       value={selectedValues[Lcon.key]}
                       switchPosition={selectedValues[Lcon.key]}
@@ -3800,6 +3815,18 @@ function Electrode({
                       }
                       level={Lcon.level}
                       face={Lcon.face}
+                    /> */}
+                    <ContactParameters
+                      key={Lcon.key}
+                      value={selectedValues[Lcon.key]}
+                      switchPosition={selectedValues[Lcon.key]}
+                      quantity={quantities[Lcon.key]}
+                      onChange={(value, anime) =>
+                        handleTripleToggleChange(value, anime, Lcon.key)
+                      }
+                      onQuantityChange={(value, anime, quantity) =>
+                        handleQuantityChange(quantity, Lcon.key)
+                      }
                     />
                   </div>
                 )}
@@ -3815,10 +3842,12 @@ function Electrode({
         {svgs.map((svg) => (
           <div
             // className="image-item-2"
-            className={showViewer ? "image-item-2-viewer" : "image-item-2"}
+            className={showViewer ? 'image-item-2-viewer' : 'image-item-2'}
             style={{ zIndex: svg.key }}
           >
-            <div className="background-image"><Background /></div>
+            <div className="background-image">
+              <Background />
+            </div>
             <div className="image-container-test">
               {React.cloneElement(svg, {
                 key: svg.key,
@@ -3826,7 +3855,7 @@ function Electrode({
               })}
               {!isNaN(Number(svg.key)) && (
                 <div className="triple-toggle-boston-test-2">
-                  <TripleToggleTest
+                  {/* <TripleToggleTest
                     key={svg.key}
                     value={selectedValues[svg.key]}
                     switchPosition={selectedValues[svg.key]}
@@ -3840,11 +3869,30 @@ function Electrode({
                     }
                     level={svg.level}
                     face={svg.face}
+                  /> */}
+                  <ContactParameters
+                    key={svg.key}
+                    value={selectedValues[svg.key]}
+                    switchPosition={selectedValues[svg.key]}
+                    quantity={quantities[svg.key]}
+                    onChange={(value, anime) =>
+                      handleTripleToggleChange(value, anime, svg.key)
+                    }
+                    onQuantityChange={(value, anime, quantity) =>
+                      handleQuantityChange(quantity, svg.key)
+                    }
                   />
                 </div>
               )}
             </div>
-            <p className="image-name-boston" style={{ color: 'white', paddingTop: '100px', marginLeft: '95px' }}>
+            <p
+              className="image-name-boston"
+              style={{
+                color: 'white',
+                paddingTop: '100px',
+                marginLeft: '95px',
+              }}
+            >
               {names[svg.key]}
             </p>
           </div>
@@ -3860,7 +3908,7 @@ function Electrode({
               })}
               {!isNaN(Number(rCon.key)) && (
                 <div className="triple-toggle-boston-test-right">
-                  <TripleToggleTest
+                  {/* <TripleToggleTest
                     key={rCon.key}
                     value={selectedValues[rCon.key]}
                     switchPosition={selectedValues[rCon.key]}
@@ -3874,6 +3922,18 @@ function Electrode({
                     }
                     level={rCon.level}
                     face={rCon.face}
+                  /> */}
+                  <ContactParameters
+                    key={rCon.key}
+                    value={selectedValues[rCon.key]}
+                    switchPosition={selectedValues[rCon.key]}
+                    quantity={quantities[rCon.key]}
+                    onChange={(value, anime) =>
+                      handleTripleToggleChange(value, anime, rCon.key)
+                    }
+                    onQuantityChange={(value, anime, quantity) =>
+                      handleQuantityChange(quantity, rCon.key)
+                    }
                   />
                 </div>
               )}
@@ -3884,7 +3944,7 @@ function Electrode({
           </div>
         ))}
       </div>
-      <div style={{zIndex: '10'}}>
+      <div style={{ zIndex: '10' }}>
         {handleIPG()}
         {radioValue === '2' &&
           (stimController === 0 || stimController === 3) && (

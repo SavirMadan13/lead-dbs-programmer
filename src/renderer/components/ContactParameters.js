@@ -1,96 +1,140 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable react/button-has-type */
-/* eslint-disable react/destructuring-assignment */
-/* eslint-disable react/prop-types */
-import React, { Component } from 'react';
-import './ContactParameters.css';
+import React, { useState, useEffect } from 'react';
+import { ToggleButton, ToggleButtonGroup, TextField } from '@mui/material';
+import { styled, textAlign } from '@mui/system';
 
-class ContactParameters extends Component {
-  constructor(props) {
-    super(props);
+// Styled Components
+const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
+  // border: '1px solid #ccc',
+  // borderRadius: '8px',
+  // padding: '0.5rem 1rem',
+  borderColor: 'transparent',
+  fontSize: '16px',
+  fontWeight: 600,
+  // color: '#333', // Primary text color
+  // color: 'transparent',
+  backgroundColor: 'transparent',
+  '&.Mui-selected': {
+    backgroundColor: 'transparent', // Main primary color
+    color: '#fff', // White text when selected
+    borderColor: 'transparent', // Dark primary color
+  },
+  '&:hover': {
+    backgroundColor: 'transparent', // Light primary color
+    color: '#fff', // White text on hover
+  },
+}));
 
-    // Initialize the component's state with default values
-    this.state = {
-      isPositive: props.imageState?.isPositive || true,
-      isOn: props.imageState?.isOn || false,
-      inputValue: props.imageState?.inputValue || '',
-    };
-  }
+const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  gap: '0rem', // Keep gap at 0
+  '& .MuiToggleButton-root': {
+    marginLeft: '-0.15rem', // Adjust the margin to bring buttons closer
+    marginRight: '-0.15rem',
+  },
+}));
 
-  // Function to handle the toggle of the +/- switch
-  togglePolarity = () => {
-    this.setState((prevState) => ({
-      isPositive: !prevState.isPositive,
-    }));
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  '& .MuiOutlinedInput-root': {
+    // borderRadius: '2px',
+    width: '100px',
+    fontSize: '16px',
+    fontWeight: '200',
+    paddingLeft: '12px',
+    textAlign: 'center',
+    color: 'white',
+    '& fieldset': {
+      borderColor: 'transparent', // Light gray border
+    },
+    '&:hover fieldset': {
+      borderColor: 'transparent', // Main primary color on hover
+    },
+    '&.Mui-focused fieldset': {
+      // borderColor: '#1976d2', // Main primary color when focused
+    },
+  },
+  '& .MuiInputLabel-root': {
+    fontSize: '14px',
+    color: '#fff', // Secondary text color
+  },
+}));
+
+function ContactParameters({
+  value = 'left',
+  switchPosition = 'left',
+  quantity = 0,
+  onChange = () => {},
+  onQuantityChange = () => {},
+}) {
+  const [currentPosition, setCurrentPosition] = useState(switchPosition);
+  const [currentQuantity, setCurrentQuantity] = useState(quantity);
+
+  useEffect(() => {
+    setCurrentPosition(switchPosition);
+    setCurrentQuantity(quantity);
+  }, [switchPosition, quantity]);
+
+  const handleSwitchChange = (event, newPosition) => {
+    if (newPosition !== null) {
+      setCurrentPosition(newPosition);
+      onChange(newPosition);
+
+      if (newPosition === 'left') {
+        setCurrentQuantity(0); // Reset quantity when switching to 'left'
+        onQuantityChange(newPosition, 0);
+      }
+    }
   };
 
-  // Function to handle the toggle of the ON/OFF switch
-  toggleSwitch = () => {
-    this.setState((prevState) => ({
-      isOn: !prevState.isOn,
-    }));
+  const handleQuantityChange = (event) => {
+    const quantityValue = parseInt(event.target.value, 10) || 0;
+
+    if (quantityValue !== 0 && currentPosition === 'left') {
+      setCurrentPosition('center'); // Automatically switch to 'center' if quantity is adjusted from 'left'
+      onChange('center');
+    }
+
+    setCurrentQuantity(quantityValue);
+    onQuantityChange(currentPosition, quantityValue);
   };
 
-  // Function to handle changes in the text box input
-  handleInputChange = (event) => {
-    this.setState({
-      inputValue: event.target.value,
-    });
-  };
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
+      <StyledToggleButtonGroup
+        value={currentPosition}
+        exclusive
+        onChange={handleSwitchChange}
+        aria-label="contact parameters"
+      >
+        <StyledToggleButton value="left" aria-label="left">
+          OFF
+        </StyledToggleButton>
+        <StyledToggleButton value="center" aria-label="center">
+          -
+        </StyledToggleButton>
+        <StyledToggleButton value="right" aria-label="right">
+          +
+        </StyledToggleButton>
+      </StyledToggleButtonGroup>
 
-  // Function to increment the input value
-  incrementValue = () => {
-    this.setState((prevState) => ({
-      inputValue: Number(prevState.inputValue) + 1,
-    }));
-  };
-
-  // Function to decrement the input value
-  decrementValue = () => {
-    this.setState((prevState) => ({
-      inputValue: Number(prevState.inputValue) - 1,
-    }));
-  };
-
-  // Function to update the parent component with the current state
-  // saveChanges = () => {
-  //   this.props.onSave(this.state);
-  // };
-
-  render() {
-    return (
-      <div className="form-container">
-        {/* Display the current state of the +/- switch */}
-        <p>Current Polarity: {this.state.isPositive ? '+' : '-'}</p>
-
-        {/* Render the +/- switch */}
-        <button onClick={this.togglePolarity}>Switch polarity</button>
-
-        {/* Display the current state of the ON/OFF switch */}
-        {/* <p>{this.state.isOn ? 'ON' : 'OFF'}</p> */}
-
-        {/* Render the ON/OFF switch */}
-        <button className="ON-OFF" onClick={this.toggleSwitch}>
-          {this.state.isOn ? 'Turn OFF' : 'Turn ON'}
-        </button>
-
-        {/* Render the input field with buttons */}
-        <div>
-          <button onClick={this.decrementValue}>-</button>
-          <input
-            type="number"
-            value={this.state.inputValue}
-            onChange={this.handleInputChange}
-          />
-          <button onClick={this.incrementValue}>+</button>
-        </div>
-
-        {/* Render a button to save changes */}
-        <button className="save-button">Save</button>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '-30px', marginLeft: '40px' }}>
+        <StyledTextField
+          type="number"
+          inputProps={{ min: 0 }}
+          value={currentQuantity}
+          onChange={handleQuantityChange}
+          size="small"
+          // variant="standard"
+        />
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 export default ContactParameters;
-
