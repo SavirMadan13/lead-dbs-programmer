@@ -911,8 +911,8 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1870 * (1 + -3 * 0.15),
-    height: 1100 * (1 + -3 * 0.1),
+    width: 875,
+    height: 770,
     // maxWidth: 1100, // Maximum width of the window
     // // maxHeight: 1200, // Maximum height of the window
     // minWidth: 1000, // Minimum width of the window
@@ -927,16 +927,16 @@ const createWindow = async () => {
   });
 
   // Set up the resize event listener to recalculate zoom level
-  mainWindow.on('resize', () => {
-    const [currentWidth, currentHeight] = mainWindow.getSize();
+  // mainWindow.on('resize', () => {
+  //   const [currentWidth, currentHeight] = mainWindow.getSize();
 
-    // Calculate the zoom level based on window size change.
-    const baseWidth = 1100; // Default window width
-    const zoomLevel = (currentWidth / baseWidth - 1) / 0.15;
+  //   // Calculate the zoom level based on window size change.
+  //   const baseWidth = 1100; // Default window width
+  //   const zoomLevel = (currentWidth / baseWidth - 1) / 0.15;
 
-    // Send the zoom level to the renderer process
-    mainWindow.webContents.send('zoom-level-changed', zoomLevel);
-  });
+  //   // Send the zoom level to the renderer process
+  //   mainWindow.webContents.send('zoom-level-changed', zoomLevel);
+  // });
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
@@ -1841,19 +1841,19 @@ app
 
 ipcMain.on('zoom-level-changed', (event, zoomLevel) => {
   if (mainWindow) {
-    const newWidth = 2100 * (1 + zoomLevel * 0.1); // Adjust the scale factor as needed
+    const newWidth = 1250 * (1 + zoomLevel * 0.1); // Adjust the scale factor as needed
     const newHeight = 1100 * (1 + zoomLevel * 0.1); // Adjust the scale factor as needed
     mainWindow.setSize(newWidth, newHeight);
   }
 });
 
 // Listen for resize requests
-ipcMain.on('resize-window', (event, width, height) => {
-  // Resize the window based on the received width and height
-  if (width && height) {
-    mainWindow.setSize(width, height);
-  }
-});
+// ipcMain.on('resize-window', (event, width, height) => {
+//   // Resize the window based on the received width and height
+//   if (width && height) {
+//     mainWindow.setSize(width, height);
+//   }
+// });
 
 // ipcMain.on('resize-window-2', (event, width, height) => {
 //   // Optionally set a minimum or maximum size
