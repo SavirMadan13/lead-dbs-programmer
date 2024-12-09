@@ -17,6 +17,10 @@
   right: 10px;
 }
 
+.TabbedIPGContainer {
+  margin-left: -70px;;
+}
+
 .form-container h2{
   font-size: 24px;
   color: #fff;
