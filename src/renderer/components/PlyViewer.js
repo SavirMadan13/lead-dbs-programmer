@@ -2961,6 +2961,44 @@ function PlyViewer({
     }
   };
 
+  const plotNifti = (mniCoordinates) => {
+    const geometry = new THREE.BufferGeometry();
+
+    // Extract positions and colors
+    const positions = [];
+    const colors = [];
+    const color = new THREE.Color();
+
+    mniCoordinates.forEach(([x, y, z, value]) => {
+      // Push positions (scaled if necessary)
+      positions.push(x, y, z);
+
+      // Map value to color (e.g., from blue to red)
+      const intensity = Math.min(Math.max(value, 0), 1); // Normalize to [0, 1]
+      color.setHSL(0.7 * (1 - intensity), 1, 0.5); // Adjust HSL for color mapping
+      colors.push(color.r, color.g, color.b);
+    });
+
+    // Add positions and colors to the geometry
+    geometry.setAttribute(
+      'position',
+      new THREE.Float32BufferAttribute(positions, 3)
+    );
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+    // Create a material
+    const material = new THREE.PointsMaterial({
+      size: 0.5, // Adjust size of points
+      vertexColors: true, // Use colors from geometry
+    });
+
+    // Create the points object
+    const points = new THREE.Points(geometry, material);
+
+    // Add to the scene
+    addMeshToScene('niiVolume', geometry, material);
+  };
+
   const handleNiiUpload = async (event) => {
     try {
       const file = event.target.files[0];
@@ -3040,9 +3078,10 @@ function PlyViewer({
 
           console.log('MNI Coordinates:', mniCoordinates);
 
+          plotNifti(mniCoordinates);
           // Set the state with the transformed coordinates
-          setNiiCoords(mniCoordinates);
-          handleNiiMap(mniCoordinates);
+          // setNiiCoords(mniCoordinates);
+          // handleNiiMap(mniCoordinates);
         } catch (error) {
           console.error('Error processing NIfTI file:', error);
         }
