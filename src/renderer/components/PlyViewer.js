@@ -89,8 +89,6 @@ function PlyViewer({
     );
   };
 
-
-
   // Current working model
   // useEffect(() => {
   //   const loadNiftiFile = async () => {
@@ -176,7 +174,7 @@ function PlyViewer({
   //   loadNiftiFile();
   // }, []);
 
-  /////////////// CSV ////////////
+  /// //////////// CSV ////////////
 
   // useEffect(() => {
   //   const loadCSVFile = async () => {
@@ -1095,13 +1093,15 @@ function PlyViewer({
           radius: sphere.geometry.parameters.radius || 0, // Save amplitude, fallback to 0 if undefined
         });
       } else {
-        console.warn(`Sphere with contactId ${contactId} is invalid or missing.`);
+        console.warn(
+          `Sphere with contactId ${contactId} is invalid or missing.`,
+        );
       }
       return acc;
     }, []);
 
     if (sphereData.length === 0) {
-      console.error("No valid spheres to save.");
+      console.error('No valid spheres to save.');
       return;
     }
 
@@ -1118,14 +1118,23 @@ function PlyViewer({
     if (distance >= radius1 + radius2) return 0; // No overlap
     if (distance <= Math.abs(radius1 - radius2)) {
       // One sphere is completely inside the other
-      return 4 / 3 * Math.PI * Math.pow(Math.min(radius1, radius2), 3);
+      return (4 / 3) * Math.PI * Math.min(radius1, radius2) ** 3;
     }
 
     const r1 = radius1;
     const r2 = radius2;
     const d = distance;
 
-    const volume1 = (Math.PI * (r1 + r2 - d) ** 2 * (d ** 2 + 2 * d * r2 - 3 * r2 ** 2 + 2 * d * r1 + 6 * r2 * r1 - 3 * r1 ** 2)) / (12 * d);
+    const volume1 =
+      (Math.PI *
+        (r1 + r2 - d) ** 2 *
+        (d ** 2 +
+          2 * d * r2 -
+          3 * r2 ** 2 +
+          2 * d * r1 +
+          6 * r2 * r1 -
+          3 * r1 ** 2)) /
+      (12 * d);
     return volume1;
   };
 
@@ -1136,13 +1145,19 @@ function PlyViewer({
     const overlaps = [];
     for (let i = 0; i < savedSpheresData.length; i++) {
       for (let j = i + 1; j < savedSpheresData.length; j++) {
-        const overlap = calculateOverlap(savedSpheresData[i][0], savedSpheresData[j][0]);
+        const overlap = calculateOverlap(
+          savedSpheresData[i][0],
+          savedSpheresData[j][0],
+        );
         overlaps.push({
           pair: [savedSpheresData[i][0].id, savedSpheresData[j][0].id],
-          overlapPercent: (overlap / Math.min(
-            4 / 3 * Math.PI * Math.pow(savedSpheresData[i][0].radius, 3),
-            4 / 3 * Math.PI * Math.pow(savedSpheresData[j][0].radius, 3)
-          )) * 100,
+          overlapPercent:
+            (overlap /
+              Math.min(
+                (4 / 3) * Math.PI * savedSpheresData[i][0].radius ** 3,
+                (4 / 3) * Math.PI * savedSpheresData[j][0].radius ** 3,
+              )) *
+            100,
         });
       }
     }
@@ -2015,7 +2030,7 @@ function PlyViewer({
         if (togglePosition === 'center') {
           updatedQuantities[contact] = updatedV[contact - 1];
         } else {
-          updatedQuantities[contact] = 100 * updatedV[contact - 1] / totalAmp;
+          updatedQuantities[contact] = (100 * updatedV[contact - 1]) / totalAmp;
         }
       } else {
         updatedQuantities[contact] = 0;
@@ -2370,7 +2385,9 @@ function PlyViewer({
 
         // Create an orthogonal basis for the electrode
         const up = new THREE.Vector3(0, 0, 1); // Assuming 'up' is along the global Z-axis
-        const right = new THREE.Vector3().crossVectors(direction, up).normalize();
+        const right = new THREE.Vector3()
+          .crossVectors(direction, up)
+          .normalize();
         const forward = new THREE.Vector3()
           .crossVectors(right, direction)
           .normalize();
@@ -2982,7 +2999,7 @@ function PlyViewer({
     // Add positions and colors to the geometry
     geometry.setAttribute(
       'position',
-      new THREE.Float32BufferAttribute(positions, 3)
+      new THREE.Float32BufferAttribute(positions, 3),
     );
     geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
 
@@ -2999,7 +3016,10 @@ function PlyViewer({
     addMeshToScene('niiVolume', geometry, material);
   };
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleNiiUpload = async (event) => {
+    setIsLoading(true); // Show spinner
     try {
       const file = event.target.files[0];
       if (!file) {
@@ -3078,12 +3098,16 @@ function PlyViewer({
 
           console.log('MNI Coordinates:', mniCoordinates);
 
-          plotNifti(mniCoordinates);
+          // plotNifti(mniCoordinates);
           // Set the state with the transformed coordinates
-          // setNiiCoords(mniCoordinates);
-          // handleNiiMap(mniCoordinates);
+          setNiiCoords(mniCoordinates);
+          handleNiiMap(mniCoordinates);
+          // setIsLoading(false); // Hide spinner
         } catch (error) {
           console.error('Error processing NIfTI file:', error);
+          // setIsLoading(false); // Hide spinner
+        } finally {
+          setIsLoading(false); // Hide spinner
         }
       };
 
@@ -3119,19 +3143,19 @@ function PlyViewer({
   //   window.electron.zoom.setZoomLevel(-3);
   // }, []);
 
-  const [searchCoordinate, setSearchCoordinate] = useState("");
+  const [searchCoordinate, setSearchCoordinate] = useState('');
   const [matchingAtlases, setMatchingAtlases] = useState([]);
 
   const handleCoordinateSearch = async () => {
     if (!searchCoordinate) {
-      alert("Please enter a valid coordinate.");
+      alert('Please enter a valid coordinate.');
       return;
     }
 
     // Parse the coordinate input (assuming comma-separated x, y, z)
-    const [x, y, z] = searchCoordinate.split(",").map(Number);
+    const [x, y, z] = searchCoordinate.split(',').map(Number);
     if ([x, y, z].some(isNaN)) {
-      alert("Please enter valid numeric coordinates in the format x,y,z.");
+      alert('Please enter valid numeric coordinates in the format x,y,z.');
       return;
     }
 
@@ -3144,8 +3168,8 @@ function PlyViewer({
       try {
         // Load and parse the PLY file
         const fileData = await window.electron.ipcRenderer.invoke(
-          "load-ply-file-2",
-          path
+          'load-ply-file-2',
+          path,
         );
         const geometry = loader.parse(fileData);
 
@@ -3178,7 +3202,6 @@ function PlyViewer({
     }
     return false;
   };
-
 
   return (
     <div>
@@ -3248,26 +3271,26 @@ function PlyViewer({
               {/* Tab for Atlases */}
               <Tab eventKey="atlases" title="Atlases">
                 <div style={controlPanelStyle2}>
-                <input
-                  type="text"
-                  placeholder="Enter coordinates (x,y,z)"
-                  value={searchCoordinate}
-                  onChange={(e) => setSearchCoordinate(e.target.value)}
-                  style={{ marginBottom: "10px", width: "300px" }}
-                />
-                <button onClick={handleCoordinateSearch}>Search</button>
-                <div style={{ marginTop: "20px" }}>
-                  <h4>Matching Atlases:</h4>
-                  {matchingAtlases.length > 0 ? (
-                    <ul>
-                      {matchingAtlases.map((file, index) => (
-                        <li key={index}>{file.name}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p>No matching atlases found.</p>
-                  )}
-                </div>
+                  <input
+                    type="text"
+                    placeholder="Enter coordinates (x,y,z)"
+                    value={searchCoordinate}
+                    onChange={(e) => setSearchCoordinate(e.target.value)}
+                    style={{ marginBottom: '10px', width: '300px' }}
+                  />
+                  <button onClick={handleCoordinateSearch}>Search</button>
+                  <div style={{ marginTop: '20px' }}>
+                    <h4>Matching Atlases:</h4>
+                    {matchingAtlases.length > 0 ? (
+                      <ul>
+                        {matchingAtlases.map((file, index) => (
+                          <li key={index}>{file.name}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>No matching atlases found.</p>
+                    )}
+                  </div>
                   <select
                     onChange={handleFileChange}
                     multiple
@@ -3596,7 +3619,9 @@ function PlyViewer({
                       </Button> */}
                       <Button
                         variant="primary"
-                        onClick={() => document.getElementById('nifti-upload').click()}
+                        onClick={() =>
+                          document.getElementById('nifti-upload').click()
+                        }
                         className="mb-4 mx-2"
                       >
                         Import NIfTI File and Provide Solution
@@ -3608,12 +3633,22 @@ function PlyViewer({
                         accept=".nii"
                         onChange={(e) => handleNiiUpload(e)}
                       />
+                      {isLoading && (
+                        <div className="d-flex justify-content-center mt-3">
+                          <div
+                            className="spinner-border text-primary"
+                            role="status"
+                          >
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                        </div>
+                      )}
                       {/* <span>{solutionText}</span> */}
                       <span>{niiSolution}</span>
-                      <button onClick={saveCurrentSpheres}>Save Spheres</button>
-                      <button onClick={() => calculatePercentOverlap(savedSpheres.current)}>
+                      {/* <Button onClick={saveCurrentSpheres}>Save Spheres</Button>
+                      <Button onClick={() => calculatePercentOverlap(savedSpheres.current)}>
                         Compare Overlap
-                      </button>
+                      </Button> */}
                     </div>
                   </div>
                 </div>
