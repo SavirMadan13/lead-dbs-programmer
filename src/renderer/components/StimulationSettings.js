@@ -587,22 +587,22 @@ function StimulationSettings({
     }
   }
 
-  const fileInputRef = useRef(null);
+  // const fileInputRef = useRef(null);
   const [newStims, setNewStims] = useState([]);
-  const handleImportFileChange = (e) => {
-    // console.log('E: ', masterImportData);
-    console.log('NewStims ', newStims.includes(e.target.value));
-    // if (!newStims.includes(e.target.value)) {
-    window.electron.ipcRenderer.sendMessage(
-      'import-previous-files',
-      e.target.value,
-      // key,
-      masterImportData,
-    );
-    // }
-    setMatImportFile(e.target.value);
-    setStimChanged(true);
-  };
+  // const handleImportFileChange = (e) => {
+  //   // console.log('E: ', masterImportData);
+  //   console.log('NewStims ', newStims.includes(e.target.value));
+  //   // if (!newStims.includes(e.target.value)) {
+  //   window.electron.ipcRenderer.sendMessage(
+  //     'import-previous-files',
+  //     e.target.value,
+  //     // key,
+  //     masterImportData,
+  //   );
+  //   // }
+  //   setMatImportFile(e.target.value);
+  //   setStimChanged(true);
+  // };
 
   const handleOnAddButtonClick = () => {
     // console.log
@@ -730,42 +730,42 @@ function StimulationSettings({
       </div>
       <div>
         {/* {(leftElectrode || rightElectrode) && ( */}
-          <ManageElectrode
-            IPG={IPG}
-            selectedElectrodeLeft={leftElectrode}
-            selectedElectrodeRight={rightElectrode}
-            // key={renderKey}
-            // setKey={setKey}
-            allQuantities={allQuantities}
-            setAllQuantities={setAllQuantities}
-            allSelectedValues={allSelectedValues}
-            setAllSelectedValues={setAllSelectedValues}
-            allTotalAmplitudes={allTotalAmplitudes}
-            setAllTotalAmplitudes={setAllTotalAmplitudes}
-            allStimulationParameters={allStimulationParameters}
-            setAllStimulationParameters={setAllStimulationParameters}
-            visModel={visModel}
-            setVisModel={setVisModel}
-            sessionTitle={sessionTitle}
-            setSessionTitle={setSessionTitle}
-            allTogglePositions={allTogglePositions}
-            setAllTogglePositions={setAllTogglePositions}
-            allPercAmpToggles={allPercAmpToggles}
-            setAllPercAmpToggles={setAllPercAmpToggles}
-            allVolAmpToggles={allVolAmpToggles}
-            setAllVolAmpToggles={setAllVolAmpToggles}
-            filePath={filePath}
-            setFilePath={setFilePath}
-            matImportFile={matImportFile}
-            stimChanged={stimChanged}
-            setStimChanged={setStimChanged}
-            patientStates={patientStates}
-            namingConvention={namingConvention}
-            selectedPatient={selectedPatient}
-            historical={historical}
-            mode={mode}
-            templateS={importNewS}
-          />
+        <ManageElectrode
+          IPG={IPG}
+          selectedElectrodeLeft={leftElectrode}
+          selectedElectrodeRight={rightElectrode}
+          // key={renderKey}
+          // setKey={setKey}
+          allQuantities={allQuantities}
+          setAllQuantities={setAllQuantities}
+          allSelectedValues={allSelectedValues}
+          setAllSelectedValues={setAllSelectedValues}
+          allTotalAmplitudes={allTotalAmplitudes}
+          setAllTotalAmplitudes={setAllTotalAmplitudes}
+          allStimulationParameters={allStimulationParameters}
+          setAllStimulationParameters={setAllStimulationParameters}
+          visModel={visModel}
+          setVisModel={setVisModel}
+          sessionTitle={sessionTitle}
+          setSessionTitle={setSessionTitle}
+          allTogglePositions={allTogglePositions}
+          setAllTogglePositions={setAllTogglePositions}
+          allPercAmpToggles={allPercAmpToggles}
+          setAllPercAmpToggles={setAllPercAmpToggles}
+          allVolAmpToggles={allVolAmpToggles}
+          setAllVolAmpToggles={setAllVolAmpToggles}
+          filePath={filePath}
+          setFilePath={setFilePath}
+          matImportFile={matImportFile}
+          stimChanged={stimChanged}
+          setStimChanged={setStimChanged}
+          patientStates={patientStates}
+          namingConvention={namingConvention}
+          selectedPatient={selectedPatient}
+          historical={historical}
+          mode={mode}
+          templateS={importNewS}
+        />
         {/* )} */}
       </div>
     </div>

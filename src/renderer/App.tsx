@@ -57,6 +57,7 @@ export default function App() {
   };
   window.electron.ipcRenderer.sendMessage('load-ply-file', null);
   window.electron.ipcRenderer.sendMessage('import-inputdata-file', ['ping']);
+  window.electron.ipcRenderer.sendMessage('ipc-example', ['ping']);
   // Function to check if the folder structure matches Lead-DBS
   const checkLeadDBSFolder = async (path) => {
     try {

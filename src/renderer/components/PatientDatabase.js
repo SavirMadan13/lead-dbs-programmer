@@ -173,6 +173,7 @@ function PatientDatabase({ key, directoryPath }) {
 
   useEffect(() => {
     window.electron.ipcRenderer.on('file-read-success', (patientsData) => {
+      console.log(patientsData);
       setPatients(patientsData); // Set the patients from the JSON file
     });
 

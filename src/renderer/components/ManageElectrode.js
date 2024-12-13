@@ -1087,6 +1087,7 @@ function ManageElectrode({
     const initialpercAmpToggle = allPercAmpToggles[key] || 'left';
     const initialVolAmpToggle = allVolAmpToggles[key] || 'center';
     const initialVisModel = visModel || '3';
+    const initialTotalAmplitude = 0;
     for (let i = 0; i < elspec.numel; i++) {
       initialSelectedValues[i + 1] = 'left';
       initialQuantityBoston[i + 1] = 0;
@@ -1129,15 +1130,23 @@ function ManageElectrode({
       });
     }
 
+    if (!allTotalAmplitudes[key]) {
+      setAllTotalAmplitudes({
+        ...allTotalAmplitudes,
+        [key]: initialTotalAmplitude,
+      });
+    }
+
     // For visModel, ensure it's set only if it's not already set
     if (!visModel) {
       setVisModel(initialVisModel);
-    }    console.log('All Quantities from initialize: ', newInitialQuantities);
+    }
+    console.log('All Quantities from initialize: ', newInitialQuantities);
   };
 
   useEffect(() => {
     initializeElectrodeVariables();
-  }, [IPG, selectedElectrodeLeft, selectedElectrodeRight]);
+  }, [IPG, selectedElectrodeLeft, selectedElectrodeRight, key]);
 
   const gatherImportedData = (jsonData) => {
     const newQuantities = {

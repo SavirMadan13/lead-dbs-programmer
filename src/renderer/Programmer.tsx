@@ -5,6 +5,8 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import GroupArchitecture from './components/GroupArchitecture';
 import { PatientContext } from './components/PatientContext';
+import initializeS from './components/InitializeS';
+import electrodeModels from './components/electrodeModels.json';
 
 function Programmer() {
   const electrodeList: any[] = [];
@@ -152,71 +154,12 @@ function Programmer() {
     },
   ];
 
-  // const handleImportedElectrode = (importedElectrode) => {
-  //   switch (importedElectrode) {
-  //     case 'Boston Scientific Vercise Directed':
-  //       return 'boston_vercise_directed';
-  //     case 'Medtronic 3389':
-  //       return 'medtronic_3389';
-  //     case 'Medtronic 3387':
-  //       return 'medtronic_3387';
-  //     case 'Medtronic 3391':
-  //       return 'medtronic_3391';
-  //     case 'Medtronic B33005':
-  //       return 'medtronic_b33005';
-  //     case 'Medtronic B33015':
-  //       return 'medtronic_b33015';
-  //     case 'Boston Scientific Vercise':
-  //       return 'boston_scientific_vercise';
-  //     case 'Boston Scientific Vercise Cartesia HX':
-  //       return 'boston_scientific_vercise_cartesia_hx';
-  //     case 'Boston Scientific Vercise Cartesia X':
-  //       return 'boston_scientific_vercise_cartesia_x';
-  //     case 'Abbott ActiveTip (6146-6149)':
-  //       return 'abott_activetip_2mm';
-  //     case 'Abbott ActiveTip (6142-6145)':
-  //       return 'abbott_activetip_3mm';
-  //     case 'Abbott Directed 6172 (short)':
-  //       return 'abbott_directed_05';
-  //     case 'Abbott Directed 6173 (long)':
-  //       return 'abott_directed_15';
-  //     default:
-  //       return '';
-  //   }
-  // };
-
   const handleImportedElectrode = (importedElectrode) => {
     const electrodeInfo = varargout.find(
       (item) => item.displayName === importedElectrode,
     );
     return electrodeInfo ? electrodeInfo.value : 'boston_vercise_directed';
   };
-
-  // const handleIPG = (importedElectrode) => {
-  //   if (
-  //     importedElectrode.includes('Boston') ||
-  //     importedElectrode.includes('boston')
-  //   ) {
-  //     return 'Boston';
-  //   }
-  //   if (
-  //     importedElectrode.includes('Abbott') ||
-  //     importedElectrode.includes('abbott')
-  //   ) {
-  //     return 'Abbott';
-  //   }
-  //   if (
-  //     importedElectrode === 'Medtronic 3387' ||
-  //     importedElectrode === 'Medtronic 3389' ||
-  //     importedElectrode === 'medtronic_3387' ||
-  //     importedElectrode === 'medtronic_3389' ||
-  //     importedElectrode === 'medtronic_3391' ||
-  //     importedElectrode === 'Medtronic 3391'
-  //   ) {
-  //     return 'Medtronic_Activa';
-  //   }
-  //   return 'Medtronic_Percept';
-  // };
 
   const handleIPG = (importedElectrode) => {
     if (importedElectrode.includes('Boston')) {
@@ -238,46 +181,13 @@ function Programmer() {
     return 'Research';
   };
 
-  // const [baseElec, setBaseElec] = useState(null);
-
-  // useEffect(() => {
-  //   const loadPlyFile = async () => {
-  //     try {
-  //       const fileData = await window.electron.ipcRenderer.invoke(
-  //         'load-vis-coords',
-  //         location.state,
-  //       );
-  //       // setPlyFile(fileData);
-  //       console.log(fileData.elmodel);
-  //       setBaseElec(fileData.elmodel);
-  //     } catch (error) {
-  //       console.error('Error loading PLY file:', error);
-  //     }
-  //   };
-
-  //   loadPlyFile(); // Call the async function
-  // }, []);
-
-  window.electron.ipcRenderer.sendMessage(
-    'import-file',
-    patient.id,
-    timeline,
-    directoryPath,
-    leadDBS,
-  );
-
-  // This effect will run once `baseElec` is set
-  // useEffect(() => {
-  //   if (baseElec) { // Only send message if baseElec is not null
-  //     window.electron.ipcRenderer.sendMessage(
-  //       'import-file',
-  //       patient.id,
-  //       timeline,
-  //       directoryPath,
-  //       leadDBS,
-  //     );
-  //   }
-  // }, [baseElec]); // Runs whenever baseElec changes
+  // window.electron.ipcRenderer.sendMessage(
+  //   'import-file',
+  //   patient.id,
+  //   timeline,
+  //   directoryPath,
+  //   leadDBS,
+  // );
 
   function generateUniqueID() {
     const currentDate = new Date();
@@ -287,148 +197,6 @@ function Programmer() {
     const randomNums = Math.floor(Math.random() * 1000000); // Generate random 4-digit number
     return `${year}${month}${day}${randomNums}`;
   }
-
-  // const gatherImportedDataNew = (jsonData, outputIPG) => {
-  //   console.log(jsonData);
-
-  //   const newQuantities = {};
-  //   const newSelectedValues = {};
-  //   const newTotalAmplitude = {};
-  //   const newAllQuantities = {};
-  //   const newAllVolAmpToggles = {};
-
-  //   console.log('Imported Amplitude: ', jsonData.amplitude);
-
-  //   for (let j = 1; j < 5; j++) {
-  //     try {
-  //       newTotalAmplitude[j] = jsonData.amplitude[1][j - 1];
-  //       newTotalAmplitude[j + 4] = jsonData.amplitude[0][j - 1];
-  //     } catch {
-  //       console.log('');
-  //     }
-
-  //     try {
-  //       newTotalAmplitude[j] = jsonData.amplitude.leftAmplitude[j - 1];
-  //       newTotalAmplitude[j + 4] = jsonData.amplitude.rightAmplitude[j - 1];
-  //     } catch {
-  //       console.log('');
-  //     }
-
-  //     console.log('newTotalAmplitude: ', newTotalAmplitude);
-
-  //     const dynamicKey2 = `Ls${j}`;
-  //     const dynamicKey3 = `Rs${j}`;
-  //     if (jsonData[dynamicKey2].va === 2) {
-  //       newAllVolAmpToggles[j] = 'center';
-  //     } else if (jsonData[dynamicKey2].va === 1) {
-  //       newAllVolAmpToggles[j] = 'right';
-  //     }
-
-  //     if (jsonData[dynamicKey3].va === 2) {
-  //       newAllVolAmpToggles[j + 4] = 'center';
-  //     } else if (jsonData[dynamicKey3].va === 1) {
-  //       newAllVolAmpToggles[j + 4] = 'right';
-  //     }
-
-  //     for (let i = 0; i < 9; i++) {
-  //       const dynamicKey = `k${i + 7}`;
-  //       const dynamicKey1 = `k${i}`;
-
-  //       if (jsonData[dynamicKey2] && jsonData[dynamicKey2][dynamicKey]) {
-  //         newQuantities[j] = newQuantities[j] || {};
-  //         newQuantities[j][i] = parseFloat(
-  //           jsonData[dynamicKey2][dynamicKey].perc,
-  //         );
-  //         newQuantities[j][0] = parseFloat(jsonData[dynamicKey2].case.perc);
-
-  //         const { pol } = jsonData[dynamicKey2][dynamicKey];
-  //         newSelectedValues[j] = newSelectedValues[j] || {};
-  //         newSelectedValues[j][i] =
-  //           pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
-
-  //         const casePol = jsonData[dynamicKey2].case.pol;
-  //         newSelectedValues[j][0] =
-  //           casePol === 0 ? 'left' : casePol === 1 ? 'center' : 'right';
-  //       }
-
-  //       if (jsonData[dynamicKey3] && jsonData[dynamicKey3][dynamicKey1]) {
-  //         newQuantities[j + 4] = newQuantities[j + 4] || {};
-  //         newQuantities[j + 4][i + 1] = parseFloat(
-  //           jsonData[dynamicKey3][dynamicKey1].perc,
-  //         );
-  //         newQuantities[j + 4][0] = parseFloat(jsonData[dynamicKey3].case.perc);
-
-  //         const { pol } = jsonData[dynamicKey3][dynamicKey1];
-  //         newSelectedValues[j + 4] = newSelectedValues[j + 4] || {};
-  //         newSelectedValues[j + 4][i + 1] =
-  //           pol === 0 ? 'left' : pol === 1 ? 'center' : 'right';
-
-  //         const casePol = jsonData[dynamicKey3].case.pol;
-  //         newSelectedValues[j + 4][0] =
-  //           casePol === 0 ? 'left' : casePol === 1 ? 'center' : 'right';
-  //       }
-  //     }
-
-  //     newAllQuantities[j] = newQuantities[j];
-  //     newAllQuantities[j + 4] = newQuantities[j + 4];
-  //   }
-
-  //   const filteredValues = Object.keys(newSelectedValues)
-  //     .filter((key) => Object.keys(newSelectedValues[key]).length > 0)
-  //     .reduce((obj, key) => {
-  //       obj[key] = newSelectedValues[key];
-  //       return obj;
-  //     }, {});
-
-  //   const filteredQuantities = Object.keys(newQuantities)
-  //     .filter((key) => Object.keys(newQuantities[key]).length > 0)
-  //     .reduce((obj, key) => {
-  //       obj[key] = newQuantities[key];
-  //       return obj;
-  //     }, {});
-
-  //   console.log('filtered', filteredQuantities);
-  //   let outputVisModel = '3';
-  //   if (jsonData.model === 'Dembek 2017') {
-  //     outputVisModel = '1';
-  //   } else if (jsonData.model === 'Fastfield (Baniasadi 2020)') {
-  //     outputVisModel = '2';
-  //   } else if (jsonData.model === 'Kuncel 2008') {
-  //     outputVisModel = '4';
-  //   } else if (jsonData.model === 'Maedler 2012') {
-  //     outputVisModel = '5';
-  //   } else if (jsonData.model === 'OSS-DBS (Butenko 2020)') {
-  //     outputVisModel = '6';
-  //   }
-
-  //   console.log('TEST!L: ', outputIPG);
-  //   if (outputIPG.includes('Medtronic')) {
-  //     Object.keys(filteredQuantities).forEach((key) => {
-  //       console.log('Test: ', filteredQuantities[key]);
-  //       Object.keys(filteredQuantities[key]).forEach((key2) => {
-  //         filteredQuantities[key][key2] =
-  //           (filteredQuantities[key][key2] / 100) * newTotalAmplitude[key];
-  //       });
-  //     });
-  //   }
-
-  //   Object.keys(newAllVolAmpToggles).forEach((key) => {
-  //     if (newAllVolAmpToggles[key] === 1) {
-  //       setIpgMaster('Medtronic_Activa');
-  //       return '';
-  //     }
-  //   });
-
-  //   return {
-  //     filteredQuantities,
-  //     filteredValues,
-  //     newTotalAmplitude,
-  //     outputVisModel,
-  //     newAllVolAmpToggles,
-  //   };
-
-  //   // Need to add some type of filtering here that detects whether it is Medtronic Activa, and then needs to put just mA values, not %
-  // };
 
   const gatherImportedDataNew = (jsonData, importedElectrode) => {
     console.log('S: ', jsonData);
@@ -578,14 +346,83 @@ function Programmer() {
     console.log('Processing stimulation data: ', stimulationData);
     setTotalS(stimulationData.S);
     setMode(stimulationData.mode);
+    console.log('Stimulation Mode: ', stimulationData.mode);
     window.electron.ipcRenderer.sendMessage('revert-to-standard', '');
     let initialStates = {}; // Initialize the object to store the processed states
+    if (stimulationData.mode === 'standalone') {
+      if (!timelineOutput[timeline]) {
+        let electrodes = 'Boston Vercise Directed';
+        const outputElectrode = handleImportedElectrode(electrodes);
+        const patientData = initializeS(timeline, electrodeModels[outputElectrode].numel);
+        const processedS = patientData
+        ? gatherImportedDataNew(patientData, electrodes)
+        : {
+            filteredQuantities: {},
+            filteredValues: {},
+            newTotalAmplitude: {},
+            outputVisModel: '3',
+            newAllVolAmpToggles: {},
+            outputIPG: handleIPG(electrodes),
+            newAllTogglePositions: {},
+          };
+        initialStates[timeline] = {
+          ...initialState,
+          leftElectrode: outputElectrode,
+          rightElectrode: outputElectrode,
+          IPG: processedS.outputIPG,
+          allQuantities: processedS.filteredQuantities,
+          allSelectedValues: processedS.filteredValues,
+          allTotalAmplitudes: processedS.newTotalAmplitude,
+          visModel: processedS.outputVisModel,
+          allVolAmpToggles: processedS.newAllVolAmpToggles,
+          allTogglePositions: processedS.newAllTogglePositions,
+        };
+      }
+      // Iterate over each key in the timelineOutput object
+      Object.keys(timelineOutput).forEach((key, index) => {
+        console.log(`Processing timeline for patient ${key}`);
+        console.log('Timeline Output: ', timelineOutput);
+        let electrodes = 'Boston Vercise Directed';
+        const currentTimeline = key;
+        const patientData = timelineOutput[key].S;
+
+        const outputElectrode = handleImportedElectrode(electrodes);
+
+        const processedS = patientData
+          ? gatherImportedDataNew(patientData, electrodes)
+          : {
+              filteredQuantities: {},
+              filteredValues: {},
+              newTotalAmplitude: {},
+              outputVisModel: '3',
+              newAllVolAmpToggles: {},
+              outputIPG: handleIPG(electrodes),
+              newAllTogglePositions: {},
+            };
+
+        // Store the processed state for each patient
+        initialStates[currentTimeline] = {
+          ...initialState,
+          leftElectrode: outputElectrode,
+          rightElectrode: outputElectrode,
+          IPG: processedS.outputIPG,
+          allQuantities: processedS.filteredQuantities,
+          allSelectedValues: processedS.filteredValues,
+          allTotalAmplitudes: processedS.newTotalAmplitude,
+          visModel: processedS.outputVisModel,
+          allVolAmpToggles: processedS.newAllVolAmpToggles,
+          allTogglePositions: processedS.newAllTogglePositions,
+        };
+      });
+      return initialStates;
+    }
+
     if (stimulationData.type === 'leaddbs') {
       // Iterate over each key in the timelineOutput object
       Object.keys(timelineOutput).forEach((key, index) => {
         console.log(`Processing timeline for patient ${key}`);
         console.log('Timeline Output: ', timelineOutput);
-        let electrodes = stimulationData.electrodeModels;
+        let electrodes = stimulationData.electrodeModels || 'Boston Vercise Directed';
         if (stimulationData.filepath.includes('leadgroup')) {
           const patientIndex = stimulationData.patientname.findIndex((name) => name === patient.id);
           const electrodeModel = stimulationData.electrodeModels[patientIndex];
@@ -666,114 +503,6 @@ function Programmer() {
     return initialStates;
   };
 
-  // useEffect(() => {
-  //   if (directoryPath && patient) {
-  //     // Fetch stimulationData first
-  //     window.electron.ipcRenderer
-  //       .invoke('get-stimulation-data', '')
-  //       .then((stimulationData) => {
-  //         // Check if stimulationData.type is "leaddbs"
-  //         if (stimulationData.type === 'leaddbs') {
-  //           console.log(
-  //             "Stimulation data is of type 'leaddbs':",
-  //             stimulationData,
-  //           );
-
-  //           // Proceed with fetching timelines
-  //           return window.electron.ipcRenderer
-  //             .invoke('get-timelines', directoryPath, patient.id, leadDBS)
-  //             .then(async (receivedTimelines) => {
-  //               console.log('Received timelines:', receivedTimelines);
-
-  //               // Filter timelines with stimulation
-  //               const stimulationTimelines = receivedTimelines.filter(
-  //                 (timelineData) => timelineData.hasStimulation,
-  //               );
-
-  //               console.log(
-  //                 'Timelines with stimulation:',
-  //                 stimulationTimelines,
-  //               );
-
-  //               // Process timelines with stimulation
-  //               const timelineResults = await Promise.all(
-  //                 stimulationTimelines.map(async (timelineData) => {
-  //                   const { timeline } = timelineData;
-  //                   try {
-  //                     const importResult =
-  //                       await window.electron.ipcRenderer.invoke(
-  //                         'import-file-2',
-  //                         directoryPath,
-  //                         patient.id,
-  //                         timeline,
-  //                         leadDBS,
-  //                       );
-  //                     return { timeline, data: importResult };
-  //                   } catch (error) {
-  //                     console.error(
-  //                       `Error importing timeline ${timeline}:`,
-  //                       error,
-  //                     );
-  //                     return { timeline, data: null }; // Handle errors gracefully
-  //                   }
-  //                 }),
-  //               );
-
-  //               console.log('Processed timeline results:', timelineResults);
-
-  //               // Aggregate results into a structured format
-  //               const timelineOutput = timelineResults.reduce((acc, result) => {
-  //                 if (result.data) {
-  //                   acc[result.timeline] = result.data;
-  //                 }
-  //                 return acc;
-  //               }, {});
-
-  //               console.log('Final timeline output:', timelineOutput);
-  //               const initialStates = handleTimelines(
-  //                 timelineOutput,
-  //                 stimulationData,
-  //               );
-  //               console.log('Initial States: ', initialStates);
-  //               setPatientStates(initialStates);
-  //               const tmppatients = Object.keys(initialStates);
-  //               console.log('TEMPPatients: ', tmppatients);
-  //               setPatients(tmppatients);
-  //             });
-  //         } else if (stimulationData.type === 'leadgroup') {
-  //           const patientIds = allPatients.patients.map((patient) => patient.id);
-  //           console.log('patient ids: ', patientIds);
-  //           console.log("Stimulation data type is not 'leaddbs'. Skipping...");
-  //           const timelineResults = await Promise.all(
-  //             patientIds.map(async (timelineData) => {
-  //               const { patientId } = timelineData;
-  //               try {
-  //                 const importResult =
-  //                   await window.electron.ipcRenderer.invoke(
-  //                     'import-file-2',
-  //                     directoryPath,
-  //                     patientId,
-  //                     stimulationData.label,
-  //                     leadDBS,
-  //                   );
-  //                 return { patientId, data: importResult };
-  //               } catch (error) {
-  //                 console.error(
-  //                   `Error importing timeline ${patientId}:`,
-  //                   error,
-  //                 );
-  //                 return { patientId, data: null }; // Handle errors gracefully
-  //               }
-  //             }),
-  //           );
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         console.error('Error fetching stimulation data or timelines:', error);
-  //       });
-  //   }
-  // }, [directoryPath, patient, leadDBS]);
-
   useEffect(() => {
     const fetchData = async () => {
       if (!directoryPath || !patient) return;
@@ -784,6 +513,8 @@ function Programmer() {
           'get-stimulation-data',
           '',
         );
+
+        // const stimulationData = getData('stimulationData');
 
         if (stimulationData.type === 'leaddbs') {
           console.log(
