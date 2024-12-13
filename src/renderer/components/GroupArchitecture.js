@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 
 import Dropdown from 'react-bootstrap/dropdown';
 import { Slider } from '@mui/material';
-import TabbedElectrodeIPGSelectionTest from './TabbedElectrodeIPGSelectionTest';
 // import Navbar from './components/Navbar';
 // import Navbar from 'react-bootstrap/Navbar'
 import StimulationSettings from './StimulationSettings';

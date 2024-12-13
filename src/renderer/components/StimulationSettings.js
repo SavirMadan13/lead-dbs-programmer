@@ -1,16 +1,11 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable react/prop-types */
 // import { useState } from 'react';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
-import InputGroup from 'react-bootstrap/InputGroup';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import { Dropdown } from 'react-bootstrap';
-import TabbedElectrodeIPGSelectionTest from './TabbedElectrodeIPGSelectionTest';
-import BostonCartesiaTest from './electrode_models/BostonCartesiaTest';
 import electrodeModels from './electrodeModels.json';
 import ManageElectrode from './ManageElectrode';
 

@@ -10,8 +10,6 @@ import PatientDetails from './components/PatientDetails';
 import { PatientProvider } from './components/PatientContext';
 import Programmer from './Programmer';
 import ClinicalScores from './components/ClinicalScores';
-import PlyViewer from './components/PlyViewer';
-import PlyViewerWithVTA from './components/PlyViewerWithVTA';
 import CustomTable from './components/CustomTable';
 import GroupStats from './components/GroupStats';
 import DatabaseStats from './components/DatabaseStats';

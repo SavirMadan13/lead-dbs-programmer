@@ -9,8 +9,6 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import StimulationSettings from './StimulationSettings';
-import AssistedToggle from './AssistedToggle';
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 // import { FaHamburger, FaSun, FaMoon } from 'react-icons/fa';
