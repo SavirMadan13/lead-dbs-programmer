@@ -353,18 +353,21 @@ function Programmer() {
       if (!timelineOutput[timeline]) {
         let electrodes = 'Boston Vercise Directed';
         const outputElectrode = handleImportedElectrode(electrodes);
-        const patientData = initializeS(timeline, electrodeModels[outputElectrode].numel);
+        const patientData = initializeS(
+          timeline,
+          electrodeModels[outputElectrode].numel,
+        );
         const processedS = patientData
-        ? gatherImportedDataNew(patientData, electrodes)
-        : {
-            filteredQuantities: {},
-            filteredValues: {},
-            newTotalAmplitude: {},
-            outputVisModel: '3',
-            newAllVolAmpToggles: {},
-            outputIPG: handleIPG(electrodes),
-            newAllTogglePositions: {},
-          };
+          ? gatherImportedDataNew(patientData, electrodes)
+          : {
+              filteredQuantities: {},
+              filteredValues: {},
+              newTotalAmplitude: {},
+              outputVisModel: '3',
+              newAllVolAmpToggles: {},
+              outputIPG: handleIPG(electrodes),
+              newAllTogglePositions: {},
+            };
         initialStates[timeline] = {
           ...initialState,
           leftElectrode: outputElectrode,
@@ -422,9 +425,12 @@ function Programmer() {
       Object.keys(timelineOutput).forEach((key, index) => {
         console.log(`Processing timeline for patient ${key}`);
         console.log('Timeline Output: ', timelineOutput);
-        let electrodes = stimulationData.electrodeModels || 'Boston Vercise Directed';
+        let electrodes =
+          stimulationData.electrodeModels || 'Boston Vercise Directed';
         if (stimulationData.filepath.includes('leadgroup')) {
-          const patientIndex = stimulationData.patientname.findIndex((name) => name === patient.id);
+          const patientIndex = stimulationData.patientname.findIndex(
+            (name) => name === patient.id,
+          );
           const electrodeModel = stimulationData.electrodeModels[patientIndex];
           console.log('Electrode model: ', electrodeModel);
           electrodes = electrodeModel;
@@ -1036,7 +1042,11 @@ function Programmer() {
 
     console.log('Output Data: ', outputData);
     const filePath = '';
-    window.electron.ipcRenderer.sendMessage('save-file-stimulate', '', outputData);
+    window.electron.ipcRenderer.sendMessage(
+      'save-file-stimulate',
+      '',
+      outputData,
+    );
     // window.electron.ipcRenderer.sendMessage('close-window');
   };
 
