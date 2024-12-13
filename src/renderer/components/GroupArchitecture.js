@@ -25,6 +25,7 @@ function GroupArchitecture({
   electrodeMaster,
   ipgMaster,
   historical,
+  setHistorical,
   mode,
   timeline,
 }) {
@@ -191,6 +192,10 @@ function GroupArchitecture({
     const currentIndex = patients.indexOf(selectedPatient);
     const previousIndex =
       (currentIndex - 1 + patients.length) % patients.length;
+    const updatedHistorical = { ...historical };
+    updatedHistorical.patient.id = patients[previousIndex];
+    updatedHistorical.timeline = patients[previousIndex];
+    setHistorical(updatedHistorical);
     setSelectedPatient(patients[previousIndex]);
     setRenderKey(renderKey + 1);
   };
@@ -198,6 +203,10 @@ function GroupArchitecture({
   const handleNextPatient = () => {
     const currentIndex = patients.indexOf(selectedPatient);
     const nextIndex = (currentIndex + 1) % patients.length;
+    const updatedHistorical = { ...historical };
+    updatedHistorical.patient.id = patients[nextIndex];
+    updatedHistorical.timeline = patients[nextIndex];
+    setHistorical(updatedHistorical);
     setSelectedPatient(patients[nextIndex]);
     setRenderKey(renderKey + 1);
   };

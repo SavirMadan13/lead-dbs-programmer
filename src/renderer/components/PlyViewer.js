@@ -41,7 +41,7 @@ function PlyViewer({
   const secondaryRendererRef = useRef(null);
   const cameraRef = useRef(null); // To store the camera reference
   const secondaryCameraRef = useRef(null);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [recoData, setRecoData] = useState(null);
   const [elecCoords, setElecCoords] = useState(null);
   const [roi, setRoi] = useState('tremor-0');
@@ -49,9 +49,10 @@ function PlyViewer({
   const [niiCoords, setNiiCoords] = useState(null);
   const [plotNiiCoords, setPlotNiiCoords] = useState({});
   const [niiSolution, setNiiSolution] = useState('');
-
+  console.log('Historical ply: ', historical);
   // Thresholding/Modification stuff
 
+  // Don't forget **********************
   useEffect(() => {
     // This loads in the combined electrodes for the selected patient
     const loadPlyFile = async () => {
@@ -204,6 +205,8 @@ function PlyViewer({
   //   loadCSVFile();
   // }, []);
 
+
+  // ******************* Don't forget 8=
   useEffect(() => {
     // This loads the anatomy.ply scene
     const loadPlyFile = async () => {
@@ -648,7 +651,7 @@ function PlyViewer({
     3: 3,
     4: 4,
   };
-  if (Object.keys(quantities).length > 6) {
+  if (elspec.numel > 6) {
     // contactDirections = {
     //   1: { x: 0, y: 0, z: 0 }, // Example directional adjustment for contact 1
     //   2: { x: 1, y: 0, z: 0 }, // Contact 2 adjustment
@@ -2890,7 +2893,10 @@ function PlyViewer({
     const sphereCoords = elecCoords;
     console.log(elecCoords);
     // const v = [0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75];
-    const v = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5];
+    const v =
+      elspec.numel === 8
+        ? [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+        : [1, 1, 1, 1];
     // const v = [1, 1, 1, 1];
     // const L = niiCoords;
     const L = importedCoords;
@@ -2945,7 +2951,7 @@ function PlyViewer({
       index === activeContact ? finalAmplitude : equalAmplitude,
     );
     console.log(updatedV);
-    setPlotNiiCoords(reducedL);
+    // setPlotNiiCoords(reducedL);
     // const reducedLJSON = JSON.stringify(normalizedPlotNiiCoords, null, 2);
 
     // // Create a Blob and download it

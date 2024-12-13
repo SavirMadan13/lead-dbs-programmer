@@ -15,6 +15,7 @@ function Programmer() {
   const [electrodeMaster, setElectrodeMaster] = useState('');
   const [ipgMaster, setIpgMaster] = useState('');
   const allPatients = useContext(PatientContext);
+  const [totalS, setTotalS] = useState({});
   console.log('All Patients: ', allPatients);
 
   const location = useLocation();
@@ -575,6 +576,7 @@ function Programmer() {
   const handleTimelines = (timelineOutput, stimulationData) => {
     console.log('Processing timelines:', timelineOutput);
     console.log('Processing stimulation data: ', stimulationData);
+    setTotalS(stimulationData.S);
     setMode(stimulationData.mode);
     window.electron.ipcRenderer.sendMessage('revert-to-standard', '');
     let initialStates = {}; // Initialize the object to store the processed states
@@ -907,6 +909,408 @@ function Programmer() {
     }
   };
 
+  const activeContacts = (valuesArray) => {
+    const activeContactsArray = [];
+    Object.keys(valuesArray).forEach((thing) => {
+      // console.log(thing);
+      if (thing !== 0) {
+        if (valuesArray[thing] === 'left') {
+          activeContactsArray.push(0);
+        } else {
+          activeContactsArray.push(1);
+        }
+      }
+    });
+    activeContactsArray.shift();
+    console.log(activeContactsArray);
+    return activeContactsArray;
+  };
+
+  const calculatePercentageFromAmplitude = (quantities, totalAmplitude) => {
+    const updatedQuantities = { ...quantities };
+    Object.keys(updatedQuantities).forEach((element) => {
+      updatedQuantities[element] =
+        (parseFloat(updatedQuantities[element]) * 100) / totalAmplitude;
+    });
+    console.log(updatedQuantities);
+    return updatedQuantities;
+  };
+
+  const calculateVoltageFromAmplitude = (quantities) => {
+    const updatedQuantities = { ...quantities };
+    Object.keys(updatedQuantities).forEach((element) => {
+      if (quantities[element] !== 0) {
+        updatedQuantities[element] = 100;
+      }
+    });
+    return updatedQuantities;
+  };
+
+  const handleTogglePositions = (
+    allQuantities,
+    allTotalAmplitudes,
+    allTogglePositions,
+  ) => {
+    let outputQuantities = {};
+    console.log(allQuantities);
+    console.log(allTotalAmplitudes);
+    console.log(allTogglePositions);
+    const updatedQuantities = { ...allQuantities };
+    Object.keys(allTogglePositions).forEach((position) => {
+      allTogglePositions[position] = 'mA';
+      if (allTogglePositions[position] === 'mA') {
+        console.log('position', position);
+        console.log('quantity: ', allTogglePositions);
+        console.log(allTotalAmplitudes[position]);
+        console.log(allQuantities[position]);
+        outputQuantities = calculatePercentageFromAmplitude(
+          allQuantities[position],
+          parseFloat(allTotalAmplitudes[position]),
+        );
+        // const updatedQuantities = {
+        //   ...allQuantities,
+        //   [position]: outputQuantities,
+        // };
+        updatedQuantities[position] = outputQuantities;
+        console.log('updaredQuantities: ', updatedQuantities);
+        outputQuantities = updatedQuantities;
+      } else if (allTogglePositions[position] === 'V') {
+        outputQuantities = calculateVoltageFromAmplitude(
+          allQuantities[position],
+        );
+        // const updatedQuantities = {
+        //   ...allQuantities,
+        //   [position]: outputQuantities,
+        // };
+        updatedQuantities[position] = outputQuantities;
+        outputQuantities = updatedQuantities;
+      } else {
+        outputQuantities[position] = allQuantities[position];
+      }
+      // return '';
+    });
+    // console.log(updatedQuantities);
+    return outputQuantities;
+  };
+
+  const translatePolarity = (sideValue) => {
+    let polar = 0;
+    if (sideValue === 'center') {
+      polar = 1;
+    } else if (sideValue === 'right') {
+      polar = 2;
+    }
+
+    return polar;
+  };
+
+  function handleExportAmplitude(amplitudeList) {
+    const exportAmplitudeList = [];
+    Object.keys(amplitudeList).forEach((thing) => {
+      exportAmplitudeList.push(parseFloat(amplitudeList[thing]));
+    });
+    exportAmplitudeList.shift();
+    return exportAmplitudeList;
+  }
+
+  const gatherExportedData5 = (
+    allTotalAmplitudes,
+    allQuantities,
+    allSelectedValues,
+    selectedElectrodeLeft,
+    selectedElectrodeRight,
+    IPG,
+    visModel,
+    allTogglePositions,
+    allPercAmpToggles,
+    index,
+    // allTemplateSpaces,
+  ) => {
+    // handleFileChange('1');
+    // saveQuantitiesandValues();
+    let updatedOutputQuantity = {};
+    updatedOutputQuantity = handleTogglePositions(
+      allQuantities,
+      allTotalAmplitudes,
+      allTogglePositions,
+    );
+    console.log('Updated output quantity: ', updatedOutputQuantity);
+    // parseAllVariables();
+    const exportAmplitudeData = handleExportAmplitude(allTotalAmplitudes);
+    // console.log(exportAmplitudeData);
+    const leftHemiArr = [];
+    const rightHemiArr = [];
+    console.log(importNewS);
+    const data = {
+      S: {
+        ...totalS[index],
+      },
+    };
+    console.log('Data: ', data);
+    // const data = {
+    //   S: {
+    //     label: groupLabel,
+    //     Rs1: {},
+    //     Rs2: {},
+    //     Rs3: {},
+    //     Rs4: {},
+    //     Ls1: {},
+    //     Ls2: {},
+    //     Ls3: {},
+    //     Ls4: {},
+    //     active: {},
+    //     model: '',
+    //     monopolarmodel: 0,
+    //     amplitude: {},
+    //     activecontacts: [],
+    //     template: 'warp',
+    //     sources: {},
+    //     // elmodel: {},
+    //     // ipg: IPG,
+    //     ver: '2.0',
+    //   },
+    // };
+
+    // data.S.elmodel = [selectedElectrodeLeft, selectedElectrodeRight];
+    const programs = Object.keys(allQuantities);
+    const firstProgram = programs[0];
+    console.log('Programs: ', programs);
+    console.log('length', programs[0]);
+
+    const loopSize = Object.keys(allQuantities[firstProgram]).length;
+    // console.log('loopSize: ', loopSize);
+    // data.S.label = 'Num1';
+    const activeArray = [];
+    const leftAmpArray = [];
+
+    for (let j = 1; j < 5; j++) {
+      const dynamicKey2 = `Ls${j}`;
+      if (allSelectedValues[j] && updatedOutputQuantity[j]) {
+        // Need to change the i = 9 to number of electrodes to accomodate for 16 contact electrodes
+        for (let i = 1; i < loopSize; i++) {
+          let polarity = 0;
+          if (allSelectedValues[j][i] === 'left') {
+            polarity = 0;
+          } else if (allSelectedValues[j][i] === 'center') {
+            polarity = 1;
+          } else if (allSelectedValues[j][i] === 'right') {
+            polarity = 2;
+          }
+          const dynamicKey = `k${i}`;
+          data.S[dynamicKey2][dynamicKey] = {
+            perc: parseFloat(updatedOutputQuantity[j][i]),
+            pol: polarity,
+            imp: 1,
+          };
+        }
+        data.S[dynamicKey2].case = {
+          perc: parseFloat(updatedOutputQuantity[j][0]),
+          pol: translatePolarity(allSelectedValues[j][0]),
+        };
+        data.S[dynamicKey2].amp = parseFloat(allTotalAmplitudes[j]);
+        // data.S[dynamicKey2].frequency = parseFloat(
+        //   allStimulationParameters[j].parameter2,
+        // );
+        // data.S[dynamicKey2].pulseWidth = parseFloat(
+        //   allStimulationParameters[j].parameter1,
+        // );
+        data.S[dynamicKey2].va = 2;
+        if (allTogglePositions[j] === 'V') {
+          data.S[dynamicKey2].va = 1;
+        }
+        activeArray.push(j);
+        leftAmpArray[j] = parseFloat(allTotalAmplitudes[j]);
+        // console.log(activeContacts(allSelectedValues[j]));
+        leftHemiArr[j - 1] = activeContacts(allSelectedValues[j]);
+        data.S.activecontacts[j - 1] = activeContacts(allSelectedValues[j]);
+        // console.log(data.S.activecontacts);
+      } else {
+        for (let i = 1; i < loopSize; i++) {
+          const dynamicKey = `k${i}`;
+          data.S[dynamicKey2][dynamicKey] = {
+            perc: 0,
+            pol: 0,
+            imp: 1,
+          };
+        }
+        data.S[dynamicKey2].case = {
+          perc: 0,
+          pol: 0,
+        };
+        data.S[dynamicKey2].amp = 0;
+        data.S[dynamicKey2].frequency = 0;
+        data.S[dynamicKey2].pulseWidth = 0;
+        data.S[dynamicKey2].va = 0;
+      }
+    }
+    const leftLength = activeArray.length;
+    const newActiveArray = [];
+    const rightAmpArray = [];
+
+    for (let j = 1; j < 5; j++) {
+      const dynamicKey2 = `Rs${j}`;
+      if (allSelectedValues[j + 4] && updatedOutputQuantity[j + 4]) {
+        for (let i = 1; i < loopSize; i++) {
+          let polarity = 0;
+          if (allSelectedValues[j + 4][i] === 'left') {
+            polarity = 0;
+          } else if (allSelectedValues[j + 4][i] === 'center') {
+            polarity = 1;
+          } else if (allSelectedValues[j + 4][i] === 'right') {
+            polarity = 2;
+          }
+          const dynamicKey = `k${i}`;
+          data.S[dynamicKey2][dynamicKey] = {
+            perc: parseFloat(updatedOutputQuantity[j + 4][i]),
+            pol: polarity,
+            imp: 1,
+          };
+        }
+        data.S[dynamicKey2].case = {
+          perc: parseFloat(updatedOutputQuantity[j + 4][0]),
+          pol: translatePolarity(allSelectedValues[j + 4][0]),
+        };
+        data.S[dynamicKey2].amp = parseFloat(allTotalAmplitudes[j + 4]);
+        // data.S[dynamicKey2].frequency = parseFloat(
+        //   allStimulationParameters[j + 4].parameter2,
+        // );
+        // data.S[dynamicKey2].pulseWidth = parseFloat(
+        //   allStimulationParameters[j + 4].parameter1,
+        // );
+        data.S[dynamicKey2].va = 2;
+        if (allTogglePositions[j + 4] === 'V') {
+          data.S[dynamicKey2].va = 1;
+        }
+        activeArray.push(j + 4);
+        newActiveArray.push(j);
+        console.log('All Selected Values: ', j);
+        // rightHemiArr[j - 1] = activeContacts(allSelectedValues[j]);
+        data.S.activecontacts[j + 3] = activeContacts(allSelectedValues[j + 4]);
+        // rightAmpArray[j + 4] = parseFloat(allTotalAmplitudes[j + 4]);
+      } else {
+        for (let i = 1; i < loopSize; i++) {
+          const dynamicKey = `k${i}`;
+          data.S[dynamicKey2][dynamicKey] = {
+            perc: 0,
+            pol: 0,
+            imp: 1,
+          };
+        }
+        data.S[dynamicKey2].case = {
+          perc: 0,
+          pol: 0,
+        };
+        data.S[dynamicKey2].amp = 0;
+        data.S[dynamicKey2].frequency = 0;
+        data.S[dynamicKey2].pulseWidth = 0;
+        data.S[dynamicKey2].va = 0;
+      }
+    }
+    // data.S.activecontacts.push(rightHemiArr);
+    // data.S.activecontacts.push(leftHemiArr);
+    // const totalAmpArray = leftAmpArray.push(rightAmpArray);
+    // data.S.amplitude{1} = leftAmpArray;
+    // data.S.amplitude{2} = rightAmpArray;
+    const leftAmplitude = [];
+    const rightAmplitude = [];
+    for (let i = 1; i < 5; i++) {
+      if (allTotalAmplitudes[i]) {
+        leftAmplitude.push(parseFloat(allTotalAmplitudes[i]));
+      } else {
+        leftAmplitude.push(0);
+      }
+    }
+    for (let i = 5; i < 9; i++) {
+      if (allTotalAmplitudes[i]) {
+        rightAmplitude.push(parseFloat(allTotalAmplitudes[i]));
+      } else {
+        rightAmplitude.push(0);
+      }
+    }
+    data.S.amplitude = { rightAmplitude, leftAmplitude };
+    // data.S.amplitude = exportAmplitudeData;
+    // console.log(exportAmplitudeData);
+    const sourcesArray = activeArray;
+    const rightLength = newActiveArray.length;
+    data.S.sources = sourcesArray;
+    // data.S.active = [leftLength, rightLength];
+    data.S.active = [1, 1];
+    // data.S.activecontacts = activeContacts(allSelectedValues[1]);
+
+    for (let i = 1; i < 9; i++) {
+      const zerosArr = [];
+      for (let j = 1; j < loopSize; j++) {
+        zerosArr.push(0);
+      }
+      if (data.S.activecontacts[i - 1]) {
+        if (data.S.activecontacts[i - 1] === null) {
+          data.S.activecontacts[i - 1] = zerosArr;
+        }
+      } else {
+        data.S.activecontacts[i - 1] = zerosArr;
+      }
+    }
+
+    let exportVisModel = '';
+    // visModel[1] = visModel;
+    // console.log(visModel[1]);
+    if (visModel === '1') {
+      console.log('here');
+      exportVisModel = 'Dembek 2017';
+    } else if (visModel === '2') {
+      exportVisModel = 'Fastfield (Baniasadi 2020)';
+    } else if (visModel === '3') {
+      exportVisModel = 'SimBio/FieldTrip (see Horn 2017)';
+    } else if (visModel === '4') {
+      exportVisModel = 'Kuncel 2008';
+    } else if (visModel === '5') {
+      exportVisModel = 'Maedler 2012';
+    } else if (visModel === '6') {
+      exportVisModel = 'OSS-DBS (Butenko 2020)';
+    }
+    // console.log('export vis model', exportVisModel);
+    data.S.model = exportVisModel;
+    // data.S.estimateInTemplate = allTemplateSpaces;
+    // if (Array.isArray(data.S.activecontacts) && data.S.activecontacts.length > 0 && data.S.activecontacts[0] === undefined) {
+    //   data.S.activecontacts.shift();
+    // }
+    console.log(data.S.activecontacts);
+    return data;
+  };
+
+  const handleExport = () => {
+    console.log('Patient States for Export', patientStates);
+    const outputData = [];
+    try {
+      Object.values(patientStates).forEach((tempStates, index) => {
+        console.log('TempStates: ', tempStates);
+        const tempData = gatherExportedData5(
+          tempStates.allTotalAmplitudes,
+          tempStates.allQuantities,
+          tempStates.allSelectedValues,
+          tempStates.leftElectrode,
+          tempStates.rightElectrode,
+          tempStates.IPG,
+          tempStates.visModel,
+          tempStates.allTogglePositions,
+          tempStates.allPercAmpToggles,
+          index,
+          // tempStates.allTemplateSpaces,
+        );
+        outputData[index] = tempData; // Using index instead of key
+      });
+    } catch (err) {
+      console.log(err);
+    }
+
+    console.log('Output Data: ', outputData);
+    const filePath = '';
+    window.electron.ipcRenderer.sendMessage('save-file-stimulate', '', outputData);
+    // window.electron.ipcRenderer.sendMessage('close-window');
+  };
+
+  const [historical, setHistorical] = useState(location.state);
+
   return (
     <div>
       {patientName && (
@@ -927,7 +1331,8 @@ function Programmer() {
             importNewS={importNewS}
             electrodeMaster={electrodeMaster}
             ipgMaster={ipgMaster}
-            historical={location.state}
+            historical={historical}
+            setHistorical={setHistorical}
             mode={mode}
             timeline={timeline}
           />
@@ -936,6 +1341,15 @@ function Programmer() {
       <div style={{ paddingLeft: '150px', marginTop: '-80px' }}>
         <button className="export-button" onClick={() => navigate(-1)}>
           Back to Patient Details
+        </button>
+      </div>
+      <div>
+        <button
+          className="export-button-final"
+          onClick={handleExport}
+          style={{ marginRight: '15px' }}
+        >
+          Save and Close
         </button>
       </div>
     </div>
