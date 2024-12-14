@@ -1,4 +1,4 @@
-name: Build Application
+name: Build and Package LeadDBS Stimcontroller
 
 on:
   push:
@@ -10,19 +10,19 @@ on:
 
 jobs:
   build:
-    name: Build Application on Different OS
+    name: Build and Package on Different OS
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      # Checkout the repository
+      # Check out the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
       # Set up Node.js
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
@@ -33,21 +33,22 @@ jobs:
 
       # Build the application
       - name: Build application
-        run: npm run package
+        run: npm run build
 
-      # Cache node_modules for faster builds
-      - name: Cache node_modules
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
+      # Package the application
+      - name: Package application
+        run: |
+          if [[ $RUNNER_OS == 'Windows' ]]; then
+            npm run package:win
+          elif [[ $RUNNER_OS == 'Linux' ]]; then
+            npm run package:linux
+          elif [[ $RUNNER_OS == 'macOS' ]]; then
+            npm run package
+          fi
 
-      # Archive build artifacts
+      # Upload the packaged artifacts
       - name: Upload build artifacts
-        if: success()
         uses: actions/upload-artifact@v3
         with:
-          name: build-artifacts-${{ matrix.os }}
-          path: dist/ # Adjust the path if your build output is different
+          name: packaged-app-${{ matrix.os }}
+          path: release/build/
