@@ -1,7 +1,7 @@
 import { app, ipcMain } from 'electron';
 import path from 'path';
 import { getData, setData } from '../data/data';
-import { getPatientFolder } from '../helpers/helpers';
+import { getPatientFolder, getPatientFolderPly } from '../helpers/helpers';
 
 const fs = require('fs');
 
@@ -305,4 +305,68 @@ export default function registerFileHandlers() {
       event.reply('import-file-clinical-group', outputData);
     },
   );
+
+  // PLY Viewer ipc functions
+
+  ipcMain.handle('load-ply-file', async (event, historical) => {
+    const { patient, timeline, directoryPath, leadDBS } = historical;
+    if (leadDBS) {
+      const patientPath = getPatientFolderPly(
+        directoryPath,
+        patient.id,
+        leadDBS,
+      );
+      const filePath = path.join(
+        patientPath,
+        'export/ply/combined_electrodes.ply',
+      );
+      const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
+      return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
+    }
+    return 'No ply file found'; // Return as ArrayBuffer // send the file contents back to renderer process
+  });
+
+  ipcMain.handle('load-ply-file-anatomy', async (event, historical) => {
+    const { patient, timeline, directoryPath, leadDBS } = historical;
+    if (leadDBS) {
+      const patientPath = getPatientFolderPly(
+        directoryPath,
+        patient.id,
+        leadDBS,
+      );
+      const filePath = path.join(patientPath, 'export/ply/anatomy.ply');
+      const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
+      return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
+    }
+    return 'No ply file found'; // Return as ArrayBuffer // send the file contents back to renderer process
+  });
+
+  ipcMain.handle('load-vis-coords', async (event, historical) => {
+    const { patient, timeline, directoryPath, leadDBS } = historical;
+    if (leadDBS) {
+      const patientPath = getPatientFolderPly(
+        directoryPath,
+        patient.id,
+        leadDBS,
+      );
+      const filePath = path.join(
+        patientPath,
+        'clinical',
+        `${patient.id}_desc-reconstruction.json`,
+      );
+      const fileData = fs.readFileSync(filePath, 'utf8'); // Read the PLY file as binary
+      const jsonData = JSON.parse(fileData); // Parse the string into a JSON object
+      return jsonData; // Return as ArrayBuffer // send the file contents back to renderer process
+    }
+    return 'No coords found'; // Return as ArrayBuffer // send the file contents back to renderer process
+  });
+
+  ipcMain.handle('load-ply-file-2', async (event, filePath) => {
+    try {
+      const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
+      return fileData.buffer; // Return as ArrayBuffer
+    } catch (error) {
+      return null;
+    }
+  });
 }

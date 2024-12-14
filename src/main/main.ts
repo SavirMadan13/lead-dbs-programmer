@@ -18,7 +18,11 @@ import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import registerFileHandlers from './ipc/ipcHandlers';
 import { getData, setData } from './data/data';
-import { getPatientFolder, readJSON } from './helpers/helpers';
+import {
+  getPatientFolder,
+  readJSON,
+  getPatientFolderPly,
+} from './helpers/helpers';
 
 ipcMain.setMaxListeners(Infinity);
 
@@ -42,8 +46,8 @@ app.on('ready', () => {
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons/derivatives/leadgroup/BwhParkinsons/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataBwh.json';
 // const inputPath = '/Users/savirmadan/Documents/SanteGroup/derivatives/leadgroup/2024nov5V2/inputData.json';
-// const inputPath = '/Users/savirmadan/Documents/LeadGroupDemo/derivatives/leadgroup/20241007203440/inputData.json';
-const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0362Output/derivatives/leaddbs/sub-CbctDbs0362/stimulations/MNI152NLin2009bAsym/inputData.json';
+const inputPath = '/Users/savirmadan/Documents/LeadGroupDemo/derivatives/leadgroup/20241007203440/inputData.json';
+// const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0362Output/derivatives/leaddbs/sub-CbctDbs0362/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0370Output/derivatives/leaddbs/sub-CbctDbs0370/stimulations/MNI152NLin2009bAsym/inputData.json';
 class AppUpdater {
   constructor() {
@@ -68,6 +72,7 @@ ipcMain.on('import-inputdata-file', async (event, arg) => {
     if (stats.isDirectory()) {
       stimulationData.mode = 'standalone';
       stimulationData.type = 'leaddbs';
+      stimulationData.path = inputPath; // change to process.argv[1]
       setData('stimulationData', stimulationData);
       event.reply('import-inputdata-file', stimulationData);
       return;
@@ -976,7 +981,8 @@ const createWindow = async () => {
     // const leadPath = datasetDescription[0].Lead_Path;
     // console.log('Lead Path: ', leadPath);
     const stimulationData = getData('stimulationData');
-    const leadPath = stimulationData.leadpath;
+    // const leadPath = stimulationData.leadpath;
+    const leadPath = '/Users/savirmadan/Documents/GitHub/leaddbs';
     // Step 3: Go to the 'atlases' folder within the Lead_Path
     const atlasesPath = path.join(
       leadPath,
@@ -1062,55 +1068,6 @@ const createWindow = async () => {
     return loadDirectoryPath();
   });
 
-  const getPatientFolderPly = (directoryPath, patientId, leadDBS) => {
-    let newFolderPath = ''; // Declare newFolderPath with a default value
-    console.log('Stimulation Data: ', stimulationData.type);
-    console.log('Directory Path: ', directoryPath);
-    console.log('LeadDBS: ', leadDBS);
-    console.log('Check: ', stimulationData.filepath.includes('leadgroup'));
-    let outputFolderPath = '';
-    if (stimulationData.type === 'leadgroup' || stimulationData.filepath.includes('leadgroup')) {
-      // Ensure patientname is an array
-      const patientIndex = stimulationData.patientname.findIndex(
-        (name) => name === patientId,
-      );
-      console.log('Patient Index: ', patientIndex);
-      // Check if patientIndex is valid
-      console.log(stimulationData.patientfolders[0][patientIndex]);
-      newFolderPath = stimulationData.patientfolders[0][patientIndex];
-      outputFolderPath = newFolderPath;
-    } else if (stimulationData.type === 'leaddbs') {
-      outputFolderPath = path.join(stimulationData.filepath, 'derivatives/leaddbs', patientId);
-    }
-    return outputFolderPath;
-  };
-
-  ipcMain.handle('load-ply-file', async (event, historical) => {
-    const { patient, timeline, directoryPath, leadDBS } = historical;
-    if (leadDBS) {
-      const patientPath = getPatientFolderPly(
-        directoryPath,
-        patient.id,
-        leadDBS,
-      );
-      console.log('patient path: ', patientPath);
-      // const filePath = path.join(
-      //   directoryPath,
-      //   'derivatives/leaddbs',
-      //   patient.id,
-      //   'export/ply/combined_electrodes.ply',
-      // );
-      const filePath = path.join(patientPath, 'export/ply/combined_electrodes.ply');
-      const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
-      return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
-    }
-    const filePath =
-      '/Volumes/Expansion/OLD/Output/Patient0316Output/derivatives/leaddbs/sub-CbctDbs0316/export/ply/combined_electrodes.ply';
-    console.log(filePath);
-    const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
-    return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
-  });
-
   // ipcMain.handle('load-nii-file', async (event, historical) => {
   //   const { patient, timeline, directoryPath, leadDBS } = historical;
   //   if (leadDBS) {
@@ -1149,87 +1106,6 @@ const createWindow = async () => {
   //   const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
   //   return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
   // });
-
-  ipcMain.handle('load-ply-file-anatomy', async (event, historical) => {
-    const { patient, timeline, directoryPath, leadDBS } = historical;
-    if (leadDBS) {
-      // const filePath = path.join(
-      //   directoryPath,
-      //   'derivatives/leaddbs',
-      //   patient.id,
-      //   'export/ply/anatomy.ply',
-      // );
-      const patientPath = getPatientFolderPly(
-        directoryPath,
-        patient.id,
-        leadDBS,
-      );
-      console.log('patient path: ', patientPath);
-      // const filePath = path.join(
-      //   directoryPath,
-      //   'derivatives/leaddbs',
-      //   patient.id,
-      //   'export/ply/combined_electrodes.ply',
-      // );
-      const filePath = path.join(patientPath, 'export/ply/anatomy.ply');
-
-      const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
-      return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
-    }
-    const filePath =
-      '/Volumes/Expansion/OLD/Output/Patient0316Output/derivatives/leaddbs/sub-CbctDbs0316/export/ply/anatomy.ply';
-    console.log(filePath);
-    const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
-    return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
-  });
-
-  ipcMain.handle('load-vis-coords', async (event, historical) => {
-    const { patient, timeline, directoryPath, leadDBS } = historical;
-    if (leadDBS) {
-      // const filePath = path.join(
-      //   directoryPath,
-      //   'derivatives/leaddbs',
-      //   patient.id,
-      //   'clinical',
-      //   `${patient.id}_desc-reconstruction.json`,
-      // );
-      const patientPath = getPatientFolderPly(
-        directoryPath,
-        patient.id,
-        leadDBS,
-      );
-      console.log('patient path: ', patientPath);
-      // const filePath = path.join(
-      //   directoryPath,
-      //   'derivatives/leaddbs',
-      //   patient.id,
-      //   'export/ply/combined_electrodes.ply',
-      // );
-      const filePath = path.join(
-        patientPath,
-        'clinical',
-        `${patient.id}_desc-reconstruction.json`,
-      );
-      const fileData = fs.readFileSync(filePath, 'utf8'); // Read the PLY file as binary
-      const jsonData = JSON.parse(fileData); // Parse the string into a JSON object
-      return jsonData; // Return as ArrayBuffer // send the file contents back to renderer process
-    }
-    const filePath =
-      '/Volumes/Expansion/OLD/Output/Patient0316Output/derivatives/leaddbs/sub-CbctDbs0316/export/ply/anatomy.ply';
-    console.log(filePath);
-    const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
-    return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
-  });
-
-  ipcMain.handle('load-ply-file-2', async (event, filePath) => {
-    try {
-      const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
-      return fileData.buffer; // Return as ArrayBuffer
-    } catch (error) {
-      console.error('Error reading file:', error);
-      return null;
-    }
-  });
 
   ipcMain.handle(
     'load-ply-file-database',

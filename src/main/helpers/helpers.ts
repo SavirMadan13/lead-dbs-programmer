@@ -22,7 +22,7 @@ function getPatientFolder(
   if (!stimulationData) {
     return path.join(directoryPath, `sub-${patientId}`);
   }
-  console.log(stimulationData);
+  // console.log(stimulationData);
   if (stimulationData.mode === 'standalone') {
     return path.join(
       directoryPath,
@@ -108,6 +108,42 @@ function readJSON(filePath) {
   }
 }
 
+function getPatientFolderPly(directoryPath, patientId, leadDBS) {
+  let newFolderPath = ''; // Declare newFolderPath with a default value
+  const stimulationData = getData('stimulationData');
+  let outputFolderPath = '';
+  if (stimulationData.mode === 'standalone') {
+    outputFolderPath = path.join(
+      directoryPath,
+      'derivatives',
+      'leaddbs',
+      `${patientId}`,
+    );
+    return outputFolderPath;
+  }
+  if (
+    stimulationData.type === 'leadgroup' ||
+    stimulationData.filepath.includes('leadgroup')
+  ) {
+    // Ensure patientname is an array
+    const patientIndex = stimulationData.patientname.findIndex(
+      (name) => name === patientId,
+    );
+    console.log('Patient Index: ', patientIndex);
+    // Check if patientIndex is valid
+    console.log(stimulationData.patientfolders[0][patientIndex]);
+    newFolderPath = stimulationData.patientfolders[0][patientIndex];
+    outputFolderPath = newFolderPath;
+  } else if (stimulationData.type === 'leaddbs') {
+    outputFolderPath = path.join(
+      stimulationData.filepath,
+      'derivatives/leaddbs',
+      patientId,
+    );
+  }
+  return outputFolderPath;
+}
+
 // Export all helper functions
 export {
   getPatientFolder,
@@ -115,4 +151,5 @@ export {
   getRelativePath,
   fileExistsInDirectory,
   readJSON,
+  getPatientFolderPly,
 };
