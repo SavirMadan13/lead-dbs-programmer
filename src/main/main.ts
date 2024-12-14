@@ -38,12 +38,12 @@ app.on('ready', () => {
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0374Output/derivatives/leaddbs/sub-CbctDbs0374/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
 // const inputPath = process.argv[1];
-const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
+// const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons/derivatives/leadgroup/BwhParkinsons/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataBwh.json';
 // const inputPath = '/Users/savirmadan/Documents/SanteGroup/derivatives/leadgroup/2024nov5V2/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/LeadGroupDemo/derivatives/leadgroup/20241007203440/inputData.json';
-// const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0362Output/derivatives/leaddbs/sub-CbctDbs0362/stimulations/MNI152NLin2009bAsym/inputData.json';
+const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0362Output/derivatives/leaddbs/sub-CbctDbs0362/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0370Output/derivatives/leaddbs/sub-CbctDbs0370/stimulations/MNI152NLin2009bAsym/inputData.json';
 class AppUpdater {
   constructor() {
@@ -1079,19 +1079,9 @@ const createWindow = async () => {
       console.log(stimulationData.patientfolders[0][patientIndex]);
       newFolderPath = stimulationData.patientfolders[0][patientIndex];
       outputFolderPath = newFolderPath;
+    } else if (stimulationData.type === 'leaddbs') {
+      outputFolderPath = path.join(stimulationData.filepath, 'derivatives/leaddbs', patientId);
     }
-    // let patientFolder = '';
-    // if (leadDBS) {
-    //   if (stimulationData.type === 'leadgroup' || stimulationData.filepath.includes('leadgroup')) {
-    //     patientFolder = path.join(newFolderPath, 'clinical');
-    //   } else {
-    //     console.log('Made it here');
-    //     patientFolder = path.join(directoryPath, 'derivatives', 'leaddbs', `${patientId}`, 'clinical');
-    //     console.log('Pt Folder: ', patientFolder);
-    //   }
-    // } else {
-    //   patientFolder = path.join(directoryPath, `sub-${patientId}`);
-    // }
     return outputFolderPath;
   };
 
