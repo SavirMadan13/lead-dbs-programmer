@@ -27,6 +27,7 @@ function Programmer() {
   console.log(location.state);
   const navigate = useNavigate(); // Initialize the navigate hook
   const [mode, setMode] = useState('');
+  const [type, setType] = useState('');
   // const { patient } = location.state || {}; // Retrieve patient data from navigation state
 
   const initialState = {
@@ -346,6 +347,7 @@ function Programmer() {
     console.log('Processing stimulation data: ', stimulationData);
     setTotalS(stimulationData.S);
     setMode(stimulationData.mode);
+    setType(stimulationData.type);
     console.log('Stimulation Mode: ', stimulationData.mode);
     window.electron.ipcRenderer.sendMessage('revert-to-standard', '');
     let initialStates = {}; // Initialize the object to store the processed states
@@ -1076,6 +1078,7 @@ function Programmer() {
             setHistorical={setHistorical}
             mode={mode}
             timeline={timeline}
+            type={type}
           />
         )}
       </div>

@@ -44,7 +44,7 @@ function getPatientFolder(
   // Helper: Build folder path for leadgroup
   const getLeadGroupFolder = (): string => {
     const patientIndex = stimulationData.patientname.findIndex(
-      (name: string) => name === patientId
+      (name: string) => name === patientId,
     );
     if (patientIndex === -1) {
       throw new Error(`Patient ID "${patientId}" not found in stimulation data.`);

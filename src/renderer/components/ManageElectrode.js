@@ -1235,10 +1235,13 @@ function ManageElectrode({
   };
 
   const handleTogglePositionChange = (updatedTogglePosition) => {
+    console.log('Updated toggle position: ', allTogglePositions);
+    console.log('Key: ', key);
     const updatedAllTogglePositions = {
       ...allTogglePositions,
       [key]: updatedTogglePosition,
     };
+    console.log('Updated all toggle positions: ', updatedAllTogglePositions);
     setAllTogglePositions(updatedAllTogglePositions);
   };
 
@@ -1256,6 +1259,10 @@ function ManageElectrode({
       [key]: updatedVolAmpToggle,
     };
     setAllVolAmpToggles(updatedAllVolAmpToggles);
+  };
+
+  const testing = () => {
+    console.log('All Toggle positions: ', allTogglePositions);
   };
 
   return (
@@ -1395,9 +1402,9 @@ function ManageElectrode({
                     }
                     sessionTitle={sessionTitle[1]}
                     togglePosition={allTogglePositions[key]}
-                    // setTogglePosition={(updatedTogglePosition) =>
-                    //   handleTogglePositionChange(updatedTogglePosition)
-                    // }
+                    setTogglePosition={(updatedTogglePosition) =>
+                      handleTogglePositionChange(updatedTogglePosition)
+                    }
                     percAmpToggle={
                       allPercAmpToggles[key] ? allPercAmpToggles[key] : 'left'
                     }

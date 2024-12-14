@@ -55,7 +55,7 @@ function Electrode({
   setVisModel,
   sessionTitle,
   togglePosition,
-  // setTogglePosition,
+  setTogglePosition,
   percAmpToggle,
   setPercAmpToggle,
   volAmpToggle,
@@ -2877,11 +2877,13 @@ function Electrode({
     if (IPG === 'Boston') {
       if (percAmpToggle === 'left') {
         outputTogglePosition = '%';
+        setTogglePosition(outputTogglePosition);
       }
     } else if (IPG === 'Medtronic_Activa') {
       console.log('volAmpToggle: ', volAmpToggle);
       if (volAmpToggle === 'right') {
         outputTogglePosition = 'V';
+        setTogglePosition(outputTogglePosition);
       }
     }
     return outputTogglePosition;
@@ -3026,8 +3028,10 @@ function Electrode({
       // setTotalAmplitude(0);
       calculatePercentageFromAmplitude();
       outputTogglePosition = '%';
+      setTogglePosition(outputTogglePosition);
     } else if (newValue === 'center') {
       outputTogglePosition = 'mA';
+      setTogglePosition(outputTogglePosition);
       calculateAmplitudeFromPercentage();
     }
     console.log(value);
@@ -3042,16 +3046,19 @@ function Electrode({
     if (newValue === 'left') {
       calculatePercentageFromAmplitude();
       outputTogglePosition = '%';
+      setTogglePosition(outputTogglePosition);
       setCurrentLabel('mA');
     } else if (newValue === 'center' && researchToggle !== 'right') {
       calculateAmplitudeFromPercentage();
       outputTogglePosition = 'mA';
+      setTogglePosition(outputTogglePosition);
       setCurrentLabel('mA');
     } else if (newValue === 'right') {
       if (researchToggle === 'left') {
         calculateAmplitudeFromPercentage();
       }
       outputTogglePosition = 'V';
+      setTogglePosition(outputTogglePosition);
       setCurrentLabel('V');
       console.log(outputTogglePosition);
     }
@@ -3073,10 +3080,12 @@ function Electrode({
     console.log('VolAmpToggleChange');
     if (newValue === 'left') {
       outputTogglePosition = 'mA';
+      setTogglePosition(outputTogglePosition);
       calculateQuantitiesWithDistribution();
       // setCurrentLabel('mA');
     } else if (newValue === 'right') {
       outputTogglePosition = 'V';
+      setTogglePosition(outputTogglePosition);
       // setCurrentLabel('V');
       console.log('Current Label: ', currentLabel);
     }
@@ -3202,16 +3211,19 @@ function Electrode({
     if (newValue === 'left') {
       calculatePercentageFromAmplitude();
       outputTogglePosition = '%';
+      setTogglePosition(outputTogglePosition);
       setCurrentLabel('mA');
     } else if (newValue === 'center' && researchToggle !== 'right') {
       calculateAmplitudeFromPercentage();
       outputTogglePosition = 'mA';
+      setTogglePosition(outputTogglePosition);
       setCurrentLabel('mA');
     } else if (newValue === 'right') {
       if (researchToggle === 'left') {
         calculateAmplitudeFromPercentage();
       }
       outputTogglePosition = 'V';
+      setTogglePosition(outputTogglePosition);
       setCurrentLabel('V');
       console.log(outputTogglePosition);
     }

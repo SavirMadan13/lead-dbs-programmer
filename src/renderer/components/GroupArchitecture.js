@@ -27,6 +27,7 @@ function GroupArchitecture({
   setHistorical,
   mode,
   timeline,
+  type,
 }) {
   const [selectedPatient, setSelectedPatient] = useState(null);
   console.log(patients);
@@ -307,20 +308,22 @@ function GroupArchitecture({
           mode={mode}
         />
       )}
-      <div className="sticky-buttons-container">
-        <button
-          className="export-button sticky-button left-button"
-          onClick={handlePreviousPatient}
-        >
-          ←
-        </button>
-        <button
-          className="export-button sticky-button right-button"
-          onClick={handleNextPatient}
-        >
-          →
-        </button>
-      </div>
+      {type === 'leadgroup' && (
+        <div className="sticky-buttons-container">
+          <button
+            className="export-button sticky-button left-button"
+            onClick={handlePreviousPatient}
+          >
+            ←
+          </button>
+          <button
+            className="export-button sticky-button right-button"
+            onClick={handleNextPatient}
+          >
+            →
+          </button>
+        </div>
+      )}
     </div>
   );
 }
