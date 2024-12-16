@@ -13,6 +13,7 @@ import ClinicalScores from './components/ClinicalScores';
 import CustomTable from './components/CustomTable';
 import GroupStats from './components/GroupStats';
 import DatabaseStats from './components/DatabaseStats';
+import Import from './components/Import';
 // import NiiVueViewer from './components/NiiVueViewer';
 
 export default function App() {
@@ -215,6 +216,14 @@ export default function App() {
               element={
                 <div style={{ maxWidth: '1000px' }}>
                   <DatabaseStats directoryPath={directoryPath} />
+                </div>
+              }
+            />
+            <Route
+              path="/import"
+              element={
+                <div style={{ maxWidth: '1000px' }}>
+                  <Import leadDBS={isLeadDBSFolder} />
                 </div>
               }
             />

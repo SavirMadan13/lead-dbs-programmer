@@ -1079,6 +1079,7 @@ function ManageElectrode({
     console.log('Here');
     console.log(electrodeModels);
     const elspec = electrodeModels[selectedElectrodeLeft];
+    console.log('Electrode: ', selectedElectrodeLeft);
     console.log('Elspec: ', elspec);
     const initialSelectedValues = { 0: 'right' };
     const initialQuantityBoston = { 0: 100 };
@@ -1145,8 +1146,10 @@ function ManageElectrode({
   };
 
   useEffect(() => {
-    initializeElectrodeVariables();
-  }, [IPG, selectedElectrodeLeft, selectedElectrodeRight, key]);
+    if (selectedElectrodeLeft) {
+      initializeElectrodeVariables();
+    }
+  }, [IPG, selectedElectrodeLeft, selectedElectrodeRight, key, electrodeModels]);
 
   const gatherImportedData = (jsonData) => {
     const newQuantities = {
@@ -1265,6 +1268,49 @@ function ManageElectrode({
     console.log('All Toggle positions: ', allTogglePositions);
   };
 
+  const mountVariables = () => {
+    return (
+      key &&
+      allQuantities &&
+      allQuantities[key] &&
+      allSelectedValues &&
+      allSelectedValues[key] &&
+      IPG &&
+      allTotalAmplitudes &&
+      allTotalAmplitudes[key] &&
+      allStimulationParameters &&
+      allStimulationParameters[key] &&
+      visModel &&
+      sessionTitle &&
+      sessionTitle[1] &&
+      allTogglePositions &&
+      allTogglePositions[key] &&
+      allPercAmpToggles &&
+      allVolAmpToggles &&
+      electrodeModels &&
+      selectedElectrodeLeft
+    );
+  };
+
+  useEffect(() => {
+    mountVariables();
+  }, [
+    key,
+    allQuantities,
+    allSelectedValues,
+    IPG,
+    allTotalAmplitudes,
+    allStimulationParameters,
+    visModel,
+    sessionTitle,
+    allTogglePositions,
+    allPercAmpToggles,
+    allVolAmpToggles,
+    selectedElectrodeLeft,
+    namingConvention,
+    historical,
+  ]);
+
   return (
     <div className="TabbedIPGContainer">
       <div style={{ marginTop: '30px' }} />
@@ -1302,6 +1348,54 @@ function ManageElectrode({
               <TabPanel key={index}>
                 <div className="form-container">
                   {/* {testElectrodeOptions[selectedElectrodeRight]} */}
+                  {/* {mountVariables() ? (
+                    <Electrode
+                      name={key}
+                      allQuantities={allQuantities}
+                      quantities={allQuantities[key]}
+                      setQuantities={(updatedQuantities) =>
+                        handleQuantityChange(updatedQuantities)
+                      }
+                      selectedValues={allSelectedValues[key]}
+                      setSelectedValues={(updatedSelectedValues) =>
+                        handleSelectedValueChange(updatedSelectedValues)
+                      }
+                      IPG={IPG}
+                      totalAmplitude={allTotalAmplitudes[key]}
+                      setTotalAmplitude={(updatedAmplitude) =>
+                        handleAmplitudeChange(updatedAmplitude)
+                      }
+                      parameters={allStimulationParameters[key]}
+                      setParameters={(updatedParameters) =>
+                        handleParameterChange(updatedParameters)
+                      }
+                      visModel={visModel}
+                      setVisModel={(updatedVisModel) =>
+                        handleVisModelChange(updatedVisModel)
+                      }
+                      sessionTitle={sessionTitle[1]}
+                      togglePosition={allTogglePositions[key]}
+                      setTogglePosition={(updatedTogglePosition) =>
+                        handleTogglePositionChange(updatedTogglePosition)
+                      }
+                      percAmpToggle={
+                        allPercAmpToggles[key] ? allPercAmpToggles[key] : 'left'
+                      }
+                      setPercAmpToggle={(updatedPercAmpToggle) =>
+                        handlePercAmpToggleChange(updatedPercAmpToggle)
+                      }
+                      volAmpToggle={allVolAmpToggles[key]}
+                      setVolAmpToggle={(updatedVolAmpToggle) =>
+                        handleVolAmpToggleChange(updatedVolAmpToggle)
+                      }
+                      contactNaming={namingConvention}
+                      adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
+                      historical={historical}
+                      elspec={electrodeModels[selectedElectrodeLeft]}
+                    />
+                  ) : (
+                    <div>Loading...</div>
+                  )} */}
                   <Electrode
                     name={key}
                     allQuantities={allQuantities}
@@ -1376,6 +1470,54 @@ function ManageElectrode({
               <TabPanel key={index}>
                 <div className="form-container">
                   {/* {testElectrodeOptions[selectedElectrodeLeft]} */}
+                  {/* {mountVariables() ? (
+                    <Electrode
+                      name={key}
+                      allQuantities={allQuantities}
+                      quantities={allQuantities[key]}
+                      setQuantities={(updatedQuantities) =>
+                        handleQuantityChange(updatedQuantities)
+                      }
+                      selectedValues={allSelectedValues[key]}
+                      setSelectedValues={(updatedSelectedValues) =>
+                        handleSelectedValueChange(updatedSelectedValues)
+                      }
+                      IPG={IPG}
+                      totalAmplitude={allTotalAmplitudes[key]}
+                      setTotalAmplitude={(updatedAmplitude) =>
+                        handleAmplitudeChange(updatedAmplitude)
+                      }
+                      parameters={allStimulationParameters[key]}
+                      setParameters={(updatedParameters) =>
+                        handleParameterChange(updatedParameters)
+                      }
+                      visModel={visModel}
+                      setVisModel={(updatedVisModel) =>
+                        handleVisModelChange(updatedVisModel)
+                      }
+                      sessionTitle={sessionTitle[1]}
+                      togglePosition={allTogglePositions[key]}
+                      setTogglePosition={(updatedTogglePosition) =>
+                        handleTogglePositionChange(updatedTogglePosition)
+                      }
+                      percAmpToggle={
+                        allPercAmpToggles[key] ? allPercAmpToggles[key] : 'left'
+                      }
+                      setPercAmpToggle={(updatedPercAmpToggle) =>
+                        handlePercAmpToggleChange(updatedPercAmpToggle)
+                      }
+                      volAmpToggle={allVolAmpToggles[key]}
+                      setVolAmpToggle={(updatedVolAmpToggle) =>
+                        handleVolAmpToggleChange(updatedVolAmpToggle)
+                      }
+                      contactNaming={namingConvention}
+                      adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
+                      historical={historical}
+                      elspec={electrodeModels[selectedElectrodeLeft]}
+                    />
+                  ) : (
+                    <div>Loading...</div>
+                  )} */}
                   <Electrode
                     name={key}
                     allQuantities={allQuantities}

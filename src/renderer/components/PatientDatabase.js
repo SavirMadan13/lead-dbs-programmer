@@ -415,12 +415,20 @@ function PatientDatabase({ key, directoryPath }) {
               <Button
                 // variant="contained"
                 // color="default"
+                onClick={() => navigate('/import')}
+                style={{ marginLeft: '5px' }}
+              >
+                Import
+              </Button>
+              {/* <Button
+                // variant="contained"
+                // color="default"
                 onClick={() => navigate('/niivue')}
                 style={{ marginLeft: '5px' }}
               >
                 NiiVue
-              </Button>
-              <Button
+              </Button> */}
+              {/* <Button
                 style={{ marginLeft: '5px' }}
                 onClick={handleButtonClick}
               >
@@ -432,7 +440,7 @@ function PatientDatabase({ key, directoryPath }) {
                 style={{ display: 'none' }}
                 accept=".xlsx, .xls"
                 onChange={handleFileChange}
-              />
+              /> */}
             </div>
           )}
         </div>

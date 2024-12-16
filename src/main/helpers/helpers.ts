@@ -17,7 +17,7 @@ function getPatientFolder(
 ): string {
   // Fetch stimulation data
   const stimulationData = getData('stimulationData');
-
+  console.log(stimulationData);
   // Validate stimulationData
   if (!stimulationData) {
     return path.join(directoryPath, `sub-${patientId}`);
@@ -36,7 +36,7 @@ function getPatientFolder(
   console.log('Fetching patient folder...');
   console.log('Directory Path:', directoryPath);
   console.log('LeadDBS Mode:', leadDBS);
-
+  console.log('Patient ID: ', patientId);
   // Check for leadgroup type
   const isLeadGroup =
     stimulationData.type === 'leadgroup' || stimulationData.filepath.includes('leadgroup');

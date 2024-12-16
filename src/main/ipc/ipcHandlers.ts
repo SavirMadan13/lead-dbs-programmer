@@ -256,7 +256,6 @@ export default function registerFileHandlers() {
   ipcMain.on(
     'import-file-clinical-group',
     async (event, id, timeline, directoryPath, leadDBS) => {
-      const fs = require('fs');
       // const path = require('path');
       console.log('Timeline: ', timeline);
       const outputData = {};
@@ -368,5 +367,43 @@ export default function registerFileHandlers() {
     } catch (error) {
       return null;
     }
+  });
+
+  // Import
+
+  ipcMain.on('batch-import', async (event, data, leadDBS) => {
+    const stimulationData = getData('stimulationData');
+    const directoryPath = stimulationData.filepath;
+    console.log(Object.keys(data));
+    Object.keys(data).forEach((key) => {
+      const { id, timeline, scores } = data[key];
+      const patientFolder = getPatientFolder(directoryPath, id, leadDBS);
+      console.log('Patient Folder: ', patientFolder);
+      console.log('Scores: ', scores);
+      const sessionDir = path.join(patientFolder, `ses-${timeline}`);
+      try {
+        // Ensure that the directories exist, if not, create them
+        if (!fs.existsSync(patientFolder))
+          fs.mkdirSync(patientFolder, { recursive: true });
+        if (!fs.existsSync(sessionDir))
+          fs.mkdirSync(sessionDir, { recursive: true });
+        // Convert the data to a string format (JSON)
+        const dataString = JSON.stringify(scores, null, 2);
+        // Dynamically name the file based on patient and timeline
+        let fileName = `sub-${id}_ses-${timeline}_clinical.json`;
+        if (leadDBS) {
+          fileName = `${id}_ses-${timeline}_clinical.json`;
+        }
+        const filePath = path.join(sessionDir, fileName);
+        // Write the data to the file
+        fs.writeFileSync(filePath, dataString);
+        // Send the file path back to the renderer process
+        console.log(`Data saved successfully to ${filePath}`);
+      } catch (error) {
+        // Handle any errors in the saving process
+        console.error('Error writing to file:', error);
+      }
+    });
+    event.reply('batch-import', 'success');
   });
 }

@@ -424,6 +424,7 @@ function Programmer() {
 
     if (stimulationData.type === 'leaddbs') {
       // Iterate over each key in the timelineOutput object
+      let defaultElectrode = null;
       Object.keys(timelineOutput).forEach((key, index) => {
         console.log(`Processing timeline for patient ${key}`);
         console.log('Timeline Output: ', timelineOutput);
@@ -437,6 +438,7 @@ function Programmer() {
           console.log('Electrode model: ', electrodeModel);
           electrodes = electrodeModel;
         }
+        defaultElectrode = electrodes;
         const currentTimeline = key;
         const patientData = timelineOutput[key].S;
 
@@ -468,6 +470,36 @@ function Programmer() {
           allTogglePositions: processedS.newAllTogglePositions,
         };
       });
+      if (!timelineOutput[timeline]) {
+        const outputElectrode = handleImportedElectrode(defaultElectrode);
+        const patientData = initializeS(
+          timeline,
+          electrodeModels[outputElectrode].numel,
+        );
+        const processedS = patientData
+          ? gatherImportedDataNew(patientData, defaultElectrode)
+          : {
+              filteredQuantities: {},
+              filteredValues: {},
+              newTotalAmplitude: {},
+              outputVisModel: '3',
+              newAllVolAmpToggles: {},
+              outputIPG: handleIPG(defaultElectrode),
+              newAllTogglePositions: {},
+            };
+        initialStates[timeline] = {
+          ...initialState,
+          leftElectrode: outputElectrode,
+          rightElectrode: outputElectrode,
+          IPG: processedS.outputIPG,
+          allQuantities: processedS.filteredQuantities,
+          allSelectedValues: processedS.filteredValues,
+          allTotalAmplitudes: processedS.newTotalAmplitude,
+          visModel: processedS.outputVisModel,
+          allVolAmpToggles: processedS.newAllVolAmpToggles,
+          allTogglePositions: processedS.newAllTogglePositions,
+        };
+      }
     } else if (stimulationData.type === 'leadgroup') {
       Object.keys(timelineOutput).forEach((key, index) => {
         console.log(`Processing timeline for patient ${key}`);
@@ -1087,15 +1119,17 @@ function Programmer() {
           Back to Patient Details
         </button>
       </div>
-      <div>
-        <button
-          className="export-button-final"
-          onClick={handleExport}
-          style={{ marginRight: '15px' }}
-        >
-          Save and Close
-        </button>
-      </div>
+      {type === 'leadgroup' && (
+        <div>
+          <button
+            className="export-button-final"
+            onClick={handleExport}
+            style={{ marginRight: '15px' }}
+          >
+            Save and Close
+          </button>
+        </div>
+      )}
     </div>
   );
 }
