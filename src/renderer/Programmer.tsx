@@ -1081,7 +1081,7 @@ function Programmer() {
       '',
       outputData,
     );
-    // window.electron.ipcRenderer.sendMessage('close-window');
+    window.electron.ipcRenderer.sendMessage('close-window');
   };
 
   const [historical, setHistorical] = useState(location.state);
@@ -1114,7 +1114,7 @@ function Programmer() {
           />
         )}
       </div>
-      <div style={{ paddingLeft: '150px', marginTop: '-80px' }}>
+      <div style={{ paddingLeft: '150px', marginTop: '-10px' }}>
         <button className="export-button" onClick={() => navigate(-1)}>
           Back to Patient Details
         </button>
@@ -1124,7 +1124,7 @@ function Programmer() {
           <button
             className="export-button-final"
             onClick={handleExport}
-            style={{ marginRight: '15px' }}
+            style={{ marginLeft: '1200px' }}
           >
             Save and Close
           </button>

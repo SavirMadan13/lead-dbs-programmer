@@ -43,6 +43,7 @@ function ManageElectrode({
   historical,
   mode,
   templateS,
+  type,
 }) {
   const testElectrodeRef = React.createRef();
   // const [selectedElectrode, setSelectedElectrode] = useState('');
@@ -1582,22 +1583,24 @@ function ManageElectrode({
           // Hide the input element
         />
       </div>
-      <div style={{ textAlign: 'center', paddingBottom: '35px' }}>
-        {/* <button
-          className="export-button-final-discard"
-          onClick={closeFunction}
-          style={{ marginRight: '15px' }}
-        >
-          Discard
-        </button> */}
-        <button
-          className="export-button-final"
-          onClick={sendDataToMain}
-          style={{ marginLeft: '1000px' }}
-        >
-          {mode === 'stimulate' ? 'Stimulate and Close' : 'Save'}
-        </button>
-      </div>
+      {type !== 'leadgroup' && (
+              <div style={{ textAlign: 'center', paddingBottom: '35px' }}>
+              {/* <button
+                className="export-button-final-discard"
+                onClick={closeFunction}
+                style={{ marginRight: '15px' }}
+              >
+                Discard
+              </button> */}
+              <button
+                className="export-button-final"
+                onClick={sendDataToMain}
+                style={{ marginLeft: '1000px' }}
+              >
+                {mode === 'stimulate' ? 'Stimulate and Close' : 'Save'}
+              </button>
+            </div>
+      )}
     </div>
   );
 }

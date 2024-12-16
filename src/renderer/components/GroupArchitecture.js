@@ -305,6 +305,7 @@ function GroupArchitecture({
           selectedPatient={selectedPatient}
           historical={historical}
           mode={mode}
+          type={type}
         />
       )}
       {type === 'leadgroup' && (

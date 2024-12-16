@@ -125,6 +125,7 @@ export default function registerFileHandlers() {
     console.log('FILE: ', file);
     const dataString = JSON.stringify(data);
     // const newStimFilePath = path.join(stimulationDirectory, 'data.json');
+    const stimulationData = getData('stimulationData');
     const newStimFilePath = path.join(stimulationData.stimDir, 'data.json');
     console.log(newStimFilePath);
     console.log(dataString);

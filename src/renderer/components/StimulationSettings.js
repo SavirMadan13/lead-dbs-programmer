@@ -53,6 +53,7 @@ function StimulationSettings({
   selectedPatient,
   historical,
   mode,
+  type,
 }) {
   // const [IPG, setIPG] = useState('');
   // const [leftElectrode, setLeftElectrode] = useState('');
@@ -709,6 +710,7 @@ function StimulationSettings({
           historical={historical}
           mode={mode}
           templateS={importNewS}
+          type={type}
         />
         {/* )} */}
       </div>
