@@ -1150,7 +1150,13 @@ function ManageElectrode({
     if (selectedElectrodeLeft) {
       initializeElectrodeVariables();
     }
-  }, [IPG, selectedElectrodeLeft, selectedElectrodeRight, key, electrodeModels]);
+  }, [
+    IPG,
+    selectedElectrodeLeft,
+    selectedElectrodeRight,
+    key,
+    electrodeModels,
+  ]);
 
   const gatherImportedData = (jsonData) => {
     const newQuantities = {
@@ -1348,55 +1354,6 @@ function ManageElectrode({
             {hemisphereData.right.map((tabState, index) => (
               <TabPanel key={index}>
                 <div className="form-container">
-                  {/* {testElectrodeOptions[selectedElectrodeRight]} */}
-                  {/* {mountVariables() ? (
-                    <Electrode
-                      name={key}
-                      allQuantities={allQuantities}
-                      quantities={allQuantities[key]}
-                      setQuantities={(updatedQuantities) =>
-                        handleQuantityChange(updatedQuantities)
-                      }
-                      selectedValues={allSelectedValues[key]}
-                      setSelectedValues={(updatedSelectedValues) =>
-                        handleSelectedValueChange(updatedSelectedValues)
-                      }
-                      IPG={IPG}
-                      totalAmplitude={allTotalAmplitudes[key]}
-                      setTotalAmplitude={(updatedAmplitude) =>
-                        handleAmplitudeChange(updatedAmplitude)
-                      }
-                      parameters={allStimulationParameters[key]}
-                      setParameters={(updatedParameters) =>
-                        handleParameterChange(updatedParameters)
-                      }
-                      visModel={visModel}
-                      setVisModel={(updatedVisModel) =>
-                        handleVisModelChange(updatedVisModel)
-                      }
-                      sessionTitle={sessionTitle[1]}
-                      togglePosition={allTogglePositions[key]}
-                      setTogglePosition={(updatedTogglePosition) =>
-                        handleTogglePositionChange(updatedTogglePosition)
-                      }
-                      percAmpToggle={
-                        allPercAmpToggles[key] ? allPercAmpToggles[key] : 'left'
-                      }
-                      setPercAmpToggle={(updatedPercAmpToggle) =>
-                        handlePercAmpToggleChange(updatedPercAmpToggle)
-                      }
-                      volAmpToggle={allVolAmpToggles[key]}
-                      setVolAmpToggle={(updatedVolAmpToggle) =>
-                        handleVolAmpToggleChange(updatedVolAmpToggle)
-                      }
-                      contactNaming={namingConvention}
-                      adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
-                      historical={historical}
-                      elspec={electrodeModels[selectedElectrodeLeft]}
-                    />
-                  ) : (
-                    <div>Loading...</div>
-                  )} */}
                   <Electrode
                     name={key}
                     allQuantities={allQuantities}
@@ -1470,55 +1427,6 @@ function ManageElectrode({
             {hemisphereData.left.map((tabState, index) => (
               <TabPanel key={index}>
                 <div className="form-container">
-                  {/* {testElectrodeOptions[selectedElectrodeLeft]} */}
-                  {/* {mountVariables() ? (
-                    <Electrode
-                      name={key}
-                      allQuantities={allQuantities}
-                      quantities={allQuantities[key]}
-                      setQuantities={(updatedQuantities) =>
-                        handleQuantityChange(updatedQuantities)
-                      }
-                      selectedValues={allSelectedValues[key]}
-                      setSelectedValues={(updatedSelectedValues) =>
-                        handleSelectedValueChange(updatedSelectedValues)
-                      }
-                      IPG={IPG}
-                      totalAmplitude={allTotalAmplitudes[key]}
-                      setTotalAmplitude={(updatedAmplitude) =>
-                        handleAmplitudeChange(updatedAmplitude)
-                      }
-                      parameters={allStimulationParameters[key]}
-                      setParameters={(updatedParameters) =>
-                        handleParameterChange(updatedParameters)
-                      }
-                      visModel={visModel}
-                      setVisModel={(updatedVisModel) =>
-                        handleVisModelChange(updatedVisModel)
-                      }
-                      sessionTitle={sessionTitle[1]}
-                      togglePosition={allTogglePositions[key]}
-                      setTogglePosition={(updatedTogglePosition) =>
-                        handleTogglePositionChange(updatedTogglePosition)
-                      }
-                      percAmpToggle={
-                        allPercAmpToggles[key] ? allPercAmpToggles[key] : 'left'
-                      }
-                      setPercAmpToggle={(updatedPercAmpToggle) =>
-                        handlePercAmpToggleChange(updatedPercAmpToggle)
-                      }
-                      volAmpToggle={allVolAmpToggles[key]}
-                      setVolAmpToggle={(updatedVolAmpToggle) =>
-                        handleVolAmpToggleChange(updatedVolAmpToggle)
-                      }
-                      contactNaming={namingConvention}
-                      adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
-                      historical={historical}
-                      elspec={electrodeModels[selectedElectrodeLeft]}
-                    />
-                  ) : (
-                    <div>Loading...</div>
-                  )} */}
                   <Electrode
                     name={key}
                     allQuantities={allQuantities}
@@ -1584,22 +1492,22 @@ function ManageElectrode({
         />
       </div>
       {type !== 'leadgroup' && (
-              <div style={{ textAlign: 'center', paddingBottom: '35px' }}>
-              {/* <button
+        <div style={{ textAlign: 'center', paddingBottom: '35px' }}>
+          {/* <button
                 className="export-button-final-discard"
                 onClick={closeFunction}
                 style={{ marginRight: '15px' }}
               >
                 Discard
               </button> */}
-              <button
-                className="export-button-final"
-                onClick={sendDataToMain}
-                style={{ marginLeft: '1000px' }}
-              >
-                {mode === 'stimulate' ? 'Stimulate and Close' : 'Save'}
-              </button>
-            </div>
+          <button
+            className="export-button-final"
+            onClick={sendDataToMain}
+            style={{ marginLeft: '1000px' }}
+          >
+            {mode === 'stimulate' ? 'Stimulate and Close' : 'Save'}
+          </button>
+        </div>
       )}
     </div>
   );

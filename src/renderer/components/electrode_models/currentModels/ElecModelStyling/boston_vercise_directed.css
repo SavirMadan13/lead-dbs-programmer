@@ -1424,17 +1424,16 @@ button:active {
 }
 
 .sticky-buttons-container {
-  position: fixed;
-  z-index: 10;
-  top: 78%;
-  width: 5%;
-  margin-left: 5%;
-  display: flex;
-  justify-content: space-between;
-  transform: translateY(-50%);
-  pointer-events: none; /* This makes sure the container itself doesn't block clicks */
 }
 
 .sticky-button {
   pointer-events: auto; /* This makes sure the buttons are clickable */
+  background-color: #117627;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+
 }

@@ -212,13 +212,51 @@ function GroupArchitecture({
 
   return (
     <div>
-      <div style={{ paddingLeft: '45px', marginBottom: '-100px' }}>
+      {/* <div style={{ paddingLeft: '45px', marginBottom: '-100px' }}>
         <PatientSelector
           selectedPatient={selectedPatient}
           setSelectedPatient={setSelectedPatient}
           setRenderKey={setRenderKey}
         />
+      </div> */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: '-100px',
+        }}
+      >
+        {/* Left Arrow Button - Conditionally Rendered */}
+        {type === 'leadgroup' && (
+          <button
+            className="sticky-button"
+            style={{ marginRight: '10px' }}
+            onClick={handlePreviousPatient}
+          >
+            ←
+          </button>
+        )}
+
+        {/* Patient Selector */}
+        <PatientSelector
+          selectedPatient={selectedPatient}
+          setSelectedPatient={setSelectedPatient}
+          setRenderKey={setRenderKey}
+        />
+
+        {/* Right Arrow Button - Conditionally Rendered */}
+        {type === 'leadgroup' && (
+          <button
+            className="sticky-button"
+            style={{ marginLeft: '10px' }}
+            onClick={handleNextPatient}
+          >
+            →
+          </button>
+        )}
       </div>
+
       {selectedPatient && (
         <StimulationSettings
           key={renderKey}
@@ -308,7 +346,7 @@ function GroupArchitecture({
           type={type}
         />
       )}
-      {type === 'leadgroup' && (
+      {/* {type === 'leadgroup' && (
         <div className="sticky-buttons-container">
           <button
             className="export-button sticky-button left-button"
@@ -323,7 +361,7 @@ function GroupArchitecture({
             →
           </button>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

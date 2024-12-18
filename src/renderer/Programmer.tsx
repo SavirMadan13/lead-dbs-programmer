@@ -1114,11 +1114,13 @@ function Programmer() {
           />
         )}
       </div>
-      <div style={{ paddingLeft: '150px', marginTop: '-10px' }}>
-        <button className="export-button" onClick={() => navigate(-1)}>
-          Back to Patient Details
-        </button>
-      </div>
+      {mode !== 'stimulate' && (
+        <div style={{ paddingLeft: '150px', marginTop: '-10px' }}>
+          <button className="export-button" onClick={() => navigate(-1)}>
+            Back to Patient Details
+          </button>
+        </div>
+      )}
       {type === 'leadgroup' && (
         <div>
           <button

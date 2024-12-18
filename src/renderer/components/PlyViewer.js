@@ -2914,6 +2914,13 @@ function PlyViewer({
       // Return the updated coordinate array with normalized R
       return [x, y, z, normalizedR];
     });
+
+    const normalizedTestCoords = L.map(([x, y, z, r]) => {
+      // Apply arctan normalization
+      const normalizedR = Math.atan(r); // Normalize arctan(r) to [0, 1]
+      // Return the updated coordinate array with normalized R
+      return [x, y, z, normalizedR];
+    });
     console.log(normalizedPlotNiiCoords);
     const sweetspotCoord = [
       clusters.average.x,
@@ -2970,6 +2977,7 @@ function PlyViewer({
       sphereCoords,
       updatedV,
       normalizedPlotNiiCoords,
+      // normalizedTestCoords,
     );
     console.log(outputV);
     handleNiftiQuantityStateChange(outputV);
@@ -3152,6 +3160,7 @@ function PlyViewer({
   const [searchCoordinate, setSearchCoordinate] = useState('');
   const [matchingAtlases, setMatchingAtlases] = useState([]);
 
+  // load-ply-file-2 is basically jsust used for the coordinate within which atlas functionality
   const handleCoordinateSearch = async () => {
     if (!searchCoordinate) {
       alert('Please enter a valid coordinate.');
