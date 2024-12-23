@@ -728,7 +728,7 @@ function Programmer() {
     console.log(allTogglePositions);
     const updatedQuantities = { ...allQuantities };
     Object.keys(allTogglePositions).forEach((position) => {
-      allTogglePositions[position] = 'mA';
+      // allTogglePositions[position] = 'mA';
       if (allTogglePositions[position] === 'mA') {
         console.log('position', position);
         console.log('quantity: ', allTogglePositions);

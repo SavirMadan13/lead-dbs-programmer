@@ -1801,11 +1801,24 @@ function PlyViewer({
       const vertices = filteredCoords.map(
         ([x, y, z]) => new THREE.Vector3(x, y, z),
       );
-      const geometry = new THREE.BufferGeometry().setFromPoints(vertices);
+      const testVertices = plotNiiCoords.map(
+        ([x, y, z]) => new THREE.Vector3(x, y, z),
+      );
+      // const geometry = new THREE.BufferGeometry().setFromPoints(vertices);
+      const geometry = new THREE.BufferGeometry().setFromPoints(testVertices);
 
       // Step 5: Create colors array
-      const colors = new Float32Array(vertices.length * 3);
-      normalizedRValues.forEach((r, i) => {
+      // const colors = new Float32Array(vertices.length * 3);
+      // normalizedRValues.forEach((r, i) => {
+      //   const color = new THREE.Color();
+      //   color.setHSL(0.1 + 0.3 * r, 1.0, 0.6); // Yellow to red
+      //   colors[i * 3] = color.r;
+      //   colors[i * 3 + 1] = color.g;
+      //   colors[i * 3 + 2] = color.b;
+      // });
+
+      const colors = new Float32Array(testVertices.length * 3);
+      rValues.forEach((r, i) => {
         const color = new THREE.Color();
         color.setHSL(0.1 + 0.3 * r, 1.0, 0.6); // Yellow to red
         colors[i * 3] = color.r;
@@ -2958,7 +2971,7 @@ function PlyViewer({
       index === activeContact ? finalAmplitude : equalAmplitude,
     );
     console.log(updatedV);
-    // setPlotNiiCoords(reducedL);
+    // setPlotNiiCoords(L);
     // const reducedLJSON = JSON.stringify(normalizedPlotNiiCoords, null, 2);
 
     // // Create a Blob and download it
@@ -2973,6 +2986,8 @@ function PlyViewer({
 
     // // Clean up the URL object
     // URL.revokeObjectURL(url);
+
+
     const outputV = optimizeSphereValues(
       sphereCoords,
       updatedV,
@@ -3053,7 +3068,7 @@ function PlyViewer({
 
           const header = nifti.readHeader(fileData);
           let image = nifti.readImage(header, fileData);
-
+          console.log('Header: ', header);
           // Ensure `image` is a valid ArrayBuffer
           if (!(image instanceof ArrayBuffer)) {
             console.log('Adjusting image to ArrayBuffer...');
