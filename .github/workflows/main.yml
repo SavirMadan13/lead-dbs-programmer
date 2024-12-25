@@ -33,8 +33,7 @@ jobs:
 
       # Package the application
       - name: Package application
-        run: |
-          npm run package
+        run: npm run package
 
       # Upload the packaged artifacts
       - name: Upload build artifacts
