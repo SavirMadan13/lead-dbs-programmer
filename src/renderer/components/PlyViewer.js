@@ -383,7 +383,6 @@ function PlyViewer({
       try {
         // Request the PLY file paths from the main process using invoke/handle
         const files = await window.electron.ipcRenderer.invoke('get-ply-files');
-
         // Store both the file name and the full path in the state
         const fileData = files.map((file) => ({
           name: file.fileName.split('/').pop(), // Extract the atlas name from the path
@@ -408,7 +407,7 @@ function PlyViewer({
         const files = await window.electron.ipcRenderer.invoke(
           'get-ply-files-database',
         );
-        console.log(files);
+        console.log('FILES: ', files);
         setPriorStims(files);
       } catch (error) {
         console.error('Error fetching PLY files:', error);
@@ -1025,12 +1024,16 @@ function PlyViewer({
 
   const handlePriorStimChange = async (event) => {
     const selectedValue = event.target.value;
+    console.log('Selected stim change: ', selectedValue);
     // console.log('Selected Value: ', selectedValue.split('-'));
     const splitValues = selectedValue.split('-');
+    console.log('Selected: ', splitValues)
     const selectedPatientID = splitValues[0];
     // const selectedPatientID = selectedValue;
     const selectedSession = splitValues[1];
     console.log(selectedPatientID);
+    const outputPatientID = splitValues[0] + '-' + splitValues[1];
+    const outputPatientSession = splitValues[2] + '-' + splitValues[3];
     const electrodeLoader = new PLYLoader();
     const anatomyLoader = new PLYLoader();
 
@@ -1038,8 +1041,10 @@ function PlyViewer({
       // Load and parse the PLY file from Electron's IPC
       const fileData = await window.electron.ipcRenderer.invoke(
         'load-ply-file-database',
-        selectedPatientID,
-        selectedSession,
+        // selectedPatientID,
+        // selectedSession,
+        outputPatientID,
+        outputPatientSession,
       );
       const electrodeGeometry = electrodeLoader.parse(
         fileData.combinedElectrodesPly,

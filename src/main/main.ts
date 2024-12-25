@@ -31,9 +31,9 @@ app.on('ready', () => {
   console.log('File handlers registered.');
 });
 
-console.log = () => {};
-console.warn = () => {};
-console.error = () => {};
+// console.log = () => {};
+// console.warn = () => {};
+// console.error = () => {};
 
 // const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
 // console.log(args);
@@ -439,6 +439,7 @@ ipcMain.on('set-status', (event, arg) => {
   }
 });
 
+// Currently not called anywhere
 ipcMain.on('database-group-figures', (event, directoryPath) => {
   console.log(directoryPath);
   const databaseMasterFile = path.join(directoryPath, 'dataset_master.json');
@@ -999,43 +1000,110 @@ const createWindow = async () => {
     return plyFiles;
   };
 
-  const gatherPlyFilesDatabase = () => {
-    const jsonData2 = readJSON(jsonFilePath);
-    const { directoryPath } = jsonData2;
+  // const gatherPlyFilesDatabase = () => {
+  //   const jsonData2 = readJSON(jsonFilePath);
+  //   const { directoryPath } = jsonData2;
 
-    // Step 2: Read the dataset description file to get Lead_Path
-    console.log('Directory Path: ', directoryPath);
-    // const datasetDescriptionPath = path.join(
-    //   directoryPath,
-    //   'dataset_description.json',
-    // );
-    // const datasetDescription = readJSON(datasetDescriptionPath);
-    // const leadPath = datasetDescription[0].Lead_Path;
-    // console.log('Lead Path: ', leadPath);
-    const masterDataFile = path.join(directoryPath, 'dataset_master.json');
-    const jsonData = readJSON(masterDataFile);
+  //   // Step 2: Read the dataset description file to get Lead_Path
+  //   console.log('Directory Path: ', directoryPath);
+  //   // const datasetDescriptionPath = path.join(
+  //   //   directoryPath,
+  //   //   'dataset_description.json',
+  //   // );
+  //   // const datasetDescription = readJSON(datasetDescriptionPath);
+  //   // const leadPath = datasetDescription[0].Lead_Path;
+  //   // console.log('Lead Path: ', leadPath);
+  //   const masterDataFile = path.join(directoryPath, 'dataset_master.json');
+  //   const jsonData = readJSON(masterDataFile);
+  //   const result = {};
+
+  //   // Iterate over each subject (sub_X)
+  //   Object.keys(jsonData).forEach((subId) => {
+  //     const { clinicalData } = jsonData[subId];
+  //     if (clinicalData) {
+  //       // Iterate over each session in clinicalData
+  //       Object.keys(clinicalData).forEach((sessionKey) => {
+  //         const sessionFiles = clinicalData[sessionKey];
+
+  //         // Check if the session contains an array of files
+  //         if (Array.isArray(sessionFiles)) {
+  //           sessionFiles.forEach((filePath) => {
+  //             // Check if the file is a stimparameters file
+  //             if (filePath.includes('stimparameters.json')) {
+  //               // Add the subId and session to the result
+  //               if (!result[subId]) {
+  //                 result[subId] = [];
+  //               }
+  //               result[subId].push(sessionKey);
+  //             }
+  //           });
+  //         }
+  //       });
+  //     }
+  //   });
+
+  //   return result;
+  // };
+
+  const gatherPlyFilesDatabase = () => {
+    console.log('GATHER PLY FILES DATABASE');
+    // const stimulationData = getData('stimulationData');
+    const directoryPath = path.join(stimulationData.path, 'derivatives', 'leaddbs');
+    console.log(stimulationData);
+    console.log(directoryPath);
     const result = {};
 
-    // Iterate over each subject (sub_X)
-    Object.keys(jsonData).forEach((subId) => {
-      const { clinicalData } = jsonData[subId];
-      if (clinicalData) {
-        // Iterate over each session in clinicalData
-        Object.keys(clinicalData).forEach((sessionKey) => {
-          const sessionFiles = clinicalData[sessionKey];
+    // Helper function to recursively find all JSON files within the clinical folder
+    const findJsonFilesInClinical = (clinicalDir) => {
+      const files = fs.readdirSync(clinicalDir);
+      let jsonFiles = [];
 
-          // Check if the session contains an array of files
-          if (Array.isArray(sessionFiles)) {
-            sessionFiles.forEach((filePath) => {
-              // Check if the file is a stimparameters file
-              if (filePath.includes('stimparameters.json')) {
-                // Add the subId and session to the result
-                if (!result[subId]) {
-                  result[subId] = [];
-                }
-                result[subId].push(sessionKey);
+      files.forEach((file) => {
+        const filePath = path.join(clinicalDir, file);
+        const stat = fs.statSync(filePath);
+
+        if (stat.isDirectory()) {
+          // Recurse into subdirectory
+          jsonFiles = jsonFiles.concat(findJsonFilesInClinical(filePath));
+        } else if (file.endsWith('.json')) {
+          // Add JSON file
+          jsonFiles.push(filePath);
+        }
+      });
+
+      return jsonFiles;
+    };
+
+    // Step 1: Get all patient subdirectories (e.g., sub-15454, sub-29781)
+    const patientDirs = fs.readdirSync(directoryPath).filter((subDir) => {
+      const fullPath = path.join(directoryPath, subDir);
+      return fs.statSync(fullPath).isDirectory() && subDir.startsWith('sub-');
+    });
+
+    console.log(patientDirs);
+
+    // Step 2: Process each patient's clinical folder
+    patientDirs.forEach((patientDir) => {
+      const clinicalDir = path.join(directoryPath, patientDir, 'clinical');
+
+      if (fs.existsSync(clinicalDir) && fs.statSync(clinicalDir).isDirectory()) {
+        const jsonFiles = findJsonFilesInClinical(clinicalDir);
+
+        jsonFiles.forEach((filePath) => {
+          // Extract session key from the file path
+          const match = filePath.match(/clinical\/(ses-[^/]+)\//);
+
+          if (match) {
+            const sessionKey = match[1];
+            const subId = patientDir;
+
+            // Check if the file is a stimparameters file
+            if (filePath.includes('stimparameters.json')) {
+              if (!result[subId]) {
+                result[subId] = [];
               }
-            });
+              result[subId].push(sessionKey);
+            }
           }
         });
       }
@@ -1055,6 +1123,7 @@ const createWindow = async () => {
   });
 
   ipcMain.handle('get-ply-files-database', async (event) => {
+    console.log('HERE');
     try {
       const plyFiles = gatherPlyFilesDatabase();
       console.log('Dataset Master: ', plyFiles); // Your function for gathering files
@@ -1108,95 +1177,203 @@ const createWindow = async () => {
   //   return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
   // });
 
+  // ipcMain.handle(
+  //   'load-ply-file-database',
+  //   async (event, patientID, sessionID) => {
+  //     const jsonData2 = readJSON(jsonFilePath);
+  //     const { directoryPath } = jsonData2;
+  //     const masterDataFile = path.join(directoryPath, 'dataset_master.json');
+  //     const jsonData = readJSON(masterDataFile);
+  //     console.log(patientID);
+
+  //     try {
+  //       // Check if the patientID exists in the master dataset
+  //       if (!jsonData[patientID]) {
+  //         throw new Error(`Patient ID ${patientID} not found in dataset.`);
+  //       }
+
+  //       // Retrieve the patient's exportData (where PLY files are located)
+  //       const { exportData } = jsonData[patientID];
+  //       const { clinicalData } = jsonData[patientID];
+
+  //       if (!exportData) {
+  //         throw new Error(`No export data found for Patient ID ${patientID}.`);
+  //       }
+
+  //       // Define a session-based PLY file retrieval (you can modify this depending on session logic)
+  //       let plyFilePath = null;
+
+  //       // Get the paths to anatomyPly and combinedElectrodesPly
+  //       let anatomyPlyPath = exportData.anatomyPly;
+  //       let combinedElectrodesPlyPath = exportData.combinedElectrodesPly;
+  //       let clinicalReconstructionPath = clinicalData.reconstructionJson;
+  //       let stimulationParametersPath = null;
+
+  //       // Check for the provided sessionID and set the stimulation parameters path
+  //       if (clinicalData[sessionID]) {
+  //         const sessionData = clinicalData[sessionID];
+  //         stimulationParametersPath = sessionData.find((filePath) =>
+  //           filePath.includes('stimparameters.json'),
+  //         );
+  //       } else {
+  //         throw new Error(
+  //           `Session ID ${sessionID} not found for Patient ID ${patientID}.`,
+  //         );
+  //       }
+
+  //       if (!stimulationParametersPath) {
+  //         throw new Error(
+  //           `No stimulation parameters file found for Patient ID ${patientID} in session ${sessionID}.`,
+  //         );
+  //       }
+
+  //       if (!anatomyPlyPath || !combinedElectrodesPlyPath) {
+  //         throw new Error(
+  //           `One or more PLY files not found for Patient ID ${patientID}.`,
+  //         );
+  //       }
+  //       anatomyPlyPath.replace(/\\\//g, '');
+  //       combinedElectrodesPlyPath.replace(/\\\//g, '');
+  //       clinicalReconstructionPath.replace(/\\\//g, '');
+  //       stimulationParametersPath = stimulationParametersPath.replace(
+  //         /\\\//g,
+  //         '',
+  //       );
+  //       // Read both PLY files as binary
+  //       const anatomyPlyData = fs.readFileSync(anatomyPlyPath);
+  //       const combinedElectrodesPlyData = fs.readFileSync(
+  //         combinedElectrodesPlyPath,
+  //       );
+  //       const clinicalReconstructionData = fs.readFileSync(
+  //         clinicalReconstructionPath,
+  //         'utf8',
+  //       );
+  //       const clinicalDataOutput = JSON.parse(clinicalReconstructionData);
+  //       const stimulationParametersData = fs.readFileSync(
+  //         stimulationParametersPath,
+  //         'utf8',
+  //       );
+  //       const jsonData3 = JSON.parse(stimulationParametersData); // Parse the string into a JSON object
+  //       // Return both files as buffers in an object
+  //       return {
+  //         anatomyPly: anatomyPlyData.buffer,
+  //         combinedElectrodesPly: combinedElectrodesPlyData.buffer,
+  //         reconstructionData: clinicalDataOutput,
+  //         stimulationParameters: jsonData3,
+  //       };
+  //     } catch (error) {
+  //       console.error('Error loading PLY file:', error);
+  //       return null; // Return null if an error occurs
+  //     }
+  //   },
+  // );
+
   ipcMain.handle(
     'load-ply-file-database',
     async (event, patientID, sessionID) => {
-      const jsonData2 = readJSON(jsonFilePath);
-      const { directoryPath } = jsonData2;
-      const masterDataFile = path.join(directoryPath, 'dataset_master.json');
-      const jsonData = readJSON(masterDataFile);
-      console.log(patientID);
-
+      const stimulationData = getData('stimulationData');
+      const directoryPath = stimulationData.path;
       try {
-        // Check if the patientID exists in the master dataset
-        if (!jsonData[patientID]) {
-          throw new Error(`Patient ID ${patientID} not found in dataset.`);
-        }
-
-        // Retrieve the patient's exportData (where PLY files are located)
-        const { exportData } = jsonData[patientID];
-        const { clinicalData } = jsonData[patientID];
-
-        if (!exportData) {
-          throw new Error(`No export data found for Patient ID ${patientID}.`);
-        }
-
-        // Define a session-based PLY file retrieval (you can modify this depending on session logic)
-        let plyFilePath = null;
-
-        // Get the paths to anatomyPly and combinedElectrodesPly
-        let anatomyPlyPath = exportData.anatomyPly;
-        let combinedElectrodesPlyPath = exportData.combinedElectrodesPly;
-        let clinicalReconstructionPath = clinicalData.reconstructionJson;
-        let stimulationParametersPath = null;
-
-        // Check for the provided sessionID and set the stimulation parameters path
-        if (clinicalData[sessionID]) {
-          const sessionData = clinicalData[sessionID];
-          stimulationParametersPath = sessionData.find((filePath) =>
-            filePath.includes('stimparameters.json'),
-          );
-        } else {
-          throw new Error(
-            `Session ID ${sessionID} not found for Patient ID ${patientID}.`,
-          );
-        }
-
-        if (!stimulationParametersPath) {
-          throw new Error(
-            `No stimulation parameters file found for Patient ID ${patientID} in session ${sessionID}.`,
-          );
-        }
-
-        if (!anatomyPlyPath || !combinedElectrodesPlyPath) {
-          throw new Error(
-            `One or more PLY files not found for Patient ID ${patientID}.`,
-          );
-        }
-        anatomyPlyPath.replace(/\\\//g, '');
-        combinedElectrodesPlyPath.replace(/\\\//g, '');
-        clinicalReconstructionPath.replace(/\\\//g, '');
-        stimulationParametersPath = stimulationParametersPath.replace(
-          /\\\//g,
-          '',
+        // Validate input directory
+        const patientDir = path.join(
+          directoryPath,
+          'derivatives',
+          'leaddbs',
+          patientID,
         );
-        // Read both PLY files as binary
+        if (!fs.existsSync(patientDir)) {
+          throw new Error(`Patient ID ${patientID} not found in directory.`);
+        }
+
+        // Get paths to clinical and export folders
+        const clinicalDir = path.join(patientDir, 'clinical');
+        const exportDir = path.join(patientDir, 'export', 'ply');
+
+        // Validate clinical and export directories
+        if (!fs.existsSync(clinicalDir)) {
+          throw new Error(
+            `Clinical directory not found for Patient ID ${patientID}.`
+          );
+        }
+        if (!fs.existsSync(exportDir)) {
+          throw new Error(
+            `Export directory not found for Patient ID ${patientID}.`
+          );
+        }
+
+        // Retrieve session files
+        const sessionDir = path.join(clinicalDir, sessionID);
+        if (!fs.existsSync(sessionDir)) {
+          throw new Error(
+            `Session ID ${sessionID} not found for Patient ID ${patientID}.`
+          );
+        }
+
+        // Find stimulation parameters file
+        const stimulationParametersFile = fs
+          .readdirSync(sessionDir)
+          .find((file) => file.includes('stimparameters.json'));
+        if (!stimulationParametersFile) {
+          throw new Error(
+            `No stimulation parameters file found for Patient ID ${patientID} in session ${sessionID}.`
+          );
+        }
+
+        const stimulationParametersPath = path.join(
+          sessionDir,
+          stimulationParametersFile
+        );
+
+        // Find anatomyPly and combinedElectrodesPly files
+        const anatomyPlyPath = path.join(exportDir, 'anatomy.ply');
+        const combinedElectrodesPlyPath = path.join(
+          exportDir,
+          'combined_electrodes.ply'
+        );
+
+        if (!fs.existsSync(anatomyPlyPath) || !fs.existsSync(combinedElectrodesPlyPath)) {
+          throw new Error(
+            `One or more PLY files not found for Patient ID ${patientID}.`
+          );
+        }
+
+        // Find reconstruction JSON file
+        const reconstructionFile = fs
+          .readdirSync(clinicalDir)
+          .find((file) => file.includes('desc-reconstruction.json'));
+        if (!reconstructionFile) {
+          throw new Error(
+            `Reconstruction JSON file not found for Patient ID ${patientID}.`
+          );
+        }
+
+        const clinicalReconstructionPath = path.join(
+          clinicalDir,
+          reconstructionFile
+        );
+
+        // Read all required files
         const anatomyPlyData = fs.readFileSync(anatomyPlyPath);
-        const combinedElectrodesPlyData = fs.readFileSync(
-          combinedElectrodesPlyPath,
+        const combinedElectrodesPlyData = fs.readFileSync(combinedElectrodesPlyPath);
+        const clinicalReconstructionData = JSON.parse(
+          fs.readFileSync(clinicalReconstructionPath, 'utf8')
         );
-        const clinicalReconstructionData = fs.readFileSync(
-          clinicalReconstructionPath,
-          'utf8',
+        const stimulationParametersData = JSON.parse(
+          fs.readFileSync(stimulationParametersPath, 'utf8')
         );
-        const clinicalDataOutput = JSON.parse(clinicalReconstructionData);
-        const stimulationParametersData = fs.readFileSync(
-          stimulationParametersPath,
-          'utf8',
-        );
-        const jsonData3 = JSON.parse(stimulationParametersData); // Parse the string into a JSON object
-        // Return both files as buffers in an object
+
+        // Return all required data
         return {
           anatomyPly: anatomyPlyData.buffer,
           combinedElectrodesPly: combinedElectrodesPlyData.buffer,
-          reconstructionData: clinicalDataOutput,
-          stimulationParameters: jsonData3,
+          reconstructionData: clinicalReconstructionData,
+          stimulationParameters: stimulationParametersData,
         };
       } catch (error) {
         console.error('Error loading PLY file:', error);
         return null; // Return null if an error occurs
       }
-    },
+    }
   );
 
   app.on('window-all-closed', function () {
