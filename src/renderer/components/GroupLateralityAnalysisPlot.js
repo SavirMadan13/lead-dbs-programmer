@@ -1,5 +1,27 @@
 import React, { useState } from 'react';
-import Plot from 'react-plotly.js';
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler, // Required for shaded areas
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 function GroupLateralityAveragePlot({ clinicalData }) {
   const [showPercentage, setShowPercentage] = useState(true);
@@ -20,77 +42,173 @@ function GroupLateralityAveragePlot({ clinicalData }) {
     '3.17a: Rest tremor amplitude- RUE', '3.17c: Rest tremor amplitude- RLE',
   ];
 
-  const timelines = [...new Set(clinicalData.flatMap(patient => Object.keys(patient.clinicalData)))];
+  const timelines = [...new Set(clinicalData.flatMap((patient) => Object.keys(patient.clinicalData)))];
   const orderedTimelines = timelines.sort((a, b) => {
     if (a === 'baseline') return -1;
     if (b === 'baseline') return 1;
     return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
   });
 
-  // Initialize arrays for averages only
-  const leftAverages = [];
-  const rightAverages = [];
-
-  orderedTimelines.forEach(timeline => {
-    const leftValues = clinicalData.map(patientData => {
-      const baselineScores = Object.entries(patientData.clinicalData['baseline'] || {})
-        .filter(([item]) => leftSideItems.includes(item))
-        .map(([, score]) => score);
-      const baselineTotal = baselineScores.reduce((sum, score) => sum + score, 0) || 1;
-
-      const scores = Object.entries(patientData.clinicalData[timeline] || {})
-        .filter(([item]) => leftSideItems.includes(item))
-        .map(([, score]) => score);
-      const totalScore = scores.reduce((sum, score) => sum + score, 0);
-
-      return showPercentage ? ((baselineTotal - totalScore) / baselineTotal) * 100 : totalScore;
-    });
-
-    const rightValues = clinicalData.map(patientData => {
-      const baselineScores = Object.entries(patientData.clinicalData['baseline'] || {})
-        .filter(([item]) => rightSideItems.includes(item))
-        .map(([, score]) => score);
-      const baselineTotal = baselineScores.reduce((sum, score) => sum + score, 0) || 1;
-
-      const scores = Object.entries(patientData.clinicalData[timeline] || {})
-        .filter(([item]) => rightSideItems.includes(item))
-        .map(([, score]) => score);
-      const totalScore = scores.reduce((sum, score) => sum + score, 0);
-
-      return showPercentage ? ((baselineTotal - totalScore) / baselineTotal) * 100 : totalScore;
-    });
-
-    // Calculate mean for left and right values
-    const leftMean = leftValues.reduce((sum, val) => sum + val, 0) / leftValues.length;
-    const rightMean = rightValues.reduce((sum, val) => sum + val, 0) / rightValues.length;
-
-    leftAverages.push(leftMean);
-    rightAverages.push(rightMean);
-  });
-
-  // Plot data for left and right without standard deviation areas
-  const leftTrace = {
-    x: orderedTimelines,
-    y: leftAverages,
-    type: 'scatter',
-    mode: 'lines+markers',
-    name: 'Left Side Average',
-    line: { width: 2, color: 'blue' },
+  // Helper function to calculate mean and standard deviation
+  const calculateStats = (values) => {
+    const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+    const stdDev = Math.sqrt(values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length);
+    return { mean, stdDev };
   };
 
-  const rightTrace = {
-    x: orderedTimelines,
-    y: rightAverages,
-    type: 'scatter',
-    mode: 'lines+markers',
-    name: 'Right Side Average',
-    line: { width: 2, color: 'red' },
+  // Collect data for each patient for left and right sides
+  const leftPatientData = clinicalData.map((patientData) =>
+    orderedTimelines.map((timeline) => {
+      const baselineScores = Object.entries(patientData.clinicalData['baseline'] || {})
+        .filter(([item]) => leftSideItems.includes(item))
+        .map(([, score]) => score);
+      const baselineTotal = baselineScores.reduce((sum, score) => sum + score, 0) || 1;
+
+      const scores = Object.entries(patientData.clinicalData[timeline] || {})
+        .filter(([item]) => leftSideItems.includes(item))
+        .map(([, score]) => score);
+      const totalScore = scores.reduce((sum, score) => sum + score, 0);
+
+      return showPercentage ? ((baselineTotal - totalScore) / baselineTotal) * 100 : totalScore;
+    })
+  );
+
+  const rightPatientData = clinicalData.map((patientData) =>
+    orderedTimelines.map((timeline) => {
+      const baselineScores = Object.entries(patientData.clinicalData['baseline'] || {})
+        .filter(([item]) => rightSideItems.includes(item))
+        .map(([, score]) => score);
+      const baselineTotal = baselineScores.reduce((sum, score) => sum + score, 0) || 1;
+
+      const scores = Object.entries(patientData.clinicalData[timeline] || {})
+        .filter(([item]) => rightSideItems.includes(item))
+        .map(([, score]) => score);
+      const totalScore = scores.reduce((sum, score) => sum + score, 0);
+
+      return showPercentage ? ((baselineTotal - totalScore) / baselineTotal) * 100 : totalScore;
+    })
+  );
+
+  // Calculate group averages and standard deviations
+  const leftAverages = orderedTimelines.map((_, i) => calculateStats(leftPatientData.map((patient) => patient[i])).mean);
+  const leftStdDevs = orderedTimelines.map((_, i) => calculateStats(leftPatientData.map((patient) => patient[i])).stdDev);
+
+  const rightAverages = orderedTimelines.map((_, i) => calculateStats(rightPatientData.map((patient) => patient[i])).mean);
+  const rightStdDevs = orderedTimelines.map((_, i) => calculateStats(rightPatientData.map((patient) => patient[i])).stdDev);
+
+  // Chart.js datasets
+  const data = {
+    labels: orderedTimelines,
+    datasets: [
+      // Individual patient lines for left side
+      ...leftPatientData.map((data, i) => ({
+        label: `Patient ${i + 1} - Left`,
+        data,
+        borderColor: 'rgba(78, 121, 167, 0.3)',
+        borderWidth: 1,
+        tension: 0.2,
+        pointRadius: 0,
+        showLine: true,
+      })),
+      // Individual patient lines for right side
+      ...rightPatientData.map((data, i) => ({
+        label: `Patient ${i + 1} - Right`,
+        data,
+        borderColor: 'rgba(242, 142, 43, 0.3)',
+        borderWidth: 1,
+        tension: 0.2,
+        pointRadius: 0,
+        showLine: true,
+      })),
+      // Group average and standard deviation for left side
+      {
+        label: 'Left Side Average',
+        data: leftAverages,
+        borderColor: '#4E79A7',
+        backgroundColor: 'rgba(78, 121, 167, 0.2)',
+        borderWidth: 2,
+        fill: '+1',
+        tension: 0.3,
+        pointRadius: 3,
+      },
+      {
+        label: 'Left Side Std Dev',
+        data: leftAverages.map((avg, i) => avg + leftStdDevs[i]),
+        backgroundColor: 'rgba(78, 121, 167, 0.2)',
+        borderWidth: 0,
+        fill: '+1',
+        pointRadius: 0,
+      },
+      {
+        label: 'Left Side Std Dev (Lower)',
+        data: leftAverages.map((avg, i) => avg - leftStdDevs[i]),
+        backgroundColor: 'rgba(78, 121, 167, 0.2)',
+        borderWidth: 0,
+        fill: false,
+        pointRadius: 0,
+      },
+      // Group average and standard deviation for right side
+      {
+        label: 'Right Side Average',
+        data: rightAverages,
+        borderColor: '#F28E2B',
+        backgroundColor: 'rgba(242, 142, 43, 0.2)',
+        borderWidth: 2,
+        fill: '+1',
+        tension: 0.3,
+        pointRadius: 3,
+      },
+      {
+        label: 'Right Side Std Dev',
+        data: rightAverages.map((avg, i) => avg + rightStdDevs[i]),
+        backgroundColor: 'rgba(242, 142, 43, 0.2)',
+        borderWidth: 0,
+        fill: '+1',
+        pointRadius: 0,
+      },
+      {
+        label: 'Right Side Std Dev (Lower)',
+        data: rightAverages.map((avg, i) => avg - rightStdDevs[i]),
+        backgroundColor: 'rgba(242, 142, 43, 0.2)',
+        borderWidth: 0,
+        fill: false,
+        pointRadius: 0,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Group Laterality Analysis',
+        font: { size: 18 },
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: 'Time',
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: showPercentage ? 'Percentage Improvement (%)' : 'Scores',
+        },
+      },
+    },
   };
 
   return (
     <div>
-      <div style={{ marginTop: '30px', marginBottom: '-10px' }}>
-        <h3 style={{fontSize: '14px'}}>
+      <div style={{ marginTop: '20px', marginBottom: '10px' }}>
+        <h3 style={{ fontSize: '14px' }}>
           <input
             type="checkbox"
             checked={showPercentage}
@@ -99,28 +217,7 @@ function GroupLateralityAveragePlot({ clinicalData }) {
           Show Percentage Improvement
         </h3>
       </div>
-      <Plot
-        data={[leftTrace, rightTrace]}
-        layout={{
-          xaxis: {
-            title: 'Time',
-            tickfont: { size: 14, color: '#333' },
-            gridcolor: '#f2f2f2',
-          },
-          yaxis: {
-            title: showPercentage ? 'Percentage Improvement (%)' : 'Scores',
-            tickfont: { size: 14, color: '#333' },
-            gridcolor: '#e6e6e6',
-            zeroline: true,
-            zerolinecolor: '#000',
-          },
-          plot_bgcolor: '#fafafa',
-          paper_bgcolor: '#ffffff',
-          margin: { l: 60, r: 40, t: 80, b: 60 },
-          hovermode: 'closest',
-        }}
-        style={{ width: '100%', height: '100%' }}
-      />
+      <Line data={data} options={options} />
     </div>
   );
 }

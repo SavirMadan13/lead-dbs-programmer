@@ -1,9 +1,44 @@
 import React, { useState } from 'react';
-import Plot from 'react-plotly.js';
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 function DatabasePlot({ clinicalData }) {
   const [showPercentage, setShowPercentage] = useState(true);
-  const traces = clinicalData.map((patientData, index) => {
+
+  // Define a clean color palette
+  const colorPalette = [
+    '#4E79A7',
+    '#F28E2B',
+    '#E15759',
+    '#76B7B2',
+    '#59A14F',
+    '#EDC948',
+    '#B07AA1',
+    '#FF9DA7',
+    '#9C755F',
+    '#BAB0AC',
+  ];
+
+  const datasets = clinicalData.map((patientData, index) => {
     const patientID = patientData.id;
     const timelines = Object.keys(patientData.clinicalData);
 
@@ -19,7 +54,7 @@ function DatabasePlot({ clinicalData }) {
     const baselineTotal = baselineScores.reduce((sum, score) => sum + score, 0) || 1;
 
     // Calculate total scores for each ordered timeline
-    const yValues = orderedTimelines.map((timeline) => {
+    const data = orderedTimelines.map((timeline) => {
       const scores = Object.values(patientData.clinicalData[timeline] || {});
       const totalScore = scores.reduce((sum, score) => sum + score, 0);
       return showPercentage
@@ -28,20 +63,66 @@ function DatabasePlot({ clinicalData }) {
     });
 
     return {
-      x: orderedTimelines,
-      y: yValues,
-      type: 'scatter',
-      mode: 'lines+markers',
-      name: patientID, // Use generated patient ID for the legend
-      line: { width: 2 },
-      marker: { size: 6 },
+      label: `Patient ${patientID}`,
+      data,
+      fill: false,
+      borderColor: colorPalette[index % colorPalette.length], // Use colors from the palette
+      tension: 0.2,
     };
   });
 
+  const labels = clinicalData[0]
+    ? Object.keys(clinicalData[0].clinicalData).sort((a, b) => {
+        if (a === 'baseline') return -1;
+        if (b === 'baseline') return 1;
+        return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+      })
+    : [];
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Clinical Data Visualization',
+      },
+      tooltip: {
+        callbacks: {
+          label: (tooltipItem) =>
+            showPercentage
+              ? `Percentage Improvement: ${tooltipItem.raw.toFixed(2)}%`
+              : `Score: ${tooltipItem.raw.toFixed(2)}`,
+        },
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: 'Time',
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: showPercentage ? 'Percentage Improvement (%)' : 'Scores',
+        },
+      },
+    },
+  };
+
+  const data = {
+    labels,
+    datasets,
+  };
+
   return (
     <div>
-      <div style={{ marginTop: '30px', marginBottom: '-10px' }}>
-        <h3 style={{fontSize: '14px'}}>
+      <div style={{ marginBottom: '10px' }}>
+        <h3 style={{fontSize: '16px'}}>
           <input
             type="checkbox"
             checked={showPercentage}
@@ -50,28 +131,7 @@ function DatabasePlot({ clinicalData }) {
           Show Percentage Improvement
         </h3>
       </div>
-      <Plot
-        data={traces}
-        layout={{
-          xaxis: {
-            title: 'Time',
-            tickfont: { size: 14, color: '#333' },
-            gridcolor: '#f2f2f2',
-          },
-          yaxis: {
-            title: showPercentage ? 'Percentage Improvement (%)' : 'Scores',
-            tickfont: { size: 14, color: '#333' },
-            gridcolor: '#e6e6e6',
-            zeroline: true,
-            zerolinecolor: '#000',
-          },
-          plot_bgcolor: '#fafafa',
-          paper_bgcolor: '#ffffff',
-          margin: { l: 60, r: 40, t: 80, b: 60 },
-          hovermode: 'closest',
-        }}
-        style={{ width: '100%', height: '100%' }}
-      />
+      <Line data={data} options={options} />
     </div>
   );
 }

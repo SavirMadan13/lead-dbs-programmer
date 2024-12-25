@@ -1,5 +1,27 @@
 import React, { useState } from 'react';
-import Plot from 'react-plotly.js';
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler, // Required for shaded areas
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 function GroupAveragePlot({ clinicalData }) {
   const [showPercentage, setShowPercentage] = useState(true);
@@ -36,30 +58,96 @@ function GroupAveragePlot({ clinicalData }) {
     stdDeviations.push(stdDev);
   });
 
-  // Prepare data for average line with shaded area
-  const traceAverage = {
-    x: orderedTimelines,
-    y: averages,
-    type: 'scatter',
-    mode: 'lines',
-    name: 'Group Average',
-    line: { width: 2, color: 'blue' },
+  // Data for Chart.js
+  const data = {
+    labels: orderedTimelines,
+    datasets: [
+      {
+        label: 'Group Average',
+        data: averages,
+        borderColor: 'blue',
+        backgroundColor: 'rgba(0, 0, 255, 0.1)',
+        borderWidth: 2,
+        tension: 0.3,
+        pointRadius: 3,
+      },
+      {
+        label: 'Standard Deviation',
+        data: averages.map((avg, i) => avg + stdDeviations[i]),
+        backgroundColor: 'rgba(173, 216, 230, 0.3)', // Light blue shading
+        borderWidth: 0,
+        fill: '+1', // Fills the area between this and the dataset below
+        tension: 0.3,
+        pointRadius: 0,
+      },
+      {
+        label: '',
+        data: averages.map((avg, i) => avg - stdDeviations[i]),
+        backgroundColor: 'rgba(173, 216, 230, 0.3)', // Same light blue shading
+        borderWidth: 0,
+        fill: false, // End of the fill for the standard deviation area
+        tension: 0.3,
+        pointRadius: 0,
+      },
+    ],
   };
 
-  const traceMargin = {
-    x: [...orderedTimelines, ...orderedTimelines.slice().reverse()],
-    y: [...averages.map((avg, i) => avg + stdDeviations[i]), ...averages.map((avg, i) => avg - stdDeviations[i]).reverse()],
-    type: 'scatter',
-    fill: 'toself',
-    fillcolor: 'rgba(173, 216, 230, 0.3)', // Light blue for standard deviation area
-    line: { width: 0 },
-    showlegend: false,
+  // Chart.js options
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: {
+          font: { size: 14 },
+        },
+      },
+      title: {
+        display: true,
+        text: 'Group Average with Standard Deviation',
+        font: { size: 18 },
+        padding: { top: 10, bottom: 10 },
+      },
+      tooltip: {
+        callbacks: {
+          label: (tooltipItem) =>
+            tooltipItem.dataset.label === 'Group Average'
+              ? `Average: ${tooltipItem.raw.toFixed(2)}`
+              : undefined,
+        },
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: 'Time',
+          font: { size: 14 },
+        },
+        ticks: {
+          font: { size: 12 },
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: showPercentage ? 'Percentage Improvement (%)' : 'Scores',
+          font: { size: 14 },
+        },
+        ticks: {
+          font: { size: 12 },
+        },
+        grid: {
+          color: 'rgba(200, 200, 200, 0.5)',
+        },
+      },
+    },
   };
 
   return (
     <div>
-      <div style={{ marginTop: '30px', marginBottom: '-10px' }}>
-        <h3 style={{fontSize: '14px'}}>
+      <div style={{ marginTop: '20px', marginBottom: '10px' }}>
+        <h3 style={{ fontSize: '14px' }}>
           <input
             type="checkbox"
             checked={showPercentage}
@@ -68,28 +156,7 @@ function GroupAveragePlot({ clinicalData }) {
           Show Percentage Improvement
         </h3>
       </div>
-      <Plot
-        data={[traceAverage, traceMargin]}
-        layout={{
-          xaxis: {
-            title: 'Time',
-            tickfont: { size: 14, color: '#333' },
-            gridcolor: '#f2f2f2',
-          },
-          yaxis: {
-            title: showPercentage ? 'Percentage Improvement (%)' : 'Scores',
-            tickfont: { size: 14, color: '#333' },
-            gridcolor: '#e6e6e6',
-            zeroline: true,
-            zerolinecolor: '#000',
-          },
-          plot_bgcolor: '#fafafa',
-          paper_bgcolor: '#ffffff',
-          margin: { l: 60, r: 40, t: 80, b: 60 },
-          hovermode: 'closest',
-        }}
-        style={{ width: '100%', height: '100%' }}
-      />
+      <Line data={data} options={options} />
     </div>
   );
 }
