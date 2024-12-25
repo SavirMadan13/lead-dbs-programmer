@@ -31,10 +31,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Build the application
-      - name: Build application
-        run: npm run build
-
       # Package the application
       - name: Package application
         run: |
