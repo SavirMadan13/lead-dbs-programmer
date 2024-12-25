@@ -34,13 +34,7 @@ jobs:
       # Package the application
       - name: Package application
         run: |
-          if [[ $RUNNER_OS == 'Windows' ]]; then
-            npm run package:win
-          elif [[ $RUNNER_OS == 'Linux' ]]; then
-            npm run package:linux
-          elif [[ $RUNNER_OS == 'macOS' ]]; then
-            npm run package
-          fi
+          npm run package
 
       # Upload the packaged artifacts
       - name: Upload build artifacts
