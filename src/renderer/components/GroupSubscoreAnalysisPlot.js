@@ -24,6 +24,7 @@ ChartJS.register(
 );
 
 function GroupSubscoreAnalysisPlot({ clinicalData }) {
+  console.log('Clinical Data: ', clinicalData);
   const [showPercentage, setShowPercentage] = useState(true);
 
   const bradykinesiaItems = [
