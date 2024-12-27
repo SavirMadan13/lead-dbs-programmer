@@ -9,7 +9,7 @@ import {
   Title,
   Tooltip,
   Legend,
-  Filler, // For shading
+  Filler,
 } from 'chart.js';
 
 ChartJS.register(
@@ -24,7 +24,6 @@ ChartJS.register(
 );
 
 function GroupSubscoreAnalysisPlot({ clinicalData }) {
-  console.log('Clinical Data: ', clinicalData);
   const [showPercentage, setShowPercentage] = useState(true);
 
   const bradykinesiaItems = [
@@ -58,7 +57,7 @@ function GroupSubscoreAnalysisPlot({ clinicalData }) {
   const categories = [
     { name: 'Bradykinesia', items: bradykinesiaItems, color: '#4E79A7' },
     { name: 'Rigidity', items: rigidityItems, color: '#59A14F' },
-    { name: 'Tremor', items: '#E15759', color: '#E15759' },
+    { name: 'Tremor', items: tremorItems, color: '#E15759' },
     { name: 'Axial', items: axialItems, color: '#F28E2B' },
   ];
 
@@ -69,14 +68,12 @@ function GroupSubscoreAnalysisPlot({ clinicalData }) {
     return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
   });
 
-  // Helper function to calculate mean and standard deviation
   const calculateStats = (values) => {
     const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
     const stdDev = Math.sqrt(values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length);
     return { mean, stdDev };
   };
 
-  // Chart.js datasets
   const datasets = [];
 
   categories.forEach(({ name, items, color }) => {
@@ -99,26 +96,24 @@ function GroupSubscoreAnalysisPlot({ clinicalData }) {
     const averages = orderedTimelines.map((_, i) => calculateStats(patientData.map((patient) => patient[i])).mean);
     const stdDevs = orderedTimelines.map((_, i) => calculateStats(patientData.map((patient) => patient[i])).stdDev);
 
-    // Individual patient lines
     patientData.forEach((data, i) => {
       datasets.push({
         label: `Patient ${i + 1} - ${name}`,
         data,
-        borderColor: `${color}33`, // Transparent version for individual lines
-        borderWidth: 1,
+        borderColor: `${color}88`, // Lighter color for visibility
+        borderWidth: 1.5,
         tension: 0.2,
         pointRadius: 0,
         showLine: true,
       });
     });
 
-    // Average line with shading for standard deviation
     datasets.push({
       label: `${name} Average`,
       data: averages,
       borderColor: color,
       backgroundColor: `${color}33`,
-      borderWidth: 2,
+      borderWidth: 2.5,
       fill: '-1',
       tension: 0.3,
       pointRadius: 3,
@@ -130,7 +125,6 @@ function GroupSubscoreAnalysisPlot({ clinicalData }) {
       backgroundColor: `${color}33`,
       borderWidth: 0,
       fill: '+1',
-      tension: 0.3,
       pointRadius: 0,
     });
 
@@ -153,7 +147,19 @@ function GroupSubscoreAnalysisPlot({ clinicalData }) {
     responsive: true,
     plugins: {
       legend: {
-        position: 'top',
+        labels: {
+          filter: (legendItem) => !legendItem.text.includes('Patient'), // Exclude patient lines
+        },
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            if (context.dataset.label.includes('Patient')) {
+              return `${context.dataset.label}: ${context.raw}`;
+            }
+            return `${context.dataset.label}: ${context.raw}`;
+          },
+        },
       },
       title: {
         display: true,

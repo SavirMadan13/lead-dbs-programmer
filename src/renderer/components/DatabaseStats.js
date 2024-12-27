@@ -67,22 +67,6 @@ function DatabaseStats({ directoryPath }) {
     '3.12: Postural stability',
     '3.13: Posture',
   ];
-  // useEffect(() => {
-  //   if (directoryPath) {
-  //     // Request timelines from the main process
-  //     window.electron.ipcRenderer
-  //       .invoke('get-timelines', directoryPath, patients[0].id, true)
-  //       .then((receivedTimelines) => {
-  //         const timelineNames = receivedTimelines.map(
-  //           (timelineData) => timelineData.timeline
-  //         );
-  //         console.log(timelineNames);
-  //       })
-  //       .catch((error) => {
-  //         console.error('Error fetching timelines:', error);
-  //       });
-  //   }
-  // }, [directoryPath, patients]);
 
   useEffect(() => {
     if (directoryPath && filteredPatients.length > 0) {
@@ -236,153 +220,29 @@ function DatabaseStats({ directoryPath }) {
         return (
           <GroupSubscoreAnalysisPlot clinicalData={clinicalDataForPlotting} />
         );
-      // case 'all':
-      //   return (
-      //     <div style={{ display: 'flex', marginLeft: '-60px', width: '1000px' }}>
-      //       <div style={{ flex: 1, marginLeft: '-30px' }}>
-      //         <DatabasePlot clinicalData={clinicalDataForPlotting}
-      //         />
-      //       </div>
-      //       <div style={{ flex: 1, marginLeft: '-50px' }}>
-      //         <LateralityAnalysisComponent
-      //           rawData={rawData}
-      //           showPercentage={showPercentage}
-      //         />
-      //       </div>
-      //       <div style={{ flex: 1, marginLeft: '-60px' }}>
-      //         <SubscoreAnalysis
-      //           rawData={rawData}
-      //           showPercentage={showPercentage}
-      //         />
-      //       </div>
-      //     </div>
-      //   );
+      case 'all':
+        return (
+          <div>
+            <div style={{ flex: 1, marginLeft: '-60px' }}>
+              <DatabasePlot clinicalData={clinicalDataForPlotting} />
+            </div>
+            <div style={{ flex: 1, marginLeft: '-60px' }}>
+              <GroupAveragePlot clinicalData={clinicalDataForPlotting} />;
+            </div>
+            <div style={{ flex: 1, marginLeft: '-60px' }}>
+              <GroupLateralityAnalysisPlot clinicalData={clinicalDataForPlotting} />
+            </div>
+            <div style={{ flex: 1, marginLeft: '-60px' }}>
+              <GroupSubscoreAnalysisPlot clinicalData={clinicalDataForPlotting} />
+
+            </div>
+          </div>
+        );
 
       default:
         return <p>Please select an analysis type.</p>;
     }
   };
-
-  // useEffect(() => {
-  //   const updatedClinicalData = { ...clinicalDataForPlotting };
-  //   const subscores = {};
-  //   const tremorPatients = [];
-  //   const bradyKinesiaPatients = [];
-  //   const otherPatients = {};
-  //   Object.keys(updatedClinicalData).forEach((key, index) => {
-  //     let ptClinicalData = updatedClinicalData[key];
-  //     const pt_baseline_scores = ptClinicalData.clinicalData.baseline;
-  //     console.log(key, pt_baseline_scores);
-  //     let pt_bradykinesia = 0;
-  //     let pt_tremor = 0;
-  //     Object.keys(bradykinesiaItems).forEach((item) => {
-  //       pt_bradykinesia += parseFloat(
-  //         pt_baseline_scores[bradykinesiaItems[item]],
-  //       );
-  //     });
-  //     Object.keys(tremorItems).forEach((tremorItem) => {
-  //       pt_tremor += parseFloat(pt_baseline_scores[tremorItems[tremorItem]]);
-  //     });
-  //     subscores[ptClinicalData.id] = {
-  //       bradykinesia: pt_bradykinesia,
-  //       tremor: pt_tremor,
-  //     };
-  //     if (pt_tremor === 0) {
-  //       console.log(patients[index]);
-  //       bradyKinesiaPatients.push(patients[index]);
-  //     } else if (pt_bradykinesia === 0 || pt_tremor / pt_bradykinesia >= 1.5) {
-  //       tremorPatients.push(patients[index]);
-  //     }
-  //   });
-  //   console.log('Subscores: ', subscores);
-  //   console.log(bradyKinesiaPatients);
-  //   console.log(tremorPatients);
-  //   setTremorPts(tremorPatients);
-  //   setBradykinesiaPts(bradyKinesiaPatients);
-  // }, [clinicalDataForPlotting]);
-
-  // useEffect(() => {
-  //   console.log(selectedPatient);
-  //   if (selectedPatient === 'tremor') {
-  //     console.log(tremorPts);
-  //     setFilteredPatients(tremorPts);
-  //     setDisplayedPatients(tremorPts);
-  //   } else if (selectedPatient === 'bradykinesia') {
-  //     console.log(bradykinesiaPts);
-  //     setFilteredPatients(bradykinesiaPts);
-  //     setDisplayedPatients(bradykinesiaPts);
-  //   } else {
-  //     // Reset to show all patients or another default list as needed
-  //     setFilteredPatients(patients);
-  //     setDisplayedPatients(patients);
-  //   }
-  // }, [selectedPatient]); // Add dependencies here
-
-  // Combine tremor and bradykinesia patient states into one
-  // const [patientGroups, setPatientGroups] = useState({
-  //   tremor: [],
-  //   bradykinesia: [],
-  // });
-
-  // useEffect(() => {
-  //   if (!clinicalDataForPlotting) return;
-
-  //   const updatedClinicalData = { ...clinicalDataForPlotting };
-  //   const subscores = {};
-  //   const tremorPatients = [];
-  //   const bradykinesiaPatients = [];
-
-  //   Object.keys(updatedClinicalData).forEach((key, index) => {
-  //     const ptClinicalData = updatedClinicalData[key];
-  //     const pt_baseline_scores = ptClinicalData.clinicalData.baseline;
-  //     console.log(key, pt_baseline_scores);
-
-  //     let pt_bradykinesia = 0;
-  //     let pt_tremor = 0;
-
-  //     // Calculate bradykinesia and tremor subscores
-  //     bradykinesiaItems.forEach((item) => {
-  //       pt_bradykinesia += parseFloat(pt_baseline_scores[bradykinesiaItems[item]]) || 0;
-  //     });
-  //     tremorItems.forEach((tremorItem) => {
-  //       pt_tremor += parseFloat(pt_baseline_scores[tremorItems[tremorItem]]) || 0;
-  //     });
-
-  //     // Determine patient group based on scores
-  //     subscores[ptClinicalData.id] = { bradykinesia: pt_bradykinesia, tremor: pt_tremor };
-  //     if (pt_tremor === 0) {
-  //       bradykinesiaPatients.push(patients[index]);
-  //     } else if (pt_bradykinesia === 0 || pt_tremor / pt_bradykinesia >= 1.5) {
-  //       tremorPatients.push(patients[index]);
-  //     }
-  //   });
-
-  //   console.log('Subscores:', subscores);
-  //   console.log('Bradykinesia Patients:', bradykinesiaPatients);
-  //   console.log('Tremor Patients:', tremorPatients);
-
-  //   // Update both groups in one state update
-  //   setPatientGroups({ tremor: tremorPatients, bradykinesia: bradykinesiaPatients });
-
-  // }, [clinicalDataForPlotting, patients]);
-
-  // // Handle selectedPatient changes by referring to `patientGroups`
-  // useEffect(() => {
-  //   const { tremor, bradykinesia } = patientGroups;
-
-  //   if (selectedPatient === 'tremor') {
-  //     console.log("Displaying Tremor Patients:", tremor);
-  //     setFilteredPatients(tremor);
-  //     setDisplayedPatients(tremor);
-  //   } else if (selectedPatient === 'bradykinesia') {
-  //     console.log("Displaying Bradykinesia Patients:", bradykinesia);
-  //     setFilteredPatients(bradykinesia);
-  //     setDisplayedPatients(bradykinesia);
-  //   } else {
-  //     setFilteredPatients(patients);
-  //     setDisplayedPatients(patients);
-  //   }
-  // }, [selectedPatient, patientGroups, patients]);
 
   const handleAnalysisChange = (e) => {
     setAnalysisType(e.target.value);
@@ -465,32 +325,16 @@ function DatabaseStats({ directoryPath }) {
           </ul>
         </div>
       </div>
-      <div>
-        {/* <select value={analysisType} onChange={handleAnalysisChange}>
-          <option value="raincloud">Trendline</option>
-          <option value="average">Group Average</option>
-          <option value="laterality">Laterality Analysis</option>
-          <option value="subscore">Subscores</option>
-        </select> */}
-      </div>
+      <div />
       {clinicalDataForPlotting && filteredPatients && (
         <div style={{ width: '1000px' }}>
-          {/* <DatabasePlot clinicalData={clinicalDataForPlotting} />
-          <GroupAveragePlot clinicalData={clinicalDataForPlotting} />
-          <GroupLateralityAnalysisPlot clinicalData={clinicalDataForPlotting} />
-          <GroupSubscoreAnalysisPlot clinicalData={clinicalDataForPlotting} /> */}
           <select value={analysisType} onChange={handleAnalysisChange}>
             <option value="none">Choose an option</option>
             <option value="raincloud">Trendline</option>
             <option value="average">Group Average</option>
             <option value="laterality">Laterality Analysis</option>
             <option value="subscore">Subscores</option>
-            {/* <option value="boxPlot">Box Plot</option>
-            <option value="laterality">Laterality Analysis</option> */}
-            {/* <option value="subscale">Subscale Comparison</option>
-            <option value="responder">Responder Analysis</option> */}
-            {/* <option value="correlation">Correlation Analysis</option> */}
-            {/* <option value="all">View All Plots</option> */}
+            <option value="all">View All Plots</option>
           </select>
           {renderAnalysis()}
         </div>
