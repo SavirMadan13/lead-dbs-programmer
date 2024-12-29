@@ -55,7 +55,10 @@ function Import({ leadDBS }) {
         const perc = percValue === null ? defaultPerc : percValue;
         const contactLevel = contact.replace(/[^\d]/g, ''); // Extract level
 
-        if (isDirected && etageIdx.some((range) => range.includes(contactLevel))) {
+        if (
+          isDirected &&
+          etageIdx.some((range) => range.includes(contactLevel))
+        ) {
           // Evenly distribute percentage among directional sub-contacts
           const levelContacts = contactNames.filter((name) =>
             name.includes(contactLevel)
