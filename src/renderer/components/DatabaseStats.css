@@ -15,17 +15,23 @@
   margin-top: -70px;
 }
 
-.filter-controls {
+/* .filter-controls {
   display: flex;
   gap: 20px;
   align-items: flex-start;
   margin-bottom: 20px;
+} */
+
+.filter-controls {
+  display: flex;
+  flex-direction: column; /* Stack filters vertically */
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
 }
 
 .age-input, .gender-select, .analysis-select {
