@@ -26,7 +26,18 @@ function Import({ leadDBS }) {
     const processContacts = (contacts, polarity, hemisphere, config, source) => {
       const isDirected = config.isdirected === 1;
       const etageIdx = isDirected ? config.etageidx : null;
-      const contactNames = config.contactnames;
+
+      // Define a mapping from contact names to indices
+      const contactMapping = {
+        '1': '1',
+        '2a': '2',
+        '2b': '3',
+        '2c': '4',
+        '3a': '5',
+        '3b': '6',
+        '3c': '7',
+        '4': '8'
+      };
 
       // Parse the contacts
       const parsedContacts = contacts.split('/').map((entry) => {
@@ -34,8 +45,21 @@ function Import({ leadDBS }) {
         const percValue = percentage
           ? parseFloat(percentage.replace('%', ''))
           : null; // Use null if percentage not specified
+
+        // Handle cases like "2a-" or "2ab-"
+        if (contact.includes('-')) {
+          // If contact is like "2a-", treat it as a single contact
+          return [{ contact, percValue }];
+        } else if (/[a-z]/.test(contact)) {
+          // If contact is like "2ab", split and distribute percentage
+          const contactParts = contact.split(/(?=[a-z])/);
+          return contactParts.map(part => ({ contact: part, percValue: percValue / contactParts.length }));
+        }
+
         return { contact, percValue };
-      });
+      }).flat(); // Flatten the array in case of split contacts
+
+      console.log(parsedContacts);
 
       // Calculate percentages for contacts
       let totalPerc = 0;
@@ -48,37 +72,57 @@ function Import({ leadDBS }) {
         }
       });
 
+      console.log(missingPerc);
+      console.log(totalPerc);
+
       const defaultPerc = missingPerc.length > 0 ? (100 - totalPerc) / missingPerc.length : 0;
 
       // Process each contact
       parsedContacts.forEach(({ contact, percValue }) => {
         const perc = percValue === null ? defaultPerc : percValue;
         const contactLevel = contact.replace(/[^\d]/g, ''); // Extract level
-
-        if (
+        console.log(contactLevel);
+        // Map contact to new index
+        const mappedContact = contactMapping[contact] || contact;
+        const sanitizedContact = contact.replace(/[+-]$/, '');
+        console.log(sanitizedContact);
+        if (sanitizedContact === 'C') {
+          console.log('case');
+          S[`${hemisphere}s${source}`].case = {
+            perc: 100,
+            pol: polarity === -1 ? 1 : 2,
+          };
+        } else if (contactMapping[sanitizedContact]) {
+          const contactIdx = contactMapping[sanitizedContact];
+          S[`${hemisphere}s${source}`][`k${contactIdx}`] = {
+            perc: 100,
+            pol: polarity === -1 ? 1 : 2,
+            imp: 1,
+          };
+        } else if (
           isDirected &&
           etageIdx.some((range) => range.includes(contactLevel))
         ) {
           // Evenly distribute percentage among directional sub-contacts
-          const levelContacts = contactNames.filter((name) =>
+          const levelContacts = Object.keys(contactMapping).filter((name) =>
             name.includes(contactLevel)
           );
           const distributedPerc = perc / levelContacts.length;
 
           levelContacts.forEach((contactName) => {
-            const contactIdx = contactName.replace(/[^\dA-Z]/g, '');
+            const contactIdx = contactMapping[contactName];
             S[`${hemisphere}s${source}`][`k${contactIdx}`] = {
               perc: distributedPerc,
-              pol: polarity,
+              pol: polarity === -1 ? 1 : 2,
               imp: 1,
             };
           });
         } else {
           // Non-directional contact or entire level
-          const contactIdx = contact.replace(/[^\d]/g, '');
+          const contactIdx = mappedContact.replace(/[^\d]/g, '');
           S[`${hemisphere}s${source}`][`k${contactIdx}`] = {
             perc,
-            pol: polarity,
+            pol: polarity === -1 ? 1 : 2,
             imp: 1,
           };
         }
@@ -99,6 +143,7 @@ function Import({ leadDBS }) {
       }
 
       if (rightNegative) {
+        console.log(rightNegative);
         processContacts(rightNegative, -1, 'R', configR, source);
       }
 
@@ -106,7 +151,7 @@ function Import({ leadDBS }) {
         processContacts(rightPositive, 1, 'R', configR, source);
 
         // Reset case if positive contacts exist
-        S[`Rs${source}`].case = { perc: 0, pol: 0 };
+        // S[`Rs${source}`].case = { perc: 0, pol: 0 };
       }
 
       // Parse Left Hemisphere
@@ -122,6 +167,7 @@ function Import({ leadDBS }) {
       }
 
       if (leftNegative) {
+        console.log(leftNegative);
         processContacts(leftNegative, -1, 'L', configL, source);
       }
 
@@ -129,13 +175,12 @@ function Import({ leadDBS }) {
         processContacts(leftPositive, 1, 'L', configL, source);
 
         // Reset case if positive contacts exist
-        S[`Ls${source}`].case = { perc: 0, pol: 0 };
+        // S[`Ls${source}`].case = { perc: 0, pol: 0 };
       }
     }
 
     return S;
   }
-
 
   const parseStimulations = (sheetData) => {
     const parsedData = sheetData.map((row) => {

@@ -2976,31 +2976,17 @@ function PlyViewer({
       index === activeContact ? finalAmplitude : equalAmplitude,
     );
     console.log(updatedV);
-    // setPlotNiiCoords(L);
-    // const reducedLJSON = JSON.stringify(normalizedPlotNiiCoords, null, 2);
+    setPlotNiiCoords(L);
 
-    // // Create a Blob and download it
-    // const blob = new Blob([reducedLJSON], { type: 'application/json' });
-    // const url = URL.createObjectURL(blob);
+    // const outputV = optimizeSphereValues(
+    //   sphereCoords,
+    //   updatedV,
+    //   normalizedPlotNiiCoords,
+    //   // normalizedTestCoords,
+    // );
+    // console.log(outputV);
+    // handleNiftiQuantityStateChange(outputV);
 
-    // // Create a temporary anchor element to trigger the download
-    // const a = document.createElement('a');
-    // a.href = url;
-    // a.download = 'L.json'; // The name of the downloaded file
-    // a.click();
-
-    // // Clean up the URL object
-    // URL.revokeObjectURL(url);
-
-
-    const outputV = optimizeSphereValues(
-      sphereCoords,
-      updatedV,
-      normalizedPlotNiiCoords,
-      // normalizedTestCoords,
-    );
-    console.log(outputV);
-    handleNiftiQuantityStateChange(outputV);
     // setNiiSolution(outputV);
   };
 

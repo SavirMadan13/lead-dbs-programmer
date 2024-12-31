@@ -263,7 +263,7 @@ function PatientDetails({ directoryPath, leadDBS }) {
       {/* Patient Information Section */}
       <h2 className="section-title">Patient Information</h2>
       <div className="patient-info-container">
-        <p className="patient-info">
+        {/* <p className="patient-info">
           <strong>ID:</strong> {patient.id}
         </p>
         <p className="patient-info">
@@ -277,7 +277,12 @@ function PatientDetails({ directoryPath, leadDBS }) {
         </p>
         <p className="patient-info">
           <strong>Diagnosis:</strong> {patient.diagnosis}
-        </p>
+        </p> */}
+        {Object.entries(patient).map(([key, value]) => (
+          <p className="patient-info" key={key}>
+            <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong> {value}
+          </p>
+        ))}
       </div>
 
       {/* Another Divider */}

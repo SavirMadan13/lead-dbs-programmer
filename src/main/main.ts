@@ -43,6 +43,7 @@ app.on('ready', () => {
 // const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
 // const inputPath = process.argv[1];
 const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
+// const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0366Output';
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons/derivatives/leadgroup/BwhParkinsons/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataBwh.json';
 // const inputPath = '/Users/savirmadan/Documents/SanteGroup/derivatives/leadgroup/2024nov5V2/inputData.json';

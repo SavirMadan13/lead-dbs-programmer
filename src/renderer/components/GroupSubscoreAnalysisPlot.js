@@ -114,26 +114,32 @@ function GroupSubscoreAnalysisPlot({ clinicalData }) {
       borderColor: color,
       backgroundColor: `${color}33`,
       borderWidth: 2.5,
-      fill: '-1',
+      fill: {
+        target: '+1', // Fill between this dataset and the next one
+        above: `${color}33`, // Color for the area above the line
+        below: `${color}33`, // Color for the area below the line
+      },
       tension: 0.3,
       pointRadius: 3,
     });
 
     datasets.push({
-      label: `${name} Std Dev`,
+      label: `${name} Std Dev Upper`,
       data: averages.map((avg, i) => avg + stdDevs[i]),
+      borderColor: 'transparent', // Hide the line
       backgroundColor: `${color}33`,
       borderWidth: 0,
-      fill: '+1',
+      fill: false,
       pointRadius: 0,
     });
 
     datasets.push({
-      label: `${name} Std Dev (Lower)`,
+      label: `${name} Std Dev Lower`,
       data: averages.map((avg, i) => avg - stdDevs[i]),
+      borderColor: 'transparent', // Hide the line
       backgroundColor: `${color}33`,
       borderWidth: 0,
-      fill: false,
+      fill: '-1', // Fill between this dataset and the previous one
       pointRadius: 0,
     });
   });

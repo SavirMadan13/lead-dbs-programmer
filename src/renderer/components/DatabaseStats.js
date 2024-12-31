@@ -317,7 +317,6 @@ function DatabaseStats({ directoryPath }) {
   //   });
   // };
 
-
   const applyFilters = (filters) => {
     console.log('Filters:', filters);
     return patients.filter((patient) => {
@@ -347,7 +346,7 @@ function DatabaseStats({ directoryPath }) {
     // Filter clinical data based on filtered patients
     if (clinicalData) {
       const filteredClinicalData = clinicalData.filter((data) =>
-        filtered.some((patient) => patient.id === data.id)
+        filtered.some((patient) => patient.id === data.id),
       );
       setClinicalDataForPlotting(filteredClinicalData);
     }
@@ -412,7 +411,14 @@ function DatabaseStats({ directoryPath }) {
             <ul>
               {displayedPatients.map((patient, index) => (
                 <li key={index}>
-                  {patient.id} - Name: {patient.name}, Age: {patient.age}, Gender: {patient.gender}
+                  {Object.entries(patient).map(([key, value]) => (
+                    <p key={key}>
+                      <strong>
+                        {key.charAt(0).toUpperCase() + key.slice(1)}:
+                      </strong>{' '}
+                      {value}
+                    </p>
+                  ))}
                 </li>
               ))}
             </ul>
