@@ -23,8 +23,9 @@ ChartJS.register(
   Filler
 );
 
-function GroupLateralityAveragePlot({ clinicalData }) {
+function GroupLateralityAnalysisPlot({ clinicalData }) {
   const [showPercentage, setShowPercentage] = useState(true);
+  const [showGroupAverage, setShowGroupAverage] = useState(false);
 
   const leftSideItems = [
     '3.3c: Rigidity- LUE', '3.3e: Rigidity- LLE', '3.4b: Finger tapping- Left hand',
@@ -42,17 +43,15 @@ function GroupLateralityAveragePlot({ clinicalData }) {
     '3.17a: Rest tremor amplitude- RUE', '3.17c: Rest tremor amplitude- RLE',
   ];
 
-  // Function to parse timeline strings (e.g., '3months', '2years', etc.)
   const parseTimeline = (timeline) => {
-    if (timeline === 'baseline') return 0; // Baseline is the starting point
+    if (timeline === 'baseline') return 0;
     const match = timeline.match(/(\d+)(years|months)/);
-    if (!match) return Infinity; // Handle unexpected formats
+    if (!match) return Infinity;
     const [_, value, unit] = match;
-    const multiplier = unit === 'years' ? 12 : 1; // Convert years to months
+    const multiplier = unit === 'years' ? 12 : 1;
     return parseInt(value) * multiplier;
   };
 
-  // Get all timelines and order them chronologically
   const timelines = [...new Set(clinicalData.flatMap((patient) => Object.keys(patient.clinicalData)))];
   const orderedTimelines = timelines.sort((a, b) => parseTimeline(a) - parseTimeline(b));
 
@@ -62,7 +61,6 @@ function GroupLateralityAveragePlot({ clinicalData }) {
     return { mean, stdDev };
   };
 
-  // Collect data for each patient for left and right sides
   const leftPatientData = clinicalData.map((patientData) =>
     orderedTimelines.map((timeline) => {
       const baselineScores = Object.entries(patientData.clinicalData['baseline'] || {})
@@ -101,56 +99,104 @@ function GroupLateralityAveragePlot({ clinicalData }) {
   const rightAverages = orderedTimelines.map((_, i) => calculateStats(rightPatientData.map((patient) => patient[i])).mean);
   const rightStdDevs = orderedTimelines.map((_, i) => calculateStats(rightPatientData.map((patient) => patient[i])).stdDev);
 
+  const individualDatasets = [
+    ...leftPatientData.map((data, i) => ({
+      label: `Patient ${clinicalData[i].id} - Left`,
+      data,
+      borderColor: 'rgba(78, 121, 167, 1)',
+      borderWidth: 2,
+      tension: 0.2,
+      pointRadius: 3,
+      showLine: true,
+    })),
+    ...rightPatientData.map((data, i) => ({
+      label: `Patient ${clinicalData[i].id} - Right`,
+      data,
+      borderColor: 'rgba(242, 142, 43, 1)',
+      borderWidth: 2,
+      tension: 0.2,
+      pointRadius: 3,
+      showLine: true,
+    })),
+  ];
+
+  const groupAverageDatasets = [
+    {
+      label: 'Left Side Average',
+      data: leftAverages,
+      borderColor: '#4E79A7',
+      backgroundColor: 'rgba(78, 121, 167, 0.2)',
+      borderWidth: 2,
+      fill: false,
+      tension: 0.3,
+      pointRadius: 3,
+      order: 1,
+    },
+    {
+      label: 'Right Side Average',
+      data: rightAverages,
+      borderColor: '#F28E2B',
+      backgroundColor: 'rgba(242, 142, 43, 0.2)',
+      borderWidth: 2,
+      fill: false,
+      tension: 0.3,
+      pointRadius: 3,
+      order: 1,
+    },
+    {
+      label: 'Left Side Std Dev Upper',
+      data: leftAverages.map((avg, i) => avg + leftStdDevs[i]),
+      backgroundColor: 'rgba(78, 121, 167, 0.1)',
+      borderWidth: 0,
+      fill: '+1',
+      tension: 0.3,
+      pointRadius: 0,
+      order: 0,
+    },
+    {
+      label: 'Left Side Std Dev Lower',
+      data: leftAverages.map((avg, i) => avg - leftStdDevs[i]),
+      backgroundColor: 'rgba(78, 121, 167, 0.1)',
+      borderWidth: 0,
+      fill: false,
+      tension: 0.3,
+      pointRadius: 0,
+      order: 0,
+    },
+    {
+      label: 'Right Side Std Dev Upper',
+      data: rightAverages.map((avg, i) => avg + rightStdDevs[i]),
+      backgroundColor: 'rgba(242, 142, 43, 0.1)',
+      borderWidth: 0,
+      fill: '+1',
+      tension: 0.3,
+      pointRadius: 0,
+      order: 0,
+    },
+    {
+      label: 'Right Side Std Dev Lower',
+      data: rightAverages.map((avg, i) => avg - rightStdDevs[i]),
+      backgroundColor: 'rgba(242, 142, 43, 0.1)',
+      borderWidth: 0,
+      fill: false,
+      tension: 0.3,
+      pointRadius: 0,
+      order: 0,
+    },
+  ];
+
   const data = {
     labels: orderedTimelines,
-    datasets: [
-      ...leftPatientData.map((data, i) => ({
-        label: `Patient ${i + 1} - Left`,
-        data,
-        borderColor: 'rgba(78, 121, 167, 0.3)',
-        borderWidth: 1,
-        tension: 0.2,
-        pointRadius: 0,
-        showLine: true,
-      })),
-      ...rightPatientData.map((data, i) => ({
-        label: `Patient ${i + 1} - Right`,
-        data,
-        borderColor: 'rgba(242, 142, 43, 0.3)',
-        borderWidth: 1,
-        tension: 0.2,
-        pointRadius: 0,
-        showLine: true,
-      })),
-      {
-        label: 'Left Side Average',
-        data: leftAverages,
-        borderColor: '#4E79A7',
-        backgroundColor: 'rgba(78, 121, 167, 0.2)',
-        borderWidth: 2,
-        fill: '-1',
-        tension: 0.3,
-        pointRadius: 3,
-      },
-      {
-        label: 'Right Side Average',
-        data: rightAverages,
-        borderColor: '#F28E2B',
-        backgroundColor: 'rgba(242, 142, 43, 0.2)',
-        borderWidth: 2,
-        fill: '-1',
-        tension: 0.3,
-        pointRadius: 3,
-      },
-    ],
+    datasets: showGroupAverage ? groupAverageDatasets : individualDatasets,
   };
 
   const options = {
     responsive: true,
     plugins: {
       legend: {
+        display: true,
         labels: {
-          filter: (legendItem) => !legendItem.text.includes('Patient'), // Exclude patient lines from the legend
+          filter: (legendItem) => !legendItem.text.includes('Std Dev'),
         },
       },
       tooltip: {
@@ -165,7 +211,7 @@ function GroupLateralityAveragePlot({ clinicalData }) {
       },
       title: {
         display: true,
-        text: 'Group Laterality Analysis',
+        text: showGroupAverage ? 'Group Laterality Analysis - Averages' : 'Group Laterality Analysis - Individual',
         font: { size: 18 },
       },
     },
@@ -196,10 +242,18 @@ function GroupLateralityAveragePlot({ clinicalData }) {
           />
           Show Percentage Improvement
         </h3>
+        <h3 style={{ fontSize: '14px' }}>
+          <input
+            type="checkbox"
+            checked={showGroupAverage}
+            onChange={() => setShowGroupAverage((prev) => !prev)}
+          />
+          Show Group Average
+        </h3>
       </div>
       <Line data={data} options={options} />
     </div>
   );
 }
 
-export default GroupLateralityAveragePlot;
+export default GroupLateralityAnalysisPlot;

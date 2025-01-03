@@ -25,6 +25,7 @@ ChartJS.register(
 
 function GroupSubscoreAnalysisPlot({ clinicalData }) {
   const [showPercentage, setShowPercentage] = useState(true);
+  const [showGroupAverage, setShowGroupAverage] = useState(false);
 
   const bradykinesiaItems = [
     '3.4a: Finger tapping- Right hand', '3.4b: Finger tapping- Left hand',
@@ -54,7 +55,7 @@ function GroupSubscoreAnalysisPlot({ clinicalData }) {
     '3.13: Posture',
   ];
 
-  const categories = [
+  const subscoreCategories = [
     { name: 'Bradykinesia', items: bradykinesiaItems, color: '#4E79A7' },
     { name: 'Rigidity', items: rigidityItems, color: '#59A14F' },
     { name: 'Tremor', items: tremorItems, color: '#E15759' },
@@ -65,7 +66,21 @@ function GroupSubscoreAnalysisPlot({ clinicalData }) {
   const orderedTimelines = timelines.sort((a, b) => {
     if (a === 'baseline') return -1;
     if (b === 'baseline') return 1;
-    return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+
+    const aIsMonth = a.includes('month');
+    const bIsMonth = b.includes('month');
+    const aIsYear = a.includes('year');
+    const bIsYear = b.includes('year');
+
+    if (aIsMonth && !bIsMonth) return -1;
+    if (!aIsMonth && bIsMonth) return 1;
+    if (aIsYear && !bIsYear) return 1;
+    if (!aIsYear && bIsYear) return -1;
+
+    return a.localeCompare(b, undefined, {
+      numeric: true,
+      sensitivity: 'base',
+    });
   });
 
   const calculateStats = (values) => {
@@ -76,7 +91,7 @@ function GroupSubscoreAnalysisPlot({ clinicalData }) {
 
   const datasets = [];
 
-  categories.forEach(({ name, items, color }) => {
+  subscoreCategories.forEach(({ name, items, color }) => {
     const patientData = clinicalData.map((patientData) =>
       orderedTimelines.map((timeline) => {
         const baselineScores = Object.entries(patientData.clinicalData['baseline'] || {})
@@ -93,55 +108,51 @@ function GroupSubscoreAnalysisPlot({ clinicalData }) {
       })
     );
 
-    const averages = orderedTimelines.map((_, i) => calculateStats(patientData.map((patient) => patient[i])).mean);
-    const stdDevs = orderedTimelines.map((_, i) => calculateStats(patientData.map((patient) => patient[i])).stdDev);
-
-    patientData.forEach((data, i) => {
-      datasets.push({
-        label: `Patient ${i + 1} - ${name}`,
-        data,
-        borderColor: `${color}88`, // Lighter color for visibility
-        borderWidth: 1.5,
-        tension: 0.2,
-        pointRadius: 0,
-        showLine: true,
+    if (!showGroupAverage) {
+      patientData.forEach((data, i) => {
+        datasets.push({
+          label: `Patient ${clinicalData[i].id} - ${name}`,
+          data,
+          borderColor: `${color}88`, // Lighter color for visibility
+          borderWidth: 1.5,
+          tension: 0.2,
+          pointRadius: 3, // Set point radius for interactivity
+          showLine: true,
+        });
       });
-    });
+    } else {
+      const averages = orderedTimelines.map((_, i) => calculateStats(patientData.map((patient) => patient[i])).mean);
+      const stdDevs = orderedTimelines.map((_, i) => calculateStats(patientData.map((patient) => patient[i])).stdDev);
 
-    datasets.push({
-      label: `${name} Average`,
-      data: averages,
-      borderColor: color,
-      backgroundColor: `${color}33`,
-      borderWidth: 2.5,
-      fill: {
-        target: '+1', // Fill between this dataset and the next one
-        above: `${color}33`, // Color for the area above the line
-        below: `${color}33`, // Color for the area below the line
-      },
-      tension: 0.3,
-      pointRadius: 3,
-    });
+      datasets.push({
+        label: `${name} Average`,
+        data: averages,
+        borderColor: color,
+        backgroundColor: `${color}33`,
+        borderWidth: 2.5,
+        fill: false,
+        tension: 0.3,
+        pointRadius: 3,
+      });
 
-    datasets.push({
-      label: `${name} Std Dev Upper`,
-      data: averages.map((avg, i) => avg + stdDevs[i]),
-      borderColor: 'transparent', // Hide the line
-      backgroundColor: `${color}33`,
-      borderWidth: 0,
-      fill: false,
-      pointRadius: 0,
-    });
+      datasets.push({
+        label: `${name} Std Dev Upper`,
+        data: averages.map((avg, i) => avg + stdDevs[i]),
+        backgroundColor: `${color}33`,
+        borderWidth: 0,
+        fill: '+1',
+        pointRadius: 0,
+      });
 
-    datasets.push({
-      label: `${name} Std Dev Lower`,
-      data: averages.map((avg, i) => avg - stdDevs[i]),
-      borderColor: 'transparent', // Hide the line
-      backgroundColor: `${color}33`,
-      borderWidth: 0,
-      fill: '-1', // Fill between this dataset and the previous one
-      pointRadius: 0,
-    });
+      datasets.push({
+        label: `${name} Std Dev Lower`,
+        data: averages.map((avg, i) => avg - stdDevs[i]),
+        backgroundColor: `${color}33`,
+        borderWidth: 0,
+        fill: false,
+        pointRadius: 0,
+      });
+    }
   });
 
   const data = {
@@ -153,8 +164,9 @@ function GroupSubscoreAnalysisPlot({ clinicalData }) {
     responsive: true,
     plugins: {
       legend: {
+        display: true,
         labels: {
-          filter: (legendItem) => !legendItem.text.includes('Patient'), // Exclude patient lines
+          filter: (legendItem) => !legendItem.text.includes('Std Dev'), // Filter out std dev from legend
         },
       },
       tooltip: {
@@ -163,13 +175,13 @@ function GroupSubscoreAnalysisPlot({ clinicalData }) {
             if (context.dataset.label.includes('Patient')) {
               return `${context.dataset.label}: ${context.raw}`;
             }
-            return `${context.dataset.label}: ${context.raw}`;
+            return `${context.dataset.label}`;
           },
         },
       },
       title: {
         display: true,
-        text: 'Group Subscore Analysis',
+        text: showGroupAverage ? 'Group Subscore Analysis - Averages' : 'Group Subscore Analysis - Individual',
         font: { size: 18 },
       },
     },
@@ -199,6 +211,14 @@ function GroupSubscoreAnalysisPlot({ clinicalData }) {
             onChange={() => setShowPercentage((prev) => !prev)}
           />
           Show Percentage Improvement
+        </h3>
+        <h3 style={{ fontSize: '14px' }}>
+          <input
+            type="checkbox"
+            checked={showGroupAverage}
+            onChange={() => setShowGroupAverage((prev) => !prev)}
+          />
+          Show Group Average
         </h3>
       </div>
       <Line data={data} options={options} />

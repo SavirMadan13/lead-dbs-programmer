@@ -31,6 +31,17 @@ function GroupAveragePlot({ clinicalData }) {
   const orderedTimelines = timelines.sort((a, b) => {
     if (a === 'baseline') return -1;
     if (b === 'baseline') return 1;
+
+    const aIsMonth = a.includes('month');
+    const bIsMonth = b.includes('month');
+    const aIsYear = a.includes('year');
+    const bIsYear = b.includes('year');
+
+    if (aIsMonth && !bIsMonth) return -1;
+    if (!aIsMonth && bIsMonth) return 1;
+    if (aIsYear && !bIsYear) return 1;
+    if (!aIsYear && bIsYear) return -1;
+
     return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
   });
 

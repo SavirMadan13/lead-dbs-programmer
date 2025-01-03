@@ -407,4 +407,49 @@ export default function registerFileHandlers() {
     });
     event.reply('batch-import', 'success');
   });
+
+  ipcMain.on('batch-import-stimulation', async (event, data, leadDBS) => {
+    const stimulationData = getData('stimulationData');
+    const directoryPath = stimulationData.filepath;
+    console.log(Object.keys(data));
+    console.log(data);
+    Object.keys(data).forEach((key) => {
+      const { id, S, timeline } = data[key];
+      console.log(directoryPath, id);
+      const patientFolder = getPatientFolder(directoryPath, id, leadDBS);
+      console.log('Patient Folder: ', patientFolder);
+      console.log('Scores: ', S);
+      const sessionDir = path.join(patientFolder, `ses-${timeline}`);
+      try {
+        // Ensure that the directories exist, if not, create them
+        if (!fs.existsSync(patientFolder))
+          fs.mkdirSync(patientFolder, { recursive: true });
+        if (!fs.existsSync(sessionDir))
+          fs.mkdirSync(sessionDir, { recursive: true });
+
+        // Wrap the S object in an outer shell
+        const dataToSave = { S };
+
+        // Convert the data to a string format (JSON)
+        const dataString = JSON.stringify(dataToSave, null, 2);
+
+        // Dynamically name the file based on patient and timeline
+        let fileName = `sub-${id}_ses-${timeline}_stim.json`;
+        if (leadDBS) {
+          fileName = `${id}_ses-${timeline}_stimparameters.json`;
+        }
+        const filePath = path.join(sessionDir, fileName);
+
+        // Write the data to the file
+        fs.writeFileSync(filePath, dataString);
+
+        // Send the file path back to the renderer process
+        console.log(`Data saved successfully to ${filePath}`);
+      } catch (error) {
+        // Handle any errors in the saving process
+        console.error('Error writing to file:', error);
+      }
+    });
+    event.reply('batch-import-stimulation', 'success');
+  });
 }

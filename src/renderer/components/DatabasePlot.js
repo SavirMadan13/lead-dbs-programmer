@@ -42,10 +42,21 @@ function DatabasePlot({ clinicalData }) {
     const patientID = patientData.id;
     const timelines = Object.keys(patientData.clinicalData);
 
-    // Sort timelines with 'baseline' first
+    // Sort timelines with 'baseline' first, then months, then years
     const orderedTimelines = timelines.sort((a, b) => {
       if (a === 'baseline') return -1;
       if (b === 'baseline') return 1;
+
+      const aIsMonth = a.includes('month');
+      const bIsMonth = b.includes('month');
+      const aIsYear = a.includes('year');
+      const bIsYear = b.includes('year');
+
+      if (aIsMonth && !bIsMonth) return -1;
+      if (!aIsMonth && bIsMonth) return 1;
+      if (aIsYear && !bIsYear) return 1;
+      if (!aIsYear && bIsYear) return -1;
+
       return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
     });
 
@@ -68,6 +79,7 @@ function DatabasePlot({ clinicalData }) {
       fill: false,
       borderColor: colorPalette[index % colorPalette.length], // Use colors from the palette
       tension: 0.2,
+      spanGaps: false,
     };
   });
 
@@ -75,6 +87,17 @@ function DatabasePlot({ clinicalData }) {
     ? Object.keys(clinicalData[0].clinicalData).sort((a, b) => {
         if (a === 'baseline') return -1;
         if (b === 'baseline') return 1;
+
+        const aIsMonth = a.includes('month');
+        const bIsMonth = b.includes('month');
+        const aIsYear = a.includes('year');
+        const bIsYear = b.includes('year');
+
+        if (aIsMonth && !bIsMonth) return -1;
+        if (!aIsMonth && bIsMonth) return 1;
+        if (aIsYear && !bIsYear) return 1;
+        if (!aIsYear && bIsYear) return -1;
+
         return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
       })
     : [];

@@ -20,6 +20,7 @@ import GroupAveragePlot from './GroupAveragePlot';
 import { PatientContext } from './PatientContext';
 import GroupLateralityAnalysisPlot from './GroupLateralityAnalysisPlot';
 import GroupSubscoreAnalysisPlot from './GroupSubscoreAnalysisPlot';
+import CombinedPlot from './CombinedPlot';
 import './DatabaseStats.css'; // Ensure this CSS file is correctly linked
 
 function DatabaseStats({ directoryPath }) {
@@ -144,14 +145,17 @@ function DatabaseStats({ directoryPath }) {
       case 'all':
         return (
           <div className="analysis-container">
-            <DatabasePlot clinicalData={clinicalDataForPlotting} />
-            <GroupAveragePlot clinicalData={clinicalDataForPlotting} />
+            {/* <DatabasePlot clinicalData={clinicalDataForPlotting} />
+            <GroupAveragePlot clinicalData={clinicalDataForPlotting} /> */}
+            <CombinedPlot clinicalData={clinicalDataForPlotting} />
             <GroupLateralityAnalysisPlot
               clinicalData={clinicalDataForPlotting}
             />
             <GroupSubscoreAnalysisPlot clinicalData={clinicalDataForPlotting} />
           </div>
         );
+      case 'new':
+        return <CombinedPlot clinicalData={clinicalDataForPlotting} />;
       default:
         return <p>Please select an analysis type.</p>;
     }
@@ -434,8 +438,9 @@ function DatabaseStats({ directoryPath }) {
             className="analysis-select"
           >
             <option value="none">Choose an option</option>
-            <option value="raincloud">Trendline</option>
-            <option value="average">Group Average</option>
+            {/* <option value="raincloud">Trendline</option>
+            <option value="average">Group Average</option> */}
+            <option value="new">Trendlines</option>
             <option value="laterality">Laterality Analysis</option>
             <option value="subscore">Subscores</option>
             <option value="all">View All Plots</option>

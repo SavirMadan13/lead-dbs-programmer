@@ -25,7 +25,7 @@ function getPatientFolder(
   // console.log(stimulationData);
   if (stimulationData.mode === 'standalone') {
     return path.join(
-      directoryPath,
+      directoryPath ? directoryPath : stimulationData.path,
       'derivatives',
       'leaddbs',
       `${patientId}`,

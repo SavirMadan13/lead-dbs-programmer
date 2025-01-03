@@ -10,131 +10,181 @@ function Import({ leadDBS }) {
   const [timeline, setTimeline] = useState('');
   const navigate = useNavigate();
 
+  const contactMapper = (level, value, etageidx) => {
+    const contactMapping = {
+      a: 0,
+      b: 1,
+      c: 2,
+    };
+
+    // Parse etageidx to handle ranges like '2:4'
+    const parseEtageIdx = (etage) => {
+      if (etage.includes(':')) {
+        const [start, end] = etage.split(':').map(Number);
+        return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+      }
+      return [parseInt(etage, 10)];
+    };
+
+    const etageLevel = parseEtageIdx(etageidx[level - 1]);
+    const contactValue = etageLevel[contactMapping[value]];
+
+    console.log(level, value, contactValue);
+    return contactValue;
+  };
+
+  // Helper function to process contacts
+  const processContacts = (
+    S,
+    contacts,
+    polarity,
+    hemisphere,
+    config,
+    source,
+  ) => {
+    const isDirected = config.isdirected === 1;
+    const etageIdx = isDirected
+      ? config.etageidx
+      : Array.from({ length: config.numel }, (_, i) => i + 1);
+
+    console.log('Config', electrodeData);
+
+    // Define a mapping from contact names to indices
+    const contactMapping = {
+      1: '1',
+      '2a': '2',
+      '2b': '3',
+      '2c': '4',
+      '3a': '5',
+      '3b': '6',
+      '3c': '7',
+      4: '8',
+    };
+    // Parse the contacts
+    const parsedContacts = contacts
+      .split('/')
+      .map((entry) => {
+        let [contact, percentage] = entry.split(',').map((x) => x.trim());
+        const percValue = percentage
+          ? parseFloat(percentage.replace('%', ''))
+          : 100 / contacts.split('/').length; // Use 100 / length of contacts if percentage not specified
+
+        contact = contact.replace(/[+-]$/, '');
+        if (contact === 'C') {
+          return { contact: 'C', percValue };
+        }
+        if (/[a-z]/.test(contact)) {
+          // If contact is like "2ab", split and distribute percentage
+          const contactParts = contact.split(/(?=[a-z])/);
+          const level = parseInt(contactParts.shift(), 10);
+          console.log('Contact Parts', contactParts, contact);
+          // const mappedContacts = contactParts.map((part) => {
+          //   return contactMapper(level, part, etageIdx, percValue);
+          // });
+          // return contactParts.map((part) => ({
+          //   contact: part,
+          //   percValue: percValue / contactParts.length,
+          // }));
+          return contactParts.map((part) => {
+            const mappedContact = contactMapper(level, part, etageIdx);
+            return {
+              contact: mappedContact,
+              percValue: percValue / contactParts.length,
+            };
+          });
+        }
+        if (isDirected) {
+          console.log('Contact', contact);
+          const level = parseInt(contact, 10);
+          console.log('Level', level);
+          const etageValue = etageIdx[level - 1];
+          console.log('Etage Value', etageValue);
+          if (etageValue.includes(':')) {
+            const [start, end] = etageValue.split(':').map(Number);
+            const etageContacts = Array.from(
+              { length: end - start + 1 },
+              (_, i) => (start + i).toString(),
+            );
+            return etageContacts.map((etageContact) => ({
+              contact: etageContact,
+              percValue: percValue / etageContacts.length,
+            }));
+          }
+          return {
+            contact: parseInt(etageValue, 10),
+            percValue,
+          };
+        }
+
+        return { contact, percValue };
+      })
+      .flat(); // Flatten the array in case of split contacts
+
+    console.log(parsedContacts);
+
+    // Calculate percentages for contacts
+    let totalPerc = 0;
+    const missingPerc = [];
+    parsedContacts.forEach(({ contact, percValue }) => {
+      if (percValue === null) {
+        missingPerc.push(contact);
+      } else {
+        totalPerc += percValue;
+      }
+    });
+
+    console.log(missingPerc);
+    console.log(totalPerc);
+
+    const defaultPerc =
+      missingPerc.length > 0 ? (100 - totalPerc) / missingPerc.length : 0;
+
+    // Process each contact
+    parsedContacts.forEach(({ contact, percValue }) => {
+      const percentage = percValue === null ? defaultPerc : percValue;
+      if (contact === 'C') {
+        console.log('case');
+        S[`${hemisphere}s${source}`].case = {
+          perc: 100,
+          pol: polarity === -1 ? 1 : 2,
+        };
+      } else {
+        // S[`${hemisphere}s${source}`].case = {
+        //   perc: 0,
+        //   pol: polarity === 0,
+        // };
+        S[`${hemisphere}s${source}`][`k${contact}`] = {
+          perc: percentage,
+          pol: polarity === -1 ? 1 : 2,
+          imp: 1,
+        };
+      }
+    });
+
+    return S;
+  };
+
   function parseStimulationParameters(row) {
     const label = row.Label;
     const electrodeModelR = row.ElectrodeModel_R;
     const electrodeModelL = row.ElectrodeModel_L;
 
     // Get electrode configurations for both hemispheres
+
+    // Will eventually need to put the contact parser in here
     const configR = electrodeData[electrodeModelR];
     const configL = electrodeData[electrodeModelL];
 
     // Initialize S using numel from the electrode configurations
-    const S = initializeS(label, configR.numel);
+    let S = initializeS(label, configR.numel);
 
-    // Helper function to process contacts
-    const processContacts = (contacts, polarity, hemisphere, config, source) => {
-      const isDirected = config.isdirected === 1;
-      const etageIdx = isDirected ? config.etageidx : null;
-
-      // Define a mapping from contact names to indices
-      const contactMapping = {
-        '1': '1',
-        '2a': '2',
-        '2b': '3',
-        '2c': '4',
-        '3a': '5',
-        '3b': '6',
-        '3c': '7',
-        '4': '8'
-      };
-
-      // Parse the contacts
-      const parsedContacts = contacts.split('/').map((entry) => {
-        const [contact, percentage] = entry.split(',').map((x) => x.trim());
-        const percValue = percentage
-          ? parseFloat(percentage.replace('%', ''))
-          : null; // Use null if percentage not specified
-
-        // Handle cases like "2a-" or "2ab-"
-        if (contact.includes('-')) {
-          // If contact is like "2a-", treat it as a single contact
-          return [{ contact, percValue }];
-        } else if (/[a-z]/.test(contact)) {
-          // If contact is like "2ab", split and distribute percentage
-          const contactParts = contact.split(/(?=[a-z])/);
-          return contactParts.map(part => ({ contact: part, percValue: percValue / contactParts.length }));
-        }
-
-        return { contact, percValue };
-      }).flat(); // Flatten the array in case of split contacts
-
-      console.log(parsedContacts);
-
-      // Calculate percentages for contacts
-      let totalPerc = 0;
-      const missingPerc = [];
-      parsedContacts.forEach(({ contact, percValue }) => {
-        if (percValue === null) {
-          missingPerc.push(contact);
-        } else {
-          totalPerc += percValue;
-        }
-      });
-
-      console.log(missingPerc);
-      console.log(totalPerc);
-
-      const defaultPerc = missingPerc.length > 0 ? (100 - totalPerc) / missingPerc.length : 0;
-
-      // Process each contact
-      parsedContacts.forEach(({ contact, percValue }) => {
-        const perc = percValue === null ? defaultPerc : percValue;
-        const contactLevel = contact.replace(/[^\d]/g, ''); // Extract level
-        console.log(contactLevel);
-        // Map contact to new index
-        const mappedContact = contactMapping[contact] || contact;
-        const sanitizedContact = contact.replace(/[+-]$/, '');
-        console.log(sanitizedContact);
-        if (sanitizedContact === 'C') {
-          console.log('case');
-          S[`${hemisphere}s${source}`].case = {
-            perc: 100,
-            pol: polarity === -1 ? 1 : 2,
-          };
-        } else if (contactMapping[sanitizedContact]) {
-          const contactIdx = contactMapping[sanitizedContact];
-          S[`${hemisphere}s${source}`][`k${contactIdx}`] = {
-            perc: 100,
-            pol: polarity === -1 ? 1 : 2,
-            imp: 1,
-          };
-        } else if (
-          isDirected &&
-          etageIdx.some((range) => range.includes(contactLevel))
-        ) {
-          // Evenly distribute percentage among directional sub-contacts
-          const levelContacts = Object.keys(contactMapping).filter((name) =>
-            name.includes(contactLevel)
-          );
-          const distributedPerc = perc / levelContacts.length;
-
-          levelContacts.forEach((contactName) => {
-            const contactIdx = contactMapping[contactName];
-            S[`${hemisphere}s${source}`][`k${contactIdx}`] = {
-              perc: distributedPerc,
-              pol: polarity === -1 ? 1 : 2,
-              imp: 1,
-            };
-          });
-        } else {
-          // Non-directional contact or entire level
-          const contactIdx = mappedContact.replace(/[^\d]/g, '');
-          S[`${hemisphere}s${source}`][`k${contactIdx}`] = {
-            perc,
-            pol: polarity === -1 ? 1 : 2,
-            imp: 1,
-          };
-        }
-      });
-    };
-
-    for (let source = 1; source <= configR.numel; source++) {
+    for (let source = 1; source <= 4; source++) {
       // Parse Right Hemisphere
       const rightNegative = row[`Right_${source}_Negative`];
       const rightPositive = row[`Right_${source}_Positive`];
       const rightAmpInput = row[`Right_${source}_Amp`];
-
+      S[`Rs${source}`].case = { perc: 0, pol: 0 };
+      S[`Ls${source}`].case = { perc: 0, pol: 0 };
       if (rightAmpInput) {
         const ampValue = parseFloat(rightAmpInput.replace(/[^\d.]/g, '')); // Extract amplitude
         const unit = rightAmpInput.includes('mA') ? 2 : 1; // Determine unit (mA or V)
@@ -143,12 +193,13 @@ function Import({ leadDBS }) {
       }
 
       if (rightNegative) {
-        console.log(rightNegative);
-        processContacts(rightNegative, -1, 'R', configR, source);
+        console.log('Right Negative', rightNegative);
+        S = processContacts(S, rightNegative, -1, 'R', configR, source);
       }
 
       if (rightPositive) {
-        processContacts(rightPositive, 1, 'R', configR, source);
+        console.log('Right Positive', rightPositive);
+        S = processContacts(S, rightPositive, 1, 'R', configR, source);
 
         // Reset case if positive contacts exist
         // S[`Rs${source}`].case = { perc: 0, pol: 0 };
@@ -167,12 +218,13 @@ function Import({ leadDBS }) {
       }
 
       if (leftNegative) {
-        console.log(leftNegative);
-        processContacts(leftNegative, -1, 'L', configL, source);
+        console.log('Left Negative', leftNegative);
+        S = processContacts(S, leftNegative, -1, 'L', configL, source);
       }
 
       if (leftPositive) {
-        processContacts(leftPositive, 1, 'L', configL, source);
+        console.log('Left Positive', leftPositive);
+        S = processContacts(S, leftPositive, 1, 'L', configL, source);
 
         // Reset case if positive contacts exist
         // S[`Ls${source}`].case = { perc: 0, pol: 0 };
@@ -186,9 +238,14 @@ function Import({ leadDBS }) {
     const parsedData = sheetData.map((row) => {
       const patientID = row.PatientID;
       const S = parseStimulationParameters(row);
-      return { patientID, S, timeline };
+      return { id: patientID, S, timeline: S.label };
     });
     console.log('Parsed Stimulation Data:', parsedData);
+    window.electron.ipcRenderer.sendMessage(
+      'batch-import-stimulation',
+      parsedData,
+      leadDBS,
+    );
   };
   // Clinical Scores
 
@@ -266,6 +323,7 @@ function Import({ leadDBS }) {
     const uploadedFile = e.target.files[0];
     if (uploadedFile) {
       parseFile(uploadedFile);
+      e.target.value = ''; // Reset the file input
     }
   };
 
@@ -274,6 +332,7 @@ function Import({ leadDBS }) {
     const uploadedFile = e.target.files[0];
     if (uploadedFile) {
       parseFile(uploadedFile, 'clinical');
+      e.target.value = ''; // Reset the file input
     }
   };
 
@@ -298,7 +357,11 @@ function Import({ leadDBS }) {
       <br />
       <label>
         Import Excel File:
-        <input type="file" accept=".xlsx, .xls" onChange={handleStimulationParametersExcel} />
+        <input
+          type="file"
+          accept=".xlsx, .xls"
+          onChange={handleStimulationParametersExcel}
+        />
       </label>
       <br />
       <button className="button" onClick={() => navigate(-1)}>
