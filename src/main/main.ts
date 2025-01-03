@@ -1429,3 +1429,14 @@ ipcMain.on('zoom-level-changed', (event, zoomLevel) => {
     mainWindow.setSize(newWidth, newHeight);
   }
 });
+
+ipcMain.on('increase-window-width', (event, showViewer) => {
+  const win = BrowserWindow.getFocusedWindow();
+  if (win && showViewer) {
+    const [width, height] = win.getSize();
+    win.setSize(width + 100, height); // Increase width by 100 pixels
+  } else   if (win && !showViewer) {
+    const [width, height] = win.getSize();
+    win.setSize(width - 100, height); // Increase width by 100 pixels
+  }
+});

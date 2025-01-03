@@ -1395,10 +1395,11 @@ function ManageElectrode({
                     adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
                     historical={historical}
                     elspec={electrodeModels[selectedElectrodeLeft]}
+                    electrodeLabel={convertElectrode(selectedElectrodeRight)}
                   />
-                  <div className="electrode-label">
+                  {/* <div className="electrode-label">
                     {convertElectrode(selectedElectrodeRight)}
-                  </div>
+                  </div> */}
                 </div>
               </TabPanel>
             ))}
@@ -1470,10 +1471,11 @@ function ManageElectrode({
                     adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
                     historical={historical}
                     elspec={electrodeModels[selectedElectrodeLeft]}
+                    electrodeLabel={convertElectrode(selectedElectrodeLeft)}
                   />
-                  <div className="electrode-label">
+                  {/* <div className="electrode-label">
                     {convertElectrode(selectedElectrodeLeft)}
-                  </div>
+                  </div> */}
                 </div>
               </TabPanel>
             ))}

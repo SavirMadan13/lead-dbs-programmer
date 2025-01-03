@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Form, Button, Table, Container } from 'react-bootstrap';
 import * as XLSX from 'xlsx';
-import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
+// import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 import PairedTTestComponent from './PairedTTestComponent';
 import BoxPlotComponent from './BoxPlotComponent';
 import UPDRSAnalysisComponent from './UPDRSAnalysisComponent';

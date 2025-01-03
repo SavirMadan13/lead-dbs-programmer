@@ -6,7 +6,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import * as XLSX from 'xlsx';
 import HomeIcon from '@mui/icons-material/Home';
-import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
+// import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 import PairedTTestComponent from './PairedTTestComponent';
 import BoxPlotComponent from './BoxPlotComponent';
 import UPDRSAnalysisComponent from './UPDRSAnalysisComponent';

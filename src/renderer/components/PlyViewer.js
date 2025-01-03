@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { PLYLoader, OrbitControls } from 'three-stdlib';
 // import * as nifti from 'nifti-reader-js'; // Correctly importing the nifti module
 import * as nifti from 'nifti-reader-js';
-import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
+// import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 import { Tabs, Tab, Collapse, Button, Form, Modal } from 'react-bootstrap';
 import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings icon
 import * as math from 'mathjs';

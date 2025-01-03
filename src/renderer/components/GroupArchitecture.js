@@ -11,7 +11,7 @@ import { ButtonGroup, Button } from 'react-bootstrap';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
 import { render } from '@testing-library/react';
-import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
+// import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 
 function GroupArchitecture({
   patients,

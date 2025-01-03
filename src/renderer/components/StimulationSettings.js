@@ -2,12 +2,13 @@
 /* eslint-disable react/prop-types */
 // import { useState } from 'react';
 import React, { useState, useRef } from 'react';
-import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
+// import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import { Dropdown } from 'react-bootstrap';
 import electrodeModels from './electrodeModels.json';
 import ManageElectrode from './ManageElectrode';
+import './StimulationSettings.css';
 
 function StimulationSettings({
   rightElectrode,

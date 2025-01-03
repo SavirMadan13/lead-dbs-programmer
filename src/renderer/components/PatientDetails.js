@@ -2,7 +2,7 @@
 /* eslint-disable promise/always-return */
 import React, { useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
+// import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 // import { TreeView, TreeItem } from '@mui/x-tree-view';
 import { RichTreeView } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -11,6 +11,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import { PatientContext } from './PatientContext';
 // import NiivueViewer from './NiivueViewer';
 // import NiftiViewer from './NiftiViewer';
+import './PatientDetails.css';
 
 function PatientDetails({ directoryPath, leadDBS }) {
   useEffect(() => {
