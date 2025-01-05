@@ -3666,7 +3666,7 @@ function Electrode({
               ))}
             </ButtonGroup>
           )}
-          {(IPG === 'Medtronic_Percept' || IPG === 'Abbott') && (
+          {/* {(IPG === 'Medtronic_Percept' || IPG === 'Abbott') && (
             <ButtonGroup className="toggle-group">
               {ampDef.map((amp, idx) => (
                 <ToggleButton
@@ -3682,7 +3682,7 @@ function Electrode({
                 </ToggleButton>
               ))}
             </ButtonGroup>
-          )}
+          )} */}
           {IPG === 'Research' && (
             <ButtonGroup className="toggle-group">
               {researchDef.map((res, idx) => (
@@ -3762,24 +3762,24 @@ function Electrode({
         >
           <ButtonGroup horizontal>
             <Button
+              variant="secondary"
               onClick={calculateQuantitiesWithDistribution}
               disabled={currentLabel === 'V'}
               title="Split evenly among active contacts"
-              style={{ backgroundColor: '#3a8a3f', outline: 'none' }} // Darker green for positive action
             >
               Split Even
             </Button>
             <Button
+              variant="secondary"
               onClick={roundToHundred}
               disabled={currentLabel === 'V'}
               title="Adjust contact values to fill total amplitude"
-              style={{ backgroundColor: '#1976d2', outline: 'none' }} // Darker blue for adjustment/calculation
             >
               Refactor
             </Button>
             <Button
+              variant="secondary"
               onClick={handleClearButton}
-              style={{ backgroundColor: 'grey', outline: 'none' }} // Darker red for destructive action
             >
               Clear
             </Button>
@@ -3798,14 +3798,14 @@ function Electrode({
               />
               <span className="steering-label">Steering</span>
               <ButtonGroup className="steering-buttons" horizontal>
-                <Button onClick={handlePercAmpChangeUp}>↑</Button>
-                <Button disabled>Level</Button>
-                <Button onClick={handlePercAmpChangeDown}>↓</Button>
+                <Button variant="secondary" onClick={handlePercAmpChangeUp}>↑</Button>
+                <Button variant="secondary" disabled>Level</Button>
+                <Button variant="secondary" onClick={handlePercAmpChangeDown}>↓</Button>
               </ButtonGroup>
               <ButtonGroup className="steering-buttons" horizontal>
-                <Button onClick={handlePercAmpChangeClockwise}>↻</Button>
-                <Button disabled>Post-Lat</Button>
-                <Button onClick={handlePercAmpChangeCounterClockwise}>↺</Button>
+                <Button variant="secondary" onClick={handlePercAmpChangeClockwise}>↻</Button>
+                <Button variant="secondary" disabled>Post-Lat</Button>
+                <Button variant="secondary" onClick={handlePercAmpChangeCounterClockwise}>↺</Button>
               </ButtonGroup>
             </div>
           )}
@@ -3833,7 +3833,7 @@ function Electrode({
         <Button
           onClick={() => {
             handleOpenViewer();
-            window.electron.ipcRenderer.sendMessage('increase-window-width', showViewer);
+            // window.electron.ipcRenderer.sendMessage('increase-window-width', showViewer);
           }}
           style={{ backgroundColor: 'green' }}
         >
@@ -4149,16 +4149,20 @@ function Electrode({
       {showViewer && (
         <div
           style={{
-            width: '1000px',
-            margin: '20px auto',
-            padding: '15px',
+            // width: '1000px',
+            // margin: '20px auto',
+            // padding: '15px',
             // border: '2px solid #ccc',
-            // borderRadius: '10px',
-            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-            backgroundColor: '#f9f9f9',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
+            borderRadius: '8px',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+            // boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+            // backgroundColor: '#f9f9f9',
+            // gap: '20px',
+            padding: '20px',
+            backgroundColor: '#f5f5f5',
+            // display: 'flex',
+            // justifyContent: 'center',
+            // alignItems: 'center',
           }}
         >
           <PlyViewer

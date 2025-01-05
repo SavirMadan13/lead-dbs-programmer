@@ -65,6 +65,7 @@
   width: 200px;
   height: 40px;
   margin: 10px auto; /* Add margin auto to center horizontally */
+  /* color: 'grey'; */
 }
 
 .steering-special-buttons {
