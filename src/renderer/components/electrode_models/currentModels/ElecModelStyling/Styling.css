@@ -6,6 +6,7 @@
 
 .container {
   display: flex;
+  margin-left: -40px;
   /* margin-left: -70px; */
   /* margin-bottom: -25px; */
 }
@@ -1440,7 +1441,8 @@ button:active {
 
 .image-item-2 {
   position: relative;
-  margin-left: -118px;
+  /* margin-left: -118px; */
+  margin-left: -42px;
   margin-bottom: -190px;
 }
 
@@ -1453,7 +1455,7 @@ button:active {
 .image-item-left {
   position: relative;
   /* margin-right: 30px; */
-  padding-right: 30px;
+  padding-right: 10px;
   /* margin-left: -40px; */
   margin-bottom: 25px;
   /* margin-left: -100px; */
