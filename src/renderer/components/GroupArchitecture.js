@@ -152,8 +152,11 @@ function GroupArchitecture({
 
     return (
       <div>
+        <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px', marginLeft: '-10px' }}>
+          Stimulation Label
+        </div>
         <Dropdown onSelect={handleSelect}>
-          <Dropdown.Toggle variant="success" id="dropdown-basic">
+          <Dropdown.Toggle variant="primary" id="dropdown-basic">
             {selectedPatient || 'Select Patient'}
           </Dropdown.Toggle>
 
@@ -222,7 +225,7 @@ function GroupArchitecture({
       <div
         style={{
           display: 'flex',
-          alignItems: 'center',
+          // alignItems: 'center',
           justifyContent: 'center',
           marginBottom: '-100px',
         }}

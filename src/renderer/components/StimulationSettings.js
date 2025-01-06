@@ -608,16 +608,27 @@ function StimulationSettings({
         {/* <div className="stim-id-group"></div> */}
         <div />
         <Dropdown>
-          <Dropdown.Toggle>Implanted Hardware</Dropdown.Toggle>
+          <Dropdown.Toggle variant="secondary">
+            Implanted Hardware
+          </Dropdown.Toggle>
           <Dropdown.Menu style={{ width: '350px', paddingLeft: '10px' }}>
             <h2 style={{ fontSize: 16 }}>Left Electrode</h2>
             <select
               value={leftElectrode}
               onChange={(e) => handleLeftElectrodeChange(e)}
-              // disabled
+              className="form-select"
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                fontSize: '14px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                backgroundColor: '#fff',
+                cursor: 'pointer',
+              }}
             >
-              {varargout.map((electrode, index) => (
-                <option key={index} value={electrode.value}>
+              {varargout.map((electrode) => (
+                <option key={electrode.value} value={electrode.value}>
                   {electrode.displayName}
                 </option>
               ))}
@@ -627,6 +638,16 @@ function StimulationSettings({
             <select
               value={rightElectrode}
               onChange={(e) => handleRightElectrodeChange(e)}
+              className="form-select"
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                fontSize: '14px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                backgroundColor: '#fff',
+                cursor: 'pointer',
+              }}
             >
               {varargout.map((electrode, index) => (
                 <option key={index} value={electrode.value}>
@@ -636,7 +657,20 @@ function StimulationSettings({
             </select>
             <div />
             <h2 style={{ fontSize: 16 }}>IPG</h2>
-            <select value={IPG} onChange={(e) => handleIPGChange(e)}>
+            <select
+              value={IPG}
+              onChange={(e) => handleIPGChange(e)}
+              className="form-select"
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                fontSize: '14px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                backgroundColor: '#fff',
+                cursor: 'pointer',
+              }}
+            >
               <option value="">None</option>
               <option value="Abbott">Abbott (Infinity, Brio, Libra)</option>
               <option value="Boston">

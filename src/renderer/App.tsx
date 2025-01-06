@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css'; // Ensure your styles are imported
 import SettingsIcon from '@mui/icons-material/Settings'; // Import the Material UI Settings Icon
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Navbar from './components/Navbar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PatientDatabase from './components/PatientDatabase';
@@ -132,10 +133,25 @@ export default function App() {
     <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
       <div className="Navbar">
         <Navbar />
-        <SettingsIcon
+        {/* <SettingsIcon
           className="settings-icon"
           onClick={() => setShowSettings(!showSettings)}
-          style={{ cursor: 'pointer', fontSize: '24px', color: '#6c757d', zIndex: '10' }} // Optional styling
+          style={{
+            cursor: 'pointer',
+            fontSize: '24px',
+            color: '#6c757d',
+            zIndex: '10',
+          }} // Optional styling
+        /> */}
+        <MoreVertIcon
+          className="settings-icon"
+          onClick={() => setShowSettings(!showSettings)}
+          style={{
+            cursor: 'pointer',
+            fontSize: '24px',
+            color: '#6c757d',
+            zIndex: '10',
+          }} // Optional styling
         />
 
         {showSettings && (
@@ -162,7 +178,7 @@ export default function App() {
             <Route
               path="/"
               element={
-                <div style={{marginTop: '0px'}}>
+                <div style={{ marginTop: '0px' }}>
                   <PatientDatabase
                     key={renderKey}
                     directoryPath={directoryPath}

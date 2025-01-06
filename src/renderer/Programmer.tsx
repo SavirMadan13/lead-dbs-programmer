@@ -1087,7 +1087,7 @@ function Programmer() {
   const [historical, setHistorical] = useState(location.state);
 
   return (
-    <div>
+    <div style={{marginTop: '-50px'}}>
       {patientName && (
         <div
           style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '20px' }}
