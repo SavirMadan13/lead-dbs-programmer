@@ -7,6 +7,24 @@
 .container {
   display: flex;
   margin-left: -40px;
+  overflow-x: visible;
+  /* transform: scale(0.9); */
+  /* transform-origin: top left; */
+  /* margin-left: -70px; */
+  /* margin-bottom: -25px; */
+}
+
+.electrode-container {
+  display: flex;
+  margin-right: -140px;
+  /* overflow-x: visible; */
+  /* gap: 20px; */
+  /* padding: 20px; */
+  /* background-color: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+  /* transform: scale(0.9); */
+  /* transform-origin: top left; */
   /* margin-left: -70px; */
   /* margin-bottom: -25px; */
 }
@@ -1516,7 +1534,7 @@ button:active {
   margin-top: 283px;
   /* margin-left: -53px; */
   margin-left: -171px;
-  margin-right: 30px;
+  /* margin-right: 30px; */
 }
 
 .image-container-right {

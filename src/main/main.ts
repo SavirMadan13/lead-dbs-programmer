@@ -559,17 +559,24 @@ const createWindow = async () => {
     },
   });
 
-  // Set up the resize event listener to recalculate zoom level
-  // mainWindow.on('resize', () => {
-  //   const [currentWidth, currentHeight] = mainWindow.getSize();
+  let previousWidth = mainWindow.getSize()[0]; // Initialize with the current width
 
-  //   // Calculate the zoom level based on window size change.
-  //   const baseWidth = 1100; // Default window width
-  //   const zoomLevel = (currentWidth / baseWidth - 1) / 0.15;
+  mainWindow.on('resize', () => {
+    const [currentWidth, currentHeight] = mainWindow.getSize();
 
-  //   // Send the zoom level to the renderer process
-  //   mainWindow.webContents.send('zoom-level-changed', zoomLevel);
-  // });
+    // Check if the width has changed
+    if (currentWidth !== previousWidth) {
+      // Calculate the zoom level based on window size change.
+      const baseWidth = 1100; // Default window width
+      const zoomLevel = (currentWidth / baseWidth - 1) / 0.15;
+
+      // Send the zoom level to the renderer process
+      mainWindow.webContents.send('zoom-level-changed', zoomLevel);
+
+      // Update the previous width
+      previousWidth = currentWidth;
+    }
+  });
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
@@ -1433,12 +1440,11 @@ ipcMain.on('zoom-level-changed', (event, zoomLevel) => {
 });
 
 ipcMain.on('increase-window-width', (event, showViewer) => {
-  const win = BrowserWindow.getFocusedWindow();
-  if (win && showViewer) {
-    const [width, height] = win.getSize();
-    win.setSize(width + 100, height); // Increase width by 100 pixels
-  } else   if (win && !showViewer) {
-    const [width, height] = win.getSize();
-    win.setSize(width - 100, height); // Increase width by 100 pixels
+  if (mainWindow && showViewer) {
+    const [width, height] = mainWindow.getSize();
+    mainWindow.setSize(width - 500, height); // Increase width by 100 pixels
+  } else if (mainWindow && !showViewer) {
+    const [width, height] = mainWindow.getSize();
+    mainWindow.setSize(width + 500, height); // Increase width by 100 pixels
   }
 });

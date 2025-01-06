@@ -3603,7 +3603,6 @@ function Electrode({
   }, [currentLabel, IPG, totalAmplitude, selectedValues]);
 
   /// //////////////////////////////////////////////////////////////////////////////////////////////////////////
-
   return (
     <div className="container">
       <div className="control-panel">
@@ -3848,14 +3847,18 @@ function Electrode({
         <Button
           onClick={() => {
             handleOpenViewer();
-            // window.electron.ipcRenderer.sendMessage('increase-window-width', showViewer);
+            // if (!showViewer) {
+            //   window.electron.zoom.setZoomLevel(-5);
+            // } else {
+            //   window.electron.zoom.setZoomLevel(-3);
+            // }
           }}
           style={{ backgroundColor: 'green' }}
         >
           {showViewer ? 'Close Viewer' : 'Open Viewer'}
         </Button>
       </div>
-      <div className="container">
+      <div className="electrode-container">
         <div className="container2">
           <div className="IPG">
             {ipgs.map((ipg) => (
@@ -4007,20 +4010,15 @@ function Electrode({
       {showViewer && (
         <div
           style={{
-            // width: '1000px',
-            // margin: '20px auto',
-            // padding: '15px',
-            // border: '2px solid #ccc',
+            width: '100%', // Use percentage for responsive width
+            padding: '20px',
             borderRadius: '8px',
             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-            // boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-            // backgroundColor: '#f9f9f9',
-            // gap: '20px',
-            padding: '20px',
             backgroundColor: '#f5f5f5',
-            // display: 'flex',
-            // justifyContent: 'center',
-            // alignItems: 'center',
+            display: 'flex', // Use flexbox for layout
+            justifyContent: 'center',
+            alignItems: 'center',
+            overflow: 'visible',
           }}
         >
           <PlyViewer

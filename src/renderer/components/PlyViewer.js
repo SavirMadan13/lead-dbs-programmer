@@ -1547,7 +1547,7 @@ function PlyViewer({
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
       };
-      window.addEventListener('resize', onWindowResize);
+      // window.addEventListener('resize', onWindowResize);
 
       rendererRef.current = renderer;
       secondaryCameraRef.current = secondaryCamera;
@@ -1563,7 +1563,7 @@ function PlyViewer({
       animate();
 
       return () => {
-        window.removeEventListener('resize', onWindowResize);
+        // window.removeEventListener('resize', onWindowResize);
         renderer.dispose();
       };
     }
@@ -3721,7 +3721,7 @@ const controlPanelStyle2 = {
   width: '300px', // Fixed width for the control panel
   height: '600px',
   padding: '10px',
-  backgroundColor: '#f8f9fa',
+  backgroundColor: '#f5f5f5',
 };
 
 const controlPanelStyle = {
@@ -3729,11 +3729,18 @@ const controlPanelStyle = {
   flexDirection: 'column', // Stack controls vertically
   maxHeight: '600px', // Matches the height of the viewer
   overflowY: 'auto', // Allows scrolling if controls exceed height
+  // padding: '10px',
   width: '300px', // Fixed width for the control panel
-  padding: '10px',
   border: '1px solid #ccc',
+  // borderRadius: '8px',
+  // backgroundColor: '#f8f9fa',
   borderRadius: '8px',
-  backgroundColor: '#f8f9fa',
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+  // boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+  // backgroundColor: '#f9f9f9',
+  // gap: '20px',
+  padding: '20px',
+  backgroundColor: '#f5f5f5',
 };
 
 const meshControlStyle = {
