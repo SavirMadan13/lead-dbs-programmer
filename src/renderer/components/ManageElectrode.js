@@ -4,7 +4,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import 'react-tabs/style/react-tabs.css';
+// import 'react-tabs/style/react-tabs.css';
 import './TabbedElectrodeIPGSelection.css';
 import electrodeModels from './electrodeModels.json';
 import Electrode from './electrode_models/currentModels/Electrode';
@@ -1325,7 +1325,7 @@ function ManageElectrode({
       <Tabs
         defaultActiveKey="profile"
         id="uncontrolled-tab-example"
-        className="mb-3"
+        // className="mb-3"
       >
         <TabList className="mb-3">
           <Tab onClick={() => handleTabChange('5')}>Right Hemisphere</Tab>
@@ -1337,7 +1337,7 @@ function ManageElectrode({
             id="uncontrolled-tab-example"
             className="mb-3"
           >
-            <TabList>
+            <TabList className="mb-3">
               <Tab key="5" onClick={() => handleTabChange('5')}>
                 Program 1
               </Tab>
@@ -1411,7 +1411,7 @@ function ManageElectrode({
             id="uncontrolled-tab-example"
             className="mb-3"
           >
-            <TabList>
+            <TabList className="mb-3">
               <Tab key="1" onClick={() => handleTabChange('1')}>
                 Program 1
               </Tab>

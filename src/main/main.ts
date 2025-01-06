@@ -571,7 +571,7 @@ const createWindow = async () => {
       const zoomLevel = (currentWidth / baseWidth - 1) / 0.15;
 
       // Send the zoom level to the renderer process
-      mainWindow.webContents.send('zoom-level-changed', zoomLevel);
+      // mainWindow.webContents.send('zoom-level-changed', zoomLevel);
 
       // Update the previous width
       previousWidth = currentWidth;
