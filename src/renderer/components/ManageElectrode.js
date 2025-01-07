@@ -1320,7 +1320,7 @@ function ManageElectrode({
 
   return (
     <div className="TabbedIPGContainer">
-      <div style={{ marginTop: '30px' }} />
+      <div style={{ marginTop: '-90px' }} />
       <div className="stimCloseContainer" />
       <Tabs
         defaultActiveKey="profile"
@@ -1336,6 +1336,7 @@ function ManageElectrode({
             defaultActiveKey="profile"
             id="uncontrolled-tab-example"
             className="mb-3"
+            // style={{ marginLeft: '-50px' }}
           >
             <TabList className="mb-3">
               <Tab key="5" onClick={() => handleTabChange('5')}>

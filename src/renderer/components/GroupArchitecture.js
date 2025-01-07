@@ -152,9 +152,9 @@ function GroupArchitecture({
 
     return (
       <div>
-        <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px', marginLeft: '-10px' }}>
+        {/* <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px', marginLeft: '-10px' }}>
           Stimulation Label
-        </div>
+        </div> */}
         <Dropdown onSelect={handleSelect}>
           <Dropdown.Toggle variant="primary" id="dropdown-basic">
             {selectedPatient || 'Select Patient'}
@@ -227,7 +227,9 @@ function GroupArchitecture({
           display: 'flex',
           // alignItems: 'center',
           justifyContent: 'center',
-          marginBottom: '-100px',
+          marginLeft: '200px',
+          marginBottom: '-110px',
+          // marginTop: '100px',
         }}
       >
         {/* Left Arrow Button - Conditionally Rendered */}
