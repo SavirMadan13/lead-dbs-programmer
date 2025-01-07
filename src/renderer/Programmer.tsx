@@ -1115,9 +1115,10 @@ function Programmer() {
         )}
       </div>
       {mode !== 'stimulate' && (
-        <div style={{ paddingLeft: '150px', marginTop: '-10px' }}>
+        <div style={{ paddingLeft: '150px', marginTop: '-120px' }}>
           <button className="export-button" onClick={() => navigate(-1)}>
-            Back to Patient Details
+            {/* Back to Patient Details */}
+            ←
           </button>
         </div>
       )}

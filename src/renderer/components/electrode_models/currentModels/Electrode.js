@@ -3853,7 +3853,7 @@ function Electrode({
             //   window.electron.zoom.setZoomLevel(-3);
             // }
           }}
-          style={{ backgroundColor: 'green' }}
+          variant="success"
         >
           {showViewer ? 'Close Viewer' : 'Open Viewer'}
         </Button>
@@ -4019,6 +4019,7 @@ function Electrode({
             justifyContent: 'center',
             alignItems: 'center',
             overflow: 'visible',
+            marginLeft: '160px',
           }}
         >
           <PlyViewer

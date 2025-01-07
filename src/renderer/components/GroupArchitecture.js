@@ -156,7 +156,7 @@ function GroupArchitecture({
           Stimulation Label
         </div> */}
         <Dropdown onSelect={handleSelect}>
-          <Dropdown.Toggle variant="primary" id="dropdown-basic">
+          <Dropdown.Toggle variant="secondary" id="dropdown-basic" style={{ marginLeft: '270px' }}>
             {selectedPatient || 'Select Patient'}
           </Dropdown.Toggle>
 

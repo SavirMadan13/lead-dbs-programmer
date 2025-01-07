@@ -336,6 +336,27 @@ function Import({ leadDBS }) {
     }
   };
 
+  const fileInputStyle = {
+    display: 'none',
+  };
+
+  const fileLabelStyle = {
+    display: 'inline-block',
+    padding: '10px 20px',
+    margin: '10px 0',
+    fontSize: '16px',
+    color: 'white',
+    backgroundColor: '#007bff',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    textAlign: 'center',
+    transition: 'background-color 0.3s',
+  };
+
+  const fileLabelHoverStyle = {
+    backgroundColor: '#0056b3',
+  };
+
   return (
     <div style={{ padding: '20px' }}>
       <h2>Batch Patient Import</h2>
@@ -349,23 +370,36 @@ function Import({ leadDBS }) {
         />
       </label>
       <br />
-      <label>
-        Import Excel File:
-        <input type="file" accept=".xlsx, .xls" onChange={handleFileChange} />
+      <label
+        style={fileLabelStyle}
+        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = fileLabelHoverStyle.backgroundColor)}
+        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = fileLabelStyle.backgroundColor)}
+      >
+        Choose Clinical Scores File
+        <input
+          type="file"
+          accept=".xlsx, .xls"
+          onChange={handleFileChange}
+          style={fileInputStyle}
+        />
       </label>
       <br />
-      <br />
-      <label>
-        Import Excel File:
+      <label
+        style={fileLabelStyle}
+        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = fileLabelHoverStyle.backgroundColor)}
+        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = fileLabelStyle.backgroundColor)}
+      >
+        Choose Stimulation Parameters File
         <input
           type="file"
           accept=".xlsx, .xls"
           onChange={handleStimulationParametersExcel}
+          style={fileInputStyle}
         />
       </label>
       <br />
       <button className="button" onClick={() => navigate(-1)}>
-        Back to Patient Details
+        ←
       </button>
     </div>
   );
