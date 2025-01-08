@@ -269,6 +269,7 @@ function DatabaseStats({ directoryPath }) {
               }
               variant="outlined"
               fullWidth
+              placeholder="none"
             />
           </Box>
         );

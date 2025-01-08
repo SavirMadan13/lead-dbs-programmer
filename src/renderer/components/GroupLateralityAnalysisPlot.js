@@ -108,6 +108,7 @@ function GroupLateralityAnalysisPlot({ clinicalData }) {
       tension: 0.2,
       pointRadius: 3,
       showLine: true,
+      fill: false,
     })),
     ...rightPatientData.map((data, i) => ({
       label: `Patient ${clinicalData[i].id} - Right`,
@@ -195,8 +196,20 @@ function GroupLateralityAnalysisPlot({ clinicalData }) {
     plugins: {
       legend: {
         display: true,
+        fill: true,
+        // labels: {
+        //   filter: (legendItem) => !legendItem.text.includes('Std Dev'),
+        // },
         labels: {
           filter: (legendItem) => !legendItem.text.includes('Std Dev'),
+          generateLabels: (chart) => {
+            const original = ChartJS.defaults.plugins.legend.labels.generateLabels;
+            const labels = original(chart);
+            labels.forEach(label => {
+              label.fillStyle = label.strokeStyle; // Use the stroke color to fill the legend
+            });
+            return labels;
+          },
         },
       },
       tooltip: {

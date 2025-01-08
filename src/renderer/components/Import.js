@@ -576,7 +576,7 @@ function Import({ leadDBS }) {
             style={actionButtonStyle}
             onClick={downloadTemplateClinicalScores}
           >
-            Download Clinical Scores Template
+            Download MDS-UPDRS III Template
           </button>
           <button
             style={actionButtonStyle}
