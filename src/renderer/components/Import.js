@@ -10,6 +10,115 @@ function Import({ leadDBS }) {
   const [timeline, setTimeline] = useState('');
   const navigate = useNavigate();
 
+  const varargout = [
+    { displayName: 'Medtronic 3389', value: 'medtronic_3389' },
+    { displayName: 'Medtronic 3387', value: 'medtronic_3387' },
+    { displayName: 'Medtronic 3391', value: 'medtronic_3391' },
+    { displayName: 'Medtronic B33005', value: 'medtronic_b33005' },
+    { displayName: 'Medtronic B33015', value: 'medtronic_b33015' },
+    { displayName: 'Boston Scientific Vercise', value: 'boston_vercise' },
+    {
+      displayName: 'Boston Scientific Vercise Directed',
+      value: 'boston_vercise_directed',
+    },
+    // {
+    //   displayName: 'Boston Scientific Vercise Cartesia HX',
+    //   value: 'boston_vercise_cartesia_hx',
+    // },
+    // {
+    //   displayName: 'Boston Scientific Vercise Cartesia X',
+    //   value: 'boston_vercise_cartesia_x',
+    // },
+    {
+      displayName: 'Abbott ActiveTip (6146-6149)',
+      value: 'abbott_activetip_2mm',
+    },
+    {
+      displayName: 'Abbott ActiveTip (6142-6145)',
+      value: 'abbott_activetip_3mm',
+    },
+    {
+      displayName: 'Abbott Directed 6172 (short)',
+      value: 'abbott_directed_05',
+    },
+    { displayName: 'Abbott Directed 6173 (long)', value: 'abbott_directed_15' },
+    { displayName: 'PINS Medical L301', value: 'pins_l301' },
+    { displayName: 'PINS Medical L302', value: 'pins_l302' },
+    { displayName: 'PINS Medical L303', value: 'pins_l303' },
+    { displayName: 'SceneRay SR1200', value: 'sceneray_sr1200' },
+    { displayName: 'SceneRay SR1210', value: 'sceneray_sr1210' },
+    { displayName: 'SceneRay SR1211', value: 'sceneray_sr1211' },
+    { displayName: 'SceneRay SR1242', value: 'sceneray_sr1242' },
+    { displayName: 'SDE-08 S8 Legacy', value: 'sde_08_s8_legacy' },
+    { displayName: 'SDE-08 S10 Legacy', value: 'sde_08_s10_legacy' },
+    { displayName: 'SDE-08 S12 Legacy', value: 'sde_08_s12_legacy' },
+    { displayName: 'SDE-08 S16 Legacy', value: 'sde_08_s16_legacy' },
+    { displayName: 'SDE-08 S8', value: 'sde_08_s8' },
+    { displayName: 'SDE-08 S10', value: 'sde_08_s10' },
+    { displayName: 'SDE-08 S12', value: 'sde_08_s12' },
+    { displayName: 'SDE-08 S14', value: 'sde_08_s14' },
+    { displayName: 'SDE-08 S16', value: 'sde_08_s16' },
+    { displayName: 'PMT 2102-04-091', value: 'pmt_2102_04_091' },
+    { displayName: 'PMT 2102-06-091', value: 'pmt_2102_06_091' },
+    { displayName: 'PMT 2102-08-091', value: 'pmt_2102_08_091' },
+    { displayName: 'PMT 2102-10-091', value: 'pmt_2102_10_091' },
+    { displayName: 'PMT 2102-12-091', value: 'pmt_2102_12_091' },
+    { displayName: 'PMT 2102-14-091', value: 'pmt_2102_14_091' },
+    { displayName: 'PMT 2102-16-091', value: 'pmt_2102_16_091' },
+    { displayName: 'PMT 2102-16-092', value: 'pmt_2102_16_092' },
+    { displayName: 'PMT 2102-16-093', value: 'pmt_2102_16_093' },
+    { displayName: 'PMT 2102-16-131', value: 'pmt_2102_16_131' },
+    { displayName: 'PMT 2102-16-142', value: 'pmt_2102_16_142' },
+    { displayName: '2069-EPC-05C-35', value: 'epc_05c' },
+    { displayName: '2069-EPC-15C-35', value: 'epc_15c' },
+    { displayName: 'NeuroPace DL-344-3.5', value: 'neuropace_dl_344_35' },
+    { displayName: 'NeuroPace DL-344-10', value: 'neuropace_dl_344_10' },
+    { displayName: 'DIXI D08-05AM', value: 'dixi_d08_05am' },
+    { displayName: 'DIXI D08-08AM', value: 'dixi_d08_08am' },
+    { displayName: 'DIXI D08-10AM', value: 'dixi_d08_10am' },
+    { displayName: 'DIXI D08-12AM', value: 'dixi_d08_12am' },
+    { displayName: 'DIXI D08-15AM', value: 'dixi_d08_15am' },
+    { displayName: 'DIXI D08-18AM', value: 'dixi_d08_18am' },
+    { displayName: 'AdTech BF08R-SP05X', value: 'adtech_bf08r_sp05x' },
+    { displayName: 'AdTech BF08R-SP21X', value: 'adtech_bf08r_sp21x' },
+    { displayName: 'AdTech BF08R-SP61X', value: 'adtech_bf08r_sp61x' },
+    { displayName: 'AdTech BF09R-SP61X-0BB', value: 'adtech_bf09r_sp61x_0bb' },
+    { displayName: 'AdTech RD06R-SP05X', value: 'adtech_rd06r_sp05x' },
+    { displayName: 'AdTech RD08R-SP05X', value: 'adtech_rd08r_sp05x' },
+    { displayName: 'AdTech RD10R-SP03X', value: 'adtech_rd10r_sp03x' },
+    { displayName: 'AdTech RD10R-SP05X', value: 'adtech_rd10r_sp05x' },
+    { displayName: 'AdTech RD10R-SP06X', value: 'adtech_rd10r_sp06x' },
+    { displayName: 'AdTech RD10R-SP07X', value: 'adtech_rd10r_sp07x' },
+    { displayName: 'AdTech RD10R-SP08X', value: 'adtech_rd10r_sp08x' },
+    { displayName: 'AdTech SD06R-SP26X', value: 'adtech_sd06r_sp26x' },
+    { displayName: 'AdTech SD08R-SP05X', value: 'adtech_sd08r_sp05x' },
+    { displayName: 'AdTech SD10R-SP05X', value: 'adtech_sd10r_sp05x' },
+    {
+      displayName: 'AdTech SD10R-SP05X Choi',
+      value: 'adtech_sd10r_sp05x_choi',
+    },
+    { displayName: 'AdTech SD14R-SP05X', value: 'adtech_sd14r_sp05x' },
+    { displayName: 'ELAINE Rat Electrode', value: 'elaine_rat_electrode' },
+    { displayName: 'FHC WU Rat Electrode', value: 'fhc_wu_rat_electrode' },
+    { displayName: 'NuMed Mini Lead', value: 'numed_minilead' },
+    {
+      displayName: 'Aleva directSTIM Directed',
+      value: 'aleva_directstim_directed',
+    },
+    { displayName: 'Aleva directSTIM 11500', value: 'aleva_directstim_11500' },
+    {
+      displayName: 'SmartFlow Cannula NGS-NC-06',
+      value: 'smartflow_ngs_nc_06',
+    },
+  ];
+
+  const handleImportedElectrode = (importedElectrode) => {
+    const electrodeInfo = varargout.find(
+      (item) => item.displayName === importedElectrode,
+    );
+    return electrodeInfo ? electrodeInfo.value : 'boston_vercise_directed';
+  };
+
   const contactMapper = (level, value, etageidx) => {
     const contactMapping = {
       a: 0,
@@ -166,8 +275,8 @@ function Import({ leadDBS }) {
 
   function parseStimulationParameters(row) {
     const label = row.Label;
-    const electrodeModelR = row.ElectrodeModel_R;
-    const electrodeModelL = row.ElectrodeModel_L;
+    const electrodeModelR = handleImportedElectrode(row.ElectrodeModel_R);
+    const electrodeModelL = handleImportedElectrode(row.ElectrodeModel_L);
 
     // Get electrode configurations for both hemispheres
 
@@ -241,18 +350,18 @@ function Import({ leadDBS }) {
       return { id: patientID, S, timeline: S.label };
     });
     console.log('Parsed Stimulation Data:', parsedData);
-    window.electron.ipcRenderer.sendMessage(
-      'batch-import-stimulation',
-      parsedData,
-      leadDBS,
-    );
+    // window.electron.ipcRenderer.sendMessage(
+    //   'batch-import-stimulation',
+    //   parsedData,
+    //   leadDBS,
+    // );
   };
   // Clinical Scores
 
   function restructurePatientData(data) {
     // Extract Patient ID and Timeline
     const id = data.PatientID;
-    const { timeline } = data;
+    const timeline = data.Timeline;
 
     // Filter out the scores by excluding non-score keys
     const scores = Object.keys(data)
@@ -272,16 +381,24 @@ function Import({ leadDBS }) {
 
   // Submit data to main process
   const handleSubmit = (sheetData) => {
-    if (!timeline || sheetData.length === 0) {
-      alert('Please provide a timeline and import data!');
+    // if (!timeline || sheetData.length === 0) {
+    //   alert('Please provide a timeline and import data!');
+    //   return;
+    // }
+
+    // const patientData = sheetData.map((entry) => ({
+    //   ...entry,
+    //   timeline,
+    // }));
+
+    if (sheetData.length === 0) {
+      alert('Please provide data!');
       return;
     }
-
     const patientData = sheetData.map((entry) => ({
       ...entry,
-      timeline,
     }));
-
+    console.log('Patient Data', patientData);
     const processedData = {};
     Object.keys(patientData).forEach((key) => {
       processedData[key] = restructurePatientData(patientData[key]);
@@ -336,70 +453,170 @@ function Import({ leadDBS }) {
     }
   };
 
+  const containerStyle = {
+    padding: '40px',
+    maxWidth: '800px',
+    margin: '0 auto',
+    fontFamily: "'Roboto', sans-serif",
+    color: '#333',
+  };
+
+  const headerStyle = {
+    textAlign: 'center',
+    fontSize: '32px',
+    marginBottom: '20px',
+    color: '#2C3E50',
+  };
+
+  const sectionCardStyle = {
+    backgroundColor: '#f9f9f9',
+    borderRadius: '10px',
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+    padding: '20px',
+    marginBottom: '20px',
+  };
+
+  const sectionHeaderStyle = {
+    fontSize: '24px',
+    marginBottom: '10px',
+    color: '#34495E',
+  };
+
+  const sectionDescriptionStyle = {
+    fontSize: '16px',
+    marginBottom: '20px',
+    color: '#7F8C8D',
+  };
+
+  const buttonContainerStyle = {
+    display: 'flex',
+    gap: '10px',
+    flexWrap: 'wrap',
+  };
+
+  const actionButtonStyle = {
+    padding: '10px 20px',
+    fontSize: '16px',
+    color: 'white',
+    backgroundColor: '#007bff',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    transition: 'background-color 0.3s ease, transform 0.2s ease',
+  };
+
+  const uploadContainerStyle = {
+    display: 'grid',
+    gap: '15px',
+  };
+
+  const uploadLabelStyle = {
+    display: 'block',
+    padding: '10px 20px',
+    fontSize: '16px',
+    color: '#333',
+    backgroundColor: '#ecf0f1',
+    borderRadius: '5px',
+    border: '2px dashed #bdc3c7',
+    textAlign: 'center',
+    cursor: 'pointer',
+    transition: 'background-color 0.3s ease, transform 0.2s ease',
+  };
+
   const fileInputStyle = {
     display: 'none',
   };
 
-  const fileLabelStyle = {
-    display: 'inline-block',
+  const backButtonStyle = {
+    display: 'block',
+    margin: '20px auto 0',
     padding: '10px 20px',
-    margin: '10px 0',
     fontSize: '16px',
-    color: 'white',
-    backgroundColor: '#007bff',
+    color: '#fff',
+    backgroundColor: '#2c3e50',
+    border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
     textAlign: 'center',
-    transition: 'background-color 0.3s',
+    transition: 'background-color 0.3s ease, transform 0.2s ease',
   };
 
-  const fileLabelHoverStyle = {
-    backgroundColor: '#0056b3',
+
+  const downloadTemplateClinicalScores = () => {
+    const link = document.createElement('a');
+    link.href = '/ClinicalData.xlsx'; // Relative path to the file in the public directory
+    link.download = 'ClinicalData.xlsx';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const downloadTemplateStimulationParameters = () => {
+    const link = document.createElement('a');
+    link.href = '/ClinicalData.xlsx'; // Relative path to the file in the public directory
+    link.download = 'ClinicalData.xlsx';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h2>Batch Patient Import</h2>
-      <label>
-        Timeline:
-        <input
-          type="text"
-          value={timeline}
-          onChange={(e) => setTimeline(e.target.value)}
-          placeholder="Enter timeline (no spaces)"
-        />
-      </label>
-      <br />
-      <label
-        style={fileLabelStyle}
-        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = fileLabelHoverStyle.backgroundColor)}
-        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = fileLabelStyle.backgroundColor)}
-      >
-        Choose Clinical Scores File
-        <input
-          type="file"
-          accept=".xlsx, .xls"
-          onChange={handleFileChange}
-          style={fileInputStyle}
-        />
-      </label>
-      <br />
-      <label
-        style={fileLabelStyle}
-        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = fileLabelHoverStyle.backgroundColor)}
-        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = fileLabelStyle.backgroundColor)}
-      >
-        Choose Stimulation Parameters File
-        <input
-          type="file"
-          accept=".xlsx, .xls"
-          onChange={handleStimulationParametersExcel}
-          style={fileInputStyle}
-        />
-      </label>
-      <br />
-      <button className="button" onClick={() => navigate(-1)}>
-        ←
+    <div style={containerStyle}>
+      <h1 style={headerStyle}>Import Data</h1>
+
+      {/* Part 1: Download Template Excel */}
+      <div style={sectionCardStyle}>
+        <h2 style={sectionHeaderStyle}>Part 1: Download Template</h2>
+        <p style={sectionDescriptionStyle}>
+          Download a template to ensure your file format is compatible for
+          upload.
+        </p>
+        <div style={buttonContainerStyle}>
+          <button
+            style={actionButtonStyle}
+            onClick={downloadTemplateClinicalScores}
+          >
+            Download Clinical Scores Template
+          </button>
+          <button
+            style={actionButtonStyle}
+            onClick={downloadTemplateStimulationParameters}
+          >
+            Download Stimulation Parameters Template
+          </button>
+        </div>
+      </div>
+
+      {/* Part 2: Upload File */}
+      <div style={sectionCardStyle}>
+        <h2 style={sectionHeaderStyle}>Part 2: Upload Files</h2>
+        <p style={sectionDescriptionStyle}>
+          Upload your completed Excel file for processing.
+        </p>
+        <div style={uploadContainerStyle}>
+          <label style={uploadLabelStyle}>
+            <span>Choose Clinical Scores File</span>
+            <input
+              type="file"
+              accept=".xlsx, .xls"
+              onChange={handleFileChange}
+              style={fileInputStyle}
+            />
+          </label>
+          <label style={uploadLabelStyle}>
+            <span>Choose Stimulation Parameters File</span>
+            <input
+              type="file"
+              accept=".xlsx, .xls"
+              onChange={handleStimulationParametersExcel}
+              style={fileInputStyle}
+            />
+          </label>
+        </div>
+      </div>
+
+      <button style={backButtonStyle} onClick={() => navigate(-1)}>
+        ← Back
       </button>
     </div>
   );
