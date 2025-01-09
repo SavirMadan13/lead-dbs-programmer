@@ -5,6 +5,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 // import 'react-tabs/style/react-tabs.css';
+import Button from 'react-bootstrap/Button';
 import './TabbedElectrodeIPGSelection.css';
 import electrodeModels from './electrodeModels.json';
 import Electrode from './electrode_models/currentModels/Electrode';
@@ -1495,7 +1496,7 @@ function ManageElectrode({
         />
       </div>
       {type !== 'leadgroup' && (
-        <div style={{ textAlign: 'center', paddingBottom: '35px' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', paddingBottom: '35px'}}>
           {/* <button
                 className="export-button-final-discard"
                 onClick={closeFunction}
@@ -1503,13 +1504,20 @@ function ManageElectrode({
               >
                 Discard
               </button> */}
-          <button
+          {/* <button
             className="export-button-final"
             onClick={sendDataToMain}
             style={{ marginLeft: '1000px' }}
           >
             {mode === 'stimulate' ? 'Stimulate and Close' : 'Save'}
-          </button>
+          </button> */}
+          <Button
+            className="export-button-final"
+            onClick={sendDataToMain}
+            style={{ marginRight: '10px' }}
+          >
+            {mode === 'stimulate' ? 'Stimulate and Close' : 'Save'}
+          </Button>
         </div>
       )}
     </div>

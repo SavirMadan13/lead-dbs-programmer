@@ -162,7 +162,18 @@ function CombinedPlot({ clinicalData }) {
     responsive: true,
     plugins: {
       legend: {
+        display: !showGroupAverage,
         position: 'top',
+        labels: {
+          generateLabels: (chart) => {
+            const original = ChartJS.defaults.plugins.legend.labels.generateLabels;
+            const labels = original(chart);
+            labels.forEach(label => {
+              label.fillStyle = label.strokeStyle; // Use the stroke color to fill the legend
+            });
+            return labels;
+          },
+        },
       },
       title: {
         display: true,

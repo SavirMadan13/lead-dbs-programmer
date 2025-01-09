@@ -123,7 +123,7 @@ function GroupLateralityAnalysisPlot({ clinicalData }) {
 
   const groupAverageDatasets = [
     {
-      label: 'Left Side Average',
+      label: 'Left',
       data: leftAverages,
       borderColor: '#4E79A7',
       backgroundColor: 'rgba(78, 121, 167, 0.2)',
@@ -134,7 +134,7 @@ function GroupLateralityAnalysisPlot({ clinicalData }) {
       order: 1,
     },
     {
-      label: 'Right Side Average',
+      label: 'Right',
       data: rightAverages,
       borderColor: '#F28E2B',
       backgroundColor: 'rgba(242, 142, 43, 0.2)',
@@ -195,7 +195,7 @@ function GroupLateralityAnalysisPlot({ clinicalData }) {
     responsive: true,
     plugins: {
       legend: {
-        display: true,
+        display: showGroupAverage,
         fill: true,
         // labels: {
         //   filter: (legendItem) => !legendItem.text.includes('Std Dev'),

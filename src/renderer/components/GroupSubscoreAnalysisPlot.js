@@ -164,7 +164,7 @@ function GroupSubscoreAnalysisPlot({ clinicalData }) {
     responsive: true,
     plugins: {
       legend: {
-        display: true,
+        display: showGroupAverage,
         labels: {
           filter: (legendItem) => !legendItem.text.includes('Std Dev'), // Filter out std dev from legend
         },
