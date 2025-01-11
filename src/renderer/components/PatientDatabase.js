@@ -134,11 +134,12 @@ function PatientDatabase({ key, directoryPath }) {
   };
 
   // Save the patients data to a JSON file in the selected directory
-  const savePatientsToJson = (patientsData) => {
-    if (directoryPath) {
+  const savePatientsToJson = (patientsData, path) => {
+    console.log('PATIENTS DATA: ', patientsData);
+    if (path) {
       window.electron.ipcRenderer.sendMessage(
         'save-patients-json',
-        directoryPath,
+        path,
         patientsData,
       );
     } else {
@@ -172,9 +173,10 @@ function PatientDatabase({ key, directoryPath }) {
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    window.electron.ipcRenderer.on('file-read-success', (patientsData) => {
+    window.electron.ipcRenderer.on('file-read-success', (patientsData, directoryPath) => {
       console.log(patientsData);
       setPatients(patientsData); // Set the patients from the JSON file
+      savePatientsToJson(patientsData, directoryPath);
     });
 
     window.electron.ipcRenderer.on('file-not-found', () => {

@@ -353,7 +353,8 @@ function Programmer() {
     let initialStates = {}; // Initialize the object to store the processed states
     if (stimulationData.mode === 'standalone') {
       if (!timelineOutput[timeline]) {
-        let electrodes = 'Boston Vercise Directed';
+        // let electrodes = 'Boston Vercise Directed';
+        let electrodes = patient['Electrode Model'];
         const outputElectrode = handleImportedElectrode(electrodes);
         const patientData = initializeS(
           timeline,
@@ -387,7 +388,7 @@ function Programmer() {
       Object.keys(timelineOutput).forEach((key, index) => {
         console.log(`Processing timeline for patient ${key}`);
         console.log('Timeline Output: ', timelineOutput);
-        let electrodes = 'Boston Vercise Directed';
+        let electrodes = patient['Electrode Model'] || 'Boston Vercise Directed';
         const currentTimeline = key;
         const patientData = timelineOutput[key].S;
 

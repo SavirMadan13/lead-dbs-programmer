@@ -3082,15 +3082,14 @@ function Electrode({
     console.log('VolAmpToggleChange');
     if (newValue === 'left') {
       outputTogglePosition = 'mA';
-      setTogglePosition(outputTogglePosition);
       calculateQuantitiesWithDistribution();
       // setCurrentLabel('mA');
     } else if (newValue === 'right') {
       outputTogglePosition = 'V';
-      setTogglePosition(outputTogglePosition);
       // setCurrentLabel('V');
       console.log('Current Label: ', currentLabel);
     }
+    setTogglePosition(outputTogglePosition);
     setCurrentLabel(outputTogglePosition);
     setVolAmpToggle(value);
   };

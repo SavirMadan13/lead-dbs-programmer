@@ -3,14 +3,12 @@ import React, { useState, useEffect } from 'react';
 // import './App.css';
 
 import Dropdown from 'react-bootstrap/dropdown';
-// import Navbar from './components/Navbar';
-// import Navbar from 'react-bootstrap/Navbar'
-import StimulationSettings from './StimulationSettings';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
 import { render } from '@testing-library/react';
+import StimulationSettings from './StimulationSettings';
 // import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 
 function GroupArchitecture({
@@ -234,13 +232,14 @@ function GroupArchitecture({
       >
         {/* Left Arrow Button - Conditionally Rendered */}
         {type === 'leadgroup' && (
-          <button
-            className="sticky-button"
-            style={{ marginRight: '10px' }}
+          <Button
+            // className="sticky-button"
+            style={{ marginRight: '10px', height: '40px', marginTop: '20px' }}
+            variant="secondary"
             onClick={handlePreviousPatient}
           >
             ←
-          </button>
+          </Button>
         )}
 
         {/* Patient Selector */}
@@ -252,13 +251,14 @@ function GroupArchitecture({
 
         {/* Right Arrow Button - Conditionally Rendered */}
         {type === 'leadgroup' && (
-          <button
-            className="sticky-button"
-            style={{ marginLeft: '10px' }}
+          <Button
+            // className="sticky-button"
+            style={{ marginLeft: '10px', height: '40px', marginTop: '20px' }}
+            variant="secondary"
             onClick={handleNextPatient}
           >
             →
-          </button>
+          </Button>
         )}
       </div>
 

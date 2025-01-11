@@ -42,8 +42,8 @@ app.on('ready', () => {
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0374Output/derivatives/leaddbs/sub-CbctDbs0374/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
 // const inputPath = process.argv[1];
-const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
-// const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0366Output';
+// const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
+const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0381Output';
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons/derivatives/leadgroup/BwhParkinsons/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataBwh.json';
 // const inputPath = '/Users/savirmadan/Documents/SanteGroup/derivatives/leadgroup/2024nov5V2/inputData.json';
@@ -90,7 +90,7 @@ ipcMain.on('import-inputdata-file', async (event, arg) => {
     // stimulationData = getData('stimulationData');
     stimulationDirectory = stimulationData.stimDir;
     const leadDBS = true;
-
+    // Writing stimulation parameters to files in clinical folder
     if (stimulationData.type === 'leaddbs') {
       stimulationData.labels.forEach((label) => {
         // let patientDir = path.join(stimulationData.filepath, `sub-${stimulationData.patientname}`);
@@ -833,7 +833,7 @@ const createWindow = async () => {
                   console.log('PATIENTS: ', patients);
                   event.sender.send('folder-selected', directoryPath, patients);
                   handleMasterDataFill(directoryPath, patients);
-                  event.sender.send('file-read-success', patients);
+                  event.sender.send('file-read-success', patients, directoryPath);
                 } catch (error) {
                   console.error('Error parsing JSON file:', error);
                   event.sender.send('file-read-error', 'Error parsing JSON file');
@@ -842,9 +842,12 @@ const createWindow = async () => {
             });
           }
           const patients = loadLeadGroupPatients(stimulationData.patientname);
+          patients.forEach((patient, index) => {
+            patient['Electrode Model'] = stimulationData.electrodeModels[index];
+          });
           console.log('PATIENTS: ', patients);
           event.sender.send('folder-selected', directoryPath, patients);
-          event.sender.send('file-read-success', patients);
+          event.sender.send('file-read-success', patients, directoryPath);
         }
         if (fs.existsSync(participantsFilePath)) {
           fs.readFile(participantsFilePath, 'utf-8', (err, data) => {
@@ -857,7 +860,7 @@ const createWindow = async () => {
                 console.log('PATIENTS: ', patients);
                 event.sender.send('folder-selected', directoryPath, patients);
                 handleMasterDataFill(directoryPath, patients);
-                event.sender.send('file-read-success', patients);
+                event.sender.send('file-read-success', patients, directoryPath);
               } catch (error) {
                 console.error('Error parsing JSON file:', error);
                 event.sender.send('file-read-error', 'Error parsing JSON file');
@@ -868,8 +871,15 @@ const createWindow = async () => {
         console.log('At this step');
         const patients = loadLeadDBSPatients(directoryPath);
         console.log('PATIENTS: ', patients);
+        patients.forEach((patient, index) => {
+          console.log('STIMULATION DATA: ', stimulationData);
+          console.log('STIMULATION DATA ELECTRODE MODELS: ', stimulationData.electrodeModels);
+          patient['Electrode Model'] = stimulationData.electrodeModels;
+          console.log('PATIENT: ', patient);
+        });
+        console.log('Directory Path: ', directoryPath);
         event.sender.send('folder-selected', directoryPath, patients);
-        event.sender.send('file-read-success', patients);
+        event.sender.send('file-read-success', patients, directoryPath);
       } else {
         // Regular dataset_description.json loading if it's not Lead-DBS
         const filePath = path.join(directoryPath, 'participants.json');
@@ -883,7 +893,7 @@ const createWindow = async () => {
                 const patients = JSON.parse(data);
                 console.log('PATIENTS: ', patients);
                 event.sender.send('folder-selected', directoryPath, patients);
-                event.sender.send('file-read-success', patients);
+                event.sender.send('file-read-success', patients, directoryPath);
               } catch (error) {
                 console.error('Error parsing JSON file:', error);
                 event.sender.send('file-read-error', 'Error parsing JSON file');
@@ -912,7 +922,7 @@ const createWindow = async () => {
           const patients = loadLeadDBSPatients(folderPath);
           console.log('PATIENTS: ', patients);
           event.sender.send('folder-selected', folderPath, patients);
-          event.sender.send('file-read-success', patients);
+          event.sender.send('file-read-success', patients, directoryPath);
         } else {
           // Regular dataset_description.json loading if it's not Lead-DBS
           const filePath = path.join(folderPath, 'participants.json');
@@ -926,7 +936,11 @@ const createWindow = async () => {
                   const patients = JSON.parse(data);
                   console.log('PATIENTS: ', patients);
                   event.sender.send('folder-selected', folderPath, patients);
-                  event.sender.send('file-read-success', patients);
+                  event.sender.send(
+                    'file-read-success',
+                    patients,
+                    directoryPath,
+                  );
                 } catch (error) {
                   console.error('Error parsing JSON file:', error);
                   event.sender.send(

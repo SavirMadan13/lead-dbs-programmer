@@ -13,7 +13,7 @@ export default function registerFileHandlers() {
   // Handle writing the JSON file
   ipcMain.on('save-patients-json', (event, folderPath, patients) => {
     const filePath = path.join(folderPath, 'participants.json');
-
+    console.log('File path: ', folderPath);
     fs.writeFile(filePath, JSON.stringify(patients, null, 2), (err) => {
       if (err) {
         console.error('Error saving JSON file:', err);
