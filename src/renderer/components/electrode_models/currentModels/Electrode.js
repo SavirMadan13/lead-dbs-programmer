@@ -3603,68 +3603,71 @@ function Electrode({
 
   /// //////////////////////////////////////////////////////////////////////////////////////////////////////////
   return (
-    <div className="container">
-      <div className="control-panel">
-        <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
-          {electrodeLabel}
-        </div>
-        <div className="model-selector">
-          <Form.Select
-            aria-label="Select Visualization Model"
-            value={visModel}
-            onChange={handleVisModelChange}
-          >
-            <option>Choose a model</option>
-            <option value="1">Dembek 2017</option>
-            <option value="2">FastField (Baniasadi 2020)</option>
-            <option value="3">SimBio/FieldTrip (see Horn 2017)</option>
-            <option value="4">Kuncel 2008</option>
-            <option value="5">Maedler 2012</option>
-            <option value="6">OSS-DBS (Butenko 2020)</option>
-          </Form.Select>
-        </div>
-        <div className="toggle-controls">
-          {IPG === 'Boston' && (
-            <ButtonGroup className="toggle-group">
-              {percAmpDef.map((percAmp, idx) => (
-                <ToggleButton
-                  key={idx}
-                  id={`percAmp-${idx}`}
-                  type="radio"
-                  variant={getVariant(percAmp.value)}
-                  name="percAmp"
-                  value={percAmp.value}
-                  checked={percAmpToggle === percAmp.value}
-                  onChange={(e) =>
-                    handlePercAmpToggleChange(e.currentTarget.value)
-                  }
-                >
-                  {percAmp.name}
-                </ToggleButton>
-              ))}
-            </ButtonGroup>
-          )}
-          {IPG === 'Medtronic_Activa' && (
-            <ButtonGroup className="toggle-group">
-              {volAmpDef.map((volAmp, idx) => (
-                <ToggleButton
-                  key={idx}
-                  id={`volAmp-${idx}`}
-                  type="radio"
-                  variant={getVariant(volAmp.value)}
-                  name="volAmp"
-                  value={volAmp.value}
-                  checked={volAmpToggle === volAmp.value}
-                  onChange={(e) =>
-                    handleVolAmpToggleChange(e.currentTarget.value)
-                  }
-                >
-                  {volAmp.name}
-                </ToggleButton>
-              ))}
-            </ButtonGroup>
-          )}
-          {/* {(IPG === 'Medtronic_Percept' || IPG === 'Abbott') && (
+    <div style={{ position: 'relative' }}>
+      <div
+        className="container"
+      >
+        <div className={elspec.tipisactive === 0 ? "control-panel" : "control-panel-inactive"}>
+          <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+            {electrodeLabel}
+          </div>
+          <div className="model-selector">
+            <Form.Select
+              aria-label="Select Visualization Model"
+              value={visModel}
+              onChange={handleVisModelChange}
+            >
+              <option>Choose a model</option>
+              <option value="1">Dembek 2017</option>
+              <option value="2">FastField (Baniasadi 2020)</option>
+              <option value="3">SimBio/FieldTrip (see Horn 2017)</option>
+              <option value="4">Kuncel 2008</option>
+              <option value="5">Maedler 2012</option>
+              <option value="6">OSS-DBS (Butenko 2020)</option>
+            </Form.Select>
+          </div>
+          <div className="toggle-controls">
+            {IPG === 'Boston' && (
+              <ButtonGroup className="toggle-group">
+                {percAmpDef.map((percAmp, idx) => (
+                  <ToggleButton
+                    key={idx}
+                    id={`percAmp-${idx}`}
+                    type="radio"
+                    variant={getVariant(percAmp.value)}
+                    name="percAmp"
+                    value={percAmp.value}
+                    checked={percAmpToggle === percAmp.value}
+                    onChange={(e) =>
+                      handlePercAmpToggleChange(e.currentTarget.value)
+                    }
+                  >
+                    {percAmp.name}
+                  </ToggleButton>
+                ))}
+              </ButtonGroup>
+            )}
+            {IPG === 'Medtronic_Activa' && (
+              <ButtonGroup className="toggle-group">
+                {volAmpDef.map((volAmp, idx) => (
+                  <ToggleButton
+                    key={idx}
+                    id={`volAmp-${idx}`}
+                    type="radio"
+                    variant={getVariant(volAmp.value)}
+                    name="volAmp"
+                    value={volAmp.value}
+                    checked={volAmpToggle === volAmp.value}
+                    onChange={(e) =>
+                      handleVolAmpToggleChange(e.currentTarget.value)
+                    }
+                  >
+                    {volAmp.name}
+                  </ToggleButton>
+                ))}
+              </ButtonGroup>
+            )}
+            {/* {(IPG === 'Medtronic_Percept' || IPG === 'Abbott') && (
             <ButtonGroup className="toggle-group">
               {ampDef.map((amp, idx) => (
                 <ToggleButton
@@ -3681,42 +3684,42 @@ function Electrode({
               ))}
             </ButtonGroup>
           )} */}
-          {IPG === 'Research' && (
-            <ButtonGroup className="toggle-group">
-              {researchDef.map((res, idx) => (
-                <ToggleButton
-                  key={idx}
-                  id={`res-${idx}`}
-                  type="radio"
-                  variant={getVariant(res.value)}
-                  name="res"
-                  value={res.value}
-                  checked={researchToggle === res.value}
-                  onChange={(e) =>
-                    handleResearchToggleChange(e.currentTarget.value)
-                  }
-                >
-                  {res.name}
-                </ToggleButton>
-              ))}
-            </ButtonGroup>
-          )}
-          <div className="input-field">
-            <input
-              className="amplitude-input"
-              type="number"
-              name="quantity"
-              pattern="[0-9]+"
-              step="0.1"
-              min="0"
-              value={totalAmplitude}
-              onChange={handleTotalAmplitudeChange}
-            />
-            <span className="input-label">{currentLabel}</span>
+            {IPG === 'Research' && (
+              <ButtonGroup className="toggle-group">
+                {researchDef.map((res, idx) => (
+                  <ToggleButton
+                    key={idx}
+                    id={`res-${idx}`}
+                    type="radio"
+                    variant={getVariant(res.value)}
+                    name="res"
+                    value={res.value}
+                    checked={researchToggle === res.value}
+                    onChange={(e) =>
+                      handleResearchToggleChange(e.currentTarget.value)
+                    }
+                  >
+                    {res.name}
+                  </ToggleButton>
+                ))}
+              </ButtonGroup>
+            )}
+            <div className="input-field">
+              <input
+                className="amplitude-input"
+                type="number"
+                name="quantity"
+                pattern="[0-9]+"
+                step="0.1"
+                min="0"
+                value={totalAmplitude}
+                onChange={handleTotalAmplitudeChange}
+              />
+              <span className="input-label">{currentLabel}</span>
+            </div>
           </div>
-        </div>
-        <div className="input-controls">
-          {/* <div className="input-field">
+          <div className="input-controls">
+            {/* <div className="input-field">
             <input
               className="amplitude-input"
               type="number"
@@ -3729,315 +3732,323 @@ function Electrode({
             />
             <span className="input-label">{currentLabel}</span>
           </div> */}
-          <div className="input-field">
-            <input
-              className="duration-input"
-              type="number"
-              name="quantity"
-              pattern="[0-9]+"
-              value={60}
-              disabled
-              onChange={handleParameterChange('parameter1')}
-            />
-            <span className="input-label">μs</span>
-          </div>
-          <div className="input-field">
-            <input
-              className="frequency-input"
-              type="number"
-              name="quantity"
-              pattern="[0-9]+"
-              disabled
-              value={130}
-              onChange={handleParameterChange('parameter2')}
-            />
-            <span className="input-label">hz</span>
-          </div>
-        </div>
-        <div
-          className="parameter-controls"
-          style={{ textAlign: 'left', zIndex: 100 }}
-        >
-          <ButtonGroup horizontal>
-            <Button
-              variant="secondary"
-              onClick={calculateQuantitiesWithDistribution}
-              disabled={currentLabel === 'V'}
-              title="Split evenly among active contacts"
-            >
-              Split Even
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={roundToHundred}
-              disabled={currentLabel === 'V'}
-              title="Adjust contact values to fill total amplitude"
-            >
-              Refactor
-            </Button>
-            <Button variant="secondary" onClick={handleClearButton}>
-              Clear
-            </Button>
-          </ButtonGroup>
-        </div>
-        {handleIPG()}
-        {(IPG === 'Boston' || IPG === 'Medtronic_Percept') &&
-          (stimController === 0 || stimController === 3) && (
-            <div className="">
-              <hr
-                style={{
-                  width: '100%',
-                  margin: '20px 0',
-                  border: '1px solid #ccc',
-                }}
+            <div className="input-field">
+              <input
+                className="duration-input"
+                type="number"
+                name="quantity"
+                pattern="[0-9]+"
+                value={60}
+                disabled
+                onChange={handleParameterChange('parameter1')}
               />
-              <span className="steering-label">Steering</span>
-              <ButtonGroup className="steering-buttons" horizontal>
-                <Button variant="secondary" onClick={handlePercAmpChangeUp}>
-                  ↑
-                </Button>
-                <Button variant="secondary" disabled>
-                  Level
-                </Button>
-                <Button variant="secondary" onClick={handlePercAmpChangeDown}>
-                  ↓
-                </Button>
-              </ButtonGroup>
-              <ButtonGroup className="steering-buttons" horizontal>
-                <Button
-                  variant="secondary"
-                  onClick={handlePercAmpChangeClockwise}
-                >
-                  ↻
-                </Button>
-                <Button variant="secondary" disabled>
-                  Post-Lat
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={handlePercAmpChangeCounterClockwise}
-                >
-                  ↺
-                </Button>
-              </ButtonGroup>
+              <span className="input-label">μs</span>
+            </div>
+            <div className="input-field">
+              <input
+                className="frequency-input"
+                type="number"
+                name="quantity"
+                pattern="[0-9]+"
+                disabled
+                value={130}
+                onChange={handleParameterChange('parameter2')}
+              />
+              <span className="input-label">hz</span>
+            </div>
+          </div>
+          <div
+            className="parameter-controls"
+            style={{ textAlign: 'left', zIndex: 100 }}
+          >
+            <ButtonGroup horizontal>
+              <Button
+                variant="secondary"
+                onClick={calculateQuantitiesWithDistribution}
+                disabled={currentLabel === 'V'}
+                title="Split evenly among active contacts"
+              >
+                Split Even
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={roundToHundred}
+                disabled={currentLabel === 'V'}
+                title="Adjust contact values to fill total amplitude"
+              >
+                Refactor
+              </Button>
+              <Button variant="secondary" onClick={handleClearButton}>
+                Clear
+              </Button>
+            </ButtonGroup>
+          </div>
+          {handleIPG()}
+          {(IPG === 'Boston' || IPG === 'Medtronic_Percept') &&
+            (stimController === 0 || stimController === 3) && (
+              <div className="">
+                <hr
+                  style={{
+                    width: '100%',
+                    margin: '20px 0',
+                    border: '1px solid #ccc',
+                  }}
+                />
+                <span className="steering-label">Steering</span>
+                <ButtonGroup className="steering-buttons" horizontal>
+                  <Button variant="secondary" onClick={handlePercAmpChangeUp}>
+                    ↑
+                  </Button>
+                  <Button variant="secondary" disabled>
+                    Level
+                  </Button>
+                  <Button variant="secondary" onClick={handlePercAmpChangeDown}>
+                    ↓
+                  </Button>
+                </ButtonGroup>
+                <ButtonGroup className="steering-buttons" horizontal>
+                  <Button
+                    variant="secondary"
+                    onClick={handlePercAmpChangeClockwise}
+                  >
+                    ↻
+                  </Button>
+                  <Button variant="secondary" disabled>
+                    Post-Lat
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={handlePercAmpChangeCounterClockwise}
+                  >
+                    ↺
+                  </Button>
+                </ButtonGroup>
+              </div>
+            )}
+          {(IPG === 'Boston' || IPG === 'Medtronic_Percept') && (
+            <div className="">
+              <SplitEvenButton
+                className="svgButtons"
+                onClick={handleSplitEvenButton}
+              />
+              <ForwardButton
+                className="svgButtons"
+                onClick={handleForwardButton}
+              />
+              <BackButton className="svgButtons" onClick={handleBackButton} />
+              <LeftButton className="svgButtons" onClick={handleRightButton} />
+              <RightButton className="svgButtons" onClick={handleLeftButton} />
             </div>
           )}
-        {(IPG === 'Boston' || IPG === 'Medtronic_Percept') && (
-          <div className="">
-            <SplitEvenButton
-              className="svgButtons"
-              onClick={handleSplitEvenButton}
-            />
-            <ForwardButton
-              className="svgButtons"
-              onClick={handleForwardButton}
-            />
-            <BackButton className="svgButtons" onClick={handleBackButton} />
-            <LeftButton className="svgButtons" onClick={handleRightButton} />
-            <RightButton className="svgButtons" onClick={handleLeftButton} />
-          </div>
-        )}
-        <hr
-          style={{ width: '100%', margin: '20px 0', border: '1px solid #ccc' }}
-        />
-        {/* <Button onClick={handleOpenViewer} style={{ backgroundColor: 'green' }}>
+          <hr
+            style={{
+              width: '100%',
+              margin: '20px 0',
+              border: '1px solid #ccc',
+            }}
+          />
+          {/* <Button onClick={handleOpenViewer} style={{ backgroundColor: 'green' }}>
           {showViewer ? 'Close Viewer' : 'Open Viewer'}
         </Button> */}
-        <Button
-          onClick={() => {
-            handleOpenViewer();
-            // if (!showViewer) {
-            //   window.electron.zoom.setZoomLevel(-5);
-            // } else {
-            //   window.electron.zoom.setZoomLevel(-3);
-            // }
-            // window.electron.ipcRenderer.sendMessage('increase-window-width', showViewer);
-          }}
-          variant="success"
-        >
-          {showViewer ? 'Close Viewer' : 'Open Viewer'}
-        </Button>
-      </div>
-      <div className="electrode-container">
-        <div className="container2">
-          <div className="IPG">
-            {ipgs.map((ipg) => (
-              <div className="image-item">
-                <div className="image-container">
-                  {React.cloneElement(ipg, {
-                    key: ipg.key,
-                    className: `${selectedValues[ipg.key]}-color`,
-                  })}
-                  {!isNaN(Number(ipg.key)) && (
-                    <div className="triple-toggle-ipg-boston-test">
-                      <ContactParameters
-                        key={ipg.key}
-                        value={selectedValues[ipg.key]}
-                        switchPosition={selectedValues[ipg.key]}
-                        animation={animation[ipg.key]}
-                        quantity={quantities[ipg.key]}
-                        onChange={(value, anime) =>
-                          handleTripleToggleChange(value, anime, ipg.key)
-                        }
-                        onQuantityChange={(value, anime, quantity) =>
-                          handleQuantityChange(quantity, ipg.key)
-                        }
-                      />
-                    </div>
-                  )}
+          <Button
+            onClick={() => {
+              handleOpenViewer();
+              // if (!showViewer) {
+              //   window.electron.zoom.setZoomLevel(-5);
+              // } else {
+              //   window.electron.zoom.setZoomLevel(-3);
+              // }
+              // window.electron.ipcRenderer.sendMessage('increase-window-width', showViewer);
+            }}
+            variant="success"
+          >
+            {showViewer ? 'Close Viewer' : 'Open Viewer'}
+          </Button>
+        </div>
+        <div className="electrode-container">
+          <div className="container2">
+            <div className="IPG">
+              {ipgs.map((ipg) => (
+                <div className="image-item">
+                  <div className="image-container">
+                    {React.cloneElement(ipg, {
+                      key: ipg.key,
+                      className: `${selectedValues[ipg.key]}-color`,
+                    })}
+                    {!isNaN(Number(ipg.key)) && (
+                      <div className="triple-toggle-ipg-boston-test">
+                        <ContactParameters
+                          key={ipg.key}
+                          value={selectedValues[ipg.key]}
+                          switchPosition={selectedValues[ipg.key]}
+                          animation={animation[ipg.key]}
+                          quantity={quantities[ipg.key]}
+                          onChange={(value, anime) =>
+                            handleTripleToggleChange(value, anime, ipg.key)
+                          }
+                          onQuantityChange={(value, anime, quantity) =>
+                            handleQuantityChange(quantity, ipg.key)
+                          }
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <div className="left-contacts-test">
+              {leftContacts.map((Lcon) => (
+                <div
+                  // className={
+                  //   showViewer ? 'image-item-left' : 'image-item-default'
+                  // }
+                  className="image-item-left"
+                >
+                  <div className="image-container-left">
+                    {React.cloneElement(Lcon, {
+                      key: Lcon.key,
+                      className: `${selectedValues[Lcon.key]}-color`,
+                    })}
+                    {!isNaN(Number(Lcon.key)) && (
+                      <div className="triple-toggle-boston-test-left">
+                        <ContactParameters
+                          key={Lcon.key}
+                          value={selectedValues[Lcon.key]}
+                          switchPosition={selectedValues[Lcon.key]}
+                          quantity={quantities[Lcon.key]}
+                          onChange={(value, anime) =>
+                            handleTripleToggleChange(value, anime, Lcon.key)
+                          }
+                          onQuantityChange={(value, anime, quantity) =>
+                            handleQuantityChange(quantity, Lcon.key)
+                          }
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <p
+                    className="image-name-boston-left"
+                    style={{ color: 'white' }}
+                  >
+                    {names[Lcon.key]}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="left-contacts-test">
-            {leftContacts.map((Lcon) => (
+          <div className="Elmodel-center">
+            {svgs.map((svg) => (
               <div
-                // className={
-                //   showViewer ? 'image-item-left' : 'image-item-default'
-                // }
-                className="image-item-left"
+                // className="image-item-2"
+                // className={showViewer ? 'image-item-2-viewer' : 'image-item-2'}
+                className="image-item-2"
+                style={{ zIndex: svg.key }}
               >
-                <div className="image-container-left">
-                  {React.cloneElement(Lcon, {
-                    key: Lcon.key,
-                    className: `${selectedValues[Lcon.key]}-color`,
+                <div className="background-image">
+                  <Background />
+                </div>
+                <div className="image-container-test">
+                  {React.cloneElement(svg, {
+                    key: svg.key,
+                    className: `${selectedValues[svg.key]}-color`,
                   })}
-                  {!isNaN(Number(Lcon.key)) && (
-                    <div className="triple-toggle-boston-test-left">
+                  {!isNaN(Number(svg.key)) && (
+                    <div className="triple-toggle-boston-test-2">
                       <ContactParameters
-                        key={Lcon.key}
-                        value={selectedValues[Lcon.key]}
-                        switchPosition={selectedValues[Lcon.key]}
-                        quantity={quantities[Lcon.key]}
+                        key={svg.key}
+                        value={selectedValues[svg.key]}
+                        switchPosition={selectedValues[svg.key]}
+                        quantity={quantities[svg.key]}
                         onChange={(value, anime) =>
-                          handleTripleToggleChange(value, anime, Lcon.key)
+                          handleTripleToggleChange(value, anime, svg.key)
                         }
                         onQuantityChange={(value, anime, quantity) =>
-                          handleQuantityChange(quantity, Lcon.key)
+                          handleQuantityChange(quantity, svg.key)
                         }
                       />
                     </div>
                   )}
                 </div>
                 <p
-                  className="image-name-boston-left"
+                  className="image-name-boston"
+                  style={{
+                    color: 'white',
+                    paddingTop: '100px',
+                    marginLeft: '95px',
+                  }}
+                >
+                  {names[svg.key]}
+                </p>
+              </div>
+            ))}
+          </div>
+          <div className="right-contacts-test">
+            {rightContacts.map((rCon) => (
+              <div className="image-item-right">
+                <div className="image-container-right">
+                  {React.cloneElement(rCon, {
+                    key: rCon.key,
+                    className: `${selectedValues[rCon.key]}-color`,
+                  })}
+                  {!isNaN(Number(rCon.key)) && (
+                    <div className="triple-toggle-boston-test-right">
+                      <ContactParameters
+                        key={rCon.key}
+                        value={selectedValues[rCon.key]}
+                        switchPosition={selectedValues[rCon.key]}
+                        quantity={quantities[rCon.key]}
+                        onChange={(value, anime) =>
+                          handleTripleToggleChange(value, anime, rCon.key)
+                        }
+                        onQuantityChange={(value, anime, quantity) =>
+                          handleQuantityChange(quantity, rCon.key)
+                        }
+                      />
+                    </div>
+                  )}
+                </div>
+                <p
+                  className="image-name-boston-right"
                   style={{ color: 'white' }}
                 >
-                  {names[Lcon.key]}
+                  {names[rCon.key]}
                 </p>
               </div>
             ))}
           </div>
         </div>
-        <div className="Elmodel-center">
-          {svgs.map((svg) => (
-            <div
-              // className="image-item-2"
-              // className={showViewer ? 'image-item-2-viewer' : 'image-item-2'}
-              className="image-item-2"
-              style={{ zIndex: svg.key }}
-            >
-              <div className="background-image">
-                <Background />
-              </div>
-              <div className="image-container-test">
-                {React.cloneElement(svg, {
-                  key: svg.key,
-                  className: `${selectedValues[svg.key]}-color`,
-                })}
-                {!isNaN(Number(svg.key)) && (
-                  <div className="triple-toggle-boston-test-2">
-                    <ContactParameters
-                      key={svg.key}
-                      value={selectedValues[svg.key]}
-                      switchPosition={selectedValues[svg.key]}
-                      quantity={quantities[svg.key]}
-                      onChange={(value, anime) =>
-                        handleTripleToggleChange(value, anime, svg.key)
-                      }
-                      onQuantityChange={(value, anime, quantity) =>
-                        handleQuantityChange(quantity, svg.key)
-                      }
-                    />
-                  </div>
-                )}
-              </div>
-              <p
-                className="image-name-boston"
-                style={{
-                  color: 'white',
-                  paddingTop: '100px',
-                  marginLeft: '95px',
-                }}
-              >
-                {names[svg.key]}
-              </p>
-            </div>
-          ))}
-        </div>
-        <div className="right-contacts-test">
-          {rightContacts.map((rCon) => (
-            <div className="image-item-right">
-              <div className="image-container-right">
-                {React.cloneElement(rCon, {
-                  key: rCon.key,
-                  className: `${selectedValues[rCon.key]}-color`,
-                })}
-                {!isNaN(Number(rCon.key)) && (
-                  <div className="triple-toggle-boston-test-right">
-                    <ContactParameters
-                      key={rCon.key}
-                      value={selectedValues[rCon.key]}
-                      switchPosition={selectedValues[rCon.key]}
-                      quantity={quantities[rCon.key]}
-                      onChange={(value, anime) =>
-                        handleTripleToggleChange(value, anime, rCon.key)
-                      }
-                      onQuantityChange={(value, anime, quantity) =>
-                        handleQuantityChange(quantity, rCon.key)
-                      }
-                    />
-                  </div>
-                )}
-              </div>
-              <p className="image-name-boston-right" style={{ color: 'white' }}>
-                {names[rCon.key]}
-              </p>
-            </div>
-          ))}
-        </div>
+        {showViewer && (
+          <div
+            style={{
+              width: '100%', // Use percentage for responsive width
+              padding: '20px',
+              borderRadius: '8px',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+              backgroundColor: '#f5f5f5',
+              display: 'flex', // Use flexbox for layout
+              justifyContent: 'center',
+              alignItems: 'center',
+              overflow: 'visible',
+              marginLeft: '160px',
+            }}
+          >
+            <PlyViewer
+              quantities={quantities}
+              setQuantities={setQuantities}
+              selectedValues={selectedValues}
+              setSelectedValues={setSelectedValues}
+              amplitude={totalAmplitude}
+              setAmplitude={setTotalAmplitude}
+              side={name}
+              historical={historical}
+              togglePosition={percAmpToggle}
+              tab={name}
+              names={names}
+              elspec={elspec}
+            />
+          </div>
+        )}
       </div>
-      {showViewer && (
-        <div
-          style={{
-            width: '100%', // Use percentage for responsive width
-            padding: '20px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-            backgroundColor: '#f5f5f5',
-            display: 'flex', // Use flexbox for layout
-            justifyContent: 'center',
-            alignItems: 'center',
-            overflow: 'visible',
-            marginLeft: '160px',
-          }}
-        >
-          <PlyViewer
-            quantities={quantities}
-            setQuantities={setQuantities}
-            selectedValues={selectedValues}
-            setSelectedValues={setSelectedValues}
-            amplitude={totalAmplitude}
-            setAmplitude={setTotalAmplitude}
-            side={name}
-            historical={historical}
-            togglePosition={percAmpToggle}
-            tab={name}
-            names={names}
-            elspec={elspec}
-          />
-        </div>
-      )}
     </div>
   );
 }

@@ -8,6 +8,7 @@
   display: flex;
   margin-left: -40px;
   overflow-x: visible;
+  height: 100%;
   /* transform: scale(0.9); */
   /* transform-origin: top left; */
   /* margin-left: -70px; */
@@ -29,6 +30,17 @@
   /* margin-bottom: -25px; */
 }
 
+.control-panel-inactive {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding-bottom: 100px;
+}
+
 .control-panel {
   display: flex;
   flex-direction: column;
@@ -37,6 +49,7 @@
   background-color: #f5f5f5;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* padding-bottom: 100px; */
 }
 
 .model-selector,
