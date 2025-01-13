@@ -31,9 +31,9 @@ app.on('ready', () => {
   console.log('File handlers registered.');
 });
 
-// console.log = () => {};
-// console.warn = () => {};
-// console.error = () => {};
+console.log = () => {};
+console.warn = () => {};
+console.error = () => {};
 
 // const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
 // console.log(args);
@@ -543,7 +543,8 @@ const createWindow = async () => {
     show: false,
     // width: 875,
     // height: 770,
-    width: 600,
+    // width: 600,
+    width: 1000,
     height: 700,
     // maxWidth: 1100, // Maximum width of the window
     // // maxHeight: 1200, // Maximum height of the window

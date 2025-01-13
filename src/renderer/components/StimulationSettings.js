@@ -55,6 +55,8 @@ function StimulationSettings({
   historical,
   mode,
   type,
+  allTemplateSpaces,
+  setAllTemplateSpaces,
 }) {
   // const [IPG, setIPG] = useState('');
   // const [leftElectrode, setLeftElectrode] = useState('');
@@ -746,6 +748,8 @@ function StimulationSettings({
           mode={mode}
           templateS={importNewS}
           type={type}
+          allTemplateSpaces={allTemplateSpaces}
+          setAllTemplateSpaces={setAllTemplateSpaces}
         />
         {/* )} */}
       </div>

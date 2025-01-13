@@ -45,6 +45,8 @@ function ManageElectrode({
   mode,
   templateS,
   type,
+  allTemplateSpaces,
+  setAllTemplateSpaces,
 }) {
   const testElectrodeRef = React.createRef();
   // const [selectedElectrode, setSelectedElectrode] = useState('');
@@ -741,7 +743,7 @@ function ManageElectrode({
     const combinedRightContacts = combineBinary(rightSideContacts);
 
     data.S.activecontacts = [combinedRightContacts, combinedLeftContacts];
-
+    data.S.estimateInTemplate = allTemplateSpaces;
     console.log(data.S.activecontacts);
     return data;
   };
@@ -998,6 +1000,10 @@ function ManageElectrode({
     setAllVolAmpToggles(updatedAllVolAmpToggles);
   };
 
+  const handleTemplateSpaceChange = (updatedTemplateSpace) => {
+    setAllTemplateSpaces(updatedTemplateSpace);
+  };
+
   const testing = () => {
     console.log('All Toggle positions: ', allTogglePositions);
   };
@@ -1067,16 +1073,16 @@ function ManageElectrode({
           >
             <TabList className="mb-3">
               <Tab key="5" onClick={() => handleTabChange('5')}>
-                Program 1
+                Source 1
               </Tab>
               <Tab key="6" onClick={() => handleTabChange('6')}>
-                Program 2
+                Source 2
               </Tab>
               <Tab key="7" onClick={() => handleTabChange('7')}>
-                Program 3
+                Source 3
               </Tab>
               <Tab key="8" onClick={() => handleTabChange('8')}>
-                Program 4
+                Source 4
               </Tab>
             </TabList>
             {hemisphereData.right.map((tabState, index) => (
@@ -1124,6 +1130,10 @@ function ManageElectrode({
                     historical={historical}
                     elspec={electrodeModels[selectedElectrodeLeft]}
                     electrodeLabel={convertElectrode(selectedElectrodeRight)}
+                    templateSpace={allTemplateSpaces}
+                    setTemplateSpace={(updatedTemplateSpace) =>
+                      handleTemplateSpaceChange(updatedTemplateSpace)
+                    }
                   />
                   {/* <div className="electrode-label">
                     {convertElectrode(selectedElectrodeRight)}
@@ -1141,16 +1151,16 @@ function ManageElectrode({
           >
             <TabList className="mb-3">
               <Tab key="1" onClick={() => handleTabChange('1')}>
-                Program 1
+                Source 1
               </Tab>
               <Tab key="2" onClick={() => handleTabChange('2')}>
-                Program 2
+                Source 2
               </Tab>
               <Tab key="3" onClick={() => handleTabChange('3')}>
-                Program 3
+                Source 3
               </Tab>
               <Tab key="4" onClick={() => handleTabChange('4')}>
-                Program 4
+                Source 4
               </Tab>
             </TabList>
             {hemisphereData.left.map((tabState, index) => (
@@ -1200,6 +1210,10 @@ function ManageElectrode({
                     historical={historical}
                     elspec={electrodeModels[selectedElectrodeLeft]}
                     electrodeLabel={convertElectrode(selectedElectrodeLeft)}
+                    templateSpace={allTemplateSpaces}
+                    setTemplateSpace={(updatedTemplateSpace) =>
+                      handleTemplateSpaceChange(updatedTemplateSpace)
+                    }
                   />
                   {/* <div className="electrode-label">
                     {convertElectrode(selectedElectrodeLeft)}

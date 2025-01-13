@@ -66,6 +66,8 @@ function Electrode({
   historical,
   elspec,
   electrodeLabel,
+  templateSpace,
+  setTemplateSpace,
 }) {
   // const { elspec } = props;
   console.log('IPG: ', IPG);
@@ -98,6 +100,24 @@ function Electrode({
   );
   useEffect(() => {
     window.electron.zoom.setZoomLevel(-3);
+  }, []);
+
+  useEffect(() => {
+    let newTogglePosition = 'mA';
+    if (IPG === 'Boston') {
+      if (percAmpToggle === 'left') {
+        newTogglePosition = '%';
+      } else {
+        newTogglePosition = 'mA';
+      }
+    } else if (IPG === 'Medtronic_Activa') {
+      if (volAmpToggle === 'right') {
+        newTogglePosition = 'V';
+      } else {
+        newTogglePosition = 'mA';
+      }
+    }
+    setTogglePosition(newTogglePosition);
   }, []);
 
   const parseEtageidx = (etageidx) => {
@@ -2611,6 +2631,10 @@ function Electrode({
     // Return the modified quantities
   }
 
+  const handleCheckboxChange = (e) => {
+    setTemplateSpace(e.target.checked ? 1 : 0);
+  };
+
   // const semiAssist = useCallback(() => {
   //   // Function implementation
   //   const updatedQuantities = { ...quantities };
@@ -3604,10 +3628,14 @@ function Electrode({
   /// //////////////////////////////////////////////////////////////////////////////////////////////////////////
   return (
     <div style={{ position: 'relative' }}>
-      <div
-        className="container"
-      >
-        <div className={elspec.tipisactive === 0 ? "control-panel" : "control-panel-inactive"}>
+      <div className="container">
+        <div
+          className={
+            elspec.tipisactive === 0
+              ? 'control-panel'
+              : 'control-panel-inactive'
+          }
+        >
           <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
             {electrodeLabel}
           </div>
@@ -3618,13 +3646,32 @@ function Electrode({
               onChange={handleVisModelChange}
             >
               <option>Choose a model</option>
-              <option value="1">Dembek 2017</option>
+              {elspec.isdirected === 0 && (
+                <option value="1">Dembek 2017</option>
+              )}
               <option value="2">FastField (Baniasadi 2020)</option>
               <option value="3">SimBio/FieldTrip (see Horn 2017)</option>
-              <option value="4">Kuncel 2008</option>
-              <option value="5">Maedler 2012</option>
+              {elspec.isdirected === 0 && (
+                <option value="4">Kuncel 2008</option>
+              )}
+              {elspec.isdirected === 0 && (
+                <option value="5">Maedler 2012</option>
+              )}
               <option value="6">OSS-DBS (Butenko 2020)</option>
             </Form.Select>
+          </div>
+          <div>
+            {(visModel === '3' || visModel === '6') && (
+              <Form.Check
+                label={
+                  <span style={{ color: 'black' }}>
+                    Estimate in template space
+                  </span>
+                }
+                checked={templateSpace === 1}
+                onChange={handleCheckboxChange}
+              />
+            )}
           </div>
           <div className="toggle-controls">
             {IPG === 'Boston' && (
@@ -3839,6 +3886,17 @@ function Electrode({
               <LeftButton className="svgButtons" onClick={handleRightButton} />
               <RightButton className="svgButtons" onClick={handleLeftButton} />
             </div>
+          )}
+          {IPG === 'Medtronic_Activa' && (
+            <div
+              style={{
+                display: 'flex',
+                width: '200px',
+                height: '200px',
+                margin:
+                  '10px auto' /* Add margin auto to center horizontally */,
+              }}
+            />
           )}
           <hr
             style={{

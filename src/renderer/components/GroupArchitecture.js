@@ -349,6 +349,10 @@ function GroupArchitecture({
           historical={historical}
           mode={mode}
           type={type}
+          allTemplateSpaces={currentPatientState.allTemplateSpaces}
+          setAllTemplateSpaces={(value) =>
+            handleStateChange(selectedPatient, { allTemplateSpaces: value })
+          }
         />
       )}
       {/* {type === 'leadgroup' && (
