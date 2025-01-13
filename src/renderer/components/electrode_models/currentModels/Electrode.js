@@ -3916,7 +3916,7 @@ function Electrode({
               // } else {
               //   window.electron.zoom.setZoomLevel(-3);
               // }
-              // window.electron.ipcRenderer.sendMessage('increase-window-width', showViewer);
+              window.electron.ipcRenderer.sendMessage('increase-window-width', showViewer);
             }}
             variant="success"
           >

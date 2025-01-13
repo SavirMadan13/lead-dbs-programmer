@@ -1471,9 +1471,9 @@ ipcMain.on('zoom-level-changed', (event, zoomLevel) => {
 ipcMain.on('increase-window-width', (event, showViewer) => {
   if (mainWindow && showViewer) {
     const [width, height] = mainWindow.getSize();
-    mainWindow.setSize(width - 500, height); // Increase width by 100 pixels
+    mainWindow.setSize(width - 450, height); // Increase width by 100 pixels
   } else if (mainWindow && !showViewer) {
     const [width, height] = mainWindow.getSize();
-    mainWindow.setSize(width + 500, height); // Increase width by 100 pixels
+    mainWindow.setSize(width + 450, height); // Increase width by 100 pixels
   }
 });
