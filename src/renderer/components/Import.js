@@ -544,8 +544,8 @@ function Import({ leadDBS }) {
 
   const downloadTemplateClinicalScores = () => {
     const link = document.createElement('a');
-    link.href = '/ClinicalData.xlsx'; // Relative path to the file in the public directory
-    link.download = 'ClinicalData.xlsx';
+    link.href = '/MDS-UPDRSIII_Template.xlsx'; // Relative path to the file in the public directory
+    link.download = 'MDS-UPDRSIII_Template.xlsx';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -553,8 +553,8 @@ function Import({ leadDBS }) {
 
   const downloadTemplateStimulationParameters = () => {
     const link = document.createElement('a');
-    link.href = '/ClinicalData.xlsx'; // Relative path to the file in the public directory
-    link.download = 'ClinicalData.xlsx';
+    link.href = '/Stimulation_Parameters_Template.xlsx'; // Relative path to the file in the public directory
+    link.download = 'Stimulation_Parameters_Template.xlsx';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
