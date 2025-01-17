@@ -47,6 +47,8 @@ function ManageElectrode({
   type,
   allTemplateSpaces,
   setAllTemplateSpaces,
+  showViewer,
+  setShowViewer,
 }) {
   const testElectrodeRef = React.createRef();
   // const [selectedElectrode, setSelectedElectrode] = useState('');
@@ -1004,6 +1006,10 @@ function ManageElectrode({
     setAllTemplateSpaces(updatedTemplateSpace);
   };
 
+  const handleShowViewer = (updatedShowViewer) => {
+    setShowViewer(updatedShowViewer);
+  };
+
   const testing = () => {
     console.log('All Toggle positions: ', allTogglePositions);
   };
@@ -1134,6 +1140,10 @@ function ManageElectrode({
                     setTemplateSpace={(updatedTemplateSpace) =>
                       handleTemplateSpaceChange(updatedTemplateSpace)
                     }
+                    showViewer={showViewer}
+                    setShowViewer={(updatedShowViewer) =>
+                      handleShowViewer(updatedShowViewer)
+                    }
                   />
                   {/* <div className="electrode-label">
                     {convertElectrode(selectedElectrodeRight)}
@@ -1213,6 +1223,10 @@ function ManageElectrode({
                     templateSpace={allTemplateSpaces}
                     setTemplateSpace={(updatedTemplateSpace) =>
                       handleTemplateSpaceChange(updatedTemplateSpace)
+                    }
+                    showViewer={showViewer}
+                    setShowViewer={(updatedShowViewer) =>
+                      handleShowViewer(updatedShowViewer)
                     }
                   />
                   {/* <div className="electrode-label">

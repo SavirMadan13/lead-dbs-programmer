@@ -68,6 +68,8 @@ function Electrode({
   electrodeLabel,
   templateSpace,
   setTemplateSpace,
+  showViewer,
+  setShowViewer,
 }) {
   // const { elspec } = props;
   console.log('IPG: ', IPG);
@@ -3294,7 +3296,7 @@ function Electrode({
     // this.onChange(value, animation);
     // this.setState({ switchPosition: value, animation });
   };
-  const [showViewer, setShowViewer] = useState(true);
+  // const [showViewer, setShowViewer] = useState(false);
   const handleOpenViewer = () => {
     setShowViewer(!showViewer);
   };

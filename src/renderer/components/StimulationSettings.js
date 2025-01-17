@@ -57,6 +57,8 @@ function StimulationSettings({
   type,
   allTemplateSpaces,
   setAllTemplateSpaces,
+  showViewer,
+  setShowViewer,
 }) {
   // const [IPG, setIPG] = useState('');
   // const [leftElectrode, setLeftElectrode] = useState('');
@@ -750,6 +752,8 @@ function StimulationSettings({
           type={type}
           allTemplateSpaces={allTemplateSpaces}
           setAllTemplateSpaces={setAllTemplateSpaces}
+          showViewer={showViewer}
+          setShowViewer={setShowViewer}
         />
         {/* )} */}
       </div>

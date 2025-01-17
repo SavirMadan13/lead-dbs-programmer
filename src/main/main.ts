@@ -41,8 +41,8 @@ console.error = () => {};
 // const inputPath = '/Users/savirmadan/Downloads/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0374Output/derivatives/leaddbs/sub-CbctDbs0374/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
-// const inputPath = process.argv[1];
-const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
+const inputPath = process.argv[1];
+// const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons/derivatives/leadgroup/BwhParkinsons/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataBwh.json';
@@ -544,7 +544,8 @@ const createWindow = async () => {
     // width: 875,
     // height: 770,
     // width: 600,
-    width: 1000,
+    // width: 1000,
+    width: 550,
     height: 700,
     // maxWidth: 1100, // Maximum width of the window
     // // maxHeight: 1200, // Maximum height of the window
@@ -1020,9 +1021,9 @@ const createWindow = async () => {
     // const datasetDescription = readJSON(datasetDescriptionPath);
     // const leadPath = datasetDescription[0].Lead_Path;
     // console.log('Lead Path: ', leadPath);
-    const stimulationData = getData('stimulationData');
-    // const leadPath = stimulationData.leadpath;
-    const leadPath = '/Users/savirmadan/Documents/GitHub/leaddbs';
+    // const stimulationData = getData('stimulationData');
+    const leadPath = stimulationData.leadpath;
+    // const leadPath = '/Users/savirmadan/Documents/GitHub/leaddbs';
     // Step 3: Go to the 'atlases' folder within the Lead_Path
     const atlasesPath = path.join(
       leadPath,

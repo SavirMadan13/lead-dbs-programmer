@@ -27,6 +27,7 @@ function GroupArchitecture({
   type,
 }) {
   const [selectedPatient, setSelectedPatient] = useState(null);
+  const [showViewer, setShowViewer] = useState(false);
   console.log(patients);
   // State for each patient
   const initialState = {
@@ -55,6 +56,7 @@ function GroupArchitecture({
   const [renderKey, setRenderKey] = useState(0); // Added state for forcing re-render
   console.log('Timeline: ', timeline);
   console.log('Patients: ', patients);
+
   useEffect(() => {
     if (patients.length > 0 && !selectedPatient) {
       // setSelectedPatient(patients[0]);
@@ -226,7 +228,10 @@ function GroupArchitecture({
           // alignItems: 'center',
           justifyContent: 'center',
           marginLeft: '200px',
-          marginBottom: '-110px',
+          ...(showViewer && {
+            marginBottom: '-110px',
+          }),
+          // marginBottom: '-110px',
           // marginTop: '100px',
         }}
       >
@@ -353,6 +358,8 @@ function GroupArchitecture({
           setAllTemplateSpaces={(value) =>
             handleStateChange(selectedPatient, { allTemplateSpaces: value })
           }
+          showViewer={showViewer}
+          setShowViewer={setShowViewer}
         />
       )}
       {/* {type === 'leadgroup' && (
