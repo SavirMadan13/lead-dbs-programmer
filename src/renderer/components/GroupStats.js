@@ -14,9 +14,7 @@ import UPDRSAnalysisComponent from './UPDRSAnalysisComponent';
 function GroupStats() {
   const location = useLocation();
   const { patient, timeline, directoryPath, leadDBS } = location.state || {};
-  const navigate = useNavigate(); // Initialize the navigate hook
-  console.log(timeline);
-  // const timeline = timelines[0];
+  const navigate = useNavigate();
   const [scoreTypes, setScoreTypes] = useState(['UPDRS', 'Y-BOCS']);
   const [selectedScoreType, setSelectedScoreType] = useState('UPDRS');
   const YBOCS = {
@@ -70,10 +68,8 @@ function GroupStats() {
   const [initialScores, setInitialScores] = useState(UPDRS);
 
   const reorderTimeline = (timeline) => {
-    // Filter out 'baseline' and add it to the start of a new array
     return ['baseline', ...timeline.filter((time) => time !== 'baseline')];
   };
-  // Usage example
   const reorderedTimeline = reorderTimeline(timeline);
 
   const handleScoreChange = (score) => {
@@ -85,10 +81,8 @@ function GroupStats() {
     setSelectedScoreType(score);
   };
 
-  // Set how many columns you want per "wrapped" table row
-  const columnsPerRow = 7; // Change this number based on how wide you want each section
+  const columnsPerRow = 7;
 
-  // Split the keys into chunks of 'columnsPerRow'
   const chunkArray = (arr, size) => {
     const result = [];
     for (let i = 0; i < arr.length; i += size) {
@@ -97,24 +91,11 @@ function GroupStats() {
     return result;
   };
 
-  // Get chunks of headers (column titles) and data (table rows)
   const keys = Object.keys(initialScores);
   const headerChunks = chunkArray(keys, columnsPerRow);
 
-  // const [patients, setPatients] = useState([
-  //   {
-  //     id: patient.id,
-  //     baseline: { ...initialScores },
-  //     '3months': { ...initialScores },
-  //     '6months': { ...initialScores },
-  //   },
-  // ]);
-
   const reorderScores = (importedScores) => {
-    // Separate 'baseline' and other timepoints
     const { baseline, ...otherScores } = importedScores;
-    console.log({ baseline, ...otherScores });
-    // Reconstruct the object with 'baseline' first
     return { baseline, ...otherScores };
   };
 
@@ -137,39 +118,25 @@ function GroupStats() {
     leadDBS,
   );
 
-  // window.electron.ipcRenderer.sendMessage(
-  //   'import-file-clinical',
-  //   patient.id,
-  //   timeline,
-  //   directoryPath,
-  //   leadDBS,
-  // );
-
   useEffect(() => {
     if (window.electron && window.electron.ipcRenderer) {
       const importedScores = {};
 
       const handleImportFile = (arg) => {
-        console.log('Import file: ', arg);
         Object.keys(timeline).forEach((key) => {
-          console.log('Timeline: ', timeline[key]);
           if (!arg[timeline[key]]) {
-            console.log(`No file found for ${arg}`);
-            importedScores[timeline[key]] = { ...initialScores }; // Use initial scores if no file
+            importedScores[timeline[key]] = { ...initialScores };
           } else {
             importedScores[timeline[key]] = arg[timeline[key]];
           }
         });
-        // When all timelines are processed, update patients
-        // if (Object.keys(importedScores).length === timeline.length) {
         const reorderedScores = reorderScores(importedScores);
         setPatients([
           {
             id: patient.id,
-            ...reorderedScores, // Spread all timelines with dynamic keys
+            ...reorderedScores,
           },
         ]);
-        // }
       };
 
       window.electron.ipcRenderer.once(
@@ -181,60 +148,13 @@ function GroupStats() {
     }
   }, []);
 
-  const addPatient = () => {
-    setPatients([
-      ...patients,
-      {
-        id: `Patient ${patients.length + 1}`,
-        baseline: { ...initialScores },
-        postop: { ...initialScores },
-      },
-    ]);
-  };
-
-  const [selectedRows, setSelectedRows] = useState({});
-  const [showGraph, setShowGraph] = useState(false);
-  const [baselineValues, setBaselineValues] = useState([]);
-  const [postopValues, setPostopValues] = useState([]);
-  const [currentStage, setCurrentStage] = useState('import');
-
-  const toggleRowSelection = (patientIndex) => {
-    setSelectedRows((prevSelectedRows) => ({
-      ...prevSelectedRows,
-      [patientIndex]: !prevSelectedRows[patientIndex],
-    }));
-  };
-
   const updateScore = (patientIndex, timePoint, field, value) => {
     const updatedPatients = [...patients];
     updatedPatients[patientIndex][timePoint][field] = value;
     setPatients(updatedPatients);
   };
 
-  const updatePatientID = (patientIndex, newID) => {
-    const updatedPatients = [...patients];
-    updatedPatients[patientIndex].id = newID;
-    setPatients(updatedPatients);
-  };
-
   const renderTable = (timePoint) => {
-    console.log('Time Point: ', timePoint);
-    const allSelected =
-      patients.length > 0 &&
-      patients.every((_, rowIndex) => selectedRows[rowIndex]);
-
-    const toggleSelectAll = () => {
-      if (allSelected) {
-        setSelectedRows({});
-      } else {
-        const newSelectedRows = {};
-        patients.forEach((_, rowIndex) => {
-          newSelectedRows[rowIndex] = true;
-        });
-        setSelectedRows(newSelectedRows);
-      }
-    };
-
     return (
       <div style={{ overflowX: 'auto', maxHeight: '700px' }}>
         {headerChunks.map((headerChunk, chunkIndex) => (
@@ -242,7 +162,6 @@ function GroupStats() {
             <Table striped bordered hover responsive>
               <thead>
                 <tr>
-                  {/* <th>Patient ID</th> */}
                   {headerChunk.map((key) => (
                     <th
                       key={key}
@@ -256,16 +175,6 @@ function GroupStats() {
               <tbody>
                 {patients.map((pt, rowIndex) => (
                   <tr key={rowIndex}>
-                    {/* <td>
-                      <Form.Control
-                        type="text"
-                        value={patient.id}
-                        onChange={(e) =>
-                          updatePatientID(rowIndex, e.target.value)
-                        }
-                        style={{ width: 'auto' }}
-                      />
-                    </td> */}
                     {headerChunk.map((key, colIndex) => (
                       <td key={key}>
                         <Form.Control
@@ -304,7 +213,7 @@ function GroupStats() {
         raw: true,
       });
 
-      const updatedPatients = [...patients]; // Copy the existing patients state
+      const updatedPatients = [...patients];
 
       json.forEach((patientData) => {
         const normalizedScores = {};
@@ -322,7 +231,6 @@ function GroupStats() {
         );
 
         if (existingPatientIndex > -1) {
-          // Update existing patient
           if (timePoint === 'baseline') {
             updatedPatients[existingPatientIndex].baseline = {
               ...updatedPatients[existingPatientIndex].baseline,
@@ -335,7 +243,6 @@ function GroupStats() {
             };
           }
         } else {
-          // Add new patient
           const newPatient = {
             id: patientID,
             baseline:
@@ -356,76 +263,45 @@ function GroupStats() {
     reader.readAsArrayBuffer(file);
   };
 
-  const analyzeSelectedRowsAndColumns = () => {
-    const baselineScores = [];
-    const postopScores = [];
-
-    Object.keys(selectedRows).forEach((rowIndex) => {
-      if (selectedRows[rowIndex]) {
-        const patient = patients[rowIndex];
-        console.log(patient);
-        // Sum all the baseline scores for this patient
-        const baselineSum = Object.values(patient.baseline).reduce(
-          (sum, value) => sum + (value || 0),
-          0,
-        );
-
-        // Sum all the postop scores for this patient
-        const postopSum = Object.values(patient.postop).reduce(
-          (sum, value) => sum + (value || 0),
-          0,
-        );
-
-        baselineScores.push(baselineSum);
-        postopScores.push(postopSum);
-      }
-    });
-
-    console.log('Baseline: ', baselineScores);
-    console.log('Postop: ', postopScores);
-    setBaselineValues(baselineScores);
-    setPostopValues(postopScores);
-    setShowGraph(true);
-    setCurrentStage('analyze');
-  };
-
-  const prepareDataForExport = () => {
-    const baselineScores = [];
-
-    Object.keys(selectedRows).forEach((rowIndex) => {
-      if (selectedRows[rowIndex]) {
-        const patient1 = patients[rowIndex];
-        // Sum all the baseline scores for this patient
-        const baselineSum = Object.values(patient1.baseline).reduce(
-          (sum, value) => sum + (value || 0),
-          0,
-        );
-
-        baselineScores.push(baselineSum);
-      }
-    });
-
-    console.log('Baseline: ', baselineScores);
-    setBaselineValues(baselineScores);
-  };
-
-  const sendDataToMain = () => {
-    console.log(patients[0].baseline);
-    window.electron.ipcRenderer.sendMessage(
-      'save-file-clinical',
-      patients[0].baseline,
-      location.state,
-    );
-  };
-
   const handleAnalysisTabClick = (key) => {
-    console.log(key);
     if (key === 'analysis') {
       setCurrentStage('analyze');
     } else {
-      setCurrentStage('import'); // or set to some other default value
+      setCurrentStage('import');
     }
   };
+
+  const [currentStage, setCurrentStage] = useState('analyze');
+  const [clinicalTimelines, setClinicalTimelines] = useState(null);
+
+  useEffect(() => {
+    const timelinePromises = window.electron.ipcRenderer.invoke(
+      'get-timelines',
+      directoryPath,
+      patient.id,
+      true,
+    );
+    timelinePromises.then((result) => setClinicalTimelines(result));
+    // Promise.all(timelinePromises)
+    //   .then((allReceivedTimelines) => {
+    //     const allFilteredTimelineNames = allReceivedTimelines.map(
+    //       (receivedTimelines) =>
+    //         receivedTimelines
+    //           .filter((timelineData) => timelineData.hasClinical)
+    //           .map((timelineData) => timelineData.timeline),
+    //     );
+
+    //     const patientsArray = patients;
+    //     const patientsWithTimelines = patientsArray.map((patient, index) => ({
+    //       id: patient.id,
+    //       timelines: allFilteredTimelineNames[index] || [],
+    //     }));
+    //     return setClinicalTimelines(patientsWithTimelines);
+    //   })
+    // .catch((error) => {
+    //   console.error('Error fetching timelines for all patients:', error);
+    // });
+  }, [patients]);
 
   return (
     <div>
@@ -434,13 +310,13 @@ function GroupStats() {
           <HomeIcon
             onClick={() => navigate('/')}
             style={{
-              fontSize: '36px', // Customize size
-              color: '#1a73e8', // Customize color
-              cursor: 'pointer', // Add pointer cursor on hover
-              margin: '0 10px', // Add some margin for spacing
+              fontSize: '36px',
+              color: '#1a73e8',
+              cursor: 'pointer',
+              margin: '0 10px',
             }}
           />
-          <Form.Select
+          {/* <Form.Select
             value={selectedScoreType}
             onChange={(e) => handleScoreChange(e.target.value)}
           >
@@ -449,14 +325,14 @@ function GroupStats() {
                 {type}
               </option>
             ))}
-          </Form.Select>
-          <Button
+          </Form.Select> */}
+          {/* <Button
             variant="secondary"
             onClick={() => document.getElementById('baseline-upload').click()}
             className="mb-4 mx-2"
           >
             Import Excel
-          </Button>
+          </Button> */}
           <input
             id="baseline-upload"
             type="file"
@@ -471,28 +347,19 @@ function GroupStats() {
             accept=".xlsx"
             onChange={(e) => handleFileUpload(e, 'postop')}
           />
-          {/* <Button
-              variant="success"
-              // onClick={() => setCurrentStage('analyze')}
-              onClick={analyzeSelectedRowsAndColumns}
-              className="mb-4"
-            >
-              Proceed to Analysis
-            </Button> */}
         </Container>
         <div>
           <Tabs
-            defaultIndex={0}
-            onSelect={(index) =>
-              setCurrentStage(index === 1 ? 'analyze' : null)
-            }
+          // defaultIndex={0}
+          // onSelect={(index) =>
+          //   setCurrentStage(index === 1 ? 'analyze' : null)
+          // }
           >
             <TabList>
-              <Tab>Scores</Tab>
-              <Tab onClick={handleAnalysisTabClick}>Analysis</Tab>
+              {/* <Tab>Scores</Tab> */}
+              {/* <Tab onClick={handleAnalysisTabClick}>Analysis</Tab> */}
             </TabList>
-
-            {/* Scores Tab Content */}
+            {/*
             <TabPanel>
               <Tabs defaultIndex={0}>
                 <TabList>
@@ -507,56 +374,37 @@ function GroupStats() {
                   </TabPanel>
                 ))}
               </Tabs>
-            </TabPanel>
+            </TabPanel> */}
 
-            {/* Analysis Tab Content */}
-            <TabPanel>
-              {currentStage === 'analyze' && (
+            {/* <TabPanel>
+              {currentStage === 'analyze' && clinicalTimelines && (
                 <UPDRSAnalysisComponent
                   currentStage={currentStage}
                   rawData={patients}
+                  clinicalTimelines={clinicalTimelines}
                 />
               )}
-            </TabPanel>
+            </TabPanel> */}
           </Tabs>
-        </div>
-      </div>
-      {/* {currentStage === 'analyze' && (
-        <div>
-          <Button variant="secondary" onClick={() => setCurrentStage('import')}>
-            Go Back to Import
-          </Button>
-          <div />
-          {showGraph && (
-            <div
-              style={{
-                float: 'left',
-                width: '50%',
-              }}
-            >
-              <UPDRSAnalysisComponent
-                baselineValues={baselineValues}
-                postopValues={postopValues}
-                rawData={patients}
-              />
-            </div>
+          {currentStage === 'analyze' && clinicalTimelines && (
+            <UPDRSAnalysisComponent
+              currentStage={currentStage}
+              rawData={patients}
+              clinicalTimelines={clinicalTimelines}
+            />
           )}
         </div>
-      )} */}
-      {currentStage !== 'analyze' && (
+      </div>
+      {/* {currentStage !== 'analyze' && (
         <div>
           <button className="export-button" onClick={() => navigate(-1)}>
             Back to Patient Details
           </button>
-          {/* <button className="export-button-final" onClick={sendDataToMain}>
-            Save Clinical Scores
-          </button> */}
         </div>
-      )}
-
-      {/* <button onClick={() => navigate('/custom-table')}>
-        Add custom table
-      </button> */}
+      )} */}
+                <button className="export-button" onClick={() => navigate(-1)}>
+            Back to Patient Details
+          </button>
     </div>
   );
 }

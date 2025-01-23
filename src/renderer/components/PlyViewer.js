@@ -3258,7 +3258,6 @@ function PlyViewer({
               id="mesh-controls-tab"
               className="mb-3"
             >
-              {/* Tab for Meshes */}
               <Tab eventKey="meshes" title="Meshes">
                 <div style={controlPanelStyle}>
                   {meshes.map((mesh, index) => (
@@ -3289,7 +3288,6 @@ function PlyViewer({
                 </div>
               </Tab>
 
-              {/* Tab for Atlases */}
               <Tab eventKey="atlases" title="Atlases">
                 <div style={controlPanelStyle2}>
                   <input
@@ -3351,7 +3349,6 @@ function PlyViewer({
                 </div>
               </Tab>
 
-              {/* Tab for Sweetspots with nested tabs */}
               <Tab eventKey="sweetspots" title="Sweetspots">
                 <Tabs defaultActiveKey="tremor" id="nested-tabs-inside">
                   <Tab eventKey="tremor" title="Tremor">
@@ -3623,21 +3620,12 @@ function PlyViewer({
                       marginTop: '10px',
                     }}
                   >
-                    {/* <Button variant="primary" onClick={handleSTNParameters}>
-                      Provide Solution
-                    </Button> */}
-                    {/* <Button variant="primary" onClick={handleAddContacts}>
-                      Add Contact
-                    </Button> */}
                     <div>
                       <Button variant="primary" onClick={handleAvoidance}>
                         Avoid
                       </Button>
                     </div>
                     <div>
-                      {/* <Button variant="primary" onClick={handleNiiMap}>
-                        Test Nii Coords
-                      </Button> */}
                       <Button
                         variant="primary"
                         onClick={() =>
@@ -3664,7 +3652,6 @@ function PlyViewer({
                           </div>
                         </div>
                       )}
-                      {/* <span>{solutionText}</span> */}
                       <span>{niiSolution}</span>
                       {/* <Button onClick={saveCurrentSpheres}>Save Spheres</Button>
                       <Button onClick={() => calculatePercentOverlap(savedSpheres.current)}>

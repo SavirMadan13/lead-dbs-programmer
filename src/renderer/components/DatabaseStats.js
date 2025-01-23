@@ -145,8 +145,6 @@ function DatabaseStats({ directoryPath }) {
       case 'all':
         return (
           <div className="analysis-container">
-            {/* <DatabasePlot clinicalData={clinicalDataForPlotting} />
-            <GroupAveragePlot clinicalData={clinicalDataForPlotting} /> */}
             <CombinedPlot clinicalData={clinicalDataForPlotting} />
             <GroupLateralityAnalysisPlot
               clinicalData={clinicalDataForPlotting}

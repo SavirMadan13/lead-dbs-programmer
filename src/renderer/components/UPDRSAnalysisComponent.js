@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
 import PairedTTestComponent from './PairedTTestComponent';
@@ -10,15 +10,33 @@ import CorrelationAnalysisComponent from './CorrelationAnalysisComponent';
 // import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 import SubscoreAnalysis from './SubscoreAnalysis';
 
-function UPDRSAnalysisComponent({ currentStage, rawData }) {
+function UPDRSAnalysisComponent({ currentStage, rawData, clinicalTimelines }) {
   console.log(rawData);
   const [analysisType, setAnalysisType] = useState('all');
   const [showPercentage, setShowPercentage] = useState(true);
+  const [plotData, setPlotData] = useState(rawData);
   const navigate = useNavigate(); // Initialize the navigate hook
 
   const handleAnalysisChange = (e) => {
     setAnalysisType(e.target.value);
   };
+
+  useEffect(() => {
+    console.log(clinicalTimelines, rawData);
+    const updatedRawData = { ...rawData };
+    console.log(updatedRawData);
+    Object.keys(clinicalTimelines).forEach((key) => {
+      console.log(clinicalTimelines[key].hasClinical);
+      console.log(updatedRawData[0][clinicalTimelines[key].timeline]);
+      if (!clinicalTimelines[key].hasClinical) {
+        delete updatedRawData[0][clinicalTimelines[key].timeline];
+        console.log(clinicalTimelines[key].timeline);
+      }
+    });
+    console.log(rawData);
+    console.log(updatedRawData);
+    setPlotData(updatedRawData);
+  }, [clinicalTimelines, rawData]);
 
   const renderAnalysis = () => {
     switch (analysisType) {
@@ -59,8 +77,8 @@ function UPDRSAnalysisComponent({ currentStage, rawData }) {
       //   );
       case 'all':
         return (
-          <div style={{ display: 'flex', marginLeft: '-60px', width: '1000px' }}>
-            <div style={{ flex: 1, marginLeft: '-30px' }}>
+          <div style={{ width: '100%', height: '100%' }}>
+            <div style={{ flex: 1, width: '100%', height: '100%' }}>
               <PairedTTestComponent
                 rawData={rawData}
                 showPercentage={showPercentage}
@@ -89,20 +107,14 @@ function UPDRSAnalysisComponent({ currentStage, rawData }) {
   return (
     <div>
       <h2>UPDRS III Analysis</h2>
-      <div>
-        {/* <label>Select Analysis Type: </label> */}
+      {/* <div>
         <select value={analysisType} onChange={handleAnalysisChange}>
           <option value="raincloud">Trendline</option>
           <option value="laterality">Laterality Analysis</option>
           <option value="subscore">Subscores</option>
-          {/* <option value="boxPlot">Box Plot</option>
-          <option value="laterality">Laterality Analysis</option> */}
-          {/* <option value="subscale">Subscale Comparison</option>
-          <option value="responder">Responder Analysis</option> */}
-          {/* <option value="correlation">Correlation Analysis</option> */}
           <option value="all">View All Plots</option>
         </select>
-      </div>
+      </div> */}
       <div style={{ marginTop: '30px', marginBottom: '-10px' }}>
         <h3 style={{fontSize: '14px'}}>
           <input

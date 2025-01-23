@@ -4082,9 +4082,9 @@ function Electrode({
             style={{
               width: '100%', // Use percentage for responsive width
               padding: '20px',
-              borderRadius: '8px',
+              // borderRadius: '8px',
               boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-              backgroundColor: '#f5f5f5',
+              // backgroundColor: '#f5f5f5',
               display: 'flex', // Use flexbox for layout
               justifyContent: 'center',
               alignItems: 'center',
