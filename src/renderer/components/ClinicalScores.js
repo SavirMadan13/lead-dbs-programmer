@@ -196,6 +196,22 @@ function ClinicalScores() {
       // Event listener for import-file
       const handleImportFile = (arg) => {
         const importedScores = arg;
+        console.log('importedScores: ', importedScores);
+        console.log('initialScores: ', totalScores);
+        const matchingScores = Object.keys(totalScores).find((score) => {
+          const totalScoreItems = Object.keys(totalScores[score]);
+          const importedScoreItems = Object.keys(importedScores);
+          return (
+            totalScoreItems.length === importedScoreItems.length &&
+            totalScoreItems.every((item) => importedScoreItems.includes(item))
+          );
+        });
+
+        if (matchingScores) {
+          console.log('Matching score found: ', matchingScores);
+        } else {
+          console.log('No matching score found');
+        }
         if (importedScores === 'File not found') {
           console.log('No File Found');
         } else {
@@ -206,6 +222,7 @@ function ClinicalScores() {
               postop: { ...initialScores },
             },
           ]);
+          setSelectedScoreType(matchingScores);
         }
       };
 
@@ -217,7 +234,7 @@ function ClinicalScores() {
     } else {
       console.error('ipcRenderer is not available');
     }
-  }, []);
+  }, [totalScores]);
 
   const addPatient = () => {
     setPatients([
