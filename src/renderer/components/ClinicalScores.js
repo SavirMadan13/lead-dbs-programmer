@@ -7,6 +7,7 @@ import * as XLSX from 'xlsx';
 import PairedTTestComponent from './PairedTTestComponent';
 import BoxPlotComponent from './BoxPlotComponent';
 import UPDRSAnalysisComponent from './UPDRSAnalysisComponent';
+import './icons/icons.css';
 
 function ClinicalScores() {
   const location = useLocation();
@@ -15,6 +16,20 @@ function ClinicalScores() {
 
   const [scoreTypes, setScoreTypes] = useState(['UPDRS', 'Y-BOCS']);
   const [selectedScoreType, setSelectedScoreType] = useState('UPDRS');
+
+  function importAll(r) {
+    let images = {};
+    r.keys().forEach((item) => {
+      const key = item.replace('./', '').replace(/\.[^/.]+$/, ''); // Remove './' and file extension
+      images[key] = r(item);
+    });
+    return images;
+  }
+
+  const UPDRSImages = importAll(
+    require.context('./icons', false, /\.(PNG|jpe?g|svg)$/),
+  );
+  console.log('UPDRSImages: ', UPDRSImages);
   const YBOCS = {
     'Time occupied by obsessive thoughts': 0,
     'Interference due to obsessive thoughts': 0,
@@ -63,6 +78,47 @@ function ClinicalScores() {
     '3.17e: Rest tremor amplitude- Lip/jaw': 0,
     '3.18: Constancy of rest tremor': 0,
   };
+
+  const keyMapping = {
+    '3.1: Speech': '3-1_Speech',
+    '3.2: Facial expression': '3-2_Facial-expression',
+    '3.3a: Rigidity- Neck': '3-3_Rigidity-neck',
+    '3.3b: Rigidity- RUE': '3-3_Rigidity_RUE',
+    '3.3c: Rigidity- LUE': '3-3_Rigidity_LUE',
+    '3.3d: Rigidity- RLE': '3-3_Rigidity_RLE',
+    '3.3e: Rigidity- LLE': '3-3_Rigidity_LLE',
+    '3.4a: Finger tapping- Right hand': '3-4_Finger-tapping_R',
+    '3.4b: Finger tapping- Left hand': '3-4_Finger-tapping_L',
+    '3.5a: Hand movements- Right hand': '3-5_Hand-movements_R',
+    '3.5b: Hand movements- Left hand': '3-5_Hand-movements_L',
+    '3.6a: Pronation- supination movements- Right hand':
+      '3-6_Pronation-supination-R',
+    '3.6b: Pronation- supination movements- Left hand':
+      '3-6_Pronation-supination-L',
+    '3.7a: Toe tapping- Right foot': '3-7_Toe-tapping_R',
+    '3.7b: Toe tapping- Left foot': '3-7_Toe-tapping_L',
+    '3.8a: Leg agility- Right leg': '3-8_Leg-agility_R',
+    '3.8b: Leg agility- Left leg': '3-8_Leg-agility_L',
+    '3.9: Arising from chair': '3-9_Arise-from-chair',
+    '3.10: Gait': '3-10_Gait',
+    '3.11: Freezing of gait': '3-11_Freezing-of-gait',
+    '3.12: Postural stability': '3-12_Postural-stability',
+    '3.13: Posture': '3-13_Posture',
+    '3.14: Global spontaneity of movement':
+      '3-14_Global-spontaneity-of-movement',
+    '3.15a: Postural tremor- Right hand': '3-15_Postural-tremor-of-hands-R',
+    '3.15b: Postural tremor- Left hand': '3-15_Postural-tremor-of-hands-L',
+    '3.16a: Kinetic tremor- Right hand': '3-16_Kinetic-tremor-of-the-hands_R',
+    '3.16b: Kinetic tremor- Left hand': '3-16_Kinetic-tremor-of-the-hands_L',
+    '3.17a: Rest tremor amplitude- RUE': '3-17_Rest-tremor_RUE',
+    '3.17b: Rest tremor amplitude- LUE': '3-17_Rest-tremor_LUE',
+    '3.17c: Rest tremor amplitude- RLE': '3-17_Rest-tremor-amp_RLE',
+    '3.17d: Rest tremor amplitude- LLE': '3-17_Rest-tremor-amp_LLE',
+    '3.17e: Rest tremor amplitude- Lip/jaw':
+      '3-17_Rest-tremor-amplitude_lip-jaw',
+    '3.18: Constancy of rest tremor': '3-18_Constancy-of-rest-tremor',
+  };
+
   const [initialScores, setInitialScores] = useState(UPDRS);
 
   const handleScoreChange = (score) => {
@@ -188,6 +244,15 @@ function ClinicalScores() {
       }
     };
 
+    const calculateOpacity = (score) => {
+      // Assuming scores range from 0 to 4, adjust as needed
+      console.log(patients);
+      const minOpacity = 0.2;
+      const maxOpacity = 1.0;
+      const maxScore = 4; // Adjust this based on your scoring system
+      return minOpacity + (score / maxScore) * (maxOpacity - minOpacity);
+    };
+
     return (
       <div style={{ overflowX: 'auto', maxHeight: '700px' }}>
         {headerChunks.map((headerChunk, chunkIndex) => (
@@ -201,7 +266,21 @@ function ClinicalScores() {
                       key={key}
                       style={{ whiteSpace: 'wrap', minWidth: '80px' }}
                     >
-                      {key}
+                      {/* {key} */}
+                      <div className="tooltip-container">
+                        <img
+                          src={UPDRSImages[keyMapping[key]]}
+                          alt={key}
+                          className="updrs-image"
+                          style={{
+                            opacity: calculateOpacity(
+                              patients[0][timePoint][key],
+                            ),
+                          }}
+                        />
+                        <span className="tooltip-text">{key}</span>
+                      </div>
+                      {/* {key} */}
                     </th>
                   ))}
                 </tr>

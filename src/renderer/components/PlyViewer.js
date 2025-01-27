@@ -5,7 +5,7 @@ import { PLYLoader, OrbitControls } from 'three-stdlib';
 // import * as nifti from 'nifti-reader-js'; // Correctly importing the nifti module
 import * as nifti from 'nifti-reader-js';
 // import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
-import { Tabs, Tab, Collapse, Button, Form, Modal } from 'react-bootstrap';
+import { Tabs, Tab, Collapse, Button, Form, Modal, Dropdown, DropdownButton } from 'react-bootstrap';
 import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings icon
 import * as math from 'mathjs';
 import { optimizeSphereValues } from './StimOptimizer';
@@ -1032,8 +1032,8 @@ function PlyViewer({
     // const selectedPatientID = selectedValue;
     const selectedSession = splitValues[1];
     console.log(selectedPatientID);
-    const outputPatientID = splitValues[0] + '-' + splitValues[1];
-    const outputPatientSession = splitValues[2] + '-' + splitValues[3];
+    const outputPatientID = `${splitValues[0]  }-${  splitValues[1]}`;
+    const outputPatientSession = `${splitValues[2]  }-${  splitValues[3]}`;
     const electrodeLoader = new PLYLoader();
     const anatomyLoader = new PLYLoader();
 
@@ -3225,7 +3225,7 @@ function PlyViewer({
   };
 
   return (
-    <div>
+    <div style={{ marginTop: '-120px' }}>
       {/* {!plyFile && (
         <div {...getRootProps({ className: 'dropzone' })} style={dropzoneStyle}>
           <input {...getInputProps()} />
@@ -3239,7 +3239,7 @@ function PlyViewer({
           <div ref={mountRef} />
           <div ref={secondaryMountRef} />
         </div>
-        <Button
+        {/* <Button
           variant="outline-secondary"
           onClick={() => setOpen(!open)}
           aria-controls="tabs-collapse"
@@ -3247,11 +3247,427 @@ function PlyViewer({
           style={{ marginBottom: '10px' }}
         >
           <SettingsIcon />
-        </Button>
+        </Button> */}
         {/* <button onClick={logCameraSettings}>Log Camera Settings</button>
         <button onClick={changeCameraAngle}>Change Camera</button> */}
+        <Dropdown drop="start">
+          <Dropdown.Toggle variant="secondary"><SettingsIcon /></Dropdown.Toggle>
+          <Dropdown.Menu style={{ backgroundColor: 'transparent' }}>
+            <div id="tabs-collapse">
+              <Tabs
+                defaultActiveKey="meshes"
+                id="mesh-controls-tab"
+                // className="mb-3"
+                style={{ backgroundColor: 'transparent' }}
+              >
+                <Tab eventKey="meshes" title="Meshes">
+                  <div style={controlPanelStyle}>
+                    {meshes.map((mesh, index) => (
+                      <div key={mesh.name} style={meshControlStyle}>
+                        <h5 style={meshNameStyle}>{mesh.name}</h5>
+                        <h3 style={{ fontSize: '12px' }}>Visibility</h3>
+                        <Form.Check
+                          type="switch"
+                          checked={meshProperties[mesh.name]?.visible}
+                          onChange={() => handleVisibilityChange(mesh.name)}
+                        />
+                        <h3 style={{ fontSize: '12px' }}>Opacity</h3>
+                        <Form.Range
+                          min={0}
+                          max={1}
+                          step={0.01}
+                          value={meshProperties[mesh.name]?.opacity || 0.8}
+                          onChange={(e) =>
+                            handleOpacityChange(
+                              mesh.name,
+                              parseFloat(e.target.value),
+                            )
+                          }
+                          style={{ width: '150px' }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </Tab>
 
-        <Collapse in={open}>
+                <Tab eventKey="atlases" title="Atlases">
+                  <div style={controlPanelStyle2}>
+                    <input
+                      type="text"
+                      placeholder="Enter coordinates (x,y,z)"
+                      value={searchCoordinate}
+                      onChange={(e) => setSearchCoordinate(e.target.value)}
+                      style={{ marginBottom: '10px', width: '300px' }}
+                    />
+                    <button onClick={handleCoordinateSearch}>Search</button>
+                    <div style={{ marginTop: '20px' }}>
+                      <h4>Matching Atlases:</h4>
+                      {matchingAtlases.length > 0 ? (
+                        <ul>
+                          {matchingAtlases.map((file, index) => (
+                            <li key={index}>{file.name}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p>No matching atlases found.</p>
+                      )}
+                    </div>
+                    <select
+                      onChange={handleFileChange}
+                      multiple
+                      style={{ height: '500px', width: '300px', backgroundColor: 'transparent' }}
+                    >
+                      {plyFiles.map((file, index) => (
+                        <option key={index} value={index}>
+                          {file.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </Tab>
+                <Tab eventKey="priorStims" title="Patient Database">
+                  <div style={controlPanelStyle2}>
+                    <select
+                      onChange={handlePriorStimChange}
+                      multiple
+                      style={{ height: '500px', width: '300px' }}
+                    >
+                      {priorStims &&
+                        Object.keys(priorStims).map((patientId, index) => (
+                          <optgroup key={index} label={patientId}>
+                            {priorStims[patientId].map(
+                              (session, sessionIndex) => (
+                                <option
+                                  key={`${patientId}-${sessionIndex}`}
+                                  value={`${patientId}-${session}`}
+                                >
+                                  {session}
+                                </option>
+                              ),
+                            )}
+                          </optgroup>
+                        ))}
+                    </select>
+                  </div>
+                </Tab>
+
+                <Tab eventKey="sweetspots" title="Sweetspots">
+                  <Tabs defaultActiveKey="tremor" id="nested-tabs-inside">
+                    <Tab eventKey="tremor" title="Tremor">
+                      <div style={controlPanelStyle2}>
+                        <select
+                          onChange={handleTremorChange}
+                          multiple
+                          style={{ height: '500px', width: '300px' }}
+                        >
+                          {tremorData.map((tremor, index) => (
+                            <option key={index} value={index}>
+                              {tremor.name}
+                            </option>
+                          ))}
+                        </select>
+                        <Button
+                          variant="primary"
+                          onClick={() => setShowModal(true)}
+                        >
+                          Add Coordinates
+                        </Button>
+                        <Modal
+                          show={showModal}
+                          onHide={() => setShowModal(false)}
+                        >
+                          <Modal.Header closeButton>
+                            <Modal.Title>Add New Coordinates</Modal.Title>
+                          </Modal.Header>
+                          <Modal.Body>
+                            <input
+                              type="text"
+                              name="name"
+                              placeholder="Name"
+                              value={newTremor.name}
+                              onChange={handleNewTremorChange}
+                              className="form-control"
+                            />
+                            <input
+                              type="number"
+                              name="coords"
+                              placeholder="X"
+                              value={newTremor.coords[0]}
+                              onChange={(e) =>
+                                setNewTremor({
+                                  ...newTremor,
+                                  coords: [
+                                    e.target.value,
+                                    newTremor.coords[1],
+                                    newTremor.coords[2],
+                                  ],
+                                })
+                              }
+                              className="form-control mt-2"
+                            />
+                            <input
+                              type="number"
+                              name="coords"
+                              placeholder="Y"
+                              value={newTremor.coords[1]}
+                              onChange={(e) =>
+                                setNewTremor({
+                                  ...newTremor,
+                                  coords: [
+                                    newTremor.coords[0],
+                                    e.target.value,
+                                    newTremor.coords[2],
+                                  ],
+                                })
+                              }
+                              className="form-control mt-2"
+                            />
+                            <input
+                              type="number"
+                              name="coords"
+                              placeholder="Z"
+                              value={newTremor.coords[2]}
+                              onChange={(e) =>
+                                setNewTremor({
+                                  ...newTremor,
+                                  coords: [
+                                    newTremor.coords[0],
+                                    newTremor.coords[1],
+                                    e.target.value,
+                                  ],
+                                })
+                              }
+                              className="form-control mt-2"
+                            />
+                          </Modal.Body>
+                          <Modal.Footer>
+                            <Button
+                              variant="secondary"
+                              onClick={() => setShowModal(false)}
+                            >
+                              Close
+                            </Button>
+                            <Button variant="primary" onClick={addNewTremor}>
+                              Add
+                            </Button>
+                          </Modal.Footer>
+                        </Modal>
+                      </div>
+                    </Tab>
+                    <Tab eventKey="pd" title="PD">
+                      <div style={controlPanelStyle2}>
+                        <select
+                          onChange={handlePDChange}
+                          multiple
+                          style={{ height: '500px', width: '300px' }}
+                        >
+                          {pdData.map((tremor, index) => (
+                            <option key={index} value={index}>
+                              {tremor.name}
+                            </option>
+                          ))}
+                        </select>
+                        <Button
+                          variant="primary"
+                          onClick={() => setShowPDModal(true)}
+                        >
+                          Add Coordinates
+                        </Button>
+                        <Modal
+                          show={showPDModal}
+                          onHide={() => setShowPDModal(false)}
+                        >
+                          <Modal.Header closeButton>
+                            <Modal.Title>Add New Coordinates</Modal.Title>
+                          </Modal.Header>
+                          <Modal.Body>
+                            <input
+                              type="text"
+                              name="name"
+                              placeholder="Name"
+                              value={newPD.name}
+                              onChange={handleNewPDChange}
+                              className="form-control"
+                            />
+                            <input
+                              type="number"
+                              name="coords"
+                              placeholder="X"
+                              value={newPD.coords[0]}
+                              onChange={(e) =>
+                                setNewPD({
+                                  ...newPD,
+                                  coords: [
+                                    e.target.value,
+                                    newPD.coords[1],
+                                    newPD.coords[2],
+                                  ],
+                                })
+                              }
+                              className="form-control mt-2"
+                            />
+                            <input
+                              type="number"
+                              name="coords"
+                              placeholder="Y"
+                              value={newPD.coords[1]}
+                              onChange={(e) =>
+                                setNewTremor({
+                                  ...newPD,
+                                  coords: [
+                                    newPD.coords[0],
+                                    e.target.value,
+                                    newPD.coords[2],
+                                  ],
+                                })
+                              }
+                              className="form-control mt-2"
+                            />
+                            <input
+                              type="number"
+                              name="coords"
+                              placeholder="Z"
+                              value={newPD.coords[2]}
+                              onChange={(e) =>
+                                setNewTremor({
+                                  ...newPD,
+                                  coords: [
+                                    newPD.coords[0],
+                                    newPD.coords[1],
+                                    e.target.value,
+                                  ],
+                                })
+                              }
+                              className="form-control mt-2"
+                            />
+                          </Modal.Body>
+                          <Modal.Footer>
+                            <Button
+                              variant="secondary"
+                              onClick={() => setShowPDModal(false)}
+                            >
+                              Close
+                            </Button>
+                            <Button variant="primary" onClick={addNewPD}>
+                              Add
+                            </Button>
+                          </Modal.Footer>
+                        </Modal>
+                      </div>
+                    </Tab>
+                  </Tabs>
+                </Tab>
+                <Tab eventKey="solution" title="Automatic Solution">
+                  <div style={controlPanelStyle2}>
+                    <h3 style={{ fontSize: '14px' }}>Optimize for:</h3>
+                    <select
+                      id="options"
+                      style={{ width: '200px' }}
+                      value={roi}
+                      onChange={handleRoiChange}
+                    >
+                      <optgroup label="Tremor Data">
+                        {tremorData.map((tremor, index) => (
+                          <option
+                            key={`tremor-${index}`}
+                            value={`tremor-${index}`}
+                          >
+                            {tremor.name}
+                          </option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="PD Data">
+                        {pdData.map((pd, index) => (
+                          <option key={`pd-${index}`} value={`pd-${index}`}>
+                            {pd.name}
+                          </option>
+                        ))}
+                      </optgroup>
+                    </select>
+                    <div>
+                      <Button variant="primary" onClick={handleSTNParameters}>
+                        Provide Solution
+                      </Button>
+                    </div>
+                    <h3 style={{ fontSize: '14px' }}>Avoid:</h3>
+                    <select
+                      id="options"
+                      style={{ width: '200px' }}
+                      value={avoidRoi}
+                      onChange={handleAvoidanceRoiChange}
+                    >
+                      <optgroup label="Tremor Data">
+                        {tremorData.map((tremor, index) => (
+                          <option
+                            key={`tremor-${index}`}
+                            value={`tremor-${index}`}
+                          >
+                            {tremor.name}
+                          </option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="PD Data">
+                        {pdData.map((pd, index) => (
+                          <option key={`pd-${index}`} value={`pd-${index}`}>
+                            {pd.name}
+                          </option>
+                        ))}
+                      </optgroup>
+                    </select>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        marginTop: '10px',
+                      }}
+                    >
+                      <div>
+                        <Button variant="primary" onClick={handleAvoidance}>
+                          Avoid
+                        </Button>
+                      </div>
+                      <div>
+                        <Button
+                          variant="primary"
+                          onClick={() =>
+                            document.getElementById('nifti-upload').click()
+                          }
+                          className="mb-4 mx-2"
+                        >
+                          Import NIfTI File and Provide Solution
+                        </Button>
+                        <input
+                          id="nifti-upload"
+                          type="file"
+                          style={{ display: 'none' }}
+                          accept=".nii"
+                          onChange={(e) => handleNiiUpload(e)}
+                        />
+                        {isLoading && (
+                          <div className="d-flex justify-content-center mt-3">
+                            <div
+                              className="spinner-border text-primary"
+                              role="status"
+                            >
+                              <span className="visually-hidden">Loading...</span>
+                            </div>
+                          </div>
+                        )}
+                        <span>{niiSolution}</span>
+                        <Button onClick={saveCurrentSpheres}>Save Spheres</Button>
+                        <Button onClick={() => calculatePercentOverlap(savedSpheres.current)}>
+                          Compare Overlap
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </Tab>
+              </Tabs>
+            </div>
+          </Dropdown.Menu>
+        </Dropdown>
+        {/* <Collapse in={open}>
           <div id="tabs-collapse">
             <Tabs
               defaultActiveKey="meshes"
@@ -3653,17 +4069,17 @@ function PlyViewer({
                         </div>
                       )}
                       <span>{niiSolution}</span>
-                      {/* <Button onClick={saveCurrentSpheres}>Save Spheres</Button>
+                      <Button onClick={saveCurrentSpheres}>Save Spheres</Button>
                       <Button onClick={() => calculatePercentOverlap(savedSpheres.current)}>
                         Compare Overlap
-                      </Button> */}
+                      </Button>
                     </div>
                   </div>
                 </div>
               </Tab>
             </Tabs>
           </div>
-        </Collapse>
+        </Collapse> */}
       </div>
     </div>
   );
@@ -3677,7 +4093,7 @@ const dropzoneStyle = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  backgroundColor: '#f8f9fa',
+  // backgroundColor: '#f8f9fa',
   transition: 'background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
   marginBottom: '20px',
   cursor: 'pointer',
@@ -3693,22 +4109,14 @@ const viewerContainerStyle = {
   width: '100%',
 };
 
-const viewerStyle = {
-  flexGrow: 1, // Allow the viewer to take up most of the space
-  height: '600px', // Fixed height, adjust as necessary
-  border: '1px solid #ccc',
-  marginRight: '20px', // Adds space between viewer and control panel
-};
-
 const controlPanelStyle2 = {
   display: 'flex',
   flexDirection: 'column', // Stack controls vertically
-  // maxHeight: '600px', // Matches the height of the viewer
-  // overflowY: 'auto', // Allows scrolling if controls exceed height
   width: '300px', // Fixed width for the control panel
   height: '600px',
   padding: '10px',
-  backgroundColor: '#f5f5f5',
+  // backgroundColor: '#f5f5f5',
+  backgroundColor: 'transparent', // Semi-transparent background color
 };
 
 const controlPanelStyle = {
@@ -3716,18 +4124,13 @@ const controlPanelStyle = {
   flexDirection: 'column', // Stack controls vertically
   maxHeight: '600px', // Matches the height of the viewer
   overflowY: 'auto', // Allows scrolling if controls exceed height
-  // padding: '10px',
   width: '300px', // Fixed width for the control panel
   border: '1px solid #ccc',
-  // borderRadius: '8px',
-  // backgroundColor: '#f8f9fa',
   borderRadius: '8px',
-  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-  // boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-  // backgroundColor: '#f9f9f9',
-  // gap: '20px',
+  // boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
   padding: '20px',
-  backgroundColor: '#f5f5f5',
+  backgroundColor: 'transparent', // Semi-transparent background color
+  // backgroundColor: 'green',
 };
 
 const meshControlStyle = {
@@ -3738,6 +4141,7 @@ const meshNameStyle = {
   fontSize: '16px',
   fontWeight: 'bold',
   marginBottom: '10px', // Add space below the mesh name
+  backgroundColor: 'rgba(245, 245, 245, 0.2)', // Semi-transparent background color
 };
 
 export default PlyViewer;
