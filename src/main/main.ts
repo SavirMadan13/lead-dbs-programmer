@@ -26,14 +26,80 @@ import {
 
 ipcMain.setMaxListeners(Infinity);
 
+function ensureClinicalScoresFile() {
+  const fs = require('fs');
+  const userDataPath = app.getPath('userData');
+  const scoresFilePath = path.join(userDataPath, 'ClinicalScores.json');
+
+  if (!fs.existsSync(scoresFilePath)) {
+    const defaultScores = {
+      UPDRS: {
+        '3.1: Speech': 0,
+        '3.2: Facial expression': 0,
+        '3.3a: Rigidity- Neck': 0,
+        '3.3b: Rigidity- RUE': 0,
+        '3.3c: Rigidity- LUE': 0,
+        '3.3d: Rigidity- RLE': 0,
+        '3.3e: Rigidity- LLE': 0,
+        '3.4a: Finger tapping- Right hand': 0,
+        '3.4b: Finger tapping- Left hand': 0,
+        '3.5a: Hand movements- Right hand': 0,
+        '3.5b: Hand movements- Left hand': 0,
+        '3.6a: Pronation- supination movements- Right hand': 0,
+        '3.6b: Pronation- supination movements- Left hand': 0,
+        '3.7a: Toe tapping- Right foot': 0,
+        '3.7b: Toe tapping- Left foot': 0,
+        '3.8a: Leg agility- Right leg': 0,
+        '3.8b: Leg agility- Left leg': 0,
+        '3.9: Arising from chair': 0,
+        '3.10: Gait': 0,
+        '3.11: Freezing of gait': 0,
+        '3.12: Postural stability': 0,
+        '3.13: Posture': 0,
+        '3.14: Global spontaneity of movement': 0,
+        '3.15a: Postural tremor- Right hand': 0,
+        '3.15b: Postural tremor- Left hand': 0,
+        '3.16a: Kinetic tremor- Right hand': 0,
+        '3.16b: Kinetic tremor- Left hand': 0,
+        '3.17a: Rest tremor amplitude- RUE': 0,
+        '3.17b: Rest tremor amplitude- LUE': 0,
+        '3.17c: Rest tremor amplitude- RLE': 0,
+        '3.17d: Rest tremor amplitude- LLE': 0,
+        '3.17e: Rest tremor amplitude- Lip/jaw': 0,
+        '3.18: Constancy of rest tremor': 0,
+      },
+      'Y-BOCS': {
+        'Time occupied by obsessive thoughts': 0,
+        'Interference due to obsessive thoughts': 0,
+        'Distress associated with obsessive thoughts': 0,
+        'Resistance against obsessions': 0,
+        'Degree of control over obsessive thoughts': 0,
+        'Time spent performing compulsive behaviors': 0,
+        'Interference due to compulsive behaviors': 0,
+        'Distress associated with compulsive behavior': 0,
+        'Resistance against compulsions': 0,
+        'Degree of control over compulsive behavior': 0,
+      },
+    };
+
+    fs.writeFileSync(
+      scoresFilePath,
+      JSON.stringify(defaultScores, null, 2),
+      'utf8',
+    );
+    console.log('Created clinicalScores.json with default content');
+  }
+}
+
 app.on('ready', () => {
   registerFileHandlers(); // Call this when the app is ready
+  ensureClinicalScoresFile();
   console.log('File handlers registered.');
 });
 
-console.log = () => {};
-console.warn = () => {};
-console.error = () => {};
+// console.log = () => {};
+// console.warn = () => {};
+// console.error = () => {};
 
 // const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
 // console.log(args);
@@ -42,7 +108,8 @@ console.error = () => {};
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0374Output/derivatives/leaddbs/sub-CbctDbs0374/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
 // const inputPath = process.argv[1];
-const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
+const inputPath =
+  '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons/derivatives/leadgroup/BwhParkinsons/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataBwh.json';
@@ -94,7 +161,11 @@ ipcMain.on('import-inputdata-file', async (event, arg) => {
     if (stimulationData.type === 'leaddbs') {
       stimulationData.labels.forEach((label, index) => {
         // let patientDir = path.join(stimulationData.filepath, `sub-${stimulationData.patientname}`);
-        const patientDir = getPatientFolder(stimulationData.filepath, stimulationData.patientname, leadDBS);
+        const patientDir = getPatientFolder(
+          stimulationData.filepath,
+          stimulationData.patientname,
+          leadDBS,
+        );
         const sessionDir = path.join(patientDir, `ses-${label}`);
         const fileName = `${stimulationData.patientname}_ses-${label}_stimparameters.json`;
         const filePath = path.join(sessionDir, fileName);
@@ -107,7 +178,11 @@ ipcMain.on('import-inputdata-file', async (event, arg) => {
         }
         fs.writeFileSync(
           filePath,
-          JSON.stringify({ S: stimulationData.S[index] || stimulationData.S }, null, 2),
+          JSON.stringify(
+            { S: stimulationData.S[index] || stimulationData.S },
+            null,
+            2,
+          ),
           'utf8',
         );
       });
@@ -115,7 +190,10 @@ ipcMain.on('import-inputdata-file', async (event, arg) => {
       stimulationData.patientname.forEach((name, index) => {
         // let patientDir = path.join(stimulationData.filepath, name);
         console.log(stimulationData.patientfolders[index]);
-        let patientDir = path.join(stimulationData.patientfolders[0][index], name);
+        let patientDir = path.join(
+          stimulationData.patientfolders[0][index],
+          name,
+        );
 
         let sessionDir = path.join(patientDir, `ses-${stimulationData.label}`);
         let fileName = `sub-${name}_ses-${stimulationData.label}_stim.json`;
@@ -190,13 +268,19 @@ ipcMain.on(
       // Check if the file exists before trying to read it
       if (!fs.existsSync(filePath)) {
         if (leadDBS) {
-          if (stimulationData.mode === 'stimulate' &&
-            (stimulationData.labels?.[0] || stimulationData.label) === timeline) {
+          if (
+            stimulationData.mode === 'stimulate' &&
+            (stimulationData.labels?.[0] || stimulationData.label) === timeline
+          ) {
             if (!fs.existsSync(sessionDir)) {
               fs.mkdirSync(sessionDir, { recursive: true });
             }
             // Write data to the file
-            fs.writeFileSync(filePath, JSON.stringify(stimulationData.S, null, 2), 'utf8');
+            fs.writeFileSync(
+              filePath,
+              JSON.stringify(stimulationData.S, null, 2),
+              'utf8',
+            );
             event.reply('import-file', stimulationData);
             return;
           }
@@ -221,8 +305,10 @@ ipcMain.on(
         event.reply('import-file', 'File Not Found');
         return;
       }
-      if (stimulationData.mode === 'stimulate' &&
-        (stimulationData.labels?.[0] || stimulationData.label) === timeline) {
+      if (
+        stimulationData.mode === 'stimulate' &&
+        (stimulationData.labels?.[0] || stimulationData.label) === timeline
+      ) {
         event.reply('import-file', stimulationData);
         return;
       }
@@ -650,7 +736,6 @@ const createWindow = async () => {
   };
 
   const loadLeadGroupPatients = (directoryPath) => {
-
     const patients = directoryPath.map((folder) => {
       const patientId = folder;
       const patientData = null;
@@ -835,10 +920,17 @@ const createWindow = async () => {
                   console.log('PATIENTS: ', patients);
                   event.sender.send('folder-selected', directoryPath, patients);
                   handleMasterDataFill(directoryPath, patients);
-                  event.sender.send('file-read-success', patients, directoryPath);
+                  event.sender.send(
+                    'file-read-success',
+                    patients,
+                    directoryPath,
+                  );
                 } catch (error) {
                   console.error('Error parsing JSON file:', error);
-                  event.sender.send('file-read-error', 'Error parsing JSON file');
+                  event.sender.send(
+                    'file-read-error',
+                    'Error parsing JSON file',
+                  );
                 }
               }
             });
@@ -888,7 +980,10 @@ const createWindow = async () => {
         console.log('PATIENTS: ', patients);
         patients.forEach((patient, index) => {
           console.log('STIMULATION DATA: ', stimulationData);
-          console.log('STIMULATION DATA ELECTRODE MODELS: ', stimulationData.electrodeModels);
+          console.log(
+            'STIMULATION DATA ELECTRODE MODELS: ',
+            stimulationData.electrodeModels,
+          );
           patient.elmodel = stimulationData.electrodeModels;
           console.log('PATIENT: ', patient);
         });
@@ -1087,7 +1182,11 @@ const createWindow = async () => {
   const gatherPlyFilesDatabase = () => {
     console.log('GATHER PLY FILES DATABASE');
     // const stimulationData = getData('stimulationData');
-    const directoryPath = path.join(stimulationData.path, 'derivatives', 'leaddbs');
+    const directoryPath = path.join(
+      stimulationData.path,
+      'derivatives',
+      'leaddbs',
+    );
     console.log(stimulationData);
     console.log(directoryPath);
     const result = {};
@@ -1125,7 +1224,10 @@ const createWindow = async () => {
     patientDirs.forEach((patientDir) => {
       const clinicalDir = path.join(directoryPath, patientDir, 'clinical');
 
-      if (fs.existsSync(clinicalDir) && fs.statSync(clinicalDir).isDirectory()) {
+      if (
+        fs.existsSync(clinicalDir) &&
+        fs.statSync(clinicalDir).isDirectory()
+      ) {
         const jsonFiles = findJsonFilesInClinical(clinicalDir);
 
         jsonFiles.forEach((filePath) => {
@@ -1331,12 +1433,12 @@ const createWindow = async () => {
         // Validate clinical and export directories
         if (!fs.existsSync(clinicalDir)) {
           throw new Error(
-            `Clinical directory not found for Patient ID ${patientID}.`
+            `Clinical directory not found for Patient ID ${patientID}.`,
           );
         }
         if (!fs.existsSync(exportDir)) {
           throw new Error(
-            `Export directory not found for Patient ID ${patientID}.`
+            `Export directory not found for Patient ID ${patientID}.`,
           );
         }
 
@@ -1344,7 +1446,7 @@ const createWindow = async () => {
         const sessionDir = path.join(clinicalDir, sessionID);
         if (!fs.existsSync(sessionDir)) {
           throw new Error(
-            `Session ID ${sessionID} not found for Patient ID ${patientID}.`
+            `Session ID ${sessionID} not found for Patient ID ${patientID}.`,
           );
         }
 
@@ -1354,25 +1456,28 @@ const createWindow = async () => {
           .find((file) => file.includes('stimparameters.json'));
         if (!stimulationParametersFile) {
           throw new Error(
-            `No stimulation parameters file found for Patient ID ${patientID} in session ${sessionID}.`
+            `No stimulation parameters file found for Patient ID ${patientID} in session ${sessionID}.`,
           );
         }
 
         const stimulationParametersPath = path.join(
           sessionDir,
-          stimulationParametersFile
+          stimulationParametersFile,
         );
 
         // Find anatomyPly and combinedElectrodesPly files
         const anatomyPlyPath = path.join(exportDir, 'anatomy.ply');
         const combinedElectrodesPlyPath = path.join(
           exportDir,
-          'combined_electrodes.ply'
+          'combined_electrodes.ply',
         );
 
-        if (!fs.existsSync(anatomyPlyPath) || !fs.existsSync(combinedElectrodesPlyPath)) {
+        if (
+          !fs.existsSync(anatomyPlyPath) ||
+          !fs.existsSync(combinedElectrodesPlyPath)
+        ) {
           throw new Error(
-            `One or more PLY files not found for Patient ID ${patientID}.`
+            `One or more PLY files not found for Patient ID ${patientID}.`,
           );
         }
 
@@ -1382,23 +1487,25 @@ const createWindow = async () => {
           .find((file) => file.includes('desc-reconstruction.json'));
         if (!reconstructionFile) {
           throw new Error(
-            `Reconstruction JSON file not found for Patient ID ${patientID}.`
+            `Reconstruction JSON file not found for Patient ID ${patientID}.`,
           );
         }
 
         const clinicalReconstructionPath = path.join(
           clinicalDir,
-          reconstructionFile
+          reconstructionFile,
         );
 
         // Read all required files
         const anatomyPlyData = fs.readFileSync(anatomyPlyPath);
-        const combinedElectrodesPlyData = fs.readFileSync(combinedElectrodesPlyPath);
+        const combinedElectrodesPlyData = fs.readFileSync(
+          combinedElectrodesPlyPath,
+        );
         const clinicalReconstructionData = JSON.parse(
-          fs.readFileSync(clinicalReconstructionPath, 'utf8')
+          fs.readFileSync(clinicalReconstructionPath, 'utf8'),
         );
         const stimulationParametersData = JSON.parse(
-          fs.readFileSync(stimulationParametersPath, 'utf8')
+          fs.readFileSync(stimulationParametersPath, 'utf8'),
         );
 
         // Return all required data
@@ -1412,7 +1519,7 @@ const createWindow = async () => {
         console.error('Error loading PLY file:', error);
         return null; // Return null if an error occurs
       }
-    }
+    },
   );
 
   app.on('window-all-closed', function () {

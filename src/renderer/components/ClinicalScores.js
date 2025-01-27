@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Form, Button, Table, Container } from 'react-bootstrap';
+import Modal from 'react-bootstrap/Modal';
 import * as XLSX from 'xlsx';
 // import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 import PairedTTestComponent from './PairedTTestComponent';
@@ -13,35 +14,6 @@ function ClinicalScores() {
   const location = useLocation();
   const { patient, timeline, directoryPath, leadDBS } = location.state || {};
   const navigate = useNavigate(); // Initialize the navigate hook
-
-  const [scoreTypes, setScoreTypes] = useState(['UPDRS', 'Y-BOCS']);
-  const [selectedScoreType, setSelectedScoreType] = useState('UPDRS');
-
-  function importAll(r) {
-    let images = {};
-    r.keys().forEach((item) => {
-      const key = item.replace('./', '').replace(/\.[^/.]+$/, ''); // Remove './' and file extension
-      images[key] = r(item);
-    });
-    return images;
-  }
-
-  const UPDRSImages = importAll(
-    require.context('./icons', false, /\.(PNG|jpe?g|svg)$/),
-  );
-  console.log('UPDRSImages: ', UPDRSImages);
-  const YBOCS = {
-    'Time occupied by obsessive thoughts': 0,
-    'Interference due to obsessive thoughts': 0,
-    'Distress associated with obsessive thoughts': 0,
-    'Resistance against obsessions': 0,
-    'Degree of control over obsessive thoughts': 0,
-    'Time spent performing compulsive behaviors': 0,
-    'Interference due to compulsive behaviors': 0,
-    'Distress associated with compulsive behavior': 0,
-    'Resistance against compulsions': 0,
-    'Degree of control over compulsive behavior': 0,
-  };
 
   const UPDRS = {
     '3.1: Speech': 0,
@@ -77,6 +49,62 @@ function ClinicalScores() {
     '3.17d: Rest tremor amplitude- LLE': 0,
     '3.17e: Rest tremor amplitude- Lip/jaw': 0,
     '3.18: Constancy of rest tremor': 0,
+  };
+  const [totalScores, setTotalScores] = useState();
+  const [scoreTypes, setScoreTypes] = useState([]);
+  const [selectedScoreType, setSelectedScoreType] = useState();
+  const [initialScores, setInitialScores] = useState(UPDRS);
+
+  useEffect(() => {
+    const loadScores = async () => {
+      console.log('Loading scores...');
+      const scores = await window.electron.ipcRenderer.invoke(
+        'get-clinical-scores-types',
+        'text',
+      );
+      if (scores) {
+        console.log('scores: ', scores);
+        setScoreTypes(Object.keys(scores));
+        setSelectedScoreType(Object.keys(scores)[0]);
+        setInitialScores(scores[Object.keys(scores)[0]]);
+        setTotalScores(scores);
+        // setPatients([
+        //   {
+        //     id: patient.id,
+        //     baseline: { ...scores[Object.keys(scores)[0]] },
+        //     postop: { ...scores[Object.keys(scores)[0]] },
+        //   },
+        // ]);
+      }
+    };
+
+    loadScores();
+  }, []);
+
+  function importAll(r) {
+    let images = {};
+    r.keys().forEach((item) => {
+      const key = item.replace('./', '').replace(/\.[^/.]+$/, ''); // Remove './' and file extension
+      images[key] = r(item);
+    });
+    return images;
+  }
+
+  const UPDRSImages = importAll(
+    require.context('./icons', false, /\.(PNG|jpe?g|svg)$/),
+  );
+  console.log('UPDRSImages: ', UPDRSImages);
+  const YBOCS = {
+    'Time occupied by obsessive thoughts': 0,
+    'Interference due to obsessive thoughts': 0,
+    'Distress associated with obsessive thoughts': 0,
+    'Resistance against obsessions': 0,
+    'Degree of control over obsessive thoughts': 0,
+    'Time spent performing compulsive behaviors': 0,
+    'Interference due to compulsive behaviors': 0,
+    'Distress associated with compulsive behavior': 0,
+    'Resistance against compulsions': 0,
+    'Degree of control over compulsive behavior': 0,
   };
 
   const keyMapping = {
@@ -119,15 +147,15 @@ function ClinicalScores() {
     '3.18: Constancy of rest tremor': '3-18_Constancy-of-rest-tremor',
   };
 
-  const [initialScores, setInitialScores] = useState(UPDRS);
-
   const handleScoreChange = (score) => {
-    if (score === 'UPDRS') {
-      setInitialScores(UPDRS);
-    } else if (score === 'Y-BOCS') {
-      setInitialScores(YBOCS);
-    }
+    setInitialScores(totalScores[score]);
     setSelectedScoreType(score);
+    // if (score === 'UPDRS') {
+    //   setInitialScores(UPDRS);
+    // } else if (score === 'Y-BOCS') {
+    //   setInitialScores(YBOCS);
+    // }
+    // setSelectedScoreType(score);
   };
 
   // Set how many columns you want per "wrapped" table row
@@ -246,7 +274,7 @@ function ClinicalScores() {
 
     const calculateOpacity = (score) => {
       // Assuming scores range from 0 to 4, adjust as needed
-      console.log(patients);
+      // console.log(patients);
       const minOpacity = 0.2;
       const maxOpacity = 1.0;
       const maxScore = 4; // Adjust this based on your scoring system
@@ -267,10 +295,12 @@ function ClinicalScores() {
                       style={{ whiteSpace: 'wrap', minWidth: '80px' }}
                     >
                       {/* {key} */}
+
                       <div className="tooltip-container">
                         <img
                           src={UPDRSImages[keyMapping[key]]}
                           alt={key}
+                          title={key}
                           className="updrs-image"
                           style={{
                             opacity: calculateOpacity(
@@ -278,7 +308,7 @@ function ClinicalScores() {
                             ),
                           }}
                         />
-                        <span className="tooltip-text">{key}</span>
+                        {/* <span className="tooltip-text">{key}</span> */}
                       </div>
                       {/* {key} */}
                     </th>
@@ -395,7 +425,7 @@ function ClinicalScores() {
     Object.keys(selectedRows).forEach((rowIndex) => {
       if (selectedRows[rowIndex]) {
         const patient = patients[rowIndex];
-        console.log(patient);
+        // console.log(patient);
         // Sum all the baseline scores for this patient
         const baselineSum = Object.values(patient.baseline).reduce(
           (sum, value) => sum + (value || 0),
@@ -449,6 +479,34 @@ function ClinicalScores() {
       location.state,
     );
   };
+  const [addScore, setAddScore] = useState(false);
+  const handleAddScoreType = () => {
+    console.log('add score type');
+    setAddScore(true);
+  };
+
+  const [newScoreName, setNewScoreName] = useState('');
+  const [newScoreValues, setNewScoreValues] = useState('');
+
+  const handleAddScore = () => {
+    console.log('add score');
+    console.log(newScoreName);
+    console.log(newScoreValues);
+    const newScore = {
+      [newScoreName]: newScoreValues.split(',').reduce((acc, item) => {
+        acc[item.trim()] = 0;
+        return acc;
+      }, {}),
+    };
+
+    console.log(newScore);
+    window.electron.ipcRenderer.sendMessage(
+      'add-score-type',
+      newScoreName,
+      newScore,
+    );
+    // setAddScore(false);
+  };
 
   return (
     <div>
@@ -460,17 +518,18 @@ function ClinicalScores() {
           >
             Patient: {patient.name}
           </div> */}
-          <div style={{ textAlign: 'center', fontSize: '20px' }}>
+          {/* <div style={{ textAlign: 'center', fontSize: '20px' }}>
             {timeline}
-          </div>
+          </div> */}
           <Container>
             {/* <Button variant="primary" onClick={addPatient} className="mb-4">
               Add Patient
             </Button> */}
-            <h4>Choose Score Type</h4>
+            {/* <h4>Choose Score Type</h4> */}
             <Form.Select
               value={selectedScoreType}
               onChange={(e) => handleScoreChange(e.target.value)}
+              style={{ width: '200px' }}
             >
               {scoreTypes.map((type, index) => (
                 <option key={index} value={type}>
@@ -479,12 +538,52 @@ function ClinicalScores() {
               ))}
             </Form.Select>
             <Button
+              style={{ marginLeft: '10px' }}
+              onClick={() => handleAddScoreType()}
+            >
+              +
+            </Button>
+            <Modal show={addScore} onHide={() => setAddScore(false)}>
+              <Modal.Header closeButton>
+                <Modal.Title>Create Clinical Score Type</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Form.Group controlId="newScoreType">
+                  <Form.Label>Enter New Score Type</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Enter Score Name"
+                    value={newScoreName}
+                    onChange={(e) => setNewScoreName(e.target.value)}
+                  />
+                  <Form.Control
+                    type="text"
+                    placeholder="Enter Score Values"
+                    value={newScoreValues}
+                    onChange={(e) => setNewScoreValues(e.target.value)}
+                  />
+                  <p>separated by commas (Ex: 'Obsessions', 'Compulsions')</p>
+                </Form.Group>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button
+                  variant="secondary"
+                  onClick={() => setAddScore(false)}
+                >
+                  Close
+                </Button>
+                <Button variant="primary" onClick={handleAddScore}>
+                  Add
+                </Button>
+              </Modal.Footer>
+            </Modal>
+            {/* <Button
               variant="secondary"
               onClick={() => document.getElementById('baseline-upload').click()}
               className="mb-4 mx-2"
             >
               Import Excel
-            </Button>
+            </Button> */}
             {/* <Button
               variant="secondary"
               onClick={() => document.getElementById('postop-upload').click()}
@@ -516,14 +615,14 @@ function ClinicalScores() {
             </Button> */}
           </Container>
           <div>
-            <h4>Enter Scores</h4>
+            <h4>{timeline} scores</h4>
             {renderTable('baseline')}
             {/* <h4>Postoperative Scores</h4>
             {renderTable('postop')} */}
           </div>
         </div>
       )}
-      {currentStage === 'analyze' && (
+      {/* {currentStage === 'analyze' && (
         <div>
           <Button variant="secondary" onClick={() => setCurrentStage('import')}>
             Go Back to Import
@@ -544,7 +643,7 @@ function ClinicalScores() {
             </div>
           )}
         </div>
-      )}
+      )} */}
       <button className="export-button" onClick={() => navigate(-1)}>
         Back to Patient Details
       </button>

@@ -452,4 +452,34 @@ export default function registerFileHandlers() {
     });
     event.reply('batch-import-stimulation', 'success');
   });
+
+  ipcMain.handle('get-clinical-scores-types', async (event, text) => {
+    console.log('text: ', text);
+    const userDataPath = app.getPath('userData');
+    const scoresFilePath = path.join(userDataPath, 'ClinicalScores.json');
+    console.log('scoresFilePath: ', scoresFilePath);
+    try {
+      const data = fs.readFileSync(scoresFilePath, 'utf8');
+      const scores = JSON.parse(data);
+      return scores;
+    } catch (err) {
+      console.error('Error reading scores file:', err);
+      return null;
+    }
+  });
+
+  ipcMain.on('add-score-type', async (event, name, newScore) => {
+    console.log('newScore: ', newScore);
+    const userDataPath = app.getPath('userData');
+    const scoresFilePath = path.join(userDataPath, 'ClinicalScores.json');
+    const data = fs.readFileSync(scoresFilePath, 'utf8');
+    const scores = JSON.parse(data);
+    console.log('scores: ', scores);
+    console.log('name: ', name);
+    console.log('newScore: ', newScore);
+    scores[name] = newScore[name];
+    console.log('scores: ', scores);
+    // scores[newScore.name] = newScore.values;
+    fs.writeFileSync(scoresFilePath, JSON.stringify(scores, null, 2));
+  });
 }

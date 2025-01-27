@@ -96,6 +96,9 @@ const electronHandler = {
   selectFolder: () => {
     ipcRenderer.send('select-folder'); // Send message to trigger folder selection
   },
+  getClinicalScores: () => {
+    return ipcRenderer.invoke('get-clinical-scores-types');
+  },
 };
 
 contextBridge.exposeInMainWorld('electron', electronHandler);
