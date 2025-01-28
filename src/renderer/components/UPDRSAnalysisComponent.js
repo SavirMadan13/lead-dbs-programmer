@@ -77,20 +77,20 @@ function UPDRSAnalysisComponent({ currentStage, rawData, clinicalTimelines }) {
       //   );
       case 'all':
         return (
-          <div style={{ width: '100%', height: '100%' }}>
-            <div style={{ flex: 1, width: '100%', height: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+            <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
               <PairedTTestComponent
                 rawData={rawData}
                 showPercentage={showPercentage}
               />
             </div>
-            <div style={{ flex: 1, marginLeft: '-50px' }}>
+            <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
               <LateralityAnalysisComponent
                 rawData={rawData}
                 showPercentage={showPercentage}
               />
             </div>
-            <div style={{ flex: 1, marginLeft: '-60px' }}>
+            <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <SubscoreAnalysis
                 rawData={rawData}
                 showPercentage={showPercentage}

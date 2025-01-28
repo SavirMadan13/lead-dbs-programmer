@@ -163,7 +163,7 @@ function LateralityAnalysisComponent({ rawData, showPercentage }) {
       <div style={{ width: '800px', height: '600px' }}>
         <Line data={data} options={options} />
       </div>
-      <div style={{ marginLeft: '120px', marginTop: '30px' }}>
+      <div style={{ marginLeft: '120px', marginTop: '-200px' }}>
         <h3 style={{ fontSize: '14px' }}>Set Threshold:</h3>
         <input
           type="number"

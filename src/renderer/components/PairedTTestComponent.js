@@ -82,7 +82,7 @@ function PairedTTestComponent({ rawData, showPercentage }) {
       },
       title: {
         display: true,
-        text: 'Paired T-Test Visualization',
+        text: 'Clinical Scores',
       },
       tooltip: {
         callbacks: {
@@ -112,7 +112,7 @@ function PairedTTestComponent({ rawData, showPercentage }) {
   };
 
   return (
-    <div style={{ width: '800px', height: '600px' }}>
+    <div style={{ width: '800px', height: '600px', marginBottom: '-200px' }}>
       <Line data={data} options={options} />
     </div>
   );
