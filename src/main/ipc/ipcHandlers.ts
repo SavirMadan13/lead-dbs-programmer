@@ -363,8 +363,11 @@ export default function registerFileHandlers() {
 
   ipcMain.handle('load-ply-file-2', async (event, filePath) => {
     try {
-      const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
-      return fileData.buffer; // Return as ArrayBuffer
+      const stnFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI_ICBM_2009b_NLIN_ASYM/atlases/DISTAL Nano (Ewert 2017)/lh/STN.nii.gz';
+      const fileData = fs.readFileSync(stnFilePath);
+      return fileData.buffer;
+      // const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
+      // return fileData.buffer; // Return as ArrayBuffer
     } catch (error) {
       return null;
     }

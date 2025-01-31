@@ -312,21 +312,22 @@ function ClinicalScores() {
                       style={{ whiteSpace: 'wrap', minWidth: '80px' }}
                     >
                       {/* {key} */}
-
-                      <div className="tooltip-container">
-                        <img
-                          src={UPDRSImages[keyMapping[key]]}
-                          alt={key}
-                          title={key}
-                          className="updrs-image"
-                          style={{
-                            opacity: calculateOpacity(
-                              patients[0][timePoint][key],
-                            ),
-                          }}
-                        />
-                        {/* <span className="tooltip-text">{key}</span> */}
-                      </div>
+                      {selectedScoreType === 'UPDRS' && (
+                        <div className="tooltip-container">
+                          <img
+                            src={UPDRSImages[keyMapping[key]]}
+                            alt={key}
+                            title={key}
+                            className="updrs-image"
+                            style={{
+                              opacity: calculateOpacity(
+                                patients[0][timePoint][key],
+                              ),
+                            }}
+                          />
+                          {/* <span className="tooltip-text">{key}</span> */}
+                        </div>
+                      )}
                       {/* {key} */}
                     </th>
                   ))}
@@ -583,10 +584,7 @@ function ClinicalScores() {
                 </Form.Group>
               </Modal.Body>
               <Modal.Footer>
-                <Button
-                  variant="secondary"
-                  onClick={() => setAddScore(false)}
-                >
+                <Button variant="secondary" onClick={() => setAddScore(false)}>
                   Close
                 </Button>
                 <Button variant="primary" onClick={handleAddScore}>

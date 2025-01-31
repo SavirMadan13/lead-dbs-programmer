@@ -3266,25 +3266,144 @@ function PlyViewer({
     const loader = new PLYLoader();
     const matchingFiles = [];
 
-    for (const file of plyFiles) {
-      const { path, name } = file;
+    const fileData = await window.electron.ipcRenderer.invoke(
+      'load-ply-file-2',
+      '',
+    );
 
-      try {
-        // Load and parse the PLY file
-        const fileData = await window.electron.ipcRenderer.invoke(
-          'load-ply-file-2',
-          path,
-        );
-        const geometry = loader.parse(fileData);
-
-        // Check if the coordinate lies in this PLY file
-        if (isCoordinateInGeometry(x, y, z, geometry)) {
-          matchingFiles.push(name);
-        }
-      } catch (error) {
-        console.error(`Error loading PLY file (${name}):`, error);
-      }
+    const header = nifti.readHeader(fileData);
+    let image = nifti.readImage(header, fileData);
+    console.log(image);
+    console.log('Header: ', header);
+    // Ensure `image` is a valid ArrayBuffer
+    if (!(image instanceof ArrayBuffer)) {
+      console.log('Adjusting image to ArrayBuffer...');
+      image = new Uint8Array(image).buffer;
     }
+
+    // Handle endian mismatch
+    if (!header.littleEndian) {
+      console.warn('File is in big-endian format. Adjusting...');
+      const dataView = new DataView(image);
+      const correctedData = new Float32Array(image.byteLength / 4);
+      for (let i = 0; i < correctedData.length; i++) {
+        correctedData[i] = dataView.getFloat32(i * 4, false); // false = big-endian
+      }
+      image = correctedData;
+    } else {
+      if (image.byteLength % 4 !== 0) {
+        const padding = 4 - (image.byteLength % 4);
+        const paddedArray = new Uint8Array(image.byteLength + padding);
+        paddedArray.set(new Uint8Array(image));
+        image = paddedArray.buffer;
+      }
+      image = new Float32Array(image);
+    }
+    console.log(image);
+    // Apply scaling factors
+    // const { scl_slope = 1, scl_inter = 0 } = header;
+    // const img = new Float32Array(
+    //   image.map((value) => value * scl_slope + scl_inter),
+    // );
+
+    // Extract dimensions
+    const dimensions = header.dims.slice(1, 4);
+    console.log('Dimensions:', dimensions);
+
+    // Generate voxel coordinates
+    const voxelCoordinates = [];
+    image.forEach((value, index) => {
+      if (!isNaN(value)) {
+        const z = Math.floor(index / (dimensions[0] * dimensions[1]));
+        const y = Math.floor(
+          (index % (dimensions[0] * dimensions[1])) / dimensions[0],
+        );
+        const x = index % dimensions[0];
+        voxelCoordinates.push([x, y, z, value]);
+      }
+    });
+    console.log(voxelCoordinates);
+    const affineMatrix = header.affine;
+    const inverseAffineMatrix = math.inv(affineMatrix);
+    const newSearchCoordinate = [
+      parseFloat(searchCoordinate.split(',')[0]),
+      parseFloat(searchCoordinate.split(',')[1]),
+      parseFloat(searchCoordinate.split(',')[2]),
+      1,
+    ];
+    console.log(searchCoordinate);
+    console.log(newSearchCoordinate);
+    const transformedCoordinates = math.multiply(
+      inverseAffineMatrix,
+      newSearchCoordinate,
+    );
+
+    console.log(transformedCoordinates);
+    const roundedCoordinates = transformedCoordinates.map((coord) =>
+      Math.round(coord),
+    );
+    console.log(roundedCoordinates);
+    // Find the value of the roundedCoordinates in voxelCoordinates
+    const [roundedX, roundedY, roundedZ] = roundedCoordinates;
+
+    const matchingVoxel = voxelCoordinates.find(
+      ([x, y, z]) => x === roundedX && y === roundedY && z === roundedZ
+    );
+
+    if (matchingVoxel) {
+      const value = matchingVoxel[3];
+      console.log('Value at rounded coordinates:', value);
+    } else {
+      // If no exact match is found, find the nearest neighbor
+      const findNearestNeighbor = (target, coordinates) => {
+        let nearest = null;
+        let minDistance = Infinity;
+
+        coordinates.forEach(([x, y, z, value]) => {
+          const distance = Math.sqrt(
+            Math.pow(x - target[0], 2) +
+            Math.pow(y - target[1], 2) +
+            Math.pow(z - target[2], 2)
+          );
+
+          if (distance < minDistance) {
+            minDistance = distance;
+            nearest = [x, y, z, value];
+          }
+        });
+
+        return nearest;
+      };
+
+      const nearestVoxel = findNearestNeighbor(roundedCoordinates, voxelCoordinates);
+
+      if (nearestVoxel) {
+        const value = nearestVoxel[3];
+        console.log('Value at nearest coordinates:', value);
+      } else {
+        console.log('No nearby voxel found.');
+      }
+      console.log('No matching voxel found for the rounded coordinates.');
+    }
+    // for (const file of plyFiles) {
+    //   const { path, name } = file;
+
+    //   try {
+    //     // Load and parse the PLY file
+    //     const fileData = await window.electron.ipcRenderer.invoke(
+    //       'load-ply-file-2',
+    //       path,
+    //     );
+    //     const geometry = loader.parse(fileData);
+
+    //     // Check if the coordinate lies in this PLY file
+    //     if (isCoordinateInGeometry(x, y, z, geometry)) {
+    //       matchingFiles.push(name);
+    //     }
+    //   } catch (error) {
+    //     console.error(`Error loading PLY file (${name}):`, error);
+    //   }
+    // }
     console.log(matchingFiles);
     setMatchingAtlases(matchingFiles);
   };
@@ -3335,7 +3454,7 @@ function PlyViewer({
         <button onClick={changeCameraAngle}>Change Camera</button> */}
         <Dropdown drop="start">
           <Dropdown.Toggle variant="secondary" style={{ marginLeft: '-100px' }}><SettingsIcon /></Dropdown.Toggle>
-          <Dropdown.Menu style={{ backgroundColor: 'transparent' }}>
+          <Dropdown.Menu style={{ backgroundColor: 'transparent', border: 'none' }}>
             <div id="tabs-collapse">
               <Tabs
                 defaultActiveKey="meshes"
@@ -4198,6 +4317,7 @@ const controlPanelStyle2 = {
   width: '300px', // Fixed width for the control panel
   height: '600px',
   padding: '10px',
+  border: 'none',
   // backgroundColor: '#f5f5f5',
   backgroundColor: 'transparent', // Semi-transparent background color
 };
@@ -4208,7 +4328,8 @@ const controlPanelStyle = {
   maxHeight: '600px', // Matches the height of the viewer
   overflowY: 'auto', // Allows scrolling if controls exceed height
   width: '300px', // Fixed width for the control panel
-  border: '1px solid #ccc',
+  // border: '1px solid #ccc',
+  border: 'none',
   borderRadius: '8px',
   // boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
   padding: '20px',
