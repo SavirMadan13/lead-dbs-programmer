@@ -1471,8 +1471,8 @@ function PlyViewer({
       scene.background = new THREE.Color(0xffffff); // White background
 
       // Create an OrthographicCamera
-      const aspect = 300 / 600;
-      const frustumSize = 100; // Adjust this value to control zoom
+      const aspect = 500 / 500;
+      const frustumSize = 45; // Adjust this value to control zoom
       const camera = new THREE.OrthographicCamera(
         (frustumSize * aspect) / -2, // left
         (frustumSize * aspect) / 2, // right
@@ -1483,10 +1483,10 @@ function PlyViewer({
       );
 
       // Secondary Camera Setup
-      const secondaryWidth = 300;
-      const secondaryHeight = 150; // Adjust height as needed
+      const secondaryWidth = 500;
+      const secondaryHeight = 250; // Adjust height as needed
       const aspectSecondary = secondaryWidth / secondaryHeight;
-      const secondaryFrustumHeight = frustumSize / 2; // Set a smaller height for the secondary view
+      const secondaryFrustumHeight = frustumSize; // Set a smaller height for the secondary view
       const secondaryCamera = new THREE.OrthographicCamera(
         (secondaryFrustumHeight * aspectSecondary) / -2,
         (secondaryFrustumHeight * aspectSecondary) / 2,
@@ -1500,11 +1500,12 @@ function PlyViewer({
 
       // const camera = new THREE.PerspectiveCamera(75, 0.5, 0.1, 1000); // 1 is the aspect ratio (square)
       const renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(300, 600); // Set smaller size
+      // renderer.setSize(300, 600); // Set smaller size
+      renderer.setSize(500, 500);
       mountRef.current.appendChild(renderer.domElement);
 
       const secondaryRenderer = new THREE.WebGLRenderer({ antialias: true });
-      secondaryRenderer.setSize(300, 150);
+      secondaryRenderer.setSize(500, 250);
       secondaryMountRef.current.appendChild(secondaryRenderer.domElement);
 
       const ambientLight = new THREE.AmbientLight(0xffffff, 1);
@@ -1522,32 +1523,7 @@ function PlyViewer({
       controls.zoomSpeed = 0.5;
       controlsRef.current = controls;
 
-      // const secondaryControls = new OrbitControls(secondaryCamera, secondaryRenderer.domElement);
-      // secondaryControls.enableDamping = true;
-      // secondaryControls.dampingFactor = 0.1;
-      // secondaryControls.rotateSpeed = 0.8;
-      // secondaryControls.zoomSpeed = 0.5;
-      // secondaryControls.current = secondaryControls;
-
-      // secondaryControlsRef.current = controls;
-
       camera.position.set(0, -50, 50); // Zoomed out to start
-      // camera.lookAt(0, 0, 0); // Ensure the camera is looking at the scene origin
-
-      // const onWindowResize = () => {
-      //   camera.aspect = window.innerWidth / window.innerHeight;
-      //   camera.updateProjectionMatrix();
-      //   renderer.setSize(window.innerWidth, window.innerHeight);
-      // };
-      const onWindowResize = () => {
-        camera.left = (frustumSize * aspect) / -2;
-        camera.right = (frustumSize * aspect) / 2;
-        camera.top = frustumSize / 2;
-        camera.bottom = frustumSize / -2;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      };
-      // window.addEventListener('resize', onWindowResize);
 
       rendererRef.current = renderer;
       secondaryCameraRef.current = secondaryCamera;
@@ -1568,6 +1544,113 @@ function PlyViewer({
       };
     }
   }, [plyFile]);
+
+  // useEffect(() => {
+  //   if (mountRef.current && secondaryMountRef.current) {
+  //     // Initialize scene, camera, and renderer only once
+  //     const scene = new THREE.Scene();
+  //     sceneRef.current = scene; // Save scene reference
+  //     scene.background = new THREE.Color(0xffffff); // White background
+
+  //     // Create an OrthographicCamera
+  //     const aspect = 300 / 600;
+  //     const frustumSize = 75; // Adjust this value to control zoom
+  //     const camera = new THREE.OrthographicCamera(
+  //       (frustumSize * aspect) / -2, // left
+  //       (frustumSize * aspect) / 2, // right
+  //       frustumSize / 2, // top
+  //       frustumSize / -2, // bottom
+  //       0.1, // near plane
+  //       1000, // far plane
+  //     );
+
+  //     // Secondary Camera Setup
+  //     const secondaryWidth = 300;
+  //     const secondaryHeight = 150; // Adjust height as needed
+  //     const aspectSecondary = secondaryWidth / secondaryHeight;
+  //     const secondaryFrustumHeight = frustumSize / 2; // Set a smaller height for the secondary view
+  //     const secondaryCamera = new THREE.OrthographicCamera(
+  //       (secondaryFrustumHeight * aspectSecondary) / -2,
+  //       (secondaryFrustumHeight * aspectSecondary) / 2,
+  //       secondaryFrustumHeight / 2,
+  //       secondaryFrustumHeight / -2,
+  //       0.1,
+  //       1000,
+  //     );
+  //     secondaryCamera.position.set(50, 50, 100);
+  //     secondaryCamera.lookAt(0, 0, 0);
+
+  //     // const camera = new THREE.PerspectiveCamera(75, 0.5, 0.1, 1000); // 1 is the aspect ratio (square)
+  //     const renderer = new THREE.WebGLRenderer({ antialias: true });
+  //     // renderer.setSize(300, 600); // Set smaller size
+  //     renderer.setSize(500, 1000);
+  //     mountRef.current.appendChild(renderer.domElement);
+
+  //     const secondaryRenderer = new THREE.WebGLRenderer({ antialias: true });
+  //     secondaryRenderer.setSize(300, 150);
+  //     secondaryMountRef.current.appendChild(secondaryRenderer.domElement);
+
+  //     const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+  //     scene.add(ambientLight);
+
+  //     const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  //     directionalLight.position.set(5, 5, 5).normalize();
+  //     scene.add(directionalLight);
+
+  //     // OrbitControls setup (only initialize once)
+  //     const controls = new OrbitControls(camera, renderer.domElement);
+  //     controls.enableDamping = true;
+  //     controls.dampingFactor = 0.1;
+  //     controls.rotateSpeed = 0.8;
+  //     controls.zoomSpeed = 0.5;
+  //     controlsRef.current = controls;
+
+  //     // const secondaryControls = new OrbitControls(secondaryCamera, secondaryRenderer.domElement);
+  //     // secondaryControls.enableDamping = true;
+  //     // secondaryControls.dampingFactor = 0.1;
+  //     // secondaryControls.rotateSpeed = 0.8;
+  //     // secondaryControls.zoomSpeed = 0.5;
+  //     // secondaryControls.current = secondaryControls;
+
+  //     // secondaryControlsRef.current = controls;
+
+  //     camera.position.set(0, -50, 50); // Zoomed out to start
+  //     // camera.lookAt(0, 0, 0); // Ensure the camera is looking at the scene origin
+
+  //     // const onWindowResize = () => {
+  //     //   camera.aspect = window.innerWidth / window.innerHeight;
+  //     //   camera.updateProjectionMatrix();
+  //     //   renderer.setSize(window.innerWidth, window.innerHeight);
+  //     // };
+  //     const onWindowResize = () => {
+  //       camera.left = (frustumSize * aspect) / -2;
+  //       camera.right = (frustumSize * aspect) / 2;
+  //       camera.top = frustumSize / 2;
+  //       camera.bottom = frustumSize / -2;
+  //       camera.updateProjectionMatrix();
+  //       renderer.setSize(window.innerWidth, window.innerHeight);
+  //     };
+  //     // window.addEventListener('resize', onWindowResize);
+
+  //     rendererRef.current = renderer;
+  //     secondaryCameraRef.current = secondaryCamera;
+  //     secondaryRendererRef.current = secondaryRenderer;
+  //     cameraRef.current = camera;
+
+  //     const animate = () => {
+  //       requestAnimationFrame(animate);
+  //       controls.update(); // Update OrbitControls
+  //       renderer.render(sceneRef.current, camera);
+  //       secondaryRenderer.render(scene, secondaryCamera);
+  //     };
+  //     animate();
+
+  //     return () => {
+  //       // window.removeEventListener('resize', onWindowResize);
+  //       renderer.dispose();
+  //     };
+  //   }
+  // }, [plyFile]);
 
   useEffect(() => {
     if (atlas && sceneRef.current) {
@@ -3251,7 +3334,7 @@ function PlyViewer({
         {/* <button onClick={logCameraSettings}>Log Camera Settings</button>
         <button onClick={changeCameraAngle}>Change Camera</button> */}
         <Dropdown drop="start">
-          <Dropdown.Toggle variant="secondary"><SettingsIcon /></Dropdown.Toggle>
+          <Dropdown.Toggle variant="secondary" style={{ marginLeft: '-100px' }}><SettingsIcon /></Dropdown.Toggle>
           <Dropdown.Menu style={{ backgroundColor: 'transparent' }}>
             <div id="tabs-collapse">
               <Tabs
@@ -3330,7 +3413,7 @@ function PlyViewer({
                     <select
                       onChange={handlePriorStimChange}
                       multiple
-                      style={{ height: '500px', width: '300px' }}
+                      style={{ height: '500px', width: '300px', backgroundColor: 'transparent' }}
                     >
                       {priorStims &&
                         Object.keys(priorStims).map((patientId, index) => (
@@ -3358,7 +3441,7 @@ function PlyViewer({
                         <select
                           onChange={handleTremorChange}
                           multiple
-                          style={{ height: '500px', width: '300px' }}
+                          style={{ height: '500px', width: '300px', backgroundColor: 'transparent' }}
                         >
                           {tremorData.map((tremor, index) => (
                             <option key={index} value={index}>
@@ -3459,7 +3542,7 @@ function PlyViewer({
                         <select
                           onChange={handlePDChange}
                           multiple
-                          style={{ height: '500px', width: '300px' }}
+                          style={{ height: '500px', width: '300px', backgroundColor: 'transparent' }}
                         >
                           {pdData.map((tremor, index) => (
                             <option key={index} value={index}>

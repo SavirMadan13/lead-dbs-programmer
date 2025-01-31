@@ -1118,6 +1118,8 @@ const createWindow = async () => {
     // console.log('Lead Path: ', leadPath);
     // const stimulationData = getData('stimulationData');
     const leadPath = stimulationData.leadpath;
+    console.log(stimulationData);
+    console.log(leadPath);
     // const leadPath = '/Users/savirmadan/Documents/GitHub/leaddbs';
     // Step 3: Go to the 'atlases' folder within the Lead_Path
     const atlasesPath = path.join(
