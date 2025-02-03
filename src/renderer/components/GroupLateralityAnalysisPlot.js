@@ -45,15 +45,35 @@ function GroupLateralityAnalysisPlot({ clinicalData }) {
 
   const parseTimeline = (timeline) => {
     if (timeline === 'baseline') return 0;
-    const match = timeline.match(/(\d+)(years|months)/);
+    const match = timeline.match(/(\d+)(years|months|day)/);
     if (!match) return Infinity;
     const [_, value, unit] = match;
-    const multiplier = unit === 'years' ? 12 : 1;
-    return parseInt(value) * multiplier;
+    const multiplier = unit === 'years' ? 365 : unit === 'months' ? 30 : 1;
+    return parseInt(value, 10) * multiplier;
   };
 
   const timelines = [...new Set(clinicalData.flatMap((patient) => Object.keys(patient.clinicalData)))];
-  const orderedTimelines = timelines.sort((a, b) => parseTimeline(a) - parseTimeline(b));
+  // const orderedTimelines = timelines.sort((a, b) => parseTimeline(a) - parseTimeline(b));
+  const orderedTimelines = timelines.sort((a, b) => {
+    if (a === 'baseline') return -1;
+    if (b === 'baseline') return 1;
+
+    const aIsDay = a.includes('day');
+    const bIsDay = b.includes('day');
+    const aIsMonth = a.includes('month');
+    const bIsMonth = b.includes('month');
+    const aIsYear = a.includes('year');
+    const bIsYear = b.includes('year');
+
+    if (aIsDay && !bIsDay) return -1;
+    if (!aIsDay && bIsDay) return 1;
+    if (aIsMonth && !bIsMonth) return -1;
+    if (!aIsMonth && bIsMonth) return 1;
+    if (aIsYear && !bIsYear) return 1;
+    if (!aIsYear && bIsYear) return -1;
+
+    return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+  });
 
   const calculateStats = (values) => {
     const mean = values.reduce((sum, val) => sum + val, 0) / values.length;

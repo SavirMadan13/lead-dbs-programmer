@@ -3059,16 +3059,16 @@ function PlyViewer({
       index === activeContact ? finalAmplitude : equalAmplitude,
     );
     console.log(updatedV);
-    setPlotNiiCoords(L);
+    // setPlotNiiCoords(L);
 
-    // const outputV = optimizeSphereValues(
-    //   sphereCoords,
-    //   updatedV,
-    //   normalizedPlotNiiCoords,
-    //   // normalizedTestCoords,
-    // );
-    // console.log(outputV);
-    // handleNiftiQuantityStateChange(outputV);
+    const outputV = optimizeSphereValues(
+      sphereCoords,
+      updatedV,
+      normalizedPlotNiiCoords,
+      // normalizedTestCoords,
+    );
+    console.log(outputV);
+    handleNiftiQuantityStateChange(outputV);
 
     // setNiiSolution(outputV);
   };
@@ -3312,14 +3312,16 @@ function PlyViewer({
 
     // Generate voxel coordinates
     const voxelCoordinates = [];
+    const threshold = 0.5; // Define your threshold value here
     image.forEach((value, index) => {
-      if (!isNaN(value)) {
+      if (!Number.isNaN(value)) {
         const z = Math.floor(index / (dimensions[0] * dimensions[1]));
         const y = Math.floor(
           (index % (dimensions[0] * dimensions[1])) / dimensions[0],
         );
         const x = index % dimensions[0];
-        voxelCoordinates.push([x, y, z, value]);
+        const binarizedValue = value >= threshold ? 1 : 0; // Binarize the value based on the threshold
+        voxelCoordinates.push([x, y, z, binarizedValue]);
       }
     });
     console.log(voxelCoordinates);
@@ -3345,11 +3347,34 @@ function PlyViewer({
     console.log(roundedCoordinates);
     // Find the value of the roundedCoordinates in voxelCoordinates
     const [roundedX, roundedY, roundedZ] = roundedCoordinates;
+    console.log(roundedX, roundedY, roundedZ);
+    Object.keys(voxelCoordinates).forEach((key) => {
 
-    const matchingVoxel = voxelCoordinates.find(
-      ([x, y, z]) => x === roundedX && y === roundedY && z === roundedZ
-    );
+      if (voxelCoordinates[key][0] === roundedX && voxelCoordinates[key][1] === roundedY && voxelCoordinates[key][2] === roundedZ) {
+        console.log('Found: ', voxelCoordinates[key][3]);
+      }
+    });
 
+    const findVoxelValue = (targetX, targetY, targetZ) => {
+      // Find the index of the voxel with the specified coordinates
+      const index = voxelCoordinates.findIndex(([x, y, z]) => x === targetX && y === targetY && z === targetZ);
+
+      // If the voxel is found, return the value; otherwise, return null or an appropriate message
+      if (index !== -1) {
+        return voxelCoordinates[index][3]; // Assuming the value is at the 4th position
+      } else {
+        return null; // Or handle the case where the voxel is not found
+      }
+    };
+
+    const value = findVoxelValue(roundedX, roundedY, roundedZ, voxelCoordinates);
+    console.log('Value at rounded coordinates:', value);
+
+    const matchingVoxel = voxelCoordinates.find((voxel) => {
+      const [x, y, z] = voxel;
+      return x === roundedX && y === roundedY && z === roundedZ;
+    });
+    console.log(matchingVoxel);
     if (matchingVoxel) {
       const value = matchingVoxel[3];
       console.log('Value at rounded coordinates:', value);
@@ -3383,7 +3408,6 @@ function PlyViewer({
       } else {
         console.log('No nearby voxel found.');
       }
-      console.log('No matching voxel found for the rounded coordinates.');
     }
     // for (const file of plyFiles) {
     //   const { path, name } = file;

@@ -83,6 +83,21 @@ function SubscoreAnalysis({ rawData, showPercentage }) {
   const orderedTimepoints = Object.keys(subscoreSumsByTimepoint.bradykinesia).sort((a, b) => {
     if (a === 'baseline') return -1;
     if (b === 'baseline') return 1;
+
+    const aIsDay = a.includes('day');
+    const bIsDay = b.includes('day');
+    const aIsMonth = a.includes('month');
+    const bIsMonth = b.includes('month');
+    const aIsYear = a.includes('year');
+    const bIsYear = b.includes('year');
+
+    if (aIsDay && !bIsDay) return -1;
+    if (!aIsDay && bIsDay) return 1;
+    if (aIsMonth && !bIsMonth) return -1;
+    if (!aIsMonth && bIsMonth) return 1;
+    if (aIsYear && !bIsYear) return 1;
+    if (!aIsYear && bIsYear) return -1;
+
     return a.localeCompare(b, undefined, { numeric: true });
   });
 

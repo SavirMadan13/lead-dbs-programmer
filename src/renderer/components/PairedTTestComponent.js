@@ -31,7 +31,9 @@ function PairedTTestComponent({ rawData, showPercentage }) {
     Object.keys(patient).forEach((timepoint) => {
       if (timepoint !== 'id') {
         const scores = Object.values(patient[timepoint]);
-        const totalScore = scores.reduce((sum, score) => sum + score, 0);
+        console.log(timepoint, scores);
+        const numericScores = scores.filter(score => typeof score === 'number');
+        const totalScore = numericScores.reduce((sum, score) => sum + score, 0);
 
         // Initialize or add to the total for this time point
         if (!scoreSums[timepoint]) {
@@ -46,7 +48,25 @@ function PairedTTestComponent({ rawData, showPercentage }) {
   const orderedTimepoints = Object.keys(scoreSums).sort((a, b) => {
     if (a === 'baseline') return -1;
     if (b === 'baseline') return 1;
-    return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+
+    const aIsDay = a.includes('day');
+    const bIsDay = b.includes('day');
+    const aIsMonth = a.includes('month');
+    const bIsMonth = b.includes('month');
+    const aIsYear = a.includes('year');
+    const bIsYear = b.includes('year');
+
+    if (aIsDay && !bIsDay) return -1;
+    if (!aIsDay && bIsDay) return 1;
+    if (aIsMonth && !bIsMonth) return -1;
+    if (!aIsMonth && bIsMonth) return 1;
+    if (aIsYear && !bIsYear) return 1;
+    if (!aIsYear && bIsYear) return -1;
+
+    return a.localeCompare(b, undefined, {
+      numeric: true,
+      sensitivity: 'base',
+    });
   });
 
   const baselineValue = scoreSums['baseline'] || 1; // Use baseline value for percentage improvement calculation
@@ -105,8 +125,8 @@ function PairedTTestComponent({ rawData, showPercentage }) {
           display: true,
           text: showPercentage ? 'Percentage Improvement (%)' : 'Scores',
         },
-        min: showPercentage ? Math.min(...yValues) - 10 : 0,
-        max: Math.max(...yValues) + 10,
+        // min: showPercentage ? Math.min(...yValues) - 10 : 0,
+        // max: Math.max(...yValues) + 10,
       },
     },
   };
