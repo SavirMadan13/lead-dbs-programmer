@@ -344,6 +344,7 @@ export default function registerFileHandlers() {
 
   ipcMain.handle('load-vis-coords', async (event, historical) => {
     const { patient, timeline, directoryPath, leadDBS } = historical;
+    console.log(patient);
     if (leadDBS) {
       const patientPath = getPatientFolderPly(
         directoryPath,
@@ -367,27 +368,23 @@ export default function registerFileHandlers() {
     const niiFiles = [];
     const atlasesPath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI_ICBM_2009b_NLIN_ASYM/atlases';
     try {
-      const atlasFolders = fs.readdirSync(atlasesPath);
-
-      // Loop through each atlas folder
-      for (const folder of atlasFolders) {
-        const folderPath = path.join(atlasesPath, folder);
-
-        // Check if it's a directory
-        if (fs.statSync(folderPath).isDirectory()) {
-          // Construct the expected PLY file name
-          const expectedNiiFile = 'gm_mask.nii.gz';
-          const niiFilePath = path.join(folderPath, expectedNiiFile);
-
-          // Check if the PLY file exists
-          if (fs.existsSync(niiFilePath)) {
+      const findNiiFiles = (dirPath) => {
+        const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+        for (const entry of entries) {
+          const fullPath = path.join(dirPath, entry.name);
+          if (entry.isDirectory()) {
+            findNiiFiles(fullPath);
+          } else if (entry.isFile() && (entry.name.endsWith('.nii') || entry.name.endsWith('.nii.gz'))) {
             niiFiles.push({
-              fileName: expectedNiiFile,
-              filePath: niiFilePath,
+              fileName: entry.name,
+              filePath: fullPath,
             });
           }
         }
-      }
+      };
+
+      findNiiFiles(atlasesPath);
+      console.log(niiFiles);
     } catch (error) {
       console.error('Error reading atlas folders:', error);
     }

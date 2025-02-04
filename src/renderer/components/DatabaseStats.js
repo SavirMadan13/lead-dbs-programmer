@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import * as XLSX from 'xlsx';
+import * as nifti from 'nifti-reader-js';
 import DatabasePlot from './DatabasePlot';
 import GroupAveragePlot from './GroupAveragePlot';
 import { PatientContext } from './PatientContext';
@@ -22,6 +23,9 @@ import GroupLateralityAnalysisPlot from './GroupLateralityAnalysisPlot';
 import GroupSubscoreAnalysisPlot from './GroupSubscoreAnalysisPlot';
 import CombinedPlot from './CombinedPlot';
 import './DatabaseStats.css'; // Ensure this CSS file is correctly linked
+import { optimizeDatabase } from './OptimizeDatabase';
+import electrodeModels from './electrodeModels.json';
+import * as math from 'mathjs';
 
 function DatabaseStats({ directoryPath }) {
   const { patients } = useContext(PatientContext);
@@ -355,6 +359,118 @@ function DatabaseStats({ directoryPath }) {
     }
   }, [filters]);
 
+  const handleNiiUpload = async (event) => {
+    try {
+      const file = event.target.files[0];
+      if (!file) {
+        throw new Error('No file selected');
+      }
+
+      // Read the file as an ArrayBuffer
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const fileData = e.target.result;
+
+          // Validate if the file is a valid NIfTI file
+          if (!nifti.isNIFTI(fileData)) {
+            throw new Error('File is not a valid NIfTI file');
+          }
+
+          const header = nifti.readHeader(fileData);
+          let image = nifti.readImage(header, fileData);
+          console.log('Header: ', header);
+          // Ensure `image` is a valid ArrayBuffer
+          if (!(image instanceof ArrayBuffer)) {
+            console.log('Adjusting image to ArrayBuffer...');
+            image = new Uint8Array(image).buffer;
+          }
+
+          // Handle endian mismatch
+          if (!header.littleEndian) {
+            console.warn('File is in big-endian format. Adjusting...');
+            const dataView = new DataView(image);
+            const correctedData = new Float32Array(image.byteLength / 4);
+            for (let i = 0; i < correctedData.length; i++) {
+              correctedData[i] = dataView.getFloat32(i * 4, false); // false = big-endian
+            }
+            image = correctedData;
+          } else {
+            image = new Float32Array(image);
+          }
+
+          // Apply scaling factors
+          const { scl_slope = 1, scl_inter = 0 } = header;
+          const img = new Float32Array(
+            image.map((value) => value * scl_slope + scl_inter),
+          );
+
+          // Extract dimensions
+          const dimensions = header.dims.slice(1, 4);
+          console.log('Dimensions:', dimensions);
+
+          // Generate voxel coordinates
+          const voxelCoordinates = [];
+          img.forEach((value, index) => {
+            if (!isNaN(value)) {
+              const z = Math.floor(index / (dimensions[0] * dimensions[1]));
+              const y = Math.floor(
+                (index % (dimensions[0] * dimensions[1])) / dimensions[0],
+              );
+              const x = index % dimensions[0];
+              voxelCoordinates.push([x, y, z, value]);
+            }
+          });
+
+          console.log('Voxel Coordinates:', voxelCoordinates);
+
+          // Transform to MNI coordinates using affine matrix
+          const affineMatrix = header.affine;
+          const mniCoordinates = voxelCoordinates.map(([x, y, z, value]) => {
+            const voxelHomogeneous = [x, y, z, 1]; // Add 1 for homogeneous transformation
+            const transformedVoxels = math.multiply(
+              affineMatrix,
+              voxelHomogeneous,
+            );
+            const [wx, wy, wz] = transformedVoxels.slice(0, 3);
+            return [wx, wy, wz, value];
+          });
+
+          console.log('MNI Coordinates:', mniCoordinates);
+
+          // plotNifti(mniCoordinates);
+          // Set the state with the transformed coordinates
+          // setNiiCoords(mniCoordinates);
+          // handleNiiMap(mniCoordinates);
+          optimizeDatabase(
+            patients,
+            directoryPath,
+            electrodeModels,
+            mniCoordinates,
+          );
+          // return mniCoordinates;
+          // setIsLoading(false); // Hide spinner
+        } catch (error) {
+          console.error('Error processing NIfTI file:', error);
+          // setIsLoading(false); // Hide spinner
+        }
+      };
+
+      reader.onerror = () => {
+        console.error('Failed to read file');
+      };
+
+      reader.readAsArrayBuffer(file);
+    } catch (error) {
+      console.error('Error loading NIfTI file:', error);
+    }
+  };
+
+  const handleOptimizeDatabase = () => {
+    const niiCoords = handleNiiUpload();
+    optimizeDatabase(patients, directoryPath, electrodeModels, niiCoords);
+  };
+
   return (
     <div className="database-stats-container">
       <HomeIcon onClick={() => navigate('/')} className="home-icon" />
@@ -450,6 +566,23 @@ function DatabaseStats({ directoryPath }) {
       <button onClick={handleExportToExcel} className="export-button">
         Export to Excel
       </button>
+      {/* <button onClick={handleNiiUpload} className="export-button">
+        Calculate stimulation parameters
+      </button> */}
+      <Button
+        variant="primary"
+        onClick={() => document.getElementById('nifti-upload').click()}
+        className="mb-4 mx-2"
+      >
+        Import NIfTI File and Provide Solution
+      </Button>
+      <input
+        id="nifti-upload"
+        type="file"
+        style={{ display: 'none' }}
+        accept=".nii"
+        onChange={(e) => handleNiiUpload(e)}
+      />
     </div>
   );
 }
