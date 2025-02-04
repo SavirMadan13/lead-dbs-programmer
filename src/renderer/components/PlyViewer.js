@@ -3301,10 +3301,10 @@ function PlyViewer({
     }
     console.log(image);
     // Apply scaling factors
-    // const { scl_slope = 1, scl_inter = 0 } = header;
-    // const img = new Float32Array(
-    //   image.map((value) => value * scl_slope + scl_inter),
-    // );
+    const { scl_slope = 1, scl_inter = 0 } = header;
+    const img = new Float32Array(
+      image.map((value) => value * scl_slope + scl_inter),
+    );
 
     // Extract dimensions
     const dimensions = header.dims.slice(1, 4);
@@ -3313,15 +3313,15 @@ function PlyViewer({
     // Generate voxel coordinates
     const voxelCoordinates = [];
     const threshold = 0.5; // Define your threshold value here
-    image.forEach((value, index) => {
+    img.forEach((value, index) => {
       if (!Number.isNaN(value)) {
         const z = Math.floor(index / (dimensions[0] * dimensions[1]));
         const y = Math.floor(
           (index % (dimensions[0] * dimensions[1])) / dimensions[0],
         );
         const x = index % dimensions[0];
-        const binarizedValue = value >= threshold ? 1 : 0; // Binarize the value based on the threshold
-        voxelCoordinates.push([x, y, z, binarizedValue]);
+        // const binarizedValue = value >= threshold ? 1 : 0; // Binarize the value based on the threshold
+        voxelCoordinates.push([x, y, z, value]);
       }
     });
     console.log(voxelCoordinates);
