@@ -1,8 +1,50 @@
 // import THREE from 'three';
 // import { optimizeSphereValues } from './StimOptimizer';
+// const {initializeS} = require('./InitializeS');
+// import initializeS from './InitializeS';
+
 const THREE = require('three');
 const math = require('mathjs');
 const {optimizeSphereValues} = require('./StimOptimizer');
+
+const initializeS = (label, numContacts) => {
+  const S = {};
+
+  // Assign label
+  S.label = Array.isArray(label) ? label[0] : label;
+
+  // Initialize right sources
+  for (let source = 1; source <= 4; source++) {
+    S[`Rs${source}`] = { case: {}, amp: 0, va: 2, pulseWidth: 60 };
+    for (let k = 1; k <= numContacts; k++) {
+      S[`Rs${source}`][`k${k}`] = { perc: 0, pol: 0, imp: 1 };
+    }
+    S[`Rs${source}`].case.perc = 100;
+    S[`Rs${source}`].case.pol = 2;
+  }
+
+  // Initialize left sources
+  for (let source = 1; source <= 4; source++) {
+    S[`Ls${source}`] = { case: {}, amp: 0, va: 2, pulseWidth: 60 };
+    for (let k = 1; k <= numContacts; k++) {
+      S[`Ls${source}`][`k${k}`] = { perc: 0, pol: 0, imp: 1 };
+    }
+    S[`Ls${source}`].case.perc = 100;
+    S[`Ls${source}`].case.pol = 2;
+  }
+
+  // Assign additional properties
+  S.active = [1, 1];
+  S.model = 'SimBio/FieldTrip (see Horn 2017)';
+  S.monopolarmodel = 0;
+  S.amplitude = [Array(4).fill(0), Array(4).fill(0)];
+  S.numContacts = numContacts;
+  S.sources = [1, 2, 3, 4];
+  S.volume = [];
+  S.ver = '2.0';
+
+  return S;
+}
 
 const varargout = [
   { displayName: 'Medtronic 3389', value: 'medtronic_3389' },
@@ -535,6 +577,7 @@ const handleNiiMap = (elecCoords, importedCoords, elspec) => {
     // normalizedTestCoords,
   );
   console.log(outputV);
+  return outputV;
   // setNiiSolution(outputV);
 };
 
@@ -542,58 +585,141 @@ const handleOptimizeDatabase = (fileData, elspec, niiCoords) => {
   console.log('Optimizing database');
   console.log(elspec);
   const recoData = fileData;
-  // const sides = [1, 10];
-  const side = 1;
+  const patientParameters = {};
+  const sides = [1, 10];
+  // const side = 1;
   const togglePosition = 'left';
   const { quantities, contactDirections, keyLevels } =
     initializeVariables(elspec);
-  const contactCoords = calculateElectrodeCoordinates(
-    quantities,
-    contactDirections,
-    keyLevels,
-    side,
-    recoData,
-    togglePosition,
-  );
-  handleNiiMap(contactCoords, niiCoords, elspec);
+  sides.forEach((side) => {
+    const contactCoords = calculateElectrodeCoordinates(
+      quantities,
+      contactDirections,
+      keyLevels,
+      side,
+      recoData,
+      togglePosition,
+    );
+    patientParameters[side] = handleNiiMap(contactCoords, niiCoords, elspec);
+  })
+  return patientParameters;
+
 };
 
-const optimizeDatabase = (patients, directoryPath, electrodeModels, niiCoords) => {
+const restructureParameters = (patientParameters) => {
+  const restructuredParameters = {};
+  Object.keys(patientParameters).forEach((key) => {
+    const tempS = initializeS(patientParameters[key], patientParameters[key][1].length);
+    let leftSum = 0;
+    let rightSum = 0;
+    let leftS = tempS;
+    let rightS = tempS;
+    if (!restructuredParameters[key]) {
+      restructuredParameters[key] = {};
+    }
+    Object.keys(patientParameters[key][1]).forEach((contact) => {
+      let contactValue = patientParameters[key][1][contact];
+      if (contactValue < 0.2) {
+        contactValue = 0;
+      }
+      leftSum += contactValue;
+      leftS['Ls1'][`k${contact}`] = contactValue;
+    })
+    leftS.amplitude[0][0] = leftSum;
+    restructuredParameters[key]['L'] = leftS;
+
+    Object.keys(patientParameters[key][10]).forEach((contact) => {
+      let contactValue = patientParameters[key][10][contact];
+      if (contactValue < 0.2) {
+        contactValue = 0;
+      }
+      rightSum += contactValue;
+      rightS['Rs1'][`k${contact}`] = contactValue;
+    })
+    rightS.amplitude[1][0] = rightSum;
+    restructuredParameters[key]['R'] = rightS;
+  })
+  return restructuredParameters;
+}
+
+const optimizeDatabase = async (patients, directoryPath, electrodeModels, niiCoords) => {
   console.log(patients);
   const timeline = 'temp';
   const leadDBS = true;
   const patientCoords = {};
+  const patientParameters = {};
+  let outputGroupParameters = {};
+  // const loadPatientCoords = async () => {
+  //   Object.keys(patients).forEach((patient) => {
+  //     const historical = {
+  //       patient: patients[patient],
+  //       timeline,
+  //       directoryPath,
+  //       leadDBS,
+  //     };
+  //     console.log(historical);
+  //     try {
+  //       const fileData = window.electron.ipcRenderer
+  //         .invoke('load-vis-coords', historical)
+  //         .then((fileData) => {
+  //           console.log(fileData);
+  //           patientCoords[patients[patient].id] = fileData;
+  //           const electrodeModel = handleImportedElectrode(fileData.elmodel);
+  //           patientParameters[patients[patient].id] = handleOptimizeDatabase(fileData, electrodeModels[electrodeModel], niiCoords);
+  //           outputGroupParameters = patientParameters;
+  //           console.log('Patient Parameters: ', patientParameters);
+  //         })
+  //         .catch((error) => {
+  //           console.error('Error loading PLY file:', error);
+  //         });
+  //     } catch (error) {
+  //       console.error('Error invoking load-vis-coords:', error);
+  //     }
+  //   });
+  // };
+
   const loadPatientCoords = async () => {
-    Object.keys(patients).forEach((patient) => {
-      const historical = {
-        patient: patients[patient],
-        timeline,
-        directoryPath,
-        leadDBS,
-      };
-      console.log(historical);
-      try {
-        const fileData = window.electron.ipcRenderer
-          .invoke('load-vis-coords', historical)
-          .then((fileData) => {
-            console.log(fileData);
-            patientCoords[patients[patient].id] = fileData;
-            const electrodeModel = handleImportedElectrode(fileData.elmodel);
-            handleOptimizeDatabase(fileData, electrodeModels[electrodeModel], niiCoords);
-            console.log(patientCoords);
-          })
-          .catch((error) => {
-            console.error('Error loading PLY file:', error);
-          });
-      } catch (error) {
-        console.error('Error invoking load-vis-coords:', error);
-      }
-    });
+    // for (const patient of Object.keys(patients)) {
+    //   const historical = {
+    //     patient: patients[patient],
+    //     timeline,
+    //     directoryPath,
+    //     leadDBS,
+    //   };
+    //   console.log(historical);
+    //   try {
+    //     const fileData = await window.electron.ipcRenderer.invoke('load-vis-coords', historical);
+    //     console.log(fileData);
+    //     patientCoords[patients[patient].id] = fileData;
+    //     const electrodeModel = handleImportedElectrode(fileData.elmodel);
+    //     patientParameters[patients[patient].id] = handleOptimizeDatabase(fileData, electrodeModels[electrodeModel], niiCoords);
+    //     outputGroupParameters = patientParameters;
+    //     console.log('Patient Parameters: ', patientParameters);
+    //   } catch (error) {
+    //     console.error('Error loading PLY file:', error);
+    //   }
+    // }
+    const historical = {
+      patient: patients[0],
+      timeline,
+      directoryPath,
+      leadDBS,
+    };
+    const fileData = await window.electron.ipcRenderer.invoke('load-vis-coords', historical);
+    console.log(fileData);
+    patientCoords[patients[0].id] = fileData;
+    const electrodeModel = handleImportedElectrode(fileData.elmodel);
+    patientParameters[patients[0].id] = handleOptimizeDatabase(fileData, electrodeModels[electrodeModel], niiCoords);
+    outputGroupParameters = patientParameters;
+
   };
 
-  loadPatientCoords();
+  await loadPatientCoords();
   console.log(patientCoords);
   console.log(electrodeModels);
+  console.log('Output Group Parameters: ', outputGroupParameters);
+  const restructuredParameters = restructureParameters(outputGroupParameters);
+  console.log('Restructured Parameters: ', restructuredParameters);
 };
 
 module.exports = {
