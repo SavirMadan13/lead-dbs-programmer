@@ -609,11 +609,13 @@ const handleOptimizeDatabase = (fileData, elspec, niiCoords) => {
 const restructureParameters = (patientParameters) => {
   const restructuredParameters = {};
   Object.keys(patientParameters).forEach((key) => {
+    console.log(patientParameters[key]);
     const tempS = initializeS(patientParameters[key], patientParameters[key][1].length);
+    console.log('tempS: ', tempS);
     let leftSum = 0;
     let rightSum = 0;
-    let leftS = tempS;
-    let rightS = tempS;
+    // let leftS = tempS;
+    // let rightS = tempS;
     if (!restructuredParameters[key]) {
       restructuredParameters[key] = {};
     }
@@ -623,21 +625,56 @@ const restructureParameters = (patientParameters) => {
         contactValue = 0;
       }
       leftSum += contactValue;
-      leftS['Ls1'][`k${contact}`] = contactValue;
     })
-    leftS.amplitude[0][0] = leftSum;
-    restructuredParameters[key]['L'] = leftS;
-
     Object.keys(patientParameters[key][10]).forEach((contact) => {
       let contactValue = patientParameters[key][10][contact];
       if (contactValue < 0.2) {
         contactValue = 0;
       }
       rightSum += contactValue;
-      rightS['Rs1'][`k${contact}`] = contactValue;
     })
-    rightS.amplitude[1][0] = rightSum;
-    restructuredParameters[key]['R'] = rightS;
+
+    Object.keys(patientParameters[key][1]).forEach((contact) => {
+      let contactValue = patientParameters[key][1][contact];
+      if (contactValue < 0.2) {
+        contactValue = 0;
+      } else {
+        try {
+          tempS['Ls1'][`k${parseFloat(contact) + 1}`].perc = (contactValue / leftSum) * 100;
+          tempS['Ls1'][`k${parseFloat(contact) + 1}`].pol = 1;
+        } catch (error) {
+          console.log('Error: ', error);
+          // console.log(tempS['Rs1'][`k${contact}`]);
+          console.log(contactValue);
+          console.log(`k${parseFloat(contact) + 1}`);
+          console.log(tempS['Ls1']);
+          console.log(tempS['Ls1'][`k${parseFloat(contact) + 1}`]);
+        }
+      }
+    })
+    tempS.amplitude[1][0] = Math.round(leftSum * 100) / 100;
+    tempS['Ls1'].amp = Math.round(leftSum * 100) / 100;
+    // restructuredParameters[key]['L'] = tempS;
+
+    Object.keys(patientParameters[key][10]).forEach((contact) => {
+      let contactValue = patientParameters[key][10][contact];
+      if (contactValue < 0.2) {
+        contactValue = 0;
+      } else {
+        try {
+          tempS['Rs1'][`k${parseFloat(contact) + 1}`].perc = (contactValue / rightSum) * 100;
+          tempS['Rs1'][`k${parseFloat(contact) + 1}`].pol = 1;
+        } catch (error) {
+          console.log('Error: ', error);
+          // console.log(tempS['Rs1'][`k${contact}`]);
+          console.log(contactValue);
+          console.log(`k${parseFloat(contact) + 1}`);
+        }
+      }
+    })
+    tempS.amplitude[0][0] = Math.round(rightSum * 100) / 100;
+    tempS['Rs1'].amp = Math.round(rightSum * 100) / 100;
+    restructuredParameters[key].S = tempS;
   })
   return restructuredParameters;
 }
@@ -679,38 +716,38 @@ const optimizeDatabase = async (patients, directoryPath, electrodeModels, niiCoo
   // };
 
   const loadPatientCoords = async () => {
-    // for (const patient of Object.keys(patients)) {
-    //   const historical = {
-    //     patient: patients[patient],
-    //     timeline,
-    //     directoryPath,
-    //     leadDBS,
-    //   };
-    //   console.log(historical);
-    //   try {
-    //     const fileData = await window.electron.ipcRenderer.invoke('load-vis-coords', historical);
-    //     console.log(fileData);
-    //     patientCoords[patients[patient].id] = fileData;
-    //     const electrodeModel = handleImportedElectrode(fileData.elmodel);
-    //     patientParameters[patients[patient].id] = handleOptimizeDatabase(fileData, electrodeModels[electrodeModel], niiCoords);
-    //     outputGroupParameters = patientParameters;
-    //     console.log('Patient Parameters: ', patientParameters);
-    //   } catch (error) {
-    //     console.error('Error loading PLY file:', error);
-    //   }
-    // }
-    const historical = {
-      patient: patients[0],
-      timeline,
-      directoryPath,
-      leadDBS,
-    };
-    const fileData = await window.electron.ipcRenderer.invoke('load-vis-coords', historical);
-    console.log(fileData);
-    patientCoords[patients[0].id] = fileData;
-    const electrodeModel = handleImportedElectrode(fileData.elmodel);
-    patientParameters[patients[0].id] = handleOptimizeDatabase(fileData, electrodeModels[electrodeModel], niiCoords);
-    outputGroupParameters = patientParameters;
+    for (const patient of Object.keys(patients)) {
+      const historical = {
+        patient: patients[patient],
+        timeline,
+        directoryPath,
+        leadDBS,
+      };
+      console.log(historical);
+      try {
+        const fileData = await window.electron.ipcRenderer.invoke('load-vis-coords', historical);
+        console.log(fileData);
+        patientCoords[patients[patient].id] = fileData;
+        const electrodeModel = handleImportedElectrode(fileData.elmodel);
+        patientParameters[patients[patient].id] = handleOptimizeDatabase(fileData, electrodeModels[electrodeModel], niiCoords);
+        outputGroupParameters = patientParameters;
+        console.log('Patient Parameters: ', patientParameters);
+      } catch (error) {
+        console.error('Error loading PLY file:', error);
+      }
+    }
+    // const historical = {
+    //   patient: patients[1],
+    //   timeline,
+    //   directoryPath,
+    //   leadDBS,
+    // };
+    // const fileData = await window.electron.ipcRenderer.invoke('load-vis-coords', historical);
+    // console.log(fileData);
+    // patientCoords[patients[1].id] = fileData;
+    // const electrodeModel = handleImportedElectrode(fileData.elmodel);
+    // patientParameters[patients[1].id] = handleOptimizeDatabase(fileData, electrodeModels[electrodeModel], niiCoords);
+    // outputGroupParameters = patientParameters;
 
   };
 
@@ -720,6 +757,7 @@ const optimizeDatabase = async (patients, directoryPath, electrodeModels, niiCoo
   console.log('Output Group Parameters: ', outputGroupParameters);
   const restructuredParameters = restructureParameters(outputGroupParameters);
   console.log('Restructured Parameters: ', restructuredParameters);
+  window.electron.ipcRenderer.sendMessage('save-file-test', restructuredParameters);
 };
 
 module.exports = {

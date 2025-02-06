@@ -141,6 +141,21 @@ export default function registerFileHandlers() {
     event.reply('file-saved', newStimFilePath);
   });
 
+  ipcMain.on('save-file-test', (event, data) => {
+    const dataString = JSON.stringify(data);
+    // const newStimFilePath = path.join(stimulationDirectory, 'data.json');
+    const newStimFilePath = '/Users/savirmadan/Documents/bradykinesia.json';
+    try {
+      // fs.writeFileSync(filePath, dataString);
+      console.log(newStimFilePath);
+      fs.writeFileSync(newStimFilePath, dataString);
+    } catch (error) {
+      // Handle the error here
+      console.error('Error writing to file:', error);
+    }
+    event.reply('file-saved', newStimFilePath);
+  });
+
   ipcMain.on('save-file-clinical', (event, data, historical) => {
     const { patient, timeline, directoryPath, leadDBS } = historical;
 
