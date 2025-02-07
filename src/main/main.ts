@@ -107,9 +107,9 @@ app.on('ready', () => {
 // const inputPath = '/Users/savirmadan/Downloads/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0374Output/derivatives/leaddbs/sub-CbctDbs0374/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
-const inputPath = process.argv[1];
+// const inputPath = process.argv[1];
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
-// const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
+const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons/derivatives/leadgroup/BwhParkinsons/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataBwh.json';
@@ -631,8 +631,8 @@ const createWindow = async () => {
     // height: 770,
     // width: 600,
     // width: 1000,
-    width: 550,
-    height: 700,
+    width: 670,
+    height: 850,
     // maxWidth: 1100, // Maximum width of the window
     // // maxHeight: 1200, // Maximum height of the window
     // minWidth: 1000, // Minimum width of the window
@@ -1581,9 +1581,9 @@ ipcMain.on('zoom-level-changed', (event, zoomLevel) => {
 ipcMain.on('increase-window-width', (event, showViewer) => {
   if (mainWindow && showViewer) {
     const [width, height] = mainWindow.getSize();
-    mainWindow.setSize(width - 450, height); // Increase width by 100 pixels
+    mainWindow.setSize(width - 350, height + 50); // Increase width by 100 pixels
   } else if (mainWindow && !showViewer) {
     const [width, height] = mainWindow.getSize();
-    mainWindow.setSize(width + 450, height); // Increase width by 100 pixels
+    mainWindow.setSize(width + 350, height - 50); // Increase width by 100 pixels
   }
 });

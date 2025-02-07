@@ -143,7 +143,7 @@ export default function App() {
             zIndex: '10',
           }} // Optional styling
         /> */}
-        <MoreVertIcon
+        {/* <MoreVertIcon
           className="settings-icon"
           onClick={() => setShowSettings(!showSettings)}
           style={{
@@ -152,7 +152,7 @@ export default function App() {
             color: '#6c757d',
             zIndex: '10',
           }} // Optional styling
-        />
+        /> */}
 
         {showSettings && (
           <div className="settings-panel">

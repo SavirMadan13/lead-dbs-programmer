@@ -214,7 +214,7 @@ function GroupArchitecture({
   };
 
   return (
-    <div>
+    <div style={{ marginLeft: '-200px' }}>
       {/* <div style={{ paddingLeft: '45px', marginBottom: '-100px' }}>
         <PatientSelector
           selectedPatient={selectedPatient}
