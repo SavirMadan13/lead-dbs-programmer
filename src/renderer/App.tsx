@@ -189,10 +189,12 @@ export default function App() {
             <Route
               path="/patient/:id"
               element={
-                <PatientDetails
-                  directoryPath={directoryPath}
-                  leadDBS={isLeadDBSFolder}
-                />
+                <div>
+                  <PatientDetails
+                    directoryPath={directoryPath}
+                    leadDBS={isLeadDBSFolder}
+                  />
+                </div>
               }
             />
             <Route path="/programmer" element={<Programmer />} />

@@ -820,31 +820,7 @@ function Programmer() {
       },
     };
     console.log('Data: ', data);
-    // const data = {
-    //   S: {
-    //     label: groupLabel,
-    //     Rs1: {},
-    //     Rs2: {},
-    //     Rs3: {},
-    //     Rs4: {},
-    //     Ls1: {},
-    //     Ls2: {},
-    //     Ls3: {},
-    //     Ls4: {},
-    //     active: {},
-    //     model: '',
-    //     monopolarmodel: 0,
-    //     amplitude: {},
-    //     activecontacts: [],
-    //     template: 'warp',
-    //     sources: {},
-    //     // elmodel: {},
-    //     // ipg: IPG,
-    //     ver: '2.0',
-    //   },
-    // };
 
-    // data.S.elmodel = [selectedElectrodeLeft, selectedElectrodeRight];
     const programs = Object.keys(allQuantities);
     const firstProgram = programs[0];
     console.log('Programs: ', programs);
@@ -1000,7 +976,7 @@ function Programmer() {
         rightAmplitude.push(0);
       }
     }
-    data.S.amplitude = { rightAmplitude, leftAmplitude };
+    // data.S.amplitude = { rightAmplitude, leftAmplitude };
     // data.S.amplitude = exportAmplitudeData;
     // console.log(exportAmplitudeData);
     const sourcesArray = activeArray;
@@ -1044,6 +1020,20 @@ function Programmer() {
     // console.log('export vis model', exportVisModel);
     data.S.model = exportVisModel;
     data.S.estimateInTemplate = allTemplateSpaces;
+    const leftSideContacts = Object.values(data.S.activecontacts).slice(0, 4);
+    const rightSideContacts = Object.values(data.S.activecontacts).slice(4, 8);
+
+    const combineBinary = (contacts) => {
+      return contacts.reduce((acc, curr) => {
+        return acc.map((val, index) => val | curr[index]);
+      });
+    };
+
+    const combinedLeftContacts = combineBinary(leftSideContacts);
+    const combinedRightContacts = combineBinary(rightSideContacts);
+
+    data.S.activecontacts = [combinedRightContacts, combinedLeftContacts];
+
     // if (Array.isArray(data.S.activecontacts) && data.S.activecontacts.length > 0 && data.S.activecontacts[0] === undefined) {
     //   data.S.activecontacts.shift();
     // }

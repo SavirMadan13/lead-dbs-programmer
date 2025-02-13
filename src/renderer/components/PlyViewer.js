@@ -5,7 +5,16 @@ import { PLYLoader, OrbitControls } from 'three-stdlib';
 // import * as nifti from 'nifti-reader-js'; // Correctly importing the nifti module
 import * as nifti from 'nifti-reader-js';
 // import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
-import { Tabs, Tab, Collapse, Button, Form, Modal, Dropdown, DropdownButton } from 'react-bootstrap';
+import {
+  Tabs,
+  Tab,
+  Collapse,
+  Button,
+  Form,
+  Modal,
+  Dropdown,
+  DropdownButton,
+} from 'react-bootstrap';
 import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings icon
 import * as math from 'mathjs';
 import { optimizeSphereValues } from './StimOptimizer';
@@ -204,7 +213,6 @@ function PlyViewer({
 
   //   loadCSVFile();
   // }, []);
-
 
   // ******************* Don't forget 8=
   useEffect(() => {
@@ -1027,13 +1035,13 @@ function PlyViewer({
     console.log('Selected stim change: ', selectedValue);
     // console.log('Selected Value: ', selectedValue.split('-'));
     const splitValues = selectedValue.split('-');
-    console.log('Selected: ', splitValues)
+    console.log('Selected: ', splitValues);
     const selectedPatientID = splitValues[0];
     // const selectedPatientID = selectedValue;
     const selectedSession = splitValues[1];
     console.log(selectedPatientID);
-    const outputPatientID = `${splitValues[0]  }-${  splitValues[1]}`;
-    const outputPatientSession = `${splitValues[2]  }-${  splitValues[3]}`;
+    const outputPatientID = `${splitValues[0]}-${splitValues[1]}`;
+    const outputPatientSession = `${splitValues[2]}-${splitValues[3]}`;
     const electrodeLoader = new PLYLoader();
     const anatomyLoader = new PLYLoader();
 
@@ -3271,165 +3279,338 @@ function PlyViewer({
       '',
     );
 
-    const header = nifti.readHeader(fileData);
-    let image = nifti.readImage(header, fileData);
-    console.log(image);
-    console.log('Header: ', header);
-    // Ensure `image` is a valid ArrayBuffer
-    if (!(image instanceof ArrayBuffer)) {
-      console.log('Adjusting image to ArrayBuffer...');
-      image = new Uint8Array(image).buffer;
-    }
+    const niiFilesPassed = [];
 
-    // Handle endian mismatch
-    if (!header.littleEndian) {
-      console.warn('File is in big-endian format. Adjusting...');
-      const dataView = new DataView(image);
-      const correctedData = new Float32Array(image.byteLength / 4);
-      for (let i = 0; i < correctedData.length; i++) {
-        correctedData[i] = dataView.getFloat32(i * 4, false); // false = big-endian
+    console.log('fileData: ', fileData);
+
+    const checkCoord = (path, fileBuffer) => {
+      const header = nifti.readHeader(fileBuffer);
+      let image = nifti.readImage(header, fileBuffer);
+      console.log(image);
+      console.log('Header: ', header);
+      // Ensure `image` is a valid ArrayBuffer
+      if (!(image instanceof ArrayBuffer)) {
+        console.log('Adjusting image to ArrayBuffer...');
+        image = new Uint8Array(image).buffer;
       }
-      image = correctedData;
-    } else {
-      if (image.byteLength % 4 !== 0) {
-        const padding = 4 - (image.byteLength % 4);
-        const paddedArray = new Uint8Array(image.byteLength + padding);
-        paddedArray.set(new Uint8Array(image));
-        image = paddedArray.buffer;
-      }
-      image = new Float32Array(image);
-    }
-    console.log(image);
-    // Apply scaling factors
-    const { scl_slope = 1, scl_inter = 0 } = header;
-    const img = new Float32Array(
-      image.map((value) => value * scl_slope + scl_inter),
-    );
 
-    // Extract dimensions
-    const dimensions = header.dims.slice(1, 4);
-    console.log('Dimensions:', dimensions);
-
-    // Generate voxel coordinates
-    const voxelCoordinates = [];
-    const threshold = 0.5; // Define your threshold value here
-    img.forEach((value, index) => {
-      if (!Number.isNaN(value)) {
-        const z = Math.floor(index / (dimensions[0] * dimensions[1]));
-        const y = Math.floor(
-          (index % (dimensions[0] * dimensions[1])) / dimensions[0],
-        );
-        const x = index % dimensions[0];
-        // const binarizedValue = value >= threshold ? 1 : 0; // Binarize the value based on the threshold
-        voxelCoordinates.push([x, y, z, value]);
-      }
-    });
-    console.log(voxelCoordinates);
-    const affineMatrix = header.affine;
-    const inverseAffineMatrix = math.inv(affineMatrix);
-    const newSearchCoordinate = [
-      parseFloat(searchCoordinate.split(',')[0]),
-      parseFloat(searchCoordinate.split(',')[1]),
-      parseFloat(searchCoordinate.split(',')[2]),
-      1,
-    ];
-    console.log(searchCoordinate);
-    console.log(newSearchCoordinate);
-    const transformedCoordinates = math.multiply(
-      inverseAffineMatrix,
-      newSearchCoordinate,
-    );
-
-    console.log(transformedCoordinates);
-    const roundedCoordinates = transformedCoordinates.map((coord) =>
-      Math.round(coord),
-    );
-    console.log(roundedCoordinates);
-    // Find the value of the roundedCoordinates in voxelCoordinates
-    const [roundedX, roundedY, roundedZ] = roundedCoordinates;
-    console.log(roundedX, roundedY, roundedZ);
-    Object.keys(voxelCoordinates).forEach((key) => {
-
-      if (voxelCoordinates[key][0] === roundedX && voxelCoordinates[key][1] === roundedY && voxelCoordinates[key][2] === roundedZ) {
-        console.log('Found: ', voxelCoordinates[key][3]);
-      }
-    });
-
-    const findVoxelValue = (targetX, targetY, targetZ) => {
-      // Find the index of the voxel with the specified coordinates
-      const index = voxelCoordinates.findIndex(([x, y, z]) => x === targetX && y === targetY && z === targetZ);
-
-      // If the voxel is found, return the value; otherwise, return null or an appropriate message
-      if (index !== -1) {
-        return voxelCoordinates[index][3]; // Assuming the value is at the 4th position
+      // Handle endian mismatch
+      if (!header.littleEndian) {
+        console.warn('File is in big-endian format. Adjusting...');
+        const dataView = new DataView(image);
+        const correctedData = new Float32Array(image.byteLength / 4);
+        for (let i = 0; i < correctedData.length; i++) {
+          correctedData[i] = dataView.getFloat32(i * 4, false); // false = big-endian
+        }
+        image = correctedData;
       } else {
+        if (image.byteLength % 4 !== 0) {
+          const padding = 4 - (image.byteLength % 4);
+          const paddedArray = new Uint8Array(image.byteLength + padding);
+          paddedArray.set(new Uint8Array(image));
+          image = paddedArray.buffer;
+        }
+        image = new Float32Array(image);
+      }
+      // Apply scaling factors
+      const { scl_slope = 1, scl_inter = 0 } = header;
+      const img = new Float32Array(
+        image.map((value) => value * scl_slope + scl_inter),
+      );
+
+      // Extract dimensions
+      const dimensions = header.dims.slice(1, 4);
+
+      // Generate voxel coordinates
+      const voxelCoordinates = [];
+      const threshold = 0.5; // Define your threshold value here
+      img.forEach((value, index) => {
+        if (!Number.isNaN(value)) {
+          const z = Math.floor(index / (dimensions[0] * dimensions[1]));
+          const y = Math.floor(
+            (index % (dimensions[0] * dimensions[1])) / dimensions[0],
+          );
+          const x = index % dimensions[0];
+          // const binarizedValue = value >= threshold ? 1 : 0; // Binarize the value based on the threshold
+          voxelCoordinates.push([x, y, z, value]);
+        }
+      });
+      const affineMatrix = header.affine;
+      const inverseAffineMatrix = math.inv(affineMatrix);
+      const newSearchCoordinate = [
+        parseFloat(searchCoordinate.split(',')[0]),
+        parseFloat(searchCoordinate.split(',')[1]),
+        parseFloat(searchCoordinate.split(',')[2]),
+        1,
+      ];
+      console.log(searchCoordinate);
+      console.log(newSearchCoordinate);
+      const transformedCoordinates = math.multiply(
+        inverseAffineMatrix,
+        newSearchCoordinate,
+      );
+
+      console.log(transformedCoordinates);
+      const roundedCoordinates = transformedCoordinates.map((coord) =>
+        Math.round(coord),
+      );
+      console.log(roundedCoordinates);
+      // Find the value of the roundedCoordinates in voxelCoordinates
+      const [roundedX, roundedY, roundedZ] = roundedCoordinates;
+      console.log(roundedX, roundedY, roundedZ);
+      Object.keys(voxelCoordinates).forEach((key) => {
+        if (
+          voxelCoordinates[key][0] === roundedX &&
+          voxelCoordinates[key][1] === roundedY &&
+          voxelCoordinates[key][2] === roundedZ
+        ) {
+          console.log('Found: ', voxelCoordinates[key][3]);
+        }
+      });
+
+      const findVoxelValue = (targetX, targetY, targetZ) => {
+        // Find the index of the voxel with the specified coordinates
+        const index = voxelCoordinates.findIndex(
+          ([x, y, z]) => x === targetX && y === targetY && z === targetZ,
+        );
+
+        // If the voxel is found, return the value; otherwise, return null or an appropriate message
+        if (index !== -1) {
+          return voxelCoordinates[index][3]; // Assuming the value is at the 4th position
+        }
         return null; // Or handle the case where the voxel is not found
+      };
+
+      const value = findVoxelValue(
+        roundedX,
+        roundedY,
+        roundedZ,
+        voxelCoordinates,
+      );
+      console.log('Value at rounded coordinates:', value);
+
+      const matchingVoxel = voxelCoordinates.find((voxel) => {
+        const [x, y, z] = voxel;
+        return x === roundedX && y === roundedY && z === roundedZ;
+      });
+      console.log(matchingVoxel);
+      if (matchingVoxel) {
+        const value = matchingVoxel[3];
+        console.log('Value at rounded coordinates:', value);
+      } else {
+        // If no exact match is found, find the nearest neighbor
+        const findNearestNeighbor = (target, coordinates) => {
+          let nearest = null;
+          let minDistance = Infinity;
+
+          coordinates.forEach(([x, y, z, value]) => {
+            const distance = Math.sqrt(
+              (x - target[0]) ** 2 +
+                (y - target[1]) ** 2 +
+                (z - target[2]) ** 2,
+            );
+
+            if (distance < minDistance) {
+              minDistance = distance;
+              nearest = [x, y, z, value];
+            }
+          });
+
+          return nearest;
+        };
+
+        const nearestVoxel = findNearestNeighbor(
+          roundedCoordinates,
+          voxelCoordinates,
+        );
+
+        if (nearestVoxel) {
+          const value = nearestVoxel[3];
+          if (value !== 0) {
+            niiFilesPassed.push(path);
+          }
+          console.log('Value at nearest coordinates:', value);
+        } else {
+          console.log('No nearby voxel found.');
+        }
+      }
+      console.log(matchingFiles);
+    };
+
+    const processFile = async (file) => {
+      const { filePath } = file;
+      const fileBuffer = await window.electron.ipcRenderer.invoke(
+        'load-file-buffer',
+        filePath,
+      );
+      console.log('filePath: ', filePath);
+      checkCoord(filePath, fileBuffer);
+    };
+
+    const processFilesSequentially = async () => {
+      for (const file of fileData) {
+        const {fileName } = file;
+        if (fileName !== 'gm_mask.nii.gz') {
+          await processFile(file);
+        }
       }
     };
 
-    const value = findVoxelValue(roundedX, roundedY, roundedZ, voxelCoordinates);
-    console.log('Value at rounded coordinates:', value);
+    // Call the function to process files one at a time
+    processFilesSequentially(fileData);
 
-    const matchingVoxel = voxelCoordinates.find((voxel) => {
-      const [x, y, z] = voxel;
-      return x === roundedX && y === roundedY && z === roundedZ;
-    });
-    console.log(matchingVoxel);
-    if (matchingVoxel) {
-      const value = matchingVoxel[3];
-      console.log('Value at rounded coordinates:', value);
-    } else {
-      // If no exact match is found, find the nearest neighbor
-      const findNearestNeighbor = (target, coordinates) => {
-        let nearest = null;
-        let minDistance = Infinity;
-
-        coordinates.forEach(([x, y, z, value]) => {
-          const distance = Math.sqrt(
-            Math.pow(x - target[0], 2) +
-            Math.pow(y - target[1], 2) +
-            Math.pow(z - target[2], 2)
-          );
-
-          if (distance < minDistance) {
-            minDistance = distance;
-            nearest = [x, y, z, value];
-          }
-        });
-
-        return nearest;
-      };
-
-      const nearestVoxel = findNearestNeighbor(roundedCoordinates, voxelCoordinates);
-
-      if (nearestVoxel) {
-        const value = nearestVoxel[3];
-        console.log('Value at nearest coordinates:', value);
-      } else {
-        console.log('No nearby voxel found.');
-      }
-    }
-    // for (const file of plyFiles) {
-    //   const { path, name } = file;
-
-    //   try {
-    //     // Load and parse the PLY file
-    //     const fileData = await window.electron.ipcRenderer.invoke(
-    //       'load-ply-file-2',
-    //       path,
+    // await Promise.all(
+    //   fileData.map(async (file) => {
+    //     const { filePath } = file;
+    //     const fileBuffer = await window.electron.ipcRenderer.invoke(
+    //       'load-file-buffer',
+    //       filePath,
     //     );
-    //     const geometry = loader.parse(fileData);
+    //     console.log('filePath: ', filePath);
+    //     checkCoord(filePath, fileBuffer);
+    //   }),
+    // );
+    console.log('niiFilesPassed: ', niiFilesPassed);
+    // const header = nifti.readHeader(fileData);
+    // let image = nifti.readImage(header, fileData);
+    // console.log(image);
+    // console.log('Header: ', header);
+    // // Ensure `image` is a valid ArrayBuffer
+    // if (!(image instanceof ArrayBuffer)) {
+    //   console.log('Adjusting image to ArrayBuffer...');
+    //   image = new Uint8Array(image).buffer;
+    // }
 
-    //     // Check if the coordinate lies in this PLY file
-    //     if (isCoordinateInGeometry(x, y, z, geometry)) {
-    //       matchingFiles.push(name);
-    //     }
-    //   } catch (error) {
-    //     console.error(`Error loading PLY file (${name}):`, error);
+    // // Handle endian mismatch
+    // if (!header.littleEndian) {
+    //   console.warn('File is in big-endian format. Adjusting...');
+    //   const dataView = new DataView(image);
+    //   const correctedData = new Float32Array(image.byteLength / 4);
+    //   for (let i = 0; i < correctedData.length; i++) {
+    //     correctedData[i] = dataView.getFloat32(i * 4, false); // false = big-endian
+    //   }
+    //   image = correctedData;
+    // } else {
+    //   if (image.byteLength % 4 !== 0) {
+    //     const padding = 4 - (image.byteLength % 4);
+    //     const paddedArray = new Uint8Array(image.byteLength + padding);
+    //     paddedArray.set(new Uint8Array(image));
+    //     image = paddedArray.buffer;
+    //   }
+    //   image = new Float32Array(image);
+    // }
+    // console.log(image);
+    // // Apply scaling factors
+    // const { scl_slope = 1, scl_inter = 0 } = header;
+    // const img = new Float32Array(
+    //   image.map((value) => value * scl_slope + scl_inter),
+    // );
+
+    // // Extract dimensions
+    // const dimensions = header.dims.slice(1, 4);
+    // console.log('Dimensions:', dimensions);
+
+    // // Generate voxel coordinates
+    // const voxelCoordinates = [];
+    // const threshold = 0.5; // Define your threshold value here
+    // img.forEach((value, index) => {
+    //   if (!Number.isNaN(value)) {
+    //     const z = Math.floor(index / (dimensions[0] * dimensions[1]));
+    //     const y = Math.floor(
+    //       (index % (dimensions[0] * dimensions[1])) / dimensions[0],
+    //     );
+    //     const x = index % dimensions[0];
+    //     // const binarizedValue = value >= threshold ? 1 : 0; // Binarize the value based on the threshold
+    //     voxelCoordinates.push([x, y, z, value]);
+    //   }
+    // });
+    // console.log(voxelCoordinates);
+    // const affineMatrix = header.affine;
+    // const inverseAffineMatrix = math.inv(affineMatrix);
+    // const newSearchCoordinate = [
+    //   parseFloat(searchCoordinate.split(',')[0]),
+    //   parseFloat(searchCoordinate.split(',')[1]),
+    //   parseFloat(searchCoordinate.split(',')[2]),
+    //   1,
+    // ];
+    // console.log(searchCoordinate);
+    // console.log(newSearchCoordinate);
+    // const transformedCoordinates = math.multiply(
+    //   inverseAffineMatrix,
+    //   newSearchCoordinate,
+    // );
+
+    // console.log(transformedCoordinates);
+    // const roundedCoordinates = transformedCoordinates.map((coord) =>
+    //   Math.round(coord),
+    // );
+    // console.log(roundedCoordinates);
+    // // Find the value of the roundedCoordinates in voxelCoordinates
+    // const [roundedX, roundedY, roundedZ] = roundedCoordinates;
+    // console.log(roundedX, roundedY, roundedZ);
+    // Object.keys(voxelCoordinates).forEach((key) => {
+
+    //   if (voxelCoordinates[key][0] === roundedX && voxelCoordinates[key][1] === roundedY && voxelCoordinates[key][2] === roundedZ) {
+    //     console.log('Found: ', voxelCoordinates[key][3]);
+    //   }
+    // });
+
+    // const findVoxelValue = (targetX, targetY, targetZ) => {
+    //   // Find the index of the voxel with the specified coordinates
+    //   const index = voxelCoordinates.findIndex(([x, y, z]) => x === targetX && y === targetY && z === targetZ);
+
+    //   // If the voxel is found, return the value; otherwise, return null or an appropriate message
+    //   if (index !== -1) {
+    //     return voxelCoordinates[index][3]; // Assuming the value is at the 4th position
+    //   } else {
+    //     return null; // Or handle the case where the voxel is not found
+    //   }
+    // };
+
+    // const value = findVoxelValue(roundedX, roundedY, roundedZ, voxelCoordinates);
+    // console.log('Value at rounded coordinates:', value);
+
+    // const matchingVoxel = voxelCoordinates.find((voxel) => {
+    //   const [x, y, z] = voxel;
+    //   return x === roundedX && y === roundedY && z === roundedZ;
+    // });
+    // console.log(matchingVoxel);
+    // if (matchingVoxel) {
+    //   const value = matchingVoxel[3];
+    //   console.log('Value at rounded coordinates:', value);
+    // } else {
+    //   // If no exact match is found, find the nearest neighbor
+    //   const findNearestNeighbor = (target, coordinates) => {
+    //     let nearest = null;
+    //     let minDistance = Infinity;
+
+    //     coordinates.forEach(([x, y, z, value]) => {
+    //       const distance = Math.sqrt(
+    //         Math.pow(x - target[0], 2) +
+    //         Math.pow(y - target[1], 2) +
+    //         Math.pow(z - target[2], 2)
+    //       );
+
+    //       if (distance < minDistance) {
+    //         minDistance = distance;
+    //         nearest = [x, y, z, value];
+    //       }
+    //     });
+
+    //     return nearest;
+    //   };
+
+    //   const nearestVoxel = findNearestNeighbor(roundedCoordinates, voxelCoordinates);
+
+    //   if (nearestVoxel) {
+    //     const value = nearestVoxel[3];
+    //     console.log('Value at nearest coordinates:', value);
+    //   } else {
+    //     console.log('No nearby voxel found.');
     //   }
     // }
-    console.log(matchingFiles);
-    setMatchingAtlases(matchingFiles);
+    // console.log(matchingFiles);
+    // setMatchingAtlases(matchingFiles);
   };
 
   const isCoordinateInGeometry = (x, y, z, geometry) => {
@@ -3477,8 +3658,12 @@ function PlyViewer({
         {/* <button onClick={logCameraSettings}>Log Camera Settings</button>
         <button onClick={changeCameraAngle}>Change Camera</button> */}
         <Dropdown drop="start">
-          <Dropdown.Toggle variant="secondary" style={{ marginLeft: '-100px' }}><SettingsIcon /></Dropdown.Toggle>
-          <Dropdown.Menu style={{ backgroundColor: 'transparent', border: 'none' }}>
+          <Dropdown.Toggle variant="secondary" style={{ marginLeft: '-100px' }}>
+            <SettingsIcon />
+          </Dropdown.Toggle>
+          <Dropdown.Menu
+            style={{ backgroundColor: 'transparent', border: 'none' }}
+          >
             <div id="tabs-collapse">
               <Tabs
                 defaultActiveKey="meshes"
@@ -3541,7 +3726,11 @@ function PlyViewer({
                     <select
                       onChange={handleFileChange}
                       multiple
-                      style={{ height: '500px', width: '300px', backgroundColor: 'transparent' }}
+                      style={{
+                        height: '500px',
+                        width: '300px',
+                        backgroundColor: 'transparent',
+                      }}
                     >
                       {plyFiles.map((file, index) => (
                         <option key={index} value={index}>
@@ -3556,7 +3745,11 @@ function PlyViewer({
                     <select
                       onChange={handlePriorStimChange}
                       multiple
-                      style={{ height: '500px', width: '300px', backgroundColor: 'transparent' }}
+                      style={{
+                        height: '500px',
+                        width: '300px',
+                        backgroundColor: 'transparent',
+                      }}
                     >
                       {priorStims &&
                         Object.keys(priorStims).map((patientId, index) => (
@@ -3584,7 +3777,11 @@ function PlyViewer({
                         <select
                           onChange={handleTremorChange}
                           multiple
-                          style={{ height: '500px', width: '300px', backgroundColor: 'transparent' }}
+                          style={{
+                            height: '500px',
+                            width: '300px',
+                            backgroundColor: 'transparent',
+                          }}
                         >
                           {tremorData.map((tremor, index) => (
                             <option key={index} value={index}>
@@ -3685,7 +3882,11 @@ function PlyViewer({
                         <select
                           onChange={handlePDChange}
                           multiple
-                          style={{ height: '500px', width: '300px', backgroundColor: 'transparent' }}
+                          style={{
+                            height: '500px',
+                            width: '300px',
+                            backgroundColor: 'transparent',
+                          }}
                         >
                           {pdData.map((tremor, index) => (
                             <option key={index} value={index}>
@@ -3876,13 +4077,21 @@ function PlyViewer({
                               className="spinner-border text-primary"
                               role="status"
                             >
-                              <span className="visually-hidden">Loading...</span>
+                              <span className="visually-hidden">
+                                Loading...
+                              </span>
                             </div>
                           </div>
                         )}
                         <span>{niiSolution}</span>
-                        <Button onClick={saveCurrentSpheres}>Save Spheres</Button>
-                        <Button onClick={() => calculatePercentOverlap(savedSpheres.current)}>
+                        <Button onClick={saveCurrentSpheres}>
+                          Save Spheres
+                        </Button>
+                        <Button
+                          onClick={() =>
+                            calculatePercentOverlap(savedSpheres.current)
+                          }
+                        >
                           Compare Overlap
                         </Button>
                       </div>

@@ -4,11 +4,13 @@ import React, { useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 // import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 // import { TreeView, TreeItem } from '@mui/x-tree-view';
+import { Dropdown } from 'react-bootstrap';
 import { RichTreeView } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import HomeIcon from '@mui/icons-material/Home';
 import { PatientContext } from './PatientContext';
+import PatientStats from './PatientStats';
 // import NiivueViewer from './NiivueViewer';
 // import NiftiViewer from './NiftiViewer';
 import './PatientDetails.css';
@@ -133,10 +135,21 @@ function PatientDetails({ directoryPath, leadDBS }) {
     addChildToTimeline(timelineLabel, newChild); // Add the Clinical Scores child to the specified timeline
   };
 
+  // const handleGroupStats = () => {
+  //   navigate('/group', {
+  //     state: { patient, timeline: timelines, directoryPath, leadDBS },
+  //   });
+  // };
+
   const handleGroupStats = () => {
-    navigate('/group', {
-      state: { patient, timeline: timelines, directoryPath, leadDBS },
-    });
+    return (
+      <PatientStats
+        patient={patient}
+        timeline={timeline}
+        directoryPath={directoryPath}
+        leadDBS={leadDBS}
+      />
+    );
   };
 
   const handleAddStimulationParameters = (timelineLabel) => {
@@ -253,7 +266,7 @@ function PatientDetails({ directoryPath, leadDBS }) {
           fontSize: '36px', // Customize size
           color: '#1a73e8', // Customize color
           cursor: 'pointer', // Add pointer cursor on hover
-          margin: '0 10px' // Add some margin for spacing
+          margin: '0 10px', // Add some margin for spacing
         }}
       />
       <h1 className="patient-title">Patient Details</h1>
@@ -281,9 +294,28 @@ function PatientDetails({ directoryPath, leadDBS }) {
         </p> */}
         {Object.entries(patient).map(([key, value]) => (
           <p className="patient-info" key={key}>
-            <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong> {value}
+            <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong>{' '}
+            {value}
           </p>
         ))}
+      </div>
+      <div>
+        <Dropdown>
+          <Dropdown.Toggle
+            variant="success"
+            id="dropdown-basic"
+          >
+            Stats
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            <PatientStats
+              patient={patient}
+              timeline={timelines}
+              directoryPath={directoryPath}
+              leadDBS={leadDBS}
+            />
+          </Dropdown.Menu>
+        </Dropdown>
       </div>
 
       {/* Another Divider */}

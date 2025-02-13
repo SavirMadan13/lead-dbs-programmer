@@ -381,7 +381,7 @@ export default function registerFileHandlers() {
   ipcMain.handle('load-ply-file-2', async (event, filePath) => {
 
     const niiFiles = [];
-    const atlasesPath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI_ICBM_2009b_NLIN_ASYM/atlases';
+    const atlasesPath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI152NLin2009bAsym/atlases';
     try {
       const findNiiFiles = (dirPath) => {
         const entries = fs.readdirSync(dirPath, { withFileTypes: true });
@@ -404,18 +404,29 @@ export default function registerFileHandlers() {
       console.error('Error reading atlas folders:', error);
     }
     console.log(niiFiles);
-    try {
-      // const stnFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI_ICBM_2009b_NLIN_ASYM/atlases/DISTAL Nano (Ewert 2017)/lh/STN.nii';
-      // const fileData = fs.readFileSync(stnFilePath);
-      const stnFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI_ICBM_2009b_NLIN_ASYM/atlases/DISTAL Nano (Ewert 2017)/lh/STN.nii.gz';
-      const compressedData = fs.readFileSync(stnFilePath);
-      const fileData = zlib.gunzipSync(compressedData); // Decompress the .nii.gz file
+    return niiFiles;
+    // try {
+    //   // const stnFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI_ICBM_2009b_NLIN_ASYM/atlases/DISTAL Nano (Ewert 2017)/lh/STN.nii';
+    //   // const fileData = fs.readFileSync(stnFilePath);
+    //   const stnFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI_ICBM_2009b_NLIN_ASYM/atlases/DISTAL Nano (Ewert 2017)/lh/STN.nii.gz';
+    //   const compressedData = fs.readFileSync(stnFilePath);
+    //   const fileData = zlib.gunzipSync(compressedData); // Decompress the .nii.gz file
+    //   return fileData.buffer;
+    //   // const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
+    //   // return fileData.buffer; // Return as ArrayBuffer
+    // } catch (error) {
+    //   return null;
+    // }
+  });
+
+  ipcMain.handle('load-file-buffer', async (event, filePath) => {
+    const fileData = fs.readFileSync(filePath);
+    if (filePath.endsWith('.gz')) {
+      const compressedData = fs.readFileSync(filePath);
+      const fileData = zlib.gunzipSync(compressedData); // Decompress the .gz file
       return fileData.buffer;
-      // const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
-      // return fileData.buffer; // Return as ArrayBuffer
-    } catch (error) {
-      return null;
     }
+    return fileData.buffer;
   });
 
   // Import
