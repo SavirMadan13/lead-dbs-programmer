@@ -1476,7 +1476,8 @@ function PlyViewer({
       // Initialize scene, camera, and renderer only once
       const scene = new THREE.Scene();
       sceneRef.current = scene; // Save scene reference
-      scene.background = new THREE.Color(0xffffff); // White background
+      // scene.background = new THREE.Color(0xffffff); // White background
+      scene.background = new THREE.Color(0x000000); // Black background
 
       // Create an OrthographicCamera
       const aspect = 500 / 500;

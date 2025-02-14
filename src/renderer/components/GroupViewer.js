@@ -80,35 +80,41 @@ function GroupViewer({
   //   loadPlyFile(); // Call the async function
   // }, []);
 
-  // useEffect(() => {
-  //   // This loads the anatomy.ply scene
-  //   const loadPlyFile = async () => {
-  //     try {
-  //       const fileData = await window.electron.ipcRenderer.invoke(
-  //         'load-ply-file-anatomy',
-  //         historical,
-  //       );
-  //       // setPlyFile(fileData);
-  //       const loader = new PLYLoader();
-  //       const geometry = loader.parse(fileData);
+  useEffect(() => {
+    // This loads the anatomy.ply scene
+    const loadPlyFile = async () => {
+      const historical = {
+        patient: filteredPatients[0],
+        timeline: 'none',
+        directoryPath,
+        leadDBS: true,
+      };
+      try {
+        const fileData = await window.electron.ipcRenderer.invoke(
+          'load-ply-file-anatomy',
+          historical,
+        );
+        // setPlyFile(fileData);
+        const loader = new PLYLoader();
+        const geometry = loader.parse(fileData);
 
-  //       const material = new THREE.MeshStandardMaterial({
-  //         vertexColors: geometry.hasAttribute('color'),
-  //         flatShading: true,
-  //         metalness: 0.1, // More reflective
-  //         roughness: 0.5, // Shinier surface
-  //         transparent: true, // Enable transparency
-  //         opacity: 0.8, // Set opacity to 60%
-  //       });
-  //       // eslint-disable-next-line no-use-before-define
-  //       addMeshToScene('Anatomy', geometry, material);
-  //     } catch (error) {
-  //       console.error('Error loading PLY file:', error);
-  //     }
-  //   };
+        const material = new THREE.MeshStandardMaterial({
+          vertexColors: geometry.hasAttribute('color'),
+          flatShading: true,
+          metalness: 0.1, // More reflective
+          roughness: 0.5, // Shinier surface
+          transparent: true, // Enable transparency
+          opacity: 0.8, // Set opacity to 60%
+        });
+        // eslint-disable-next-line no-use-before-define
+        addMeshToScene('Anatomy', geometry, material);
+      } catch (error) {
+        console.error('Error loading PLY file:', error);
+      }
+    };
 
-  //   loadPlyFile(); // Call the async function
-  // }, []);
+    loadPlyFile(); // Call the async function
+  }, []);
 
 
   const [meshVisibility, setMeshVisibility] = useState({});
@@ -417,14 +423,103 @@ function GroupViewer({
   useEffect(() => {
     console.log('Filtered patients: ', filteredPatients);
     if (sceneRef.current && mountRef.current) {
+      // Remove all previously rendered patients
+      sceneRef.current.children = sceneRef.current.children.filter(
+        (child) => !child.name.includes('-electrodes')
+      );
+
+      // Render the filtered patients
       filteredPatients.forEach((patient) => {
         handlePriorStimChange(patient.id);
       });
     }
   }, [filteredPatients]);
 
+  // useEffect(() => {
+  //   if (mountRef.current && secondaryMountRef.current) {
+  //     // Initialize scene, camera, and renderer only once
+  //     const scene = new THREE.Scene();
+  //     sceneRef.current = scene; // Save scene reference
+  //     scene.background = new THREE.Color(0xffffff); // White background
+
+  //     // Create an OrthographicCamera
+  //     const aspect = 500 / 500;
+  //     const frustumSize = 45; // Adjust this value to control zoom
+  //     const camera = new THREE.OrthographicCamera(
+  //       (frustumSize * aspect) / -2, // left
+  //       (frustumSize * aspect) / 2, // right
+  //       frustumSize / 2, // top
+  //       frustumSize / -2, // bottom
+  //       0.1, // near plane
+  //       1000, // far plane
+  //     );
+
+  //     // Secondary Camera Setup
+  //     const secondaryWidth = 500;
+  //     const secondaryHeight = 250; // Adjust height as needed
+  //     const aspectSecondary = secondaryWidth / secondaryHeight;
+  //     const secondaryFrustumHeight = frustumSize; // Set a smaller height for the secondary view
+  //     const secondaryCamera = new THREE.OrthographicCamera(
+  //       (secondaryFrustumHeight * aspectSecondary) / -2,
+  //       (secondaryFrustumHeight * aspectSecondary) / 2,
+  //       secondaryFrustumHeight / 2,
+  //       secondaryFrustumHeight / -2,
+  //       0.1,
+  //       1000,
+  //     );
+  //     secondaryCamera.position.set(50, 50, 100);
+  //     secondaryCamera.lookAt(0, 0, 0);
+
+  //     // const camera = new THREE.PerspectiveCamera(75, 0.5, 0.1, 1000); // 1 is the aspect ratio (square)
+  //     const renderer = new THREE.WebGLRenderer({ antialias: true });
+  //     // renderer.setSize(300, 600); // Set smaller size
+  //     renderer.setSize(500, 500);
+  //     mountRef.current.appendChild(renderer.domElement);
+
+  //     const secondaryRenderer = new THREE.WebGLRenderer({ antialias: true });
+  //     secondaryRenderer.setSize(500, 250);
+  //     secondaryMountRef.current.appendChild(secondaryRenderer.domElement);
+
+  //     const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+  //     scene.add(ambientLight);
+
+  //     const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  //     directionalLight.position.set(5, 5, 5).normalize();
+  //     scene.add(directionalLight);
+
+  //     // OrbitControls setup (only initialize once)
+  //     const controls = new OrbitControls(camera, renderer.domElement);
+  //     controls.enableDamping = true;
+  //     controls.dampingFactor = 0.1;
+  //     controls.rotateSpeed = 0.8;
+  //     controls.zoomSpeed = 0.5;
+  //     controlsRef.current = controls;
+
+  //     camera.position.set(0, -50, 50); // Zoomed out to start
+
+  //     rendererRef.current = renderer;
+  //     secondaryCameraRef.current = secondaryCamera;
+  //     secondaryRendererRef.current = secondaryRenderer;
+  //     cameraRef.current = camera;
+
+  //     const animate = () => {
+  //       requestAnimationFrame(animate);
+  //       controls.update(); // Update OrbitControls
+  //       renderer.render(sceneRef.current, camera);
+  //       secondaryRenderer.render(scene, secondaryCamera);
+  //     };
+  //     animate();
+
+  //     return () => {
+  //       // window.removeEventListener('resize', onWindowResize);
+  //       renderer.dispose();
+  //     };
+  //   }
+  // }, []);
+
+
   useEffect(() => {
-    if (mountRef.current && secondaryMountRef.current) {
+    if (mountRef.current) {
       // Initialize scene, camera, and renderer only once
       const scene = new THREE.Scene();
       sceneRef.current = scene; // Save scene reference
@@ -442,31 +537,9 @@ function GroupViewer({
         1000, // far plane
       );
 
-      // Secondary Camera Setup
-      const secondaryWidth = 500;
-      const secondaryHeight = 250; // Adjust height as needed
-      const aspectSecondary = secondaryWidth / secondaryHeight;
-      const secondaryFrustumHeight = frustumSize; // Set a smaller height for the secondary view
-      const secondaryCamera = new THREE.OrthographicCamera(
-        (secondaryFrustumHeight * aspectSecondary) / -2,
-        (secondaryFrustumHeight * aspectSecondary) / 2,
-        secondaryFrustumHeight / 2,
-        secondaryFrustumHeight / -2,
-        0.1,
-        1000,
-      );
-      secondaryCamera.position.set(50, 50, 100);
-      secondaryCamera.lookAt(0, 0, 0);
-
-      // const camera = new THREE.PerspectiveCamera(75, 0.5, 0.1, 1000); // 1 is the aspect ratio (square)
       const renderer = new THREE.WebGLRenderer({ antialias: true });
-      // renderer.setSize(300, 600); // Set smaller size
       renderer.setSize(500, 500);
       mountRef.current.appendChild(renderer.domElement);
-
-      const secondaryRenderer = new THREE.WebGLRenderer({ antialias: true });
-      secondaryRenderer.setSize(500, 250);
-      secondaryMountRef.current.appendChild(secondaryRenderer.domElement);
 
       const ambientLight = new THREE.AmbientLight(0xffffff, 1);
       scene.add(ambientLight);
@@ -486,20 +559,16 @@ function GroupViewer({
       camera.position.set(0, -50, 50); // Zoomed out to start
 
       rendererRef.current = renderer;
-      secondaryCameraRef.current = secondaryCamera;
-      secondaryRendererRef.current = secondaryRenderer;
       cameraRef.current = camera;
 
       const animate = () => {
         requestAnimationFrame(animate);
         controls.update(); // Update OrbitControls
         renderer.render(sceneRef.current, camera);
-        secondaryRenderer.render(scene, secondaryCamera);
       };
       animate();
 
       return () => {
-        // window.removeEventListener('resize', onWindowResize);
         renderer.dispose();
       };
     }
@@ -915,7 +984,7 @@ function GroupViewer({
         {/* <Button onClick={changeCameraAngle}>View from top</Button> */}
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <div ref={mountRef} />
-          <div ref={secondaryMountRef} />
+          {/* <div ref={secondaryMountRef} /> */}
         </div>
         <Dropdown drop="start">
           <Dropdown.Toggle variant="secondary" style={{ marginLeft: '-100px' }}>

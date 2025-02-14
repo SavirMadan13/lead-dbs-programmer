@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
+import Dropdown from 'react-bootstrap/Dropdown';
 import {
   Slider,
   TextField,
@@ -570,13 +571,13 @@ function DatabaseStats({ directoryPath }) {
       {/* <button onClick={handleNiiUpload} className="export-button">
         Calculate stimulation parameters
       </button> */}
-      <Button
+      {/* <Button
         variant="primary"
         onClick={() => document.getElementById('nifti-upload').click()}
         className="mb-4 mx-2"
       >
         Import NIfTI File and Provide Solution
-      </Button>
+      </Button> */}
       <input
         id="nifti-upload"
         type="file"
@@ -584,12 +585,24 @@ function DatabaseStats({ directoryPath }) {
         accept=".nii"
         onChange={(e) => handleNiiUpload(e)}
       />
-      {filteredPatients && (
+      <Dropdown>
+        <Dropdown.Toggle variant="success" id="dropdown-basic">
+          <Dropdown.Menu>
+            {filteredPatients && (
+              <GroupViewer
+                filteredPatients={filteredPatients}
+                directoryPath={directoryPath}
+              />
+            )}
+          </Dropdown.Menu>
+        </Dropdown.Toggle>
+      </Dropdown>
+      {/* {filteredPatients && (
         <GroupViewer
           filteredPatients={filteredPatients}
           directoryPath={directoryPath}
         />
-      )}
+      )} */}
     </div>
   );
 }
