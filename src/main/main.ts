@@ -107,9 +107,10 @@ app.on('ready', () => {
 // const inputPath = '/Users/savirmadan/Downloads/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0374Output/derivatives/leaddbs/sub-CbctDbs0374/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
-const inputPath = process.argv[1];
+// const inputPath = process.argv[1];
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
-// const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
+const inputPath =
+  '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons/derivatives/leadgroup/BwhParkinsons/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataBwh.json';
@@ -968,7 +969,7 @@ const createWindow = async () => {
               event.sender.send('folder-selected', directoryPath, patients);
               handleMasterDataFill(directoryPath, patients);
               event.sender.send('file-read-success', patients, directoryPath);
-              return; // Exit the ipcMain process after sending the event
+              // Exit the ipcMain process after sending the event
             } catch (error) {
               console.error('Error parsing JSON file:', error);
               event.sender.send('file-read-error', 'Error parsing JSON file');
@@ -1516,6 +1517,70 @@ const createWindow = async () => {
           combinedElectrodesPly: combinedElectrodesPlyData.buffer,
           reconstructionData: clinicalReconstructionData,
           stimulationParameters: stimulationParametersData,
+        };
+      } catch (error) {
+        console.error('Error loading PLY file:', error);
+        return null; // Return null if an error occurs
+      }
+    },
+  );
+
+  ipcMain.handle(
+    'load-reconstruction',
+    async (event, patientID, directoryPath) => {
+      try {
+        // Validate input directory
+        const patientDir = path.join(
+          directoryPath,
+          'derivatives',
+          'leaddbs',
+          patientID,
+        );
+        if (!fs.existsSync(patientDir)) {
+          throw new Error(`Patient ID ${patientID} not found in directory.`);
+        }
+
+        // Get paths to clinical and export folders
+        const clinicalDir = path.join(patientDir, 'clinical');
+        const exportDir = path.join(patientDir, 'export', 'ply');
+
+        // Validate clinical and export directories
+        if (!fs.existsSync(clinicalDir)) {
+          throw new Error(
+            `Clinical directory not found for Patient ID ${patientID}.`,
+          );
+        }
+        if (!fs.existsSync(exportDir)) {
+          throw new Error(
+            `Export directory not found for Patient ID ${patientID}.`,
+          );
+        }
+
+        // Find anatomyPly and combinedElectrodesPly files
+        const anatomyPlyPath = path.join(exportDir, 'anatomy.ply');
+        const combinedElectrodesPlyPath = path.join(
+          exportDir,
+          'combined_electrodes.ply',
+        );
+
+        if (
+          !fs.existsSync(anatomyPlyPath) ||
+          !fs.existsSync(combinedElectrodesPlyPath)
+        ) {
+          throw new Error(
+            `One or more PLY files not found for Patient ID ${patientID}.`,
+          );
+        }
+
+        // Read all required files
+        const anatomyPlyData = fs.readFileSync(anatomyPlyPath);
+        const combinedElectrodesPlyData = fs.readFileSync(
+          combinedElectrodesPlyPath,
+        );
+
+        // Return all required data
+        return {
+          combinedElectrodesPly: combinedElectrodesPlyData.buffer,
         };
       } catch (error) {
         console.error('Error loading PLY file:', error);

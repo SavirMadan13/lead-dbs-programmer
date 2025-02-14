@@ -26,6 +26,7 @@ import './DatabaseStats.css'; // Ensure this CSS file is correctly linked
 import { optimizeDatabase } from './OptimizeDatabase';
 import electrodeModels from './electrodeModels.json';
 import * as math from 'mathjs';
+import GroupViewer from './GroupViewer';
 
 function DatabaseStats({ directoryPath }) {
   const { patients } = useContext(PatientContext);
@@ -583,6 +584,12 @@ function DatabaseStats({ directoryPath }) {
         accept=".nii"
         onChange={(e) => handleNiiUpload(e)}
       />
+      {filteredPatients && (
+        <GroupViewer
+          filteredPatients={filteredPatients}
+          directoryPath={directoryPath}
+        />
+      )}
     </div>
   );
 }
