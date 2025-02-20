@@ -132,8 +132,8 @@ export default function App() {
   return (
     <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
       <div className="Navbar">
-        {/* <Navbar />
-        <SettingsIcon
+        <Navbar text="Lead-DBS Programmer" />
+        {/* <SettingsIcon
           className="settings-icon"
           onClick={() => setShowSettings(!showSettings)}
           style={{

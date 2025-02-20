@@ -608,91 +608,100 @@ function StimulationSettings({
   return (
     <div>
       <div className="stimulationSettingsContainer">
-        <div />
-        {/* <div className="stim-id-group"></div> */}
-        <div />
-        <Dropdown>
-          <Dropdown.Toggle variant="secondary">
-            Implanted Hardware
-          </Dropdown.Toggle>
-          <Dropdown.Menu style={{ width: '350px', paddingLeft: '10px' }}>
-            <h2 style={{ fontSize: 16 }}>Left Electrode</h2>
-            <select
-              value={leftElectrode}
-              onChange={(e) => handleLeftElectrodeChange(e)}
-              className="form-select"
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                fontSize: '14px',
-                border: '1px solid #ddd',
-                borderRadius: '6px',
-                backgroundColor: '#fff',
-                cursor: 'pointer',
-              }}
-            >
-              {varargout.map((electrode) => (
-                <option key={electrode.value} value={electrode.value}>
-                  {electrode.displayName}
-                </option>
-              ))}
-            </select>
-            <div />
-            <h2 style={{ fontSize: 16 }}>Right Electrode</h2>
-            <select
-              value={rightElectrode}
-              onChange={(e) => handleRightElectrodeChange(e)}
-              className="form-select"
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                fontSize: '14px',
-                border: '1px solid #ddd',
-                borderRadius: '6px',
-                backgroundColor: '#fff',
-                cursor: 'pointer',
-              }}
-            >
-              {varargout.map((electrode, index) => (
-                <option key={index} value={electrode.value}>
-                  {electrode.displayName}
-                </option>
-              ))}
-            </select>
-            <div />
-            <h2 style={{ fontSize: 16 }}>IPG</h2>
-            <select
-              value={IPG}
-              onChange={(e) => handleIPGChange(e)}
-              className="form-select"
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                fontSize: '14px',
-                border: '1px solid #ddd',
-                borderRadius: '6px',
-                backgroundColor: '#fff',
-                cursor: 'pointer',
-              }}
-            >
-              <option value="">None</option>
-              <option value="Abbott">Abbott (Infinity, Brio, Libra)</option>
-              <option value="Boston">
-                Boston Scientific (Vercise, Genus, Gevia)
-              </option>
-              <option value="Medtronic_Activa">Medtronic Activa</option>
-              <option value="Medtronic_Percept">Medtronic Percept</option>
-              <option value="Research">Master</option>
-            </select>
-          </Dropdown.Menu>
-        </Dropdown>
         <div
-          style={{ paddingBottom: '20px', float: 'right', marginRight: '20px' }}
+          style={{ zIndex: 2, paddingLeft: '100px', paddingTop: '10px' }}
         >
-          <h4 style={{ fontSize: '16px', marginBottom: '2px' }}>
+          <Dropdown>
+            <Dropdown.Toggle
+              variant="secondary"
+              style={{
+                borderRadius: '20px',
+                boxShadow: 'inset 0 4px 8px rgba(0, 0, 0, 0.2)',
+                backgroundColor: 'white',
+                color: 'black',
+                fontWeight: 'bold',
+                border: 'none',
+                width: '250px',
+                marginLeft: '-30px',
+              }}
+            >
+              Implanted Hardware
+            </Dropdown.Toggle>
+            <Dropdown.Menu style={{ width: '350px', paddingLeft: '10px' }}>
+              <h2 style={{ fontSize: 16 }}>Left Electrode</h2>
+              <select
+                value={leftElectrode}
+                onChange={(e) => handleLeftElectrodeChange(e)}
+                className="form-select"
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  fontSize: '14px',
+                  border: '1px solid #ddd',
+                  borderRadius: '6px',
+                  backgroundColor: '#fff',
+                  cursor: 'pointer',
+                }}
+              >
+                {varargout.map((electrode) => (
+                  <option key={electrode.value} value={electrode.value}>
+                    {electrode.displayName}
+                  </option>
+                ))}
+              </select>
+              <div />
+              <h2 style={{ fontSize: 16 }}>Right Electrode</h2>
+              <select
+                value={rightElectrode}
+                onChange={(e) => handleRightElectrodeChange(e)}
+                className="form-select"
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  fontSize: '14px',
+                  border: '1px solid #ddd',
+                  borderRadius: '6px',
+                  backgroundColor: '#fff',
+                  cursor: 'pointer',
+                }}
+              >
+                {varargout.map((electrode, index) => (
+                  <option key={index} value={electrode.value}>
+                    {electrode.displayName}
+                  </option>
+                ))}
+              </select>
+              <div />
+              <h2 style={{ fontSize: 16 }}>IPG</h2>
+              <select
+                value={IPG}
+                onChange={(e) => handleIPGChange(e)}
+                className="form-select"
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  fontSize: '14px',
+                  border: '1px solid #ddd',
+                  borderRadius: '6px',
+                  backgroundColor: '#fff',
+                  cursor: 'pointer',
+                }}
+              >
+                <option value="">None</option>
+                <option value="Abbott">Abbott (Infinity, Brio, Libra)</option>
+                <option value="Boston">
+                  Boston Scientific (Vercise, Genus, Gevia)
+                </option>
+                <option value="Medtronic_Activa">Medtronic Activa</option>
+                <option value="Medtronic_Percept">Medtronic Percept</option>
+                <option value="Research">Master</option>
+              </select>
+            </Dropdown.Menu>
+          </Dropdown>
+          {/* <h4 style={{ fontSize: '16px', marginBottom: '2px' }}>
             Contact Naming
-          </h4>
-          <ButtonGroup>
+          </h4> */}
+          <ButtonGroup style={{gap: '10px', marginLeft: '-20px'}}>
             {namingConventionDef.map((name, idx) => (
               <ToggleButton
                 key={idx}
@@ -705,6 +714,22 @@ function StimulationSettings({
                 onChange={(e) =>
                   handleNamingConventionChange(e.currentTarget.value)
                 }
+                style={{
+                  borderRadius: '20px',
+                  width: '120px',
+                  backgroundColor: 'white',
+                  color: 'navy',
+                  fontWeight: 'bold',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+                  border: 'none',
+                  ...(namingConvention === name.value && {
+                    // backgroundColor: 'grey',
+                    color: 'black',
+                    fontWeight: 'bold',
+                    border: 'none',
+                    boxShadow: 'inset 0 4px 8px rgba(0, 0, 0, 0.4)', // Inward shadow for selected
+                  }),
+                }}
               >
                 {name.name}
               </ToggleButton>

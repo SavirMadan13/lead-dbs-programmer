@@ -9,6 +9,7 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
 import { render } from '@testing-library/react';
 import StimulationSettings from './StimulationSettings';
+import Navbar from './Navbar';
 // import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 
 function GroupArchitecture({
@@ -27,7 +28,7 @@ function GroupArchitecture({
   type,
 }) {
   const [selectedPatient, setSelectedPatient] = useState(null);
-  const [showViewer, setShowViewer] = useState(false);
+  const [showViewer, setShowViewer] = useState(true);
   console.log(patients);
   // State for each patient
   const initialState = {
@@ -155,8 +156,20 @@ function GroupArchitecture({
         {/* <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px', marginLeft: '-10px' }}>
           Stimulation Label
         </div> */}
-        <Dropdown onSelect={handleSelect}>
-          <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+        <Dropdown onSelect={handleSelect} style={{borderRadius: '20px'}}>
+          <Dropdown.Toggle
+            variant="secondary"
+            id="dropdown-basic"
+            style={{
+              borderRadius: '20px',
+              width: '250px',
+              boxShadow: 'inset 0 4px 8px rgba(0, 0, 0, 0.2)',
+              backgroundColor: 'white',
+              color: 'black',
+              fontWeight: 'bold',
+              border: 'none',
+            }}
+          >
             {selectedPatient || 'Select Patient'}
           </Dropdown.Toggle>
 
@@ -214,7 +227,7 @@ function GroupArchitecture({
   };
 
   return (
-    <div style={{ marginLeft: '-200px' }}>
+    <div style={{ marginLeft: '-300px', marginTop: '200px' }}>
       {/* <div style={{ paddingLeft: '45px', marginBottom: '-100px' }}>
         <PatientSelector
           selectedPatient={selectedPatient}
@@ -224,15 +237,13 @@ function GroupArchitecture({
       </div> */}
       <div
         style={{
-          display: 'flex',
-          // alignItems: 'center',
-          justifyContent: 'center',
-          marginLeft: '200px',
+          position: 'absolute',
           ...(showViewer && {
             marginBottom: '-110px',
           }),
-          // marginBottom: '-110px',
-          // marginTop: '100px',
+          marginTop: '-30px',
+          marginLeft: '100px',
+          zIndex: 5,
         }}
       >
         {/* Left Arrow Button - Conditionally Rendered */}
@@ -266,118 +277,105 @@ function GroupArchitecture({
           </Button>
         )}
       </div>
-
-      {selectedPatient && (
-        <StimulationSettings
-          key={renderKey}
-          IPG={currentPatientState.IPG}
-          setIPG={(value) => handleStateChange(selectedPatient, { IPG: value })}
-          leftElectrode={currentPatientState.leftElectrode}
-          setLeftElectrode={(value) =>
-            handleStateChange(selectedPatient, { leftElectrode: value })
-          }
-          rightElectrode={currentPatientState.rightElectrode}
-          setRightElectrode={(value) =>
-            handleStateChange(selectedPatient, { rightElectrode: value })
-          }
-          allQuantities={currentPatientState.allQuantities}
-          setAllQuantities={(value) =>
-            handleStateChange(selectedPatient, { allQuantities: value })
-          }
-          allSelectedValues={currentPatientState.allSelectedValues}
-          setAllSelectedValues={(value) =>
-            handleStateChange(selectedPatient, { allSelectedValues: value })
-          }
-          allTotalAmplitudes={currentPatientState.allTotalAmplitudes}
-          setAllTotalAmplitudes={(value) =>
-            handleStateChange(selectedPatient, { allTotalAmplitudes: value })
-          }
-          allTogglePositions={currentPatientState.allTogglePositions}
-          setAllTogglePositions={(value) =>
-            handleStateChange(selectedPatient, { allTogglePositions: value })
-          }
-          allPercAmpToggles={currentPatientState.allPercAmpToggles}
-          setAllPercAmpToggles={(value) =>
-            handleStateChange(selectedPatient, { allPercAmpToggles: value })
-          }
-          allVolAmpToggles={currentPatientState.allVolAmpToggles}
-          setAllVolAmpToggles={(value) =>
-            handleStateChange(selectedPatient, { allVolAmpToggles: value })
-          }
-          importCount={currentPatientState.importCount}
-          setImportCount={(value) =>
-            handleStateChange(selectedPatient, { importCount: value })
-          }
-          importDataTest={currentPatientState.importData}
-          setImportDataTest={(value) =>
-            handleStateChange(selectedPatient, { importData: value })
-          }
-          masterImportData={currentPatientState.masterImportData}
-          setMasterImportData={(value) =>
-            handleStateChange(selectedPatient, { masterImportData: value })
-          }
-          matImportFile={currentPatientState.matImportFile}
-          setMatImportFile={(value) =>
-            handleStateChange(selectedPatient, { matImportFile: value })
-          }
-          newImportFiles={currentPatientState.newImportFiles}
-          setNewImportFiles={(value) =>
-            handleStateChange(selectedPatient, { newImportFiles: value })
-          }
-          filePath={currentPatientState.filePath}
-          setFilePath={(value) =>
-            handleStateChange(selectedPatient, { filePath: value })
-          }
-          stimChanged={currentPatientState.stimChanged}
-          setStimChanged={(value) =>
-            handleStateChange(selectedPatient, { stimChanged: value })
-          }
-          allStimulationParameters={
-            currentPatientState.allStimulationParameters
-          }
-          setAllStimulationParameters={(value) =>
-            handleStateChange(selectedPatient, {
-              allStimulationParameters: value,
-            })
-          }
-          visModel={currentPatientState.visModel}
-          setVisModel={(value) =>
-            handleStateChange(selectedPatient, { visModel: value })
-          }
-          sessionTitle={currentPatientState.sessionTitle}
-          setSessionTitle={(value) =>
-            handleStateChange(selectedPatient, { sessionTitle: value })
-          }
-          patientStates={patientStates}
-          importNewS={importNewS}
-          selectedPatient={selectedPatient}
-          historical={historical}
-          mode={mode}
-          type={type}
-          allTemplateSpaces={currentPatientState.allTemplateSpaces}
-          setAllTemplateSpaces={(value) =>
-            handleStateChange(selectedPatient, { allTemplateSpaces: value })
-          }
-          showViewer={showViewer}
-          setShowViewer={setShowViewer}
-        />
-      )}
-      {/* {type === 'leadgroup' && (
-        <div className="sticky-buttons-container">
-          <button
-            className="export-button sticky-button left-button"
-            onClick={handlePreviousPatient}
-          >
-            ←
-          </button>
-          <button
-            className="export-button sticky-button right-button"
-            onClick={handleNextPatient}
-          >
-            →
-          </button>
-        </div>
-      )} */}
+      <div>
+        {selectedPatient && (
+          <StimulationSettings
+            key={renderKey}
+            IPG={currentPatientState.IPG}
+            setIPG={(value) =>
+              handleStateChange(selectedPatient, { IPG: value })
+            }
+            leftElectrode={currentPatientState.leftElectrode}
+            setLeftElectrode={(value) =>
+              handleStateChange(selectedPatient, { leftElectrode: value })
+            }
+            rightElectrode={currentPatientState.rightElectrode}
+            setRightElectrode={(value) =>
+              handleStateChange(selectedPatient, { rightElectrode: value })
+            }
+            allQuantities={currentPatientState.allQuantities}
+            setAllQuantities={(value) =>
+              handleStateChange(selectedPatient, { allQuantities: value })
+            }
+            allSelectedValues={currentPatientState.allSelectedValues}
+            setAllSelectedValues={(value) =>
+              handleStateChange(selectedPatient, { allSelectedValues: value })
+            }
+            allTotalAmplitudes={currentPatientState.allTotalAmplitudes}
+            setAllTotalAmplitudes={(value) =>
+              handleStateChange(selectedPatient, { allTotalAmplitudes: value })
+            }
+            allTogglePositions={currentPatientState.allTogglePositions}
+            setAllTogglePositions={(value) =>
+              handleStateChange(selectedPatient, { allTogglePositions: value })
+            }
+            allPercAmpToggles={currentPatientState.allPercAmpToggles}
+            setAllPercAmpToggles={(value) =>
+              handleStateChange(selectedPatient, { allPercAmpToggles: value })
+            }
+            allVolAmpToggles={currentPatientState.allVolAmpToggles}
+            setAllVolAmpToggles={(value) =>
+              handleStateChange(selectedPatient, { allVolAmpToggles: value })
+            }
+            importCount={currentPatientState.importCount}
+            setImportCount={(value) =>
+              handleStateChange(selectedPatient, { importCount: value })
+            }
+            importDataTest={currentPatientState.importData}
+            setImportDataTest={(value) =>
+              handleStateChange(selectedPatient, { importData: value })
+            }
+            masterImportData={currentPatientState.masterImportData}
+            setMasterImportData={(value) =>
+              handleStateChange(selectedPatient, { masterImportData: value })
+            }
+            matImportFile={currentPatientState.matImportFile}
+            setMatImportFile={(value) =>
+              handleStateChange(selectedPatient, { matImportFile: value })
+            }
+            newImportFiles={currentPatientState.newImportFiles}
+            setNewImportFiles={(value) =>
+              handleStateChange(selectedPatient, { newImportFiles: value })
+            }
+            filePath={currentPatientState.filePath}
+            setFilePath={(value) =>
+              handleStateChange(selectedPatient, { filePath: value })
+            }
+            stimChanged={currentPatientState.stimChanged}
+            setStimChanged={(value) =>
+              handleStateChange(selectedPatient, { stimChanged: value })
+            }
+            allStimulationParameters={
+              currentPatientState.allStimulationParameters
+            }
+            setAllStimulationParameters={(value) =>
+              handleStateChange(selectedPatient, {
+                allStimulationParameters: value,
+              })
+            }
+            visModel={currentPatientState.visModel}
+            setVisModel={(value) =>
+              handleStateChange(selectedPatient, { visModel: value })
+            }
+            sessionTitle={currentPatientState.sessionTitle}
+            setSessionTitle={(value) =>
+              handleStateChange(selectedPatient, { sessionTitle: value })
+            }
+            patientStates={patientStates}
+            importNewS={importNewS}
+            selectedPatient={selectedPatient}
+            historical={historical}
+            mode={mode}
+            type={type}
+            allTemplateSpaces={currentPatientState.allTemplateSpaces}
+            setAllTemplateSpaces={(value) =>
+              handleStateChange(selectedPatient, { allTemplateSpaces: value })
+            }
+            showViewer={showViewer}
+            setShowViewer={setShowViewer}
+          />
+        )}
+      </div>
     </div>
   );
 }

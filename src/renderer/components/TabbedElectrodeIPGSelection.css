@@ -1,5 +1,5 @@
 .TabbedIPGContainer {
-  /* margin-top: -50px; */
+  /* margin-top: 50px; */
 }
 
 .form-container {
@@ -51,6 +51,11 @@ div > div {
   /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); */
   /* text-align: left; */
   /* margin-top: 0 20px; */
+}
+
+.form-container {
+  margin-top: -200px;
+  z-index: -1;
 }
 
 .compact-form-container h2 {

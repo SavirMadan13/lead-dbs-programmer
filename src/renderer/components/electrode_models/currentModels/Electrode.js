@@ -3638,14 +3638,18 @@ function Electrode({
               : 'control-panel-inactive'
           }
         >
-          <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+          {/* <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
             {electrodeLabel}
-          </div>
+          </div> */}
           <div className="model-selector">
             <Form.Select
               aria-label="Select Visualization Model"
               value={visModel}
               onChange={handleVisModelChange}
+              style={{
+                borderRadius: '20px',
+                boxShadow: 'inset 0 4px 8px rgba(0, 0, 0, 0.2)',
+              }}
             >
               <option>Choose a model</option>
               {elspec.isdirected === 0 && (
@@ -3662,7 +3666,7 @@ function Electrode({
               <option value="6">OSS-DBS (Butenko 2020)</option>
             </Form.Select>
           </div>
-          <div>
+          <div style={{ marginTop: '-20px' }}>
             {(visModel === '3' || visModel === '6') && (
               <Form.Check
                 label={
@@ -3676,83 +3680,6 @@ function Electrode({
             )}
           </div>
           <div className="toggle-controls">
-            {IPG === 'Boston' && (
-              <ButtonGroup className="toggle-group">
-                {percAmpDef.map((percAmp, idx) => (
-                  <ToggleButton
-                    key={idx}
-                    id={`percAmp-${idx}`}
-                    type="radio"
-                    variant={getVariant(percAmp.value)}
-                    name="percAmp"
-                    value={percAmp.value}
-                    checked={percAmpToggle === percAmp.value}
-                    onChange={(e) =>
-                      handlePercAmpToggleChange(e.currentTarget.value)
-                    }
-                  >
-                    {percAmp.name}
-                  </ToggleButton>
-                ))}
-              </ButtonGroup>
-            )}
-            {IPG === 'Medtronic_Activa' && (
-              <ButtonGroup className="toggle-group">
-                {volAmpDef.map((volAmp, idx) => (
-                  <ToggleButton
-                    key={idx}
-                    id={`volAmp-${idx}`}
-                    type="radio"
-                    variant={getVariant(volAmp.value)}
-                    name="volAmp"
-                    value={volAmp.value}
-                    checked={volAmpToggle === volAmp.value}
-                    onChange={(e) =>
-                      handleVolAmpToggleChange(e.currentTarget.value)
-                    }
-                  >
-                    {volAmp.name}
-                  </ToggleButton>
-                ))}
-              </ButtonGroup>
-            )}
-            {/* {(IPG === 'Medtronic_Percept' || IPG === 'Abbott') && (
-            <ButtonGroup className="toggle-group">
-              {ampDef.map((amp, idx) => (
-                <ToggleButton
-                  key={idx}
-                  id={`amp-${idx}`}
-                  type="radio"
-                  variant={getVariant(amp.value)}
-                  name="amp"
-                  value={amp.value}
-                  checked={ampToggle === amp.value}
-                >
-                  {amp.name}
-                </ToggleButton>
-              ))}
-            </ButtonGroup>
-          )} */}
-            {IPG === 'Research' && (
-              <ButtonGroup className="toggle-group">
-                {researchDef.map((res, idx) => (
-                  <ToggleButton
-                    key={idx}
-                    id={`res-${idx}`}
-                    type="radio"
-                    variant={getVariant(res.value)}
-                    name="res"
-                    value={res.value}
-                    checked={researchToggle === res.value}
-                    onChange={(e) =>
-                      handleResearchToggleChange(e.currentTarget.value)
-                    }
-                  >
-                    {res.name}
-                  </ToggleButton>
-                ))}
-              </ButtonGroup>
-            )}
             <div className="input-field">
               <input
                 className="amplitude-input"
@@ -3766,21 +3693,84 @@ function Electrode({
               />
               <span className="input-label">{currentLabel}</span>
             </div>
+            <div style={{ marginTop: '-15px' }}>
+              {IPG === 'Boston' && (
+                <ButtonGroup className="toggle-group">
+                  {percAmpDef.map((percAmp, idx) => (
+                    <ToggleButton
+                      key={idx}
+                      id={`percAmp-${idx}`}
+                      type="radio"
+                      variant={getVariant(percAmp.value)}
+                      name="percAmp"
+                      value={percAmp.value}
+                      checked={percAmpToggle === percAmp.value}
+                      onChange={(e) =>
+                        handlePercAmpToggleChange(e.currentTarget.value)
+                      }
+                      style={{
+                        borderRadius: '10px',
+                        backgroundColor: 'white',
+                        color: 'navy',
+                        fontWeight: 'bold',
+                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+                        border: 'none',
+                        ...(percAmpToggle === percAmp.value && {
+                          color: 'black',
+                          fontWeight: 'bold',
+                          border: 'none',
+                          boxShadow: 'inset 0 4px 8px rgba(0, 0, 0, 0.4)', // Inward shadow for selected
+                        }),
+                      }}
+                    >
+                      {percAmp.name}
+                    </ToggleButton>
+                  ))}
+                </ButtonGroup>
+              )}
+              {IPG === 'Medtronic_Activa' && (
+                <ButtonGroup className="toggle-group">
+                  {volAmpDef.map((volAmp, idx) => (
+                    <ToggleButton
+                      key={idx}
+                      id={`volAmp-${idx}`}
+                      type="radio"
+                      variant={getVariant(volAmp.value)}
+                      name="volAmp"
+                      value={volAmp.value}
+                      checked={volAmpToggle === volAmp.value}
+                      onChange={(e) =>
+                        handleVolAmpToggleChange(e.currentTarget.value)
+                      }
+                    >
+                      {volAmp.name}
+                    </ToggleButton>
+                  ))}
+                </ButtonGroup>
+              )}
+              {IPG === 'Research' && (
+                <ButtonGroup className="toggle-group">
+                  {researchDef.map((res, idx) => (
+                    <ToggleButton
+                      key={idx}
+                      id={`res-${idx}`}
+                      type="radio"
+                      variant={getVariant(res.value)}
+                      name="res"
+                      value={res.value}
+                      checked={researchToggle === res.value}
+                      onChange={(e) =>
+                        handleResearchToggleChange(e.currentTarget.value)
+                      }
+                    >
+                      {res.name}
+                    </ToggleButton>
+                  ))}
+                </ButtonGroup>
+              )}
+            </div>
           </div>
           <div className="input-controls">
-            {/* <div className="input-field">
-            <input
-              className="amplitude-input"
-              type="number"
-              name="quantity"
-              pattern="[0-9]+"
-              step="0.1"
-              min="0"
-              value={totalAmplitude}
-              onChange={handleTotalAmplitudeChange}
-            />
-            <span className="input-label">{currentLabel}</span>
-          </div> */}
             <div className="input-field">
               <input
                 className="duration-input"
@@ -3808,7 +3798,12 @@ function Electrode({
           </div>
           <div
             className="parameter-controls"
-            style={{ textAlign: 'left', zIndex: 100 }}
+            style={{
+              textAlign: 'left',
+              zIndex: 100,
+              marginTop: '-10px',
+              marginBottom: '-50px',
+            }}
           >
             <ButtonGroup horizontal>
               <Button
@@ -3816,6 +3811,15 @@ function Electrode({
                 onClick={calculateQuantitiesWithDistribution}
                 disabled={currentLabel === 'V'}
                 title="Split evenly among active contacts"
+                style={{
+                  borderRadius: '10px',
+                  backgroundColor: 'white',
+                  color: 'black',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+                  border: 'none',
+                  marginRight: '10px',
+                  marginLeft: '-10px',
+                }}
               >
                 Split Even
               </Button>
@@ -3824,10 +3828,28 @@ function Electrode({
                 onClick={roundToHundred}
                 disabled={currentLabel === 'V'}
                 title="Adjust contact values to fill total amplitude"
+                style={{
+                  borderRadius: '10px',
+                  backgroundColor: 'white',
+                  color: 'black',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+                  border: 'none',
+                  marginRight: '10px',
+                }}
               >
                 Refactor
               </Button>
-              <Button variant="secondary" onClick={handleClearButton}>
+              <Button
+                variant="secondary"
+                onClick={handleClearButton}
+                style={{
+                  borderRadius: '10px',
+                  backgroundColor: 'white',
+                  color: 'black',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+                  border: 'none',
+                }}
+              >
                 Clear
               </Button>
             </ButtonGroup>
@@ -3845,13 +3867,45 @@ function Electrode({
                 />
                 <span className="steering-label">Steering</span>
                 <ButtonGroup className="steering-buttons" horizontal>
-                  <Button variant="secondary" onClick={handlePercAmpChangeUp}>
+                  <Button
+                    variant="secondary"
+                    onClick={handlePercAmpChangeUp}
+                    style={{
+                      borderRadius: '10px',
+                      backgroundColor: 'white',
+                      color: 'black',
+                      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+                      border: 'none',
+                      marginRight: '10px',
+                    }}
+                  >
                     ↑
                   </Button>
-                  <Button variant="secondary" disabled>
+                  <Button
+                    variant="secondary"
+                    disabled
+                    style={{
+                      borderRadius: '10px',
+                      backgroundColor: 'white',
+                      color: 'black',
+                      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+                      border: 'none',
+                      marginRight: '10px',
+                    }}
+                  >
                     Level
                   </Button>
-                  <Button variant="secondary" onClick={handlePercAmpChangeDown}>
+                  <Button
+                    variant="secondary"
+                    onClick={handlePercAmpChangeDown}
+                    style={{
+                      borderRadius: '10px',
+                      backgroundColor: 'white',
+                      color: 'black',
+                      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+                      border: 'none',
+                    }}
+                  >
                     ↓
                   </Button>
                 </ButtonGroup>
@@ -3859,15 +3913,41 @@ function Electrode({
                   <Button
                     variant="secondary"
                     onClick={handlePercAmpChangeClockwise}
+                    style={{
+                      borderRadius: '10px',
+                      backgroundColor: 'white',
+                      color: 'black',
+                      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+                      border: 'none',
+                      marginRight: '10px',
+                    }}
                   >
                     ↻
                   </Button>
-                  <Button variant="secondary" disabled>
+                  <Button
+                    variant="secondary"
+                    disabled
+                    style={{
+                      borderRadius: '10px',
+                      backgroundColor: 'white',
+                      color: 'black',
+                      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+                      border: 'none',
+                      marginRight: '10px',
+                    }}
+                  >
                     Post-Lat
                   </Button>
                   <Button
                     variant="secondary"
                     onClick={handlePercAmpChangeCounterClockwise}
+                    style={{
+                      borderRadius: '10px',
+                      backgroundColor: 'white',
+                      color: 'black',
+                      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+                      border: 'none',
+                    }}
                   >
                     ↺
                   </Button>
@@ -3918,9 +3998,21 @@ function Electrode({
               // } else {
               //   window.electron.zoom.setZoomLevel(-3);
               // }
-              window.electron.ipcRenderer.sendMessage('increase-window-width', showViewer);
+              window.electron.ipcRenderer.sendMessage(
+                'increase-window-width',
+                showViewer,
+              );
             }}
             variant="success"
+            style={{
+              borderRadius: '10px',
+              backgroundColor: 'white',
+              color: 'black',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+              border: 'none',
+              outline: 'none',
+              marginTop: '-60px',
+            }}
           >
             {showViewer ? 'Close Viewer' : 'Open Viewer'}
           </Button>
@@ -4080,12 +4172,12 @@ function Electrode({
         {showViewer && (
           <div
             style={{
-              width: '100%', // Use percentage for responsive width
-              padding: '20px',
-              borderRadius: '8px',
-              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+              // width: '100%', // Use percentage for responsive width
+              // padding: '20px',
+              borderRadius: '30px',
+              // boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+              // background: 'linear-gradient(to bottom, rgba(135, 162, 191, 0.6), #A9C3D1)',
               backgroundColor: 'black',
-              // backgroundColor: '#f5f5f5',
               display: 'flex', // Use flexbox for layout
               justifyContent: 'center',
               alignItems: 'center',

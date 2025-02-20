@@ -14,7 +14,7 @@ import { NavLink } from 'react-router-dom';
 // import { FaHamburger, FaSun, FaMoon } from 'react-icons/fa';
 
 // eslint-disable-next-line import/prefer-default-export
-export default function Navbar() {
+export default function Navbar({text}) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -67,10 +67,11 @@ export default function Navbar() {
   );
 
   return (
-    <AppBar position="fixed">
+    <AppBar position="fixed" style={{ backgroundColor: 'black' }}>
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           {/* Lead-DBS Programmer */}
+          {text}
         </Typography>
         {/* {isMobile ? (
           <>

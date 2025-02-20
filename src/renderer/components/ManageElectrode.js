@@ -5,6 +5,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 // import 'react-tabs/style/react-tabs.css';
+import ToggleButton from 'react-bootstrap/ToggleButton';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
 import './TabbedElectrodeIPGSelection.css';
 import electrodeModels from './electrodeModels.json';
@@ -82,6 +84,16 @@ function ManageElectrode({
   // const [namingConvention, setNamingConvention] = useState('clinical');
   const fileInputRef = useRef(null);
   const [visualizationModel, setVisualizationModel] = useState('3');
+  const hemisphereButtons = [
+    {
+      name: 'Right',
+      value: '5',
+    },
+    {
+      name: 'Left',
+      value: '1',
+    },
+  ];
   // const [allQuantities, setAllQuantities] = useState({});
   // const [allSelectedValues, setAllSelectedValues] = useState({});
 
@@ -536,7 +548,7 @@ function ManageElectrode({
     // data.S.label = 'Num1';
     const activeArray = [];
     const leftAmpArray = [];
-    data.S.activecontacts={};
+    data.S.activecontacts = {};
     for (let j = 1; j < 5; j++) {
       const dynamicKey2 = `Ls${j}`;
       if (allSelectedValues[j] && updatedOutputQuantity[j]) {
@@ -672,15 +684,15 @@ function ManageElectrode({
     for (let i = 1; i < 5; i++) {
       if (allTotalAmplitudes[i]) {
         leftAmplitude.push(parseFloat(allTotalAmplitudes[i]));
-        data.S.amplitude[0][i-1] = parseFloat(allTotalAmplitudes[i]);
+        data.S.amplitude[0][i - 1] = parseFloat(allTotalAmplitudes[i]);
       } else {
-        leftAmplitude.push(0);;
+        leftAmplitude.push(0);
       }
     }
     for (let i = 5; i < 9; i++) {
       if (allTotalAmplitudes[i]) {
         rightAmplitude.push(parseFloat(allTotalAmplitudes[i]));
-        data.S.amplitude[1][i-5] = parseFloat(allTotalAmplitudes[i]);
+        data.S.amplitude[1][i - 5] = parseFloat(allTotalAmplitudes[i]);
       } else {
         rightAmplitude.push(0);
       }
@@ -1060,184 +1072,192 @@ function ManageElectrode({
   return (
     <div className="TabbedIPGContainer">
       <div style={{ marginTop: '-90px' }} />
-      <div className="stimCloseContainer" />
-      <Tabs
-        defaultActiveKey="profile"
-        id="uncontrolled-tab-example"
-        // className="mb-3"
-      >
-        <TabList className="mb-3">
-          <Tab onClick={() => handleTabChange('5')}>Right Hemisphere</Tab>
-          <Tab onClick={() => handleTabChange('1')}>Left Hemisphere</Tab>
-        </TabList>
-        <TabPanel>
-          <Tabs
-            defaultActiveKey="profile"
-            id="uncontrolled-tab-example"
-            className="mb-3"
-            // style={{ marginLeft: '-50px' }}
+      {/* <div className="stimCloseContainer" /> */}
+      {/* <ButtonGroup>
+        <Button onClick={() => handleTabChange('5')}>Right Hemisphere</Button>
+        <Button onClick={() => handleTabChange('1')}>Left Hemisphere</Button>
+      </ButtonGroup> */}
+      <div style={{ position: 'absolute', zIndex: 1, marginTop: '200px' }}>
+        <p style={{ fontSize: '18px', marginBottom: '-10px' }}>Hemisphere</p>
+        <ButtonGroup className="mb-2" style={{ gap: '10px' }}>
+          {hemisphereButtons.map((radio, idx) => (
+            <ToggleButton
+              key={idx}
+              id={`radio-${idx}`}
+              type="radio"
+              name="radio"
+              value={radio.value}
+              checked={key === radio.value}
+              onChange={(e) => handleTabChange(e.currentTarget.value)}
+              style={{
+                borderRadius: '20px',
+                width: '150px',
+                backgroundColor: 'white',
+                color: 'navy',
+                fontWeight: 'bold',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+                border: 'none',
+                ...(((parseFloat(key) >= 5 && radio.value === '5') ||
+                  (parseFloat(key) < 5 && radio.value === '1')) && {
+                  // backgroundColor: 'grey',
+                  color: 'black',
+                  fontWeight: 'bold',
+                  border: 'none',
+                  boxShadow: 'inset 0 4px 8px rgba(0, 0, 0, 0.4)', // Inward shadow for selected
+                }),
+              }}
+            >
+              {radio.name}
+            </ToggleButton>
+          ))}
+        </ButtonGroup>
+        <p style={{ fontSize: '18px', marginBottom: '-10px' }}>Source</p>
+        <div>
+          <Button
+            style={{
+              borderRadius: '20px',
+              width: '70px',
+              marginRight: '10px',
+              backgroundColor: 'white',
+              color: 'navy',
+              fontWeight: 'bold',
+              border: 'none',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+              ...((key === '5' || key === '1') && {
+                // backgroundColor: 'grey',
+                color: 'black',
+                fontWeight: 'bold',
+                border: 'none',
+                boxShadow: 'inset 0 4px 8px rgba(0, 0, 0, 0.4)',
+              }),
+            }}
+            onClick={() => handleTabChange(parseFloat(key) >= 5 ? '5' : '1')}
           >
-            <TabList className="mb-3">
-              <Tab key="5" onClick={() => handleTabChange('5')}>
-                Source 1
-              </Tab>
-              <Tab key="6" onClick={() => handleTabChange('6')}>
-                Source 2
-              </Tab>
-              <Tab key="7" onClick={() => handleTabChange('7')}>
-                Source 3
-              </Tab>
-              <Tab key="8" onClick={() => handleTabChange('8')}>
-                Source 4
-              </Tab>
-            </TabList>
-            {hemisphereData.right.map((tabState, index) => (
-              <TabPanel key={index}>
-                <div className="form-container">
-                  <Electrode
-                    name={key}
-                    allQuantities={allQuantities}
-                    quantities={allQuantities[key]}
-                    setQuantities={(updatedQuantities) =>
-                      handleQuantityChange(updatedQuantities)
-                    }
-                    selectedValues={allSelectedValues[key]}
-                    setSelectedValues={(updatedSelectedValues) =>
-                      handleSelectedValueChange(updatedSelectedValues)
-                    }
-                    IPG={IPG}
-                    totalAmplitude={allTotalAmplitudes[key]}
-                    setTotalAmplitude={(updatedAmplitude) =>
-                      handleAmplitudeChange(updatedAmplitude)
-                    }
-                    parameters={allStimulationParameters[key]}
-                    setParameters={(updatedParameters) =>
-                      handleParameterChange(updatedParameters)
-                    }
-                    visModel={visModel}
-                    setVisModel={(updatedVisModel) =>
-                      handleVisModelChange(updatedVisModel)
-                    }
-                    sessionTitle={sessionTitle[1]}
-                    togglePosition={allTogglePositions[key]}
-                    setTogglePosition={(updatedTogglePosition) =>
-                      handleTogglePositionChange(updatedTogglePosition)
-                    }
-                    percAmpToggle={allPercAmpToggles[key]}
-                    setPercAmpToggle={(updatedPercAmpToggle) =>
-                      handlePercAmpToggleChange(updatedPercAmpToggle)
-                    }
-                    volAmpToggle={allVolAmpToggles[key]}
-                    setVolAmpToggle={(updatedVolAmpToggle) =>
-                      handleVolAmpToggleChange(updatedVolAmpToggle)
-                    }
-                    contactNaming={namingConvention}
-                    adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
-                    historical={historical}
-                    elspec={electrodeModels[selectedElectrodeLeft]}
-                    electrodeLabel={convertElectrode(selectedElectrodeRight)}
-                    templateSpace={allTemplateSpaces}
-                    setTemplateSpace={(updatedTemplateSpace) =>
-                      handleTemplateSpaceChange(updatedTemplateSpace)
-                    }
-                    showViewer={showViewer}
-                    setShowViewer={(updatedShowViewer) =>
-                      handleShowViewer(updatedShowViewer)
-                    }
-                  />
-                  {/* <div className="electrode-label">
-                    {convertElectrode(selectedElectrodeRight)}
-                  </div> */}
-                </div>
-              </TabPanel>
-            ))}
-          </Tabs>
-        </TabPanel>
-        <TabPanel>
-          <Tabs
-            defaultActiveKey="profile"
-            id="uncontrolled-tab-example"
-            className="mb-3"
+            1
+          </Button>
+          <Button
+            style={{
+              borderRadius: '20px',
+              width: '70px',
+              marginRight: '10px',
+              backgroundColor: 'white',
+              color: 'navy',
+              fontWeight: 'bold',
+              border: 'none',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+              ...((key === '6' || key === '2') && {
+                // backgroundColor: 'grey',
+                color: 'black',
+                fontWeight: 'bold',
+                border: 'none',
+                boxShadow: 'inset 0 4px 8px rgba(0, 0, 0, 0.4)',
+              }),
+            }}
+            onClick={() => handleTabChange(parseFloat(key) >= 5 ? '6' : '2')}
           >
-            <TabList className="mb-3">
-              <Tab key="1" onClick={() => handleTabChange('1')}>
-                Source 1
-              </Tab>
-              <Tab key="2" onClick={() => handleTabChange('2')}>
-                Source 2
-              </Tab>
-              <Tab key="3" onClick={() => handleTabChange('3')}>
-                Source 3
-              </Tab>
-              <Tab key="4" onClick={() => handleTabChange('4')}>
-                Source 4
-              </Tab>
-            </TabList>
-            {hemisphereData.left.map((tabState, index) => (
-              <TabPanel key={index}>
-                <div className="form-container">
-                  <Electrode
-                    name={key}
-                    allQuantities={allQuantities}
-                    quantities={allQuantities[key]}
-                    setQuantities={(updatedQuantities) =>
-                      handleQuantityChange(updatedQuantities)
-                    }
-                    selectedValues={allSelectedValues[key]}
-                    setSelectedValues={(updatedSelectedValues) =>
-                      handleSelectedValueChange(updatedSelectedValues)
-                    }
-                    IPG={IPG}
-                    totalAmplitude={allTotalAmplitudes[key]}
-                    setTotalAmplitude={(updatedAmplitude) =>
-                      handleAmplitudeChange(updatedAmplitude)
-                    }
-                    parameters={allStimulationParameters[key]}
-                    setParameters={(updatedParameters) =>
-                      handleParameterChange(updatedParameters)
-                    }
-                    visModel={visModel}
-                    setVisModel={(updatedVisModel) =>
-                      handleVisModelChange(updatedVisModel)
-                    }
-                    sessionTitle={sessionTitle[1]}
-                    togglePosition={allTogglePositions[key]}
-                    setTogglePosition={(updatedTogglePosition) =>
-                      handleTogglePositionChange(updatedTogglePosition)
-                    }
-                    percAmpToggle={
-                      allPercAmpToggles[key] ? allPercAmpToggles[key] : 'left'
-                    }
-                    setPercAmpToggle={(updatedPercAmpToggle) =>
-                      handlePercAmpToggleChange(updatedPercAmpToggle)
-                    }
-                    volAmpToggle={allVolAmpToggles[key]}
-                    setVolAmpToggle={(updatedVolAmpToggle) =>
-                      handleVolAmpToggleChange(updatedVolAmpToggle)
-                    }
-                    contactNaming={namingConvention}
-                    adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
-                    historical={historical}
-                    elspec={electrodeModels[selectedElectrodeLeft]}
-                    electrodeLabel={convertElectrode(selectedElectrodeLeft)}
-                    templateSpace={allTemplateSpaces}
-                    setTemplateSpace={(updatedTemplateSpace) =>
-                      handleTemplateSpaceChange(updatedTemplateSpace)
-                    }
-                    showViewer={showViewer}
-                    setShowViewer={(updatedShowViewer) =>
-                      handleShowViewer(updatedShowViewer)
-                    }
-                  />
-                  {/* <div className="electrode-label">
-                    {convertElectrode(selectedElectrodeLeft)}
-                  </div> */}
-                </div>
-              </TabPanel>
-            ))}
-          </Tabs>
-        </TabPanel>
-      </Tabs>
+            2
+          </Button>
+          <Button
+            style={{
+              borderRadius: '20px',
+              width: '70px',
+              marginRight: '10px',
+              backgroundColor: 'white',
+              color: 'navy',
+              fontWeight: 'bold',
+              border: 'none',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+              ...((key === '7' || key === '3') && {
+                // backgroundColor: 'grey',
+                color: 'black',
+                fontWeight: 'bold',
+                border: 'none',
+                boxShadow: 'inset 0 4px 8px rgba(0, 0, 0, 0.4)',
+              }),
+            }}
+            onClick={() => handleTabChange(parseFloat(key) >= 5 ? '7' : '3')}
+          >
+            3
+          </Button>
+          <Button
+            style={{
+              borderRadius: '20px',
+              width: '70px',
+              marginRight: '10px',
+              backgroundColor: 'white',
+              color: 'navy',
+              fontWeight: 'bold',
+              border: 'none',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+              ...((key === '8' || key === '4') && {
+                // backgroundColor: 'grey',
+                color: 'black',
+                fontWeight: 'bold',
+                border: 'none',
+                boxShadow: 'inset 0 4px 8px rgba(0, 0, 0, 0.4)',
+              }),
+            }}
+            onClick={() => handleTabChange(parseFloat(key) >= 5 ? '8' : '4')}
+          >
+            4
+          </Button>
+        </div>
+      </div>
+      <div className="form-container">
+        <Electrode
+          name={key}
+          allQuantities={allQuantities}
+          quantities={allQuantities[key]}
+          setQuantities={(updatedQuantities) =>
+            handleQuantityChange(updatedQuantities)
+          }
+          selectedValues={allSelectedValues[key]}
+          setSelectedValues={(updatedSelectedValues) =>
+            handleSelectedValueChange(updatedSelectedValues)
+          }
+          IPG={IPG}
+          totalAmplitude={allTotalAmplitudes[key]}
+          setTotalAmplitude={(updatedAmplitude) =>
+            handleAmplitudeChange(updatedAmplitude)
+          }
+          parameters={allStimulationParameters[key]}
+          setParameters={(updatedParameters) =>
+            handleParameterChange(updatedParameters)
+          }
+          visModel={visModel}
+          setVisModel={(updatedVisModel) =>
+            handleVisModelChange(updatedVisModel)
+          }
+          sessionTitle={sessionTitle[1]}
+          togglePosition={allTogglePositions[key]}
+          setTogglePosition={(updatedTogglePosition) =>
+            handleTogglePositionChange(updatedTogglePosition)
+          }
+          percAmpToggle={
+            allPercAmpToggles[key] ? allPercAmpToggles[key] : 'left'
+          }
+          setPercAmpToggle={(updatedPercAmpToggle) =>
+            handlePercAmpToggleChange(updatedPercAmpToggle)
+          }
+          volAmpToggle={allVolAmpToggles[key]}
+          setVolAmpToggle={(updatedVolAmpToggle) =>
+            handleVolAmpToggleChange(updatedVolAmpToggle)
+          }
+          contactNaming={namingConvention}
+          adornment={allVolAmpToggles[key] === 'right' ? 'V' : 'mA'}
+          historical={historical}
+          elspec={electrodeModels[selectedElectrodeLeft]}
+          electrodeLabel={convertElectrode(selectedElectrodeLeft)}
+          templateSpace={allTemplateSpaces}
+          setTemplateSpace={(updatedTemplateSpace) =>
+            handleTemplateSpaceChange(updatedTemplateSpace)
+          }
+          showViewer={showViewer}
+          setShowViewer={(updatedShowViewer) =>
+            handleShowViewer(updatedShowViewer)
+          }
+        />
+      </div>
       <div className="export-button-container">
         <input
           ref={fileInputRef}
@@ -1250,7 +1270,15 @@ function ManageElectrode({
         />
       </div>
       {type !== 'leadgroup' && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', paddingBottom: '35px'}}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-start',
+            marginLeft: '150px',
+            marginTop: '-20px',
+            // paddingBottom: '35px',
+          }}
+        >
           {/* <button
                 className="export-button-final-discard"
                 onClick={closeFunction}
@@ -1266,9 +1294,20 @@ function ManageElectrode({
             {mode === 'stimulate' ? 'Stimulate and Close' : 'Save'}
           </button> */}
           <Button
-            className="export-button-final"
+            // className="export-button-final"
             onClick={sendDataToMain}
-            style={{ marginRight: '10px' }}
+            style={{
+              // left: '-000px',
+              // marginTop: -10,
+              width: '200px',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+              backgroundColor: 'green',
+              color: 'white',
+              borderRadius: '30px',
+              padding: '10px 20px',
+              fontSize: '16px',
+              // fontWeight: 'bold',
+            }}
           >
             {mode === 'stimulate' ? 'Stimulate and Close' : 'Save'}
           </Button>

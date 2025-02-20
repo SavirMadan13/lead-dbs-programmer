@@ -974,7 +974,7 @@ function PlyViewer({
         // Apply the rotation to the directionOffset using the quaternion
         directionOffset.applyQuaternion(rotationQuaternion);
 
-        // Apply the direction offset to the newPosition relative to the electrode’s orientation
+        // Apply the direction offset to the newPosition relative to the electrode's orientation
         newPosition.x +=
           right.x * directionOffset.x +
           forward.x * directionOffset.y +
@@ -1476,8 +1476,26 @@ function PlyViewer({
       // Initialize scene, camera, and renderer only once
       const scene = new THREE.Scene();
       sceneRef.current = scene; // Save scene reference
-      // scene.background = new THREE.Color(0xffffff); // White background
-      scene.background = new THREE.Color(0x000000); // Black background
+
+      // Create a gradient background
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = 1;
+      canvas.height = 500;
+
+      // Create a linear gradient
+      const gradient = context.createLinearGradient(0, 0, 0, 500);
+
+      // Define color stops to stay mostly blue through the whole way
+      gradient.addColorStop(0, 'rgba(65, 92, 121, 0.6)'); // Darker second color stop
+      gradient.addColorStop(0.8, '#2C3E50'); // Darker first color stop
+
+      context.fillStyle = gradient;
+      context.fillRect(0, 0, 1, 500);
+
+      const texture = new THREE.CanvasTexture(canvas);
+      // scene.background = texture;
+      scene.background = new THREE.Color('black'); // White background
 
       // Create an OrthographicCamera
       const aspect = 500 / 500;
@@ -3644,7 +3662,12 @@ function PlyViewer({
         {/* <div ref={mountRef} /> */}
         {/* <Button onClick={changeCameraAngle}>View from top</Button> */}
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div ref={mountRef} />
+          <div
+            ref={mountRef}
+            style={{
+              borderRadius: '15px', // Add rounded corners
+            }}
+          />
           <div ref={secondaryMountRef} />
         </div>
         {/* <Button

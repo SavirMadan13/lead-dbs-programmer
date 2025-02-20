@@ -1080,8 +1080,7 @@ function Programmer() {
   const [historical, setHistorical] = useState(location.state);
 
   return (
-    <div style={{marginTop: '-50px', width: '100%'}}>
-      <div style={{ width: '100%', height: '50px', backgroundColor: 'black', marginBottom: '10px' }}></div>
+    <div style={{ }}>
       {patientName && (
         <div
           style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '20px' }}
@@ -1109,8 +1108,25 @@ function Programmer() {
         )}
       </div>
       {mode !== 'stimulate' && (
-        <div style={{ paddingLeft: '150px', marginTop: '-120px' }}>
-          <button className="export-button" onClick={() => navigate(-1)}>
+        <div
+          style={{ marginTop: '-120px' }}
+        >
+          <button
+            className="export-button"
+            style={{
+              marginTop: '65px',
+              marginLeft: '-200px',
+              width: '100px',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+              backgroundColor: 'white',
+              color: 'black',
+              borderRadius: '30px',
+              padding: '10px 20px',
+              fontSize: '16px',
+              fontWeight: 'bold',
+            }}
+            onClick={() => navigate(-1)}
+          >
             {/* Back to Patient Details */}
             ←
           </button>
