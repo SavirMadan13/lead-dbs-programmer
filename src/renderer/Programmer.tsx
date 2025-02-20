@@ -1081,6 +1081,7 @@ function Programmer() {
 
   return (
     <div style={{marginTop: '-50px', width: '100%'}}>
+      <div style={{ width: '100%', height: '50px', backgroundColor: 'black', marginBottom: '10px' }}></div>
       {patientName && (
         <div
           style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '20px' }}

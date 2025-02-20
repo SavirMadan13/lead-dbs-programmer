@@ -132,8 +132,8 @@ export default function App() {
   return (
     <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
       <div className="Navbar">
-        <Navbar />
-        {/* <SettingsIcon
+        {/* <Navbar />
+        <SettingsIcon
           className="settings-icon"
           onClick={() => setShowSettings(!showSettings)}
           style={{
@@ -142,8 +142,8 @@ export default function App() {
             color: '#6c757d',
             zIndex: '10',
           }} // Optional styling
-        /> */}
-        {/* <MoreVertIcon
+        />
+        <MoreVertIcon
           className="settings-icon"
           onClick={() => setShowSettings(!showSettings)}
           style={{
@@ -201,7 +201,10 @@ export default function App() {
             <Route
               path="/clinical-scores"
               element={
-                <div style={{ maxWidth: '1000px' }}>
+                // <div style={{ maxWidth: '1000px' }}>
+                //   <ClinicalScores />
+                // </div>
+                <div>
                   <ClinicalScores />
                 </div>
               }

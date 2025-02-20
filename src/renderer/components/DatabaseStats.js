@@ -571,13 +571,13 @@ function DatabaseStats({ directoryPath }) {
       {/* <button onClick={handleNiiUpload} className="export-button">
         Calculate stimulation parameters
       </button> */}
-      {/* <Button
+      <Button
         variant="primary"
         onClick={() => document.getElementById('nifti-upload').click()}
         className="mb-4 mx-2"
       >
         Import NIfTI File and Provide Solution
-      </Button> */}
+      </Button>
       <input
         id="nifti-upload"
         type="file"
