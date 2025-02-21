@@ -378,7 +378,7 @@
   width: 230px; */
   /* height: 200px;
   width: 200px; */
-  margin-top: 10px;
+  /* margin-top: 15px; */
   margin: -10px;
   /* This is setting the margin between the contacts   */
   z-index: 0;
@@ -1559,13 +1559,13 @@ button:active {
   align-items: center;
   height: 250px;
   width: 250px;
-  row-gap: 100px;
+  /* row-gap: 110px; */
   /* margin-right: 40px; */
 }
 
 .image-item-right {
   position: relative;
-  margin-bottom: -80px;
+  margin-bottom: -75px;
   /* margin-right: 30px; */
   /* margin-left: -70px; */
 }

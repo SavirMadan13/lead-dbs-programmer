@@ -173,10 +173,10 @@ function SubscoreAnalysis({ rawData, showPercentage }) {
 
   return (
     <div>
-      <div style={{ width: '800px', height: '600px' }}>
+      <div style={{ width: '500px', height: '600px' }}>
         <Line data={data} options={options} />
       </div>
-      <div style={{ marginLeft: '120px', marginTop: '-200px' }}>
+      <div style={{ marginLeft: '70px', marginTop: '-360px' }}>
         <h3 style={{ fontSize: '14px' }}>Set Threshold:</h3>
         <input
           type="number"

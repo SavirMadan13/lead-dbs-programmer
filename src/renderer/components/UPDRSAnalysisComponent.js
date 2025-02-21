@@ -41,8 +41,12 @@ function UPDRSAnalysisComponent({ currentStage, rawData, clinicalTimelines }) {
   const renderAnalysis = () => {
     switch (analysisType) {
       case 'raincloud':
-        return <PairedTTestComponent rawData={rawData} showPercentage={showPercentage}
-        />;
+        return (
+          <PairedTTestComponent
+            rawData={rawData}
+            showPercentage={showPercentage}
+          />
+        );
       // case 'boxPlot':
       //   return (
       //     <BoxPlotComponent
@@ -50,9 +54,16 @@ function UPDRSAnalysisComponent({ currentStage, rawData, clinicalTimelines }) {
       //     />
       //   );
       case 'laterality':
-        return <LateralityAnalysisComponent rawData={rawData} showPercentage={showPercentage} />;
+        return (
+          <LateralityAnalysisComponent
+            rawData={rawData}
+            showPercentage={showPercentage}
+          />
+        );
       case 'subscore':
-        return <SubscoreAnalysis rawData={rawData} showPercentage={showPercentage} />;
+        return (
+          <SubscoreAnalysis rawData={rawData} showPercentage={showPercentage} />
+        );
       // // case 'subscale':
       // //   return (
       // //     <SubscaleAnalysisComponent
@@ -77,20 +88,48 @@ function UPDRSAnalysisComponent({ currentStage, rawData, clinicalTimelines }) {
       //   );
       case 'all':
         return (
-          <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
-            <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                marginBottom: '10px',
+              }}
+            >
               <PairedTTestComponent
                 rawData={rawData}
                 showPercentage={showPercentage}
               />
             </div>
-            <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                marginBottom: '10px',
+              }}
+            >
               <LateralityAnalysisComponent
                 rawData={rawData}
                 showPercentage={showPercentage}
               />
             </div>
-            <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+              }}
+            >
               <SubscoreAnalysis
                 rawData={rawData}
                 showPercentage={showPercentage}
@@ -116,7 +155,7 @@ function UPDRSAnalysisComponent({ currentStage, rawData, clinicalTimelines }) {
         </select>
       </div> */}
       <div style={{ marginTop: '30px', marginBottom: '-10px' }}>
-        <h3 style={{fontSize: '14px'}}>
+        <h3 style={{ fontSize: '14px' }}>
           <input
             type="checkbox"
             checked={showPercentage}

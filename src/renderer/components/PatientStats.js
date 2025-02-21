@@ -305,7 +305,7 @@ function PatientStats({ patient, timeline, directoryPath, leadDBS }) {
     <div>
       <div>
         <Container>
-          <HomeIcon
+          {/* <HomeIcon
             onClick={() => navigate('/')}
             style={{
               fontSize: '36px',
@@ -313,7 +313,7 @@ function PatientStats({ patient, timeline, directoryPath, leadDBS }) {
               cursor: 'pointer',
               margin: '0 10px',
             }}
-          />
+          /> */}
           {/* <Form.Select
             value={selectedScoreType}
             onChange={(e) => handleScoreChange(e.target.value)}
@@ -346,44 +346,7 @@ function PatientStats({ patient, timeline, directoryPath, leadDBS }) {
             onChange={(e) => handleFileUpload(e, 'postop')}
           />
         </Container>
-        <div>
-          <Tabs
-          // defaultIndex={0}
-          // onSelect={(index) =>
-          //   setCurrentStage(index === 1 ? 'analyze' : null)
-          // }
-          >
-            <TabList>
-              {/* <Tab>Scores</Tab> */}
-              {/* <Tab onClick={handleAnalysisTabClick}>Analysis</Tab> */}
-            </TabList>
-            {/*
-            <TabPanel>
-              <Tabs defaultIndex={0}>
-                <TabList>
-                  {timeline.map((time, index) => (
-                    <Tab key={index}>{time}</Tab>
-                  ))}
-                </TabList>
-
-                {timeline.map((time, index) => (
-                  <TabPanel key={index}>
-                    <div className="tab-content mt-3">{renderTable(time)}</div>
-                  </TabPanel>
-                ))}
-              </Tabs>
-            </TabPanel> */}
-
-            {/* <TabPanel>
-              {currentStage === 'analyze' && clinicalTimelines && (
-                <UPDRSAnalysisComponent
-                  currentStage={currentStage}
-                  rawData={patients}
-                  clinicalTimelines={clinicalTimelines}
-                />
-              )}
-            </TabPanel> */}
-          </Tabs>
+        <div style={{ display: 'flex', flexDirection: 'column', width: '700px', height: '500px', overflowY: 'scroll' }}>
           {currentStage === 'analyze' && clinicalTimelines && (
             <UPDRSAnalysisComponent
               currentStage={currentStage}

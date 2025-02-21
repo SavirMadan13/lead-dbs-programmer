@@ -307,7 +307,7 @@ function GroupStats() {
     <div>
       <div>
         <Container>
-          <HomeIcon
+          {/* <HomeIcon
             onClick={() => navigate('/')}
             style={{
               fontSize: '36px',
@@ -315,7 +315,7 @@ function GroupStats() {
               cursor: 'pointer',
               margin: '0 10px',
             }}
-          />
+          /> */}
           {/* <Form.Select
             value={selectedScoreType}
             onChange={(e) => handleScoreChange(e.target.value)}

@@ -132,7 +132,7 @@ function PairedTTestComponent({ rawData, showPercentage }) {
   };
 
   return (
-    <div style={{ width: '800px', height: '600px', marginBottom: '-200px' }}>
+    <div style={{ width: '500px', height: '600px', marginBottom: '-370px' }}>
       <Line data={data} options={options} />
     </div>
   );

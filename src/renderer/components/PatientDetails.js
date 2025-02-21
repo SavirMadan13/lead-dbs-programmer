@@ -264,7 +264,7 @@ function PatientDetails({ directoryPath, leadDBS }) {
         onClick={() => navigate('/')}
         style={{
           fontSize: '36px', // Customize size
-          color: '#1a73e8', // Customize color
+          color: '#375D7A', // Customize color
           cursor: 'pointer', // Add pointer cursor on hover
           margin: '0 10px', // Add some margin for spacing
         }}
@@ -294,7 +294,9 @@ function PatientDetails({ directoryPath, leadDBS }) {
         </p> */}
         {Object.entries(patient).map(([key, value]) => (
           <p className="patient-info" key={key}>
-            <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong>{' '}
+            <strong style={{ color: 'black' }}>
+              {key.charAt(0).toUpperCase() + key.slice(1)}:
+            </strong>{' '}
             {value}
           </p>
         ))}
@@ -304,6 +306,7 @@ function PatientDetails({ directoryPath, leadDBS }) {
           <Dropdown.Toggle
             variant="success"
             id="dropdown-basic"
+            style={{ backgroundColor: '#375D7A', color: 'white' }}
           >
             Stats
           </Dropdown.Toggle>
@@ -333,20 +336,36 @@ function PatientDetails({ directoryPath, leadDBS }) {
       />
       <div>
         <button
-          className="export-button"
           onClick={() => handleAddStimulationParameters(timeline)}
+          style={{
+            borderRadius: '20px',
+            backgroundColor: 'white',
+            color: 'black',
+            fontWeight: 'bold',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+            border: 'none',
+            marginRight: '10px',
+          }}
         >
           Add Stimulation Parameters
         </button>
         <button
-          className="export-button"
           onClick={() => handleAddClinicalScores(timeline)}
+          style={{
+            borderRadius: '20px',
+            backgroundColor: 'white',
+            color: 'black',
+            fontWeight: 'bold',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+            border: 'none',
+            marginRight: '10px',
+          }}
         >
           Add Clinical Scores
         </button>
-        <button className="export-button" onClick={() => handleGroupStats()}>
+        {/* <button className="export-button" onClick={() => handleGroupStats()}>
           Stats
-        </button>
+        </button> */}
       </div>
       {/* <button className="back-button" onClick={() => navigate('/viewer')}>
           Go To Viewer
@@ -359,36 +378,90 @@ function PatientDetails({ directoryPath, leadDBS }) {
           <button
             className="timeline-button"
             onClick={() => handleQuickAdd('baseline')}
+            style={{
+              borderRadius: '20px',
+              backgroundColor: 'white',
+              color: 'black',
+              fontWeight: 'bold',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+              border: 'none',
+              marginRight: '10px',
+            }}
           >
             Baseline
           </button>
           <button
             className="timeline-button"
             onClick={() => handleQuickAdd('3months')}
+            style={{
+              borderRadius: '20px',
+              backgroundColor: 'white',
+              color: 'black',
+              fontWeight: 'bold',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+              border: 'none',
+              marginRight: '10px',
+            }}
           >
             3 Months
           </button>
           <button
             className="timeline-button"
             onClick={() => handleQuickAdd('6months')}
+            style={{
+              borderRadius: '20px',
+              backgroundColor: 'white',
+              color: 'black',
+              fontWeight: 'bold',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+              border: 'none',
+              marginRight: '10px',
+            }}
           >
             6 Months
           </button>
           <button
             className="timeline-button"
             onClick={() => handleQuickAdd('12months')}
+            style={{
+              borderRadius: '20px',
+              backgroundColor: 'white',
+              color: 'black',
+              fontWeight: 'bold',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+              border: 'none',
+              marginRight: '10px',
+            }}
           >
             12 Months
           </button>
           <button
             className="timeline-button"
             onClick={() => handleQuickAdd('24months')}
+            style={{
+              borderRadius: '20px',
+              backgroundColor: 'white',
+              color: 'black',
+              fontWeight: 'bold',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+              border: 'none',
+              marginRight: '10px',
+            }}
           >
             24 Months
           </button>
           <button
             className="timeline-button"
             onClick={() => handleQuickAdd('36months')}
+            style={{
+              borderRadius: '20px',
+              backgroundColor: 'white',
+              color: 'black',
+              fontWeight: 'bold',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+              border: 'none',
+              marginRight: '10px',
+            }}
           >
             36 Months
           </button>
@@ -408,7 +481,19 @@ function PatientDetails({ directoryPath, leadDBS }) {
           value={newTimeline}
           onChange={(e) => setNewTimeline(e.target.value)}
         />
-        <button className="add-timeline-button" onClick={handleAddTimeline}>
+        <button
+          className="add-timeline-button"
+          onClick={handleAddTimeline}
+          style={{
+            borderRadius: '20px',
+            backgroundColor: 'white',
+            color: '#375D7A',
+            fontWeight: 'bold',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+            border: 'none',
+            marginRight: '10px',
+          }}
+        >
           +
         </button>
       </div>

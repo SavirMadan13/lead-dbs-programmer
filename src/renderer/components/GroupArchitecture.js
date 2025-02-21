@@ -1,5 +1,6 @@
 /* eslint-disable react/no-unstable-nested-components */
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 // import './App.css';
 
 import Dropdown from 'react-bootstrap/dropdown';
@@ -30,6 +31,9 @@ function GroupArchitecture({
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showViewer, setShowViewer] = useState(true);
   console.log(patients);
+  const location = useLocation();
+  const patientInfo = location.state || {};
+  console.log('patientInfo: ', patientInfo);
   // State for each patient
   const initialState = {
     IPG: '',
@@ -228,6 +232,7 @@ function GroupArchitecture({
 
   return (
     <div style={{ marginLeft: '-300px', marginTop: '200px' }}>
+      <Navbar text={mode === 'leadgroup' ? {selectedPatient} : patientInfo.patient.id} color1="#375D7A" text2={patientInfo.patient.elmodel} color2="lightgrey" />
       {/* <div style={{ paddingLeft: '45px', marginBottom: '-100px' }}>
         <PatientSelector
           selectedPatient={selectedPatient}

@@ -14,7 +14,7 @@ import { NavLink } from 'react-router-dom';
 // import { FaHamburger, FaSun, FaMoon } from 'react-icons/fa';
 
 // eslint-disable-next-line import/prefer-default-export
-export default function Navbar({text}) {
+export default function Navbar({ text, text2, color1, color2 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -67,13 +67,13 @@ export default function Navbar({text}) {
   );
 
   return (
-    <AppBar position="fixed" style={{ backgroundColor: 'black' }}>
-      <Toolbar>
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          {/* Lead-DBS Programmer */}
-          {text}
-        </Typography>
-        {/* {isMobile ? (
+    <div>
+      {/* <AppBar position="fixed" style={{ backgroundColor: color1 }}>
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            {text}
+          </Typography>
+          {isMobile ? (
           <>
             <IconButton color="inherit" onClick={() => toggleDrawer(true)}>
               Button
@@ -90,9 +90,30 @@ export default function Navbar({text}) {
           </>
         ) : (
           menuItems
-        )} */}
-      </Toolbar>
-      {/* <StimulationSettings /> */}
-    </AppBar>
+        )}
+        </Toolbar>
+      </AppBar> */}
+      <AppBar position="fixed" style={{ backgroundColor: color1 }}>
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center', fontSize: '24px', fontWeight: 'bold' }}>
+            {text}
+          </Typography>
+          {/* Add any additional elements for the first row here */}
+        </Toolbar>
+      </AppBar>
+      {color2 && (
+        <AppBar
+          position="fixed"
+          style={{ backgroundColor: color2, top: 'auto', marginTop: '-140px' }}
+        >
+          <Toolbar>
+            <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center', fontSize: '24px', fontWeight: 'bold', color: 'black',  }}>
+              {text2}
+            </Typography>
+            {/* Add any additional elements for the second row here */}
+          </Toolbar>
+        </AppBar>
+      )}
+    </div>
   );
 }

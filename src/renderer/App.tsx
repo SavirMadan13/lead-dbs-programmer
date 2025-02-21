@@ -132,7 +132,6 @@ export default function App() {
   return (
     <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
       <div className="Navbar">
-        <Navbar text="Lead-DBS Programmer" />
         {/* <SettingsIcon
           className="settings-icon"
           onClick={() => setShowSettings(!showSettings)}
@@ -179,6 +178,7 @@ export default function App() {
               path="/"
               element={
                 <div style={{ marginTop: '0px' }}>
+                  <Navbar text="" color1="#375D7A" />
                   <PatientDatabase
                     key={renderKey}
                     directoryPath={directoryPath}
@@ -190,6 +190,7 @@ export default function App() {
               path="/patient/:id"
               element={
                 <div>
+                  <Navbar text="" color1="#375D7A" />
                   <PatientDetails
                     directoryPath={directoryPath}
                     leadDBS={isLeadDBSFolder}
@@ -236,6 +237,7 @@ export default function App() {
               path="/groupstats"
               element={
                 <div style={{ maxWidth: '1000px' }}>
+                  <Navbar text="" color1="#375D7A" />
                   <DatabaseStats directoryPath={directoryPath} />
                 </div>
               }
