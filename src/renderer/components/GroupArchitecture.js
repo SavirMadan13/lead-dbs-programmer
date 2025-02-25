@@ -29,7 +29,7 @@ function GroupArchitecture({
   type,
 }) {
   const [selectedPatient, setSelectedPatient] = useState(null);
-  const [showViewer, setShowViewer] = useState(true);
+  const [showViewer, setShowViewer] = useState(false);
   console.log(patients);
   const location = useLocation();
   const patientInfo = location.state || {};
@@ -160,13 +160,13 @@ function GroupArchitecture({
         {/* <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px', marginLeft: '-10px' }}>
           Stimulation Label
         </div> */}
-        <Dropdown onSelect={handleSelect} style={{borderRadius: '20px'}}>
+        <Dropdown onSelect={handleSelect} style={{ borderRadius: '20px' }}>
           <Dropdown.Toggle
             variant="secondary"
             id="dropdown-basic"
             style={{
               borderRadius: '20px',
-              width: '250px',
+              width: mode === 'leadgroup' ? '250px' : '150px',
               boxShadow: 'inset 0 4px 8px rgba(0, 0, 0, 0.2)',
               backgroundColor: 'white',
               color: 'black',
@@ -185,24 +185,6 @@ function GroupArchitecture({
             ))}
           </Dropdown.Menu>
         </Dropdown>
-        {/* <div style={{ maxWidth: '300px' }}>
-          <InputGroup className="mb-3">
-            <Form.Control
-              placeholder="Tab for auto ID"
-              aria-describedby="basic-addon2"
-              value={newStim}
-              onChange={handleNewStimText}
-              onKeyDown={handleTabKeyPress}
-            />
-            <Button
-              variant="outline-secondary"
-              id="button-addon2"
-              onClick={handleOnAddButtonClick}
-            >
-              Add
-            </Button>
-          </InputGroup>
-        </div> */}
       </div>
     );
   }
@@ -232,7 +214,14 @@ function GroupArchitecture({
 
   return (
     <div style={{ marginLeft: '-300px', marginTop: '200px' }}>
-      <Navbar text={mode === 'leadgroup' ? {selectedPatient} : patientInfo.patient.id} color1="#375D7A" text2={patientInfo.patient.elmodel} color2="lightgrey" />
+      <Navbar
+        text={
+          mode === 'leadgroup' ? { selectedPatient } : patientInfo.patient.id
+        }
+        color1="#375D7A"
+        text2={patientInfo.patient.elmodel}
+        color2="lightgrey"
+      />
       {/* <div style={{ paddingLeft: '45px', marginBottom: '-100px' }}>
         <PatientSelector
           selectedPatient={selectedPatient}
@@ -251,35 +240,60 @@ function GroupArchitecture({
           zIndex: 5,
         }}
       >
-        {/* Left Arrow Button - Conditionally Rendered */}
         {type === 'leadgroup' && (
-          <Button
-            // className="sticky-button"
-            style={{ marginRight: '10px', height: '40px', marginTop: '20px' }}
-            variant="secondary"
-            onClick={handlePreviousPatient}
-          >
-            ←
-          </Button>
+          <div style={{ display: 'flex', alignItems: 'center', marginTop: '-10px' }}>
+            <Button
+              // className="sticky-button"
+              style={{
+                borderRadius: '20px',
+                marginLeft: '10px',
+                marginRight: '-5px',
+                boxShadow: 'inset 0 4px 8px rgba(0, 0, 0, 0.2)',
+                backgroundColor: 'white',
+                color: 'black',
+                fontWeight: 'bold',
+                border: 'none',
+              }}
+              variant="secondary"
+              onClick={handlePreviousPatient}
+            >
+              ←
+            </Button>
+
+            <PatientSelector
+              selectedPatient={selectedPatient}
+              setSelectedPatient={setSelectedPatient}
+              setRenderKey={setRenderKey}
+            />
+
+            <Button
+              // className="sticky-button"
+              style={{
+                // marginRight: '10px',
+                borderRadius: '20px',
+                // width: '250px',
+                marginRight: '10px',
+                marginLeft: '-10px',
+                boxShadow: 'inset 0 4px 8px rgba(0, 0, 0, 0.2)',
+                backgroundColor: 'white',
+                color: 'black',
+                fontWeight: 'bold',
+                border: 'none',
+              }}
+              variant="secondary"
+              onClick={handleNextPatient}
+            >
+              →
+            </Button>
+          </div>
         )}
 
-        {/* Patient Selector */}
-        <PatientSelector
-          selectedPatient={selectedPatient}
-          setSelectedPatient={setSelectedPatient}
-          setRenderKey={setRenderKey}
-        />
-
-        {/* Right Arrow Button - Conditionally Rendered */}
-        {type === 'leadgroup' && (
-          <Button
-            // className="sticky-button"
-            style={{ marginLeft: '10px', height: '40px', marginTop: '20px' }}
-            variant="secondary"
-            onClick={handleNextPatient}
-          >
-            →
-          </Button>
+        {type !== 'leadgroup' && (
+          <PatientSelector
+            selectedPatient={selectedPatient}
+            setSelectedPatient={setSelectedPatient}
+            setRenderKey={setRenderKey}
+          />
         )}
       </div>
       <div>

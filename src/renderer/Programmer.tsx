@@ -1080,7 +1080,7 @@ function Programmer() {
   const [historical, setHistorical] = useState(location.state);
 
   return (
-    <div style={{ }}>
+    <div style={{}}>
       {patientName && (
         <div
           style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '20px' }}
@@ -1135,9 +1135,21 @@ function Programmer() {
       {type === 'leadgroup' && (
         <div>
           <button
-            className="export-button-final"
+            // className="export-button-final"
             onClick={handleExport}
-            style={{ marginLeft: '1200px' }}
+            // style={{ marginLeft: '1200px' }}
+            style={{
+              width: '200px',
+              marginLeft: '-125px',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+              backgroundColor: 'green',
+              color: 'white',
+              borderRadius: '30px',
+              padding: '10px 20px',
+              fontSize: '16px',
+              outline: 'none',
+              border: 'none',
+            }}
           >
             Save and Close
           </button>
