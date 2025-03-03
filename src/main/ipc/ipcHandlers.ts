@@ -541,4 +541,33 @@ export default function registerFileHandlers() {
     // scores[newScore.name] = newScore.values;
     fs.writeFileSync(scoresFilePath, JSON.stringify(scores, null, 2));
   });
+
+  ipcMain.handle('get-unit-solutions', async (event, filePath) => {
+    const patientFolder = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/stimulations/MNI152NLin2009bAsym/initialize';
+    const side = 'rh';
+    const OSSFolder = path.join(patientFolder, `OSS_sim_files_${side}`);
+    const numContacts = 8;
+    const results = {};
+
+    for (let i = 1; i <= numContacts; i++) {
+      const contactFolder = path.join(OSSFolder, `ResultsE1C${i}`);
+      const niiFilePath = path.join(contactFolder, 'E_field_solution_Lattice.nii');
+
+      try {
+        const fileBuffer = fs.readFileSync(niiFilePath);
+        results[i-1] = fileBuffer.buffer;
+      } catch (error) {
+        console.error(`Error reading file for contact E1C${i}:`, error);
+        results[`E1C${i}`] = null;
+      }
+    }
+    // const arrayBufferArray = Object.values(results).map(buffer => {
+    //   if (buffer) {
+    //     return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+    //   }
+    //   return null;
+    // });
+
+    return results;
+  });
 }

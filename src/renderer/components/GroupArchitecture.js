@@ -166,7 +166,7 @@ function GroupArchitecture({
             id="dropdown-basic"
             style={{
               borderRadius: '20px',
-              width: mode === 'leadgroup' ? '250px' : '150px',
+              width: type === 'leadgroup' ? '150px' : '250px',
               boxShadow: 'inset 0 4px 8px rgba(0, 0, 0, 0.2)',
               backgroundColor: 'white',
               color: 'black',
@@ -214,14 +214,16 @@ function GroupArchitecture({
 
   return (
     <div style={{ marginLeft: '-300px', marginTop: '200px' }}>
-      <Navbar
-        text={
-          mode === 'leadgroup' ? { selectedPatient } : patientInfo.patient.id
-        }
+      {patientInfo && (
+        <Navbar
+          text={
+            mode === 'leadgroup' ? { selectedPatient } : patientInfo.patient.id
+          }
         color1="#375D7A"
         text2={patientInfo.patient.elmodel}
-        color2="lightgrey"
-      />
+          color2="lightgrey"
+        />
+      )}
       {/* <div style={{ paddingLeft: '45px', marginBottom: '-100px' }}>
         <PatientSelector
           selectedPatient={selectedPatient}

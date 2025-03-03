@@ -17,6 +17,7 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import * as XLSX from 'xlsx';
 import * as nifti from 'nifti-reader-js';
+import { Niivue, SLICE_TYPE } from "@niivue/niivue";
 import DatabasePlot from './DatabasePlot';
 import GroupAveragePlot from './GroupAveragePlot';
 import { PatientContext } from './PatientContext';
@@ -585,7 +586,7 @@ function DatabaseStats({ directoryPath }) {
         accept=".nii"
         onChange={(e) => handleNiiUpload(e)}
       />
-      <Dropdown>
+      {/* <Dropdown>
         <Dropdown.Toggle variant="success" id="dropdown-basic">
           <Dropdown.Menu>
             {filteredPatients && (
@@ -596,7 +597,16 @@ function DatabaseStats({ directoryPath }) {
             )}
           </Dropdown.Menu>
         </Dropdown.Toggle>
-      </Dropdown>
+      </Dropdown> */}
+      <div style={{ padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', marginTop: '100px' }}>
+        {filteredPatients && (
+          <GroupViewer
+            filteredPatients={filteredPatients}
+            directoryPath={directoryPath}
+          />
+        )}
+      </div>
+
       {/* {filteredPatients && (
         <GroupViewer
           filteredPatients={filteredPatients}

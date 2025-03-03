@@ -2,6 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import * as THREE from 'three';
 import { PLYLoader, OrbitControls } from 'three-stdlib';
+import Delaunator from 'delaunator';
+import { Niivue } from '@niivue/niivue';
+// import { Niivue } from 'niivue/niivue';
 // import * as nifti from 'nifti-reader-js'; // Correctly importing the nifti module
 import * as nifti from 'nifti-reader-js';
 // import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
@@ -18,6 +21,7 @@ import {
 import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings icon
 import * as math from 'mathjs';
 import { optimizeSphereValues } from './StimOptimizer';
+import { computeSuperimposedEField } from './OssDbsStimsets';
 // import { remote } from 'electron'; // Use 'electron' for Electron v12+
 
 function PlyViewer({
@@ -71,6 +75,7 @@ function PlyViewer({
           historical,
         );
         // setPlyFile(fileData);
+        console.log('fileData ply test', fileData);
         const loader = new PLYLoader();
         const geometry = loader.parse(fileData);
 
@@ -1679,6 +1684,7 @@ function PlyViewer({
   //   }
   // }, [plyFile]);
 
+
   useEffect(() => {
     if (atlas && sceneRef.current) {
       const scene = sceneRef.current;
@@ -1713,6 +1719,184 @@ function PlyViewer({
       // });
     }
   }, [quantities, amplitude]);
+
+  const [unitSolutions, setUnitSolutions] = useState(null);
+
+
+  async function loadNiftiAsVolume(arrayBuffer, scene) {
+    // Initialize Niivue
+    let nv = new Niivue();
+    // await nv.loadVolumes([{ data: arrayBuffer, colormap: 'gray' }]);
+
+    // // Get the volume data
+    // let volume = nv.volumes[0];
+    // if (!volume) {
+    //   throw new Error('Failed to load volume.');
+    // }
+
+    // let dims = volume.hdr.dims; // [x, y, z] dimensions
+    // let textureData = volume.img; // Intensity values
+
+    // console.log(`Loaded volume with dimensions: ${dims}`);
+
+    // // Create a 3D texture
+    // let texture = new THREE.Data3DTexture(
+    //   new Float32Array(textureData), // Convert to typed array
+    //   dims[1], // width (X)
+    //   dims[2], // height (Y)
+    //   dims[3], // depth (Z)
+    // );
+    // texture.format = THREE.RedFormat;
+    // texture.type = THREE.FloatType;
+    // texture.minFilter = THREE.LinearFilter;
+    // texture.magFilter = THREE.LinearFilter;
+    // texture.wrapS = THREE.ClampToEdgeWrapping;
+    // texture.wrapT = THREE.ClampToEdgeWrapping;
+    // texture.wrapR = THREE.ClampToEdgeWrapping;
+
+    // // Create a box geometry for the volume
+    // let geometry = new THREE.BoxGeometry(dims[1], dims[2], dims[3]);
+
+    // Shader Material for Volume Rendering
+    // let material = new THREE.ShaderMaterial({
+    //   uniforms: { volumeTexture: { value: texture } },
+    //   vertexShader: `
+    //         varying vec3 vUv;
+    //         void main() {
+    //             vUv = position;
+    //             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    //         }
+    //     `,
+    //   fragmentShader: `
+    //         uniform sampler3D volumeTexture;
+    //         varying vec3 vUv;
+    //         void main() {
+    //             float intensity = texture(volumeTexture, vUv).r;
+    //             gl_FragColor = vec4(intensity, intensity, intensity, 1.0);
+    //         }
+    //     `,
+    //   transparent: true,
+    // });
+
+    // let volumeMesh = new THREE.Mesh(geometry, material);
+    // scene.add(volumeMesh);
+
+    console.log('NIfTI volume rendered as a 3D texture.');
+  }
+  // Don't LOSE EFIELD SUPERIMPOSED
+  // useEffect(() => {
+  //   let tempUnitSolutions = null;
+  //   if (!unitSolutions) {
+  //     window.electron.ipcRenderer
+  //       .invoke('get-unit-solutions', '')
+  //       .then((solutions) => {
+  //         tempUnitSolutions = solutions;
+  //         console.log('tempUnitSolutions: ', tempUnitSolutions);
+  //         setUnitSolutions(solutions);
+  //       });
+  //   }
+
+  //   if (quantities && unitSolutions) {
+  //     console.log('quantities temp vector: ', quantities);
+  //     // Convert quantities struct to an array and remove the first index
+  //     let quantitiesArray = Object.values(quantities).slice(1);
+  //     // Divide each element in quantitiesArray by 1000
+  //     quantitiesArray = quantitiesArray.map((value) => value / 1000);
+  //     console.log('quantitiesArray: ', quantitiesArray);
+  //     const output = computeSuperimposedEField(quantitiesArray, unitSolutions);
+  //     console.log('output: ', output);
+
+  //     const img = output.eFieldSuperimposed;
+  //     const dimensions = output.header.dims.slice(1, 4);
+
+  //     // Generate voxel coordinates
+  //     const voxelCoordinates = [];
+  //     img.forEach((value, index) => {
+  //       if (!isNaN(value)) {
+  //         const z = Math.floor(index / (dimensions[0] * dimensions[1]));
+  //         const y = Math.floor(
+  //           (index % (dimensions[0] * dimensions[1])) / dimensions[0],
+  //         );
+  //         const x = index % dimensions[0];
+  //         voxelCoordinates.push([x, y, z, value]);
+  //       }
+  //     });
+  //     console.log('voxelCoordinates: ', voxelCoordinates);
+
+  //     const affineMatrix = output.header.affine;
+  //     const mniCoordinates = voxelCoordinates.map(([x, y, z, value]) => {
+  //       const voxelHomogeneous = [x, y, z, 1]; // Add 1 for homogeneous transformation
+  //       const transformedVoxels = math.multiply(affineMatrix, voxelHomogeneous);
+  //       const [wx, wy, wz] = transformedVoxels.slice(0, 3);
+  //       return [wx, wy, wz, value];
+  //     });
+
+  //     console.log('mniCoordinates: ', mniCoordinates);
+  //     // Binarize the mniCoordinates values
+  //     const threshold = 0.5; // Define a threshold value for binarization
+  //     const binarizedMniCoordinates = mniCoordinates.map(([x, y, z, value]) => {
+  //       const binarizedValue = value > threshold ? 1 : 0;
+  //       return [x, y, z, binarizedValue];
+  //     });
+
+  //     console.log('binarizedMniCoordinates: ', binarizedMniCoordinates);
+  //     const vertices = binarizedMniCoordinates.map(
+  //       ([x, y, z]) => new THREE.Vector3(x, y, z),
+  //     );
+  //     // Create a Delaunay triangulation from the vertices
+  //     //       const delaunay = Delaunator.from(vertices.map(v => [v.x, v.y, v.z]));
+  //     //       const indices = delaunay.triangles;
+  //     //       console.log('indices: ', indices);
+
+  //     //       let plyContent = `ply
+  //     // format ascii 1.0
+  //     // element vertex ${vertices.length}
+  //     // property float x
+  //     // property float y
+  //     // property float z
+  //     // element face ${indices.length / 3}
+  //     // property list uchar int vertex_index
+  //     // end_header
+  //     // `;
+
+  //     //       // Add vertices
+  //     //       vertices.forEach(v => {
+  //     //         plyContent += `${v.x} ${v.y} ${v.z}\n`;
+  //     //       });
+
+  //     //       // Add faces
+  //     //       for (let i = 0; i < indices.length; i += 3) {
+  //     //         plyContent += `3 ${indices[i]} ${indices[i + 1]} ${indices[i + 2]}\n`;
+  //     //       }
+
+  //     //       const loader = new PLYLoader();
+  //     //       const geometry = loader.parse(plyContent);
+  //     //       console.log('geometry: ', geometry);
+  //     // const geometry = new THREE.ConvexGeometry(vertices);
+  //     // const material = new THREE.MeshStandardMaterial({
+  //     //   color: 0x00ff00,
+  //     //   transparent: true,
+  //     //   opacity: 0.8,
+  //     // });
+
+  //     // const geometry = new THREE.BufferGeometry().setFromPoints(vertices);
+  //     // console.log('geometry: ', geometry);
+  //     // const material = new THREE.MeshStandardMaterial({
+  //     //   vertexColors: false, // Disable vertex colors to see the base color
+  //     //   flatShading: true,
+  //     //   metalness: 0.1,
+  //     //   roughness: 0.5,
+  //     //   transparent: true,
+  //     //   opacity: 0.8,
+  //     //   color: 0xffffff,
+  //     // });
+  //     // eslint-disable-next-line no-use-before-define
+  //     // addMeshToScene('PLY Scene', geometry, material);
+  //     const scene = sceneRef.current;
+  //     const niiPath = binarizedMniCoordinates;
+  //     loadNiftiAsVolume(niiPath, scene);
+  //   }
+  // }, [quantities, amplitude, unitSolutions]);
 
   // useEffect(() => {
   //   const scene = sceneRef.current;
@@ -3468,7 +3652,7 @@ function PlyViewer({
 
     const processFilesSequentially = async () => {
       for (const file of fileData) {
-        const {fileName } = file;
+        const { fileName } = file;
         if (fileName !== 'gm_mask.nii.gz') {
           await processFile(file);
         }

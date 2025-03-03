@@ -110,6 +110,8 @@ app.on('ready', () => {
 // const inputPath = process.argv[1];
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
 const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
+// const inputPath = null;
+// const inputPath = '/Volumes/OneTouch/MasterDataset/AllData';
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
 // const inputPath = '/Users/savirmadan/Documents/LeadGroupDemo/derivatives/leadgroup/20241007203440/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/stimulations/MNI152NLin2009bAsym/inputData.json';
@@ -614,6 +616,8 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
+let showResize = false;
+
 const createWindow = async () => {
   if (isDebug) {
     await installExtensions();
@@ -650,19 +654,21 @@ const createWindow = async () => {
   });
 
   let previousWidth = mainWindow.getSize()[0]; // Initialize with the current width
-
   mainWindow.on('resize', () => {
     const [currentWidth, currentHeight] = mainWindow.getSize();
 
     // Check if the width has changed
     if (currentWidth !== previousWidth) {
       // Calculate the zoom level based on window size change.
-      const baseWidth = 1100; // Default window width
-      const zoomLevel = (currentWidth / baseWidth - 1) / 0.15;
+      let baseWidth = 1100; // Default window width
+      let zoomLevel = (currentWidth / baseWidth - 1) / 0.15;
 
       // Send the zoom level to the renderer process
-      // mainWindow.webContents.send('zoom-level-changed', zoomLevel);
 
+      // if (!showResize) {
+      //   mainWindow.webContents.send('zoom-level-changed', zoomLevel);
+      // }
+      // showResize = true;
       // Update the previous width
       previousWidth = currentWidth;
     }
@@ -707,13 +713,20 @@ const createWindow = async () => {
 
   // Load the saved directory path from the JSON file
   const loadDirectoryPath = () => {
-    if (fs.existsSync(jsonFilePath)) {
-      const data = fs.readFileSync(jsonFilePath, 'utf-8');
-      // return JSON.parse(data).directoryPath;
-      // console.log(stimulationData.filepath);
-      if (!stimulationData.filepath) {
-        return inputPath;
-      }
+    // if (fs.existsSync(jsonFilePath)) {
+    //   const data = fs.readFileSync(jsonFilePath, 'utf-8');
+    //   // return JSON.parse(data).directoryPath;
+    //   // console.log(stimulationData.filepath);
+    //   if (!stimulationData.filepath) {
+    //     return inputPath;
+    //   }
+    //   return stimulationData.filepath;
+    // } else {
+
+    // }
+    if (!stimulationData.filepath) {
+      return inputPath;
+    } else {
       return stimulationData.filepath;
     }
     return null;
@@ -1645,11 +1658,16 @@ ipcMain.on('zoom-level-changed', (event, zoomLevel) => {
 });
 
 ipcMain.on('increase-window-width', (event, showViewer) => {
+  showResize = showViewer;
   if (mainWindow && showViewer) {
     const [width, height] = mainWindow.getSize();
-    mainWindow.setSize(width - 350, height + 50); // Increase width by 100 pixels
+    if (width > 800) {
+      mainWindow.setSize(width - 350, height); // Increase width by 100 pixels
+    }
   } else if (mainWindow && !showViewer) {
     const [width, height] = mainWindow.getSize();
-    mainWindow.setSize(width + 350, height - 50); // Increase width by 100 pixels
+    if (width < 800) {
+      mainWindow.setSize(width + 350, height); // Increase width by 100 pixels
+    }
   }
 });

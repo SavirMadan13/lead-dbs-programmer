@@ -15,8 +15,8 @@ import CustomTable from './components/CustomTable';
 import GroupStats from './components/GroupStats';
 import DatabaseStats from './components/DatabaseStats';
 import Import from './components/Import';
-// import NiiVueViewer from './components/NiiVueViewer';
-
+import NiiViewer from './components/NiiViewer';
+import TestApp from './niivue/ui/TestApp';
 export default function App() {
   const [directoryPath, setDirectoryPath] = useState(null);
   const [showSettings, setShowSettings] = useState(false); // New state to control visibility
@@ -250,14 +250,17 @@ export default function App() {
                 </div>
               }
             />
-            {/* <Route
+            <Route
               path="/niivue"
               element={
-                <div style={{ maxWidth: '1000px' }}>
-                  <NiiVueViewer />
+                <div>
+                  {/* <Navbar text="" color1="#375D7A" /> */}
+                  <div style={{ marginTop: '100px' }}>
+                    <TestApp />
+                  </div>
                 </div>
               }
-            /> */}
+            />
           </Routes>
         </Router>
       </PatientProvider>
