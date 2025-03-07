@@ -615,14 +615,14 @@ function DatabaseStats({ directoryPath }) {
           </Dropdown.Menu>
         </Dropdown.Toggle>
       </Dropdown> */}
-      {/* <div style={{ padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', marginTop: '100px' }}>
+      <div style={{ padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', marginTop: '100px' }}>
         {filteredPatients && (
           <GroupViewer
             filteredPatients={filteredPatients}
             directoryPath={directoryPath}
           />
         )}
-      </div> */}
+      </div>
 
       {/* {filteredPatients && (
         <GroupViewer
