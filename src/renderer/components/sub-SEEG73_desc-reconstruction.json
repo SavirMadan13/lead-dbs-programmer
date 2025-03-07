@@ -1,0 +1,339 @@
+[
+	{
+		"elmodel": "Multiple",
+		"manually_corrected": 1,
+		"multiple_elmodel": "DIXI D08-08AM",
+		"elname": "LACC",
+		"labels": [
+			[
+				"LACC1",
+				"LACC2",
+				"LACC3",
+				"LACC4",
+				"LACC5",
+				"LACC6",
+				"LACC7",
+				"LACC8",
+				"LACC9",
+				"LACC10",
+				"LACC11",
+				"LACC12",
+				"LACC13",
+				"LACC14"
+			]
+		]
+	},
+	{
+		"elmodel": "Multiple",
+		"manually_corrected": 1,
+		"multiple_elmodel": "DIXI D08-10AM",
+		"elname": "LAHIPP",
+		"labels": [
+			[
+				"LAHIPP1",
+				"LAHIPP2",
+				"LAHIPP3",
+				"LAHIPP4",
+				"LAHIPP5",
+				"LAHIPP6",
+				"LAHIPP7",
+				"LAHIPP8",
+				"LAHIPP9",
+				"LAHIPP10",
+				"LAHIPP11",
+				"LAHIPP12"
+			]
+		]
+	},
+	{
+		"elmodel": "Multiple",
+		"manually_corrected": 1,
+		"multiple_elmodel": "DIXI D08-12AM",
+		"elname": "LAMY",
+		"labels": [
+			[
+				"LAMY1",
+				"LAMY2",
+				"LAMY3",
+				"LAMY4",
+				"LAMY5",
+				"LAMY6",
+				"LAMY7",
+				"LAMY8",
+				"LAMY9",
+				"LAMY10",
+				"LAMY11",
+				"LAMY12",
+				"LAMY13",
+				"LAMY14"
+			]
+		]
+	},
+	{
+		"elmodel": "Multiple",
+		"manually_corrected": 1,
+		"multiple_elmodel": "DIXI D08-10AM",
+		"elname": "LENT",
+		"labels": [
+			[
+				"LENT1",
+				"LENT2",
+				"LENT3",
+				"LENT4",
+				"LENT5",
+				"LENT6",
+				"LENT7",
+				"LENT8",
+				"LENT9",
+				"LENT10"
+			]
+		]
+	},
+	{
+		"elmodel": "Multiple",
+		"manually_corrected": 1,
+		"multiple_elmodel": "DIXI D08-08AM",
+		"elname": "LHG",
+		"labels": [
+			[
+				"LHG1",
+				"LHG2",
+				"LHG3",
+				"LHG4",
+				"LHG5",
+				"LHG6",
+				"LHG7",
+				"LHG8",
+				"LHG9",
+				"LHG10"
+			]
+		]
+	},
+	{
+		"elmodel": "Multiple",
+		"manually_corrected": 1,
+		"multiple_elmodel": "DIXI D08-12AM",
+		"elname": "LITG",
+		"labels": [
+			[
+				"LITG1",
+				"LITG2",
+				"LITG3",
+				"LITG4",
+				"LITG5",
+				"LITG6",
+				"LITG7",
+				"LITG8",
+				"LITG9",
+				"LITG10",
+				"LITG11",
+				"LITG12"
+			]
+		]
+	},
+	{
+		"elmodel": "Multiple",
+		"manually_corrected": 1,
+		"multiple_elmodel": "DIXI D08-15AM",
+		"elname": "LOFC",
+		"labels": [
+			[
+				"LOFC1",
+				"LOFC2",
+				"LOFC3",
+				"LOFC4",
+				"LOFC5",
+				"LOFC6",
+				"LOFC7",
+				"LOFC8",
+				"LOFC9",
+				"LOFC10",
+				"LOFC11",
+				"LOFC12",
+				"LOFC13",
+				"LOFC14"
+			]
+		]
+	},
+	{
+		"elmodel": "Multiple",
+		"manually_corrected": 1,
+		"multiple_elmodel": "DIXI D08-12AM",
+		"elname": "LPLANINS",
+		"labels": [
+			[
+				"LPLANINS8",
+				"LPLANINS7",
+				"LPLANINS6",
+				"LPLANINS5",
+				"LPLANINS4",
+				"LPLANINS3",
+				"LPLANINS2",
+				"LPLANINS1"
+			]
+		]
+	},
+	{
+		"elmodel": "Multiple",
+		"manually_corrected": 1,
+		"multiple_elmodel": "DIXI D08-08AM",
+		"elname": "LRHIPP",
+		"labels": [
+			[
+				"LRHIPP1",
+				"LRHIPP2",
+				"LRHIPP3",
+				"LRHIPP4",
+				"LRHIPP5",
+				"LRHIPP6",
+				"LRHIPP7",
+				"LRHIPP8",
+				"LRHIPP9",
+				"LRHIPP10",
+				"LRHIPP11",
+				"LRHIPP12"
+			]
+		]
+	},
+	{
+		"elmodel": "Multiple",
+		"manually_corrected": 1,
+		"multiple_elmodel": "DIXI D08-10AM",
+		"elname": "LSMAAINS",
+		"labels": [
+			[
+				"LSMAAINS1",
+				"LSMAAINS2",
+				"LSMAAINS3",
+				"LSMAAINS4",
+				"LSMAAINS5",
+				"LSMAAINS6",
+				"LSMAAINS7",
+				"LSMAAINS8"
+			]
+		]
+	},
+	{
+		"elmodel": "Multiple",
+		"manually_corrected": 1,
+		"multiple_elmodel": "DIXI D08-10AM",
+		"elname": "LSTGPHP",
+		"labels": [
+			[
+				"LSTGPHP1",
+				"LSTGPHP2",
+				"LSTGPHP3",
+				"LSTGPHP4",
+				"LSTGPHP5",
+				"LSTGPHP6",
+				"LSTGPHP7",
+				"LSTGPHP8"
+			]
+		]
+	},
+	{
+		"elmodel": "Multiple",
+		"manually_corrected": 1,
+		"multiple_elmodel": "DIXI D08-08AM",
+		"elname": "LTP",
+		"labels": [
+			[
+				"LTP1",
+				"LTP2",
+				"LTP3",
+				"LTP4",
+				"LTP5",
+				"LTP6",
+				"LTP7",
+				"LTP8"
+			]
+		]
+	},
+	{
+		"elmodel": "Multiple",
+		"manually_corrected": 1,
+		"multiple_elmodel": "DIXI D08-08AM",
+		"elname": "LTPO",
+		"labels": [
+			[
+				"LTPO1",
+				"LTPO2",
+				"LTPO3",
+				"LTPO4",
+				"LTPO5",
+				"LTPO6",
+				"LTPO7",
+				"LTPO8",
+				"LTPO9",
+				"LTPO10"
+			]
+		]
+	},
+	{
+		"elmodel": "Multiple",
+		"manually_corrected": 1,
+		"multiple_elmodel": "DIXI D08-15AM",
+		"elname": "RAHIPP",
+		"labels": [
+			[
+				"RAHIPP1",
+				"RAHIPP2",
+				"RAHIPP3",
+				"RAHIPP4",
+				"RAHIPP5",
+				"RAHIPP6",
+				"RAHIPP7",
+				"RAHIPP8",
+				"RAHIPP9",
+				"RAHIPP10",
+				"RAHIPP11",
+				"RAHIPP12",
+				"RAHIPP13",
+				"RAHIPP14"
+			]
+		]
+	},
+	{
+		"elmodel": "Multiple",
+		"manually_corrected": 1,
+		"multiple_elmodel": "DIXI D08-10AM",
+		"elname": "RAMY",
+		"labels": [
+			[
+				"RAMY1",
+				"RAMY2",
+				"RAMY3",
+				"RAMY4",
+				"RAMY5",
+				"RAMY6",
+				"RAMY7",
+				"RAMY8",
+				"RAMY9",
+				"RAMY10",
+				"RAMY11"
+			]
+		]
+	},
+	{
+		"elmodel": "Multiple",
+		"manually_corrected": 1,
+		"multiple_elmodel": "DIXI D08-10AM",
+		"elname": "RPHIPP",
+		"labels": [
+			[
+				"RPHIPP1",
+				"RPHIPP2",
+				"RPHIPP3",
+				"RPHIPP4",
+				"RPHIPP5",
+				"RPHIPP6",
+				"RPHIPP7",
+				"RPHIPP8",
+				"RPHIPP9",
+				"RPHIPP10",
+				"RPHIPP11",
+				"RPHIPP12"
+			]
+		]
+	}
+]

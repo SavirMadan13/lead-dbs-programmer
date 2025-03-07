@@ -21,7 +21,7 @@ ChartJS.register(
   Legend
 );
 
-function PairedTTestComponent({ rawData, showPercentage }) {
+function PairedTTestComponent({ rawData, showPercentage, scoretype }) {
   // const [showPercentage, setShowPercentage] = useState(false);
   console.log(rawData);
   const scoreSums = {};
@@ -29,8 +29,8 @@ function PairedTTestComponent({ rawData, showPercentage }) {
   // Calculate the total score for each time point, excluding 'id'
   rawData.forEach((patient) => {
     Object.keys(patient).forEach((timepoint) => {
-      if (timepoint !== 'id') {
-        const scores = Object.values(patient[timepoint]);
+      if (timepoint !== 'id' && patient[timepoint][scoretype]) {
+        const scores = Object.values(patient[timepoint][scoretype]);
         console.log(timepoint, scores);
         const numericScores = scores.filter(score => typeof score === 'number');
         const totalScore = numericScores.reduce((sum, score) => sum + score, 0);

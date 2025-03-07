@@ -82,11 +82,15 @@ function ensureClinicalScoresFile() {
       },
     };
 
-    fs.writeFileSync(
-      scoresFilePath,
-      JSON.stringify(defaultScores, null, 2),
-      'utf8',
-    );
+    try {
+      fs.writeFileSync(
+        scoresFilePath,
+        JSON.stringify(defaultScores, null, 2),
+        'utf8',
+      );
+    } catch (error) {
+      console.error('Error writing default scores to file:', error);
+    }
     console.log('Created clinicalScores.json with default content');
   }
 }
@@ -660,8 +664,8 @@ const createWindow = async () => {
     // Check if the width has changed
     if (currentWidth !== previousWidth) {
       // Calculate the zoom level based on window size change.
-      let baseWidth = 1100; // Default window width
-      let zoomLevel = (currentWidth / baseWidth - 1) / 0.15;
+      const baseWidth = 1100; // Default window width
+      const zoomLevel = (currentWidth / baseWidth - 1) / 0.15;
 
       // Send the zoom level to the renderer process
 
@@ -712,23 +716,40 @@ const createWindow = async () => {
   };
 
   // Load the saved directory path from the JSON file
-  const loadDirectoryPath = () => {
-    // if (fs.existsSync(jsonFilePath)) {
-    //   const data = fs.readFileSync(jsonFilePath, 'utf-8');
-    //   // return JSON.parse(data).directoryPath;
-    //   // console.log(stimulationData.filepath);
-    //   if (!stimulationData.filepath) {
-    //     return inputPath;
-    //   }
-    //   return stimulationData.filepath;
-    // } else {
+  // const loadDirectoryPath = () => {
+  //   // if (fs.existsSync(jsonFilePath)) {
+  //   //   const data = fs.readFileSync(jsonFilePath, 'utf-8');
+  //   //   // return JSON.parse(data).directoryPath;
+  //   //   // console.log(stimulationData.filepath);
+  //   //   if (!stimulationData.filepath) {
+  //   //     return inputPath;
+  //   //   }
+  //   //   return stimulationData.filepath;
+  //   // } else {
 
-    // }
-    if (!stimulationData.filepath) {
-      return inputPath;
-    } else {
+  //   // }
+  //   if (!stimulationData.filepath) {
+  //     return inputPath;
+  //   } else {
+  //     return stimulationData.filepath;
+  //   }
+  //   return null;
+  // };
+
+  const loadDirectoryPath = () => {
+    console.log('load directory path');
+    if (fs.existsSync(jsonFilePath)) {
+      console.log(jsonFilePath);
+      const data = fs.readFileSync(jsonFilePath, 'utf-8');
+      // return JSON.parse(data).directoryPath;
+      // console.log(stimulationData.filepath);
+      if (!stimulationData.filepath) {
+        return inputPath;
+      }
       return stimulationData.filepath;
     }
+    return inputPath;
+
     return null;
   };
 

@@ -54,6 +54,7 @@ function ClinicalScores() {
   const [scoreTypes, setScoreTypes] = useState([]);
   const [selectedScoreType, setSelectedScoreType] = useState();
   const [initialScores, setInitialScores] = useState(UPDRS);
+  const [allScores, setAllScores] = useState([]);
 
   useEffect(() => {
     const loadScores = async () => {
@@ -147,9 +148,25 @@ function ClinicalScores() {
     '3.18: Constancy of rest tremor': '3-18_Constancy-of-rest-tremor',
   };
 
+  const [patients, setPatients] = useState([
+    {
+      id: patient.id,
+      baseline: { ...initialScores },
+      postop: { ...initialScores },
+    },
+  ]);
+
   const handleScoreChange = (score) => {
-    setInitialScores(totalScores[score]);
+    console.log('Total score change: ', allScores[score]);
+    setInitialScores(allScores[score]);
     setSelectedScoreType(score);
+    setPatients([
+      {
+        id: patient.id,
+        baseline: { ...allScores[score] },
+        postop: { ...allScores[score] },
+      },
+    ]);
     // if (score === 'UPDRS') {
     //   setInitialScores(UPDRS);
     // } else if (score === 'Y-BOCS') {
@@ -174,14 +191,6 @@ function ClinicalScores() {
   const keys = Object.keys(initialScores);
   const headerChunks = chunkArray(keys, columnsPerRow);
 
-  const [patients, setPatients] = useState([
-    {
-      id: patient.id,
-      baseline: { ...initialScores },
-      postop: { ...initialScores },
-    },
-  ]);
-
   window.electron.ipcRenderer.sendMessage(
     'import-file-clinical',
     patient.id,
@@ -197,33 +206,62 @@ function ClinicalScores() {
       const handleImportFile = (arg) => {
         const importedScores = arg;
         console.log('importedScores: ', importedScores);
-        console.log('initialScores: ', totalScores);
-        const matchingScores = Object.keys(totalScores).find((score) => {
-          const totalScoreItems = Object.keys(totalScores[score]);
-          const importedScoreItems = Object.keys(importedScores);
-          return (
-            totalScoreItems.length === importedScoreItems.length &&
-            totalScoreItems.every((item) => importedScoreItems.includes(item))
-          );
-        });
-
-        if (matchingScores) {
-          console.log('Matching score found: ', matchingScores);
-        } else {
-          console.log('No matching score found');
-        }
         if (importedScores === 'File not found') {
-          console.log('No File Found');
-        } else {
+          setAllScores(totalScores);
           setPatients([
             {
               id: patient.id,
-              baseline: importedScores,
-              postop: { ...initialScores },
+              baseline: { ...initialScores(Object.keys(totalScores)[0]) },
+              postop: { ...initialScores(Object.keys(totalScores)[0]) },
             },
           ]);
-          setSelectedScoreType(matchingScores);
+          setSelectedScoreType(Object.keys(totalScores)[0]);
+          return;
         }
+        console.log('initialScores: ', totalScores);
+        const newAllScores = {
+          ...totalScores,
+        };
+        Object.keys(importedScores).forEach((score) => {
+          console.log('score: ', score);
+          newAllScores[score] = importedScores[score];
+        });
+        console.log('newAllScores: ', newAllScores);
+        setAllScores(newAllScores);
+        setPatients([
+          {
+            id: patient.id,
+            baseline: importedScores[Object.keys(importedScores)[0]],
+            postop: { ...initialScores },
+          },
+        ]);
+        setSelectedScoreType(Object.keys(importedScores)[0]);
+        // const matchingScores = Object.keys(totalScores).find((score) => {
+        //   const totalScoreItems = Object.keys(totalScores[score]);
+        //   const importedScoreItems = Object.keys(importedScores);
+        //   return (
+        //     totalScoreItems.length === importedScoreItems.length &&
+        //     totalScoreItems.every((item) => importedScoreItems.includes(item))
+        //   );
+        // });
+
+        // if (matchingScores) {
+        //   console.log('Matching score found: ', matchingScores);
+        // } else {
+        //   console.log('No matching score found');
+        // }
+        // if (importedScores === 'File not found') {
+        //   console.log('No File Found');
+        // } else {
+        //   setPatients([
+        //     {
+        //       id: patient.id,
+        //       baseline: importedScores,
+        //       postop: { ...initialScores },
+        //     },
+        //   ]);
+        //   setAllScores(newAllScores);
+        // }
       };
 
       // Attach listeners using 'once' so that it only listens for the event once
@@ -327,6 +365,9 @@ function ClinicalScores() {
                           />
                           {/* <span className="tooltip-text">{key}</span> */}
                         </div>
+                      )}
+                      {selectedScoreType !== 'UPDRS' && (
+                        <div className="tooltip-text">{key}</div>
                       )}
                       {/* {key} */}
                     </th>
@@ -490,11 +531,13 @@ function ClinicalScores() {
   };
 
   const sendDataToMain = () => {
+    console.log(patients);
     console.log(patients[0].baseline);
     window.electron.ipcRenderer.sendMessage(
       'save-file-clinical',
       patients[0].baseline,
       location.state,
+      selectedScoreType,
     );
   };
   const [addScore, setAddScore] = useState(false);

@@ -97,6 +97,7 @@
     "@mui/icons-material": "^6.1.0",
     "@mui/lab": "^6.0.0-beta.9",
     "@mui/material": "^6.1.0",
+    "@mui/styles": "^6.4.7",
     "@mui/x-tree-view": "^7.17.0",
     "@niivue/niivue": "^0.50.0",
     "@react-three/drei": "^9.112.0",

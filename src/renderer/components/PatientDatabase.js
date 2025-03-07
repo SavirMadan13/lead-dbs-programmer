@@ -417,6 +417,14 @@ function PatientDatabase({ key, directoryPath }) {
               <Button
                 // variant="contained"
                 // color="default"
+                onClick={() => navigate('/seeg')}
+                style={{ marginLeft: '5px' }}
+              >
+                SEEG
+              </Button>
+              <Button
+                // variant="contained"
+                // color="default"
                 onClick={() => navigate('/groupstats')}
                 style={{ marginLeft: '5px' }}
               >

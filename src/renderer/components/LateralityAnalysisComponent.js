@@ -21,7 +21,7 @@ ChartJS.register(
   Legend
 );
 
-function LateralityAnalysisComponent({ rawData, showPercentage }) {
+function LateralityAnalysisComponent({ rawData, showPercentage, scoretype }) {
   const [threshold, setThreshold] = useState(0);
 
   const leftSideItems = [
@@ -59,8 +59,8 @@ function LateralityAnalysisComponent({ rawData, showPercentage }) {
 
   rawData.forEach((patientData) => {
     Object.keys(patientData).forEach((timepoint) => {
-      if (timepoint !== 'id') {
-        const { leftSideSum, rightSideSum } = splitScoresByLaterality(patientData[timepoint]);
+      if (timepoint !== 'id' && patientData[timepoint][scoretype]) {
+        const { leftSideSum, rightSideSum } = splitScoresByLaterality(patientData[timepoint][scoretype]);
 
         if (!leftSumsByTimepoint[timepoint]) {
           leftSumsByTimepoint[timepoint] = 0;

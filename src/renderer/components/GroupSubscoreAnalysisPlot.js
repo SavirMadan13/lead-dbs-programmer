@@ -23,9 +23,14 @@ ChartJS.register(
   Filler
 );
 
-function GroupSubscoreAnalysisPlot({ clinicalData }) {
+function GroupSubscoreAnalysisPlot({ clinicalData, scoretype }) {
   const [showPercentage, setShowPercentage] = useState(true);
   const [showGroupAverage, setShowGroupAverage] = useState(false);
+
+  // Filter out patients with no clinical data
+  const filteredClinicalData = clinicalData.filter(patient =>
+    Object.keys(patient.clinicalData).length > 0
+  );
 
   const bradykinesiaItems = [
     '3.4a: Finger tapping- Right hand', '3.4b: Finger tapping- Left hand',
@@ -96,26 +101,32 @@ function GroupSubscoreAnalysisPlot({ clinicalData }) {
   const datasets = [];
 
   subscoreCategories.forEach(({ name, items, color }) => {
-    const patientData = clinicalData.map((patientData) =>
+    const patientData = filteredClinicalData.map((patientData) =>
       orderedTimelines.map((timeline) => {
-        const baselineScores = Object.entries(patientData.clinicalData['baseline'] || {})
+        // Check if the scoretype data exists for the baseline and current timeline
+        const baselineData = patientData.clinicalData['baseline']?.[scoretype];
+        const timelineData = patientData.clinicalData[timeline]?.[scoretype];
+
+        if (!baselineData || !timelineData) return null; // Skip if data is missing
+
+        const baselineScores = Object.entries(baselineData)
           .filter(([item]) => items.includes(item))
           .map(([, score]) => score);
         const baselineTotal = baselineScores.reduce((sum, score) => sum + score, 0) || 1;
 
-        const scores = Object.entries(patientData.clinicalData[timeline] || {})
+        const scores = Object.entries(timelineData)
           .filter(([item]) => items.includes(item))
           .map(([, score]) => score);
         const totalScore = scores.reduce((sum, score) => sum + score, 0);
 
         return showPercentage ? ((baselineTotal - totalScore) / baselineTotal) * 100 : totalScore;
-      })
+      }).filter(score => score !== null) // Filter out null values
     );
 
     if (!showGroupAverage) {
       patientData.forEach((data, i) => {
         datasets.push({
-          label: `Patient ${clinicalData[i].id} - ${name}`,
+          label: `Patient ${filteredClinicalData[i].id} - ${name}`,
           data,
           borderColor: `${color}88`, // Lighter color for visibility
           borderWidth: 1.5,

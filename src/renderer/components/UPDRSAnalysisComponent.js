@@ -10,9 +10,9 @@ import CorrelationAnalysisComponent from './CorrelationAnalysisComponent';
 // import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 import SubscoreAnalysis from './SubscoreAnalysis';
 
-function UPDRSAnalysisComponent({ currentStage, rawData, clinicalTimelines }) {
+function UPDRSAnalysisComponent({ currentStage, rawData, clinicalTimelines, scoretype }) {
   console.log(rawData);
-  const [analysisType, setAnalysisType] = useState('all');
+  const [analysisType, setAnalysisType] = useState(scoretype === 'UPDRS' ? 'all' : 'raincloud');
   const [showPercentage, setShowPercentage] = useState(true);
   const [plotData, setPlotData] = useState(rawData);
   const navigate = useNavigate(); // Initialize the navigate hook
@@ -33,8 +33,8 @@ function UPDRSAnalysisComponent({ currentStage, rawData, clinicalTimelines }) {
         console.log(clinicalTimelines[key].timeline);
       }
     });
-    console.log(rawData);
-    console.log(updatedRawData);
+    console.log('rawData: ', rawData);
+    console.log('updatedRawData: ', updatedRawData);
     setPlotData(updatedRawData);
   }, [clinicalTimelines, rawData]);
 
@@ -45,6 +45,7 @@ function UPDRSAnalysisComponent({ currentStage, rawData, clinicalTimelines }) {
           <PairedTTestComponent
             rawData={rawData}
             showPercentage={showPercentage}
+            scoretype={scoretype}
           />
         );
       // case 'boxPlot':
@@ -58,11 +59,12 @@ function UPDRSAnalysisComponent({ currentStage, rawData, clinicalTimelines }) {
           <LateralityAnalysisComponent
             rawData={rawData}
             showPercentage={showPercentage}
+            scoretype={scoretype}
           />
         );
       case 'subscore':
         return (
-          <SubscoreAnalysis rawData={rawData} showPercentage={showPercentage} />
+          <SubscoreAnalysis rawData={rawData} showPercentage={showPercentage} scoretype={scoretype} />
         );
       // // case 'subscale':
       // //   return (
@@ -106,6 +108,7 @@ function UPDRSAnalysisComponent({ currentStage, rawData, clinicalTimelines }) {
               <PairedTTestComponent
                 rawData={rawData}
                 showPercentage={showPercentage}
+                scoretype={scoretype}
               />
             </div>
             <div
@@ -120,6 +123,7 @@ function UPDRSAnalysisComponent({ currentStage, rawData, clinicalTimelines }) {
               <LateralityAnalysisComponent
                 rawData={rawData}
                 showPercentage={showPercentage}
+                scoretype={scoretype}
               />
             </div>
             <div
@@ -133,6 +137,7 @@ function UPDRSAnalysisComponent({ currentStage, rawData, clinicalTimelines }) {
               <SubscoreAnalysis
                 rawData={rawData}
                 showPercentage={showPercentage}
+                scoretype={scoretype}
               />
             </div>
           </div>

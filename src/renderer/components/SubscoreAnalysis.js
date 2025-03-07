@@ -21,7 +21,7 @@ ChartJS.register(
   Legend
 );
 
-function SubscoreAnalysis({ rawData, showPercentage }) {
+function SubscoreAnalysis({ rawData, showPercentage, scoretype }) {
   const [threshold, setThreshold] = useState(0);
 
   const bradykinesiaItems = [
@@ -68,9 +68,9 @@ function SubscoreAnalysis({ rawData, showPercentage }) {
 
   rawData.forEach((patientData) => {
     Object.keys(patientData).forEach((timepoint) => {
-      if (timepoint !== 'id') {
+      if (timepoint !== 'id' && patientData[timepoint][scoretype]) {
         const calculateSum = (items) =>
-          items.reduce((sum, item) => sum + (patientData[timepoint][item] >= threshold ? patientData[timepoint][item] : 0), 0);
+          items.reduce((sum, item) => sum + (patientData[timepoint][scoretype][item] >= threshold ? patientData[timepoint][scoretype][item] : 0), 0);
 
         subscoreSumsByTimepoint.bradykinesia[timepoint] = calculateSum(bradykinesiaItems);
         subscoreSumsByTimepoint.rigidity[timepoint] = calculateSum(rigidityItems);

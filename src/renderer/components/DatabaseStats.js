@@ -44,6 +44,7 @@ function DatabaseStats({ directoryPath }) {
   const [sortDirection, setSortDirection] = useState('asc');
   const [displayedPatients, setDisplayedPatients] = useState([]);
   const [filters, setFilters] = useState({});
+  const [scoretype, setScoretype] = useState('UPDRS');
 
   useEffect(() => {
     if (directoryPath && filteredPatients.length > 0) {
@@ -152,11 +153,18 @@ function DatabaseStats({ directoryPath }) {
       case 'all':
         return (
           <div className="analysis-container">
-            <CombinedPlot clinicalData={clinicalDataForPlotting} />
+            <CombinedPlot
+              clinicalData={clinicalDataForPlotting}
+              scoretype={scoretype}
+            />
             <GroupLateralityAnalysisPlot
               clinicalData={clinicalDataForPlotting}
+              scoretype={scoretype}
             />
-            <GroupSubscoreAnalysisPlot clinicalData={clinicalDataForPlotting} />
+            <GroupSubscoreAnalysisPlot
+              clinicalData={clinicalDataForPlotting}
+              scoretype={scoretype}
+            />
           </div>
         );
       case 'new':
@@ -547,7 +555,16 @@ function DatabaseStats({ directoryPath }) {
           </div>
         </AccordionDetails>
       </Accordion>
-
+      <div>
+        <Select
+          value={scoretype}
+          onChange={(e) => setScoretype(e.target.value)}
+          className="analysis-select"
+        >
+          <MenuItem value="UPDRS">UPDRS</MenuItem>
+          <MenuItem value="Y-BOCS">Y-BOCS</MenuItem>
+        </Select>
+      </div>
       {clinicalDataForPlotting && filteredPatients && (
         <div className="analysis-section">
           <select
@@ -598,14 +615,14 @@ function DatabaseStats({ directoryPath }) {
           </Dropdown.Menu>
         </Dropdown.Toggle>
       </Dropdown> */}
-      <div style={{ padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', marginTop: '100px' }}>
+      {/* <div style={{ padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', marginTop: '100px' }}>
         {filteredPatients && (
           <GroupViewer
             filteredPatients={filteredPatients}
             directoryPath={directoryPath}
           />
         )}
-      </div>
+      </div> */}
 
       {/* {filteredPatients && (
         <GroupViewer

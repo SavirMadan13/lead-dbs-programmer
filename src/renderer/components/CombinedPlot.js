@@ -23,10 +23,10 @@ ChartJS.register(
   Filler,
 );
 
-function CombinedPlot({ clinicalData }) {
+function CombinedPlot({ clinicalData, scoretype }) {
   const [showPercentage, setShowPercentage] = useState(true);
   const [showGroupAverage, setShowGroupAverage] = useState(false);
-
+  console.log('Patient data: ', clinicalData);
   // Define a clean color palette
   const colorPalette = [
     '#4E79A7',
@@ -47,6 +47,7 @@ function CombinedPlot({ clinicalData }) {
       clinicalData.flatMap((patient) => Object.keys(patient.clinicalData)),
     ),
   ];
+  console.log('Timelines: ', timelines);
   const orderedTimelines = timelines.sort((a, b) => {
     if (a === 'baseline') return -1;
     if (b === 'baseline') return 1;
@@ -70,25 +71,37 @@ function CombinedPlot({ clinicalData }) {
       sensitivity: 'base',
     });
   });
-
+  console.log('Ordered timelines: ', orderedTimelines);
   // Calculate average and standard deviation for each timeline
   const averages = [];
   const stdDeviations = [];
 
   orderedTimelines.forEach((timeline) => {
     const values = clinicalData.map((patientData) => {
-      const baselineScores = Object.values(
-        patientData.clinicalData.baseline || {},
-      );
+      // Check if the patient has clinical data for the baseline and the current timeline
+      const baselineData = patientData.clinicalData.baseline?.[scoretype];
+      const timelineData = patientData.clinicalData[timeline]?.[scoretype];
+
+      if (!baselineData || !timelineData) {
+        return null; // Return null if data is missing
+      }
+
+      const baselineScores = Object.values(baselineData);
       const baselineTotal =
         baselineScores.reduce((sum, score) => sum + score, 0) || 1;
 
-      const scores = Object.values(patientData.clinicalData[timeline] || {});
+      const scores = Object.values(timelineData);
       const totalScore = scores.reduce((sum, score) => sum + score, 0);
       return showPercentage
         ? ((baselineTotal - totalScore) / baselineTotal) * 100
         : totalScore;
-    });
+    }).filter(value => value !== null); // Filter out null values
+
+    if (values.length === 0) {
+      averages.push(0); // Handle case where no valid values are present
+      stdDeviations.push(0);
+      return;
+    }
 
     const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
     const stdDev = Math.sqrt(
@@ -98,23 +111,28 @@ function CombinedPlot({ clinicalData }) {
     averages.push(mean);
     stdDeviations.push(stdDev);
   });
-
+  console.log('Averages: ', averages);
+  console.log('Std deviations: ', stdDeviations);
   // Create datasets for individual patients
   const patientDatasets = clinicalData.map((patientData, index) => {
     const patientID = patientData.id;
     const baselineScores = Object.values(
-      patientData.clinicalData.baseline || {},
+      patientData.clinicalData.baseline?.[scoretype] || {},
     );
     const baselineTotal =
       baselineScores.reduce((sum, score) => sum + score, 0) || 1;
 
     const data = orderedTimelines.map((timeline) => {
-      const scores = Object.values(patientData.clinicalData[timeline] || {});
+      const timelineData = patientData.clinicalData[timeline]?.[scoretype];
+      if (!timelineData) {
+        return null; // Return null if timeline data is missing
+      }
+      const scores = Object.values(timelineData);
       const totalScore = scores.reduce((sum, score) => sum + score, 0);
       return showPercentage
         ? ((baselineTotal - totalScore) / baselineTotal) * 100
         : totalScore;
-    });
+    }).filter(value => value !== null); // Filter out null values
 
     return {
       label: `Patient ${patientID}`,
@@ -124,7 +142,7 @@ function CombinedPlot({ clinicalData }) {
       tension: 0.2,
       spanGaps: false,
     };
-  });
+  }).filter(dataset => dataset.data.length > 0); // Filter out datasets with no data
 
   // Create datasets for group average
   const groupAverageDataset = [

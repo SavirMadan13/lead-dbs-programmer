@@ -156,7 +156,7 @@ export default function registerFileHandlers() {
     event.reply('file-saved', newStimFilePath);
   });
 
-  ipcMain.on('save-file-clinical', (event, data, historical) => {
+  ipcMain.on('save-file-clinical', (event, data, historical, scoretype) => {
     const { patient, timeline, directoryPath, leadDBS } = historical;
 
     if (!patient || !timeline || !directoryPath) {
@@ -192,9 +192,15 @@ export default function registerFileHandlers() {
         fileName = `${patient.id}_ses-${timeline}_clinical.json`;
       }
       const filePath = path.join(sessionDir, fileName);
-
-      // Write the data to the file
-      fs.writeFileSync(filePath, dataString);
+      if (fs.existsSync(filePath)) {
+        const clinicalScores = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        clinicalScores[scoretype] = data;
+        fs.writeFileSync(filePath, JSON.stringify(clinicalScores, null, 2));
+      } else {
+        let clinicalScores = {};
+        clinicalScores[scoretype] = data;
+        fs.writeFileSync(filePath, JSON.stringify(clinicalScores, null, 2));
+      }
       // Send the file path back to the renderer process
       event.reply('file-saved', filePath);
 
@@ -440,6 +446,9 @@ export default function registerFileHandlers() {
       const patientFolder = getPatientFolder(directoryPath, id, leadDBS);
       console.log('Patient Folder: ', patientFolder);
       console.log('Scores: ', scores);
+      const scoretype = scores['Score Type'];
+      // Remove 'Score Type' from scores
+      delete scores['Score Type'];
       const sessionDir = path.join(patientFolder, `ses-${timeline}`);
       try {
         // Ensure that the directories exist, if not, create them
@@ -456,7 +465,15 @@ export default function registerFileHandlers() {
         }
         const filePath = path.join(sessionDir, fileName);
         // Write the data to the file
-        fs.writeFileSync(filePath, dataString);
+        if (fs.existsSync(filePath)) {
+          const clinicalScores = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+          clinicalScores[scoretype] = scores;
+          fs.writeFileSync(filePath, JSON.stringify(clinicalScores, null, 2));
+        } else {
+          let clinicalScores = {};
+          clinicalScores[scoretype] = scores;
+          fs.writeFileSync(filePath, JSON.stringify(clinicalScores, null, 2));
+        }
         // Send the file path back to the renderer process
         console.log(`Data saved successfully to ${filePath}`);
       } catch (error) {

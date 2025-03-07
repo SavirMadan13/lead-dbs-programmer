@@ -17,6 +17,8 @@ import DatabaseStats from './components/DatabaseStats';
 import Import from './components/Import';
 import NiiViewer from './components/NiiViewer';
 import TestApp from './niivue/ui/TestApp';
+import SEEG from './components/SEEG';
+
 export default function App() {
   const [directoryPath, setDirectoryPath] = useState(null);
   const [showSettings, setShowSettings] = useState(false); // New state to control visibility
@@ -57,7 +59,7 @@ export default function App() {
   const selectFolder = () => {
     window.electron.ipcRenderer.sendMessage('select-folder', null); // Request folder selection
   };
-  window.electron.ipcRenderer.sendMessage('load-ply-file', null);
+  // window.electron.ipcRenderer.sendMessage('load-ply-file', null);
   window.electron.ipcRenderer.sendMessage('import-inputdata-file', ['ping']);
   window.electron.ipcRenderer.sendMessage('ipc-example', ['ping']);
   // Function to check if the folder structure matches Lead-DBS
@@ -258,6 +260,15 @@ export default function App() {
                   <div style={{ marginTop: '100px' }}>
                     <TestApp />
                   </div>
+                </div>
+              }
+            />
+            <Route
+              path="/seeg"
+              element={
+                <div>
+                  <Navbar text="Lead-SEEG" color1="#375D7A" />
+                  <SEEG />
                 </div>
               }
             />

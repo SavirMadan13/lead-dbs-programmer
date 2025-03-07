@@ -71,12 +71,13 @@ function PatientStats({ patient, timeline, directoryPath, leadDBS }) {
   const reorderedTimeline = reorderTimeline(timeline);
 
   const handleScoreChange = (score) => {
-    if (score === 'UPDRS') {
-      setInitialScores(UPDRS);
-    } else if (score === 'Y-BOCS') {
-      setInitialScores(YBOCS);
-    }
+    // if (score === 'UPDRS') {
+    //   setInitialScores(UPDRS);
+    // } else if (score === 'Y-BOCS') {
+    //   setInitialScores(YBOCS);
+    // }
     setSelectedScoreType(score);
+
   };
 
   const columnsPerRow = 7;
@@ -129,6 +130,7 @@ function PatientStats({ patient, timeline, directoryPath, leadDBS }) {
           }
         });
         const reorderedScores = reorderScores(importedScores);
+        console.log('reorderedScores: ', reorderedScores);
         setPatients([
           {
             id: patient.id,
@@ -314,7 +316,7 @@ function PatientStats({ patient, timeline, directoryPath, leadDBS }) {
               margin: '0 10px',
             }}
           /> */}
-          {/* <Form.Select
+          <Form.Select
             value={selectedScoreType}
             onChange={(e) => handleScoreChange(e.target.value)}
           >
@@ -323,7 +325,7 @@ function PatientStats({ patient, timeline, directoryPath, leadDBS }) {
                 {type}
               </option>
             ))}
-          </Form.Select> */}
+          </Form.Select>
           {/* <Button
             variant="secondary"
             onClick={() => document.getElementById('baseline-upload').click()}
@@ -347,11 +349,20 @@ function PatientStats({ patient, timeline, directoryPath, leadDBS }) {
           />
         </Container>
         <div style={{ display: 'flex', flexDirection: 'column', width: '700px', height: '500px', overflowY: 'scroll' }}>
-          {currentStage === 'analyze' && clinicalTimelines && (
+          {currentStage === 'analyze' && clinicalTimelines && selectedScoreType === 'UPDRS' && (
             <UPDRSAnalysisComponent
               currentStage={currentStage}
               rawData={patients}
               clinicalTimelines={clinicalTimelines}
+              scoretype={selectedScoreType}
+            />
+          )}
+          {currentStage === 'analyze' && clinicalTimelines && selectedScoreType !== 'UPDRS' && (
+            <UPDRSAnalysisComponent
+              currentStage={currentStage}
+              rawData={patients}
+              clinicalTimelines={clinicalTimelines}
+              scoretype={selectedScoreType}
             />
           )}
         </div>
