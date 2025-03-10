@@ -20,7 +20,7 @@ import {
 } from 'react-bootstrap';
 import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings icon
 import * as math from 'mathjs';
-import { optimizeSphereValues } from './StimOptimizer';
+import { optimizeSphereValues, projectNumContacts } from './StimOptimizer';
 import { computeSuperimposedEField } from './OssDbsStimsets';
 // import { remote } from 'electron'; // Use 'electron' for Electron v12+
 
@@ -3278,8 +3278,14 @@ function PlyViewer({
       normalizedPlotNiiCoords,
       // normalizedTestCoords,
     );
+    const newOutputV = projectNumContacts(
+      sphereCoords,
+      outputV,
+      1,
+      normalizedPlotNiiCoords,
+    );
     console.log(outputV);
-    handleNiftiQuantityStateChange(outputV);
+    handleNiftiQuantityStateChange(newOutputV);
 
     // setNiiSolution(outputV);
   };

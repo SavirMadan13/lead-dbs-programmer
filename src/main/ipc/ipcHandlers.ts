@@ -144,7 +144,7 @@ export default function registerFileHandlers() {
   ipcMain.on('save-file-test', (event, data) => {
     const dataString = JSON.stringify(data);
     // const newStimFilePath = path.join(stimulationDirectory, 'data.json');
-    const newStimFilePath = '/Users/savirmadan/Documents/bradykinesia.json';
+    const newStimFilePath = '/Users/savirmadan/Documents/twocontact.json';
     try {
       // fs.writeFileSync(filePath, dataString);
       console.log(newStimFilePath);

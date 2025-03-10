@@ -879,6 +879,29 @@ const optimizeSphereValues = (
   return currentV; // projectConstraints(currentV, maxTotal=5);
 };
 
+/**
+ * This function takes the max number of allowed contacts and the currect contact values.
+ * It then selects the combination of N (max number) contacts which optimize Loss.
+ * @param {Array} v - Array of contact values.
+ * @param {number} numContacts - Maximum number of contacts to allow.
+ * @param {number} L - Flattened landscape values, an array of (n,m) where n is the points and m is 4 cols (x coord,y coord,z coord,magnitude)
+ * @param {number} lambda - Penalty coefficient.
+ * @returns {Array} - Projected contact values.
+ */
+const projectNumContacts = (sphereCoords, v, numContacts, L, lambda=1) => {
+  const positiveIndices = v.map((value, idx) => ({ value, idx })).filter(entry => entry.value > 0);       // get all positive amp indices
+  const losses = positiveIndices.map(({ value, idx }) => {                                                // get loss for each contact
+      let vSingle = new Array(v.length).fill(0);                                                          // set all other contacts to 0
+      vSingle[idx] = value;                                                                               // set this contact ot active value
+      return { idx, loss: lossFunction(sphereCoords, v, L, lambda) };                                 // get loss for this contact
+  });
+  losses.sort((a, b) => b.loss - a.loss);                                                                 // sort by loss (descending order)
+  const selectedIndices = losses.slice(0, numContacts).map(entry => entry.idx);                           // Top numContacts losses are selected
+  const mask = v.map((_, idx) => selectedIndices.includes(idx) ? 1 : 0);                                  // Create a mask for selected contacts
+  const projectedV = v.map((val, idx) => mask[idx] * val);                                                // Apply mask to threshold v back to constraints
+  return projectedV;
+}
+
 // -----------------------
 //      Helper Code
 // -----------------------
@@ -987,4 +1010,5 @@ module.exports = {
   partialDifferenceQuotient,
   gradientVectorHandler,
   gradientAscent,
+  projectNumContacts,
 };

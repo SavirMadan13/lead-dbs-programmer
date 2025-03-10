@@ -5,7 +5,7 @@
 
 const THREE = require('three');
 const math = require('mathjs');
-const {optimizeSphereValues} = require('./StimOptimizer');
+const { optimizeSphereValues, projectNumContacts } = require('./StimOptimizer');
 
 const initializeS = (label, numContacts) => {
   const S = {};
@@ -576,8 +576,14 @@ const handleNiiMap = (elecCoords, importedCoords, elspec) => {
     normalizedPlotNiiCoords,
     // normalizedTestCoords,
   );
-  console.log(outputV);
-  return outputV;
+  const newOutputV = projectNumContacts(
+    sphereCoords,
+    outputV,
+    2,
+    normalizedPlotNiiCoords,
+  );
+  console.log(newOutputV);
+  return newOutputV;
   // setNiiSolution(outputV);
 };
 
