@@ -97,7 +97,11 @@ function ensureClinicalScoresFile() {
 
 app.on('ready', () => {
   registerFileHandlers(); // Call this when the app is ready
-  ensureClinicalScoresFile();
+  try {
+    ensureClinicalScoresFile();
+  } catch (error) {
+    console.error('Error ensuring clinical scores file:', error);
+  }
   console.log('File handlers registered.');
 });
 
@@ -112,8 +116,8 @@ console.error = () => {};
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0374Output/derivatives/leaddbs/sub-CbctDbs0374/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
 // const inputPath = process.argv[1];
-const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
-// const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
+// const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
+const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
 // const inputPath = null;
 // const inputPath = '/Volumes/OneTouch/MasterDataset/AllData';
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
