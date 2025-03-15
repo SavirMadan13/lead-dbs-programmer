@@ -23,7 +23,7 @@ export default function App() {
   const [directoryPath, setDirectoryPath] = useState(null);
   const [showSettings, setShowSettings] = useState(false); // New state to control visibility
   const [renderKey, setRenderKey] = useState(0);
-  const [isLeadDBSFolder, setIsLeadDBSFolder] = useState(false); // New state to track if it's a Lead-DBS folder
+  const [isLeadDBSFolder, setIsLeadDBSFolder] = useState(true); // New state to track if it's a Lead-DBS folder
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const containerRef = useRef(null);
 
@@ -63,37 +63,37 @@ export default function App() {
   window.electron.ipcRenderer.sendMessage('import-inputdata-file', ['ping']);
   window.electron.ipcRenderer.sendMessage('ipc-example', ['ping']);
   // Function to check if the folder structure matches Lead-DBS
-  const checkLeadDBSFolder = async (path) => {
-    try {
-      // Check for existence of required folders for Lead-DBS
-      const derivativesExists = await window.electron.ipcRenderer.invoke(
-        'check-folder-exists',
-        `${path}/derivatives/leaddbs`,
-      );
-      const rawdataExists = await window.electron.ipcRenderer.invoke(
-        'check-folder-exists',
-        `${path}/rawdata`,
-      );
-      const sourcedataExists = await window.electron.ipcRenderer.invoke(
-        'check-folder-exists',
-        `${path}/sourcedata`,
-      );
-      const isLeadGroup = path.includes('leadgroup');
+  // const checkLeadDBSFolder = async (path) => {
+  //   try {
+  //     // Check for existence of required folders for Lead-DBS
+  //     const derivativesExists = await window.electron.ipcRenderer.invoke(
+  //       'check-folder-exists',
+  //       `${path}/derivatives/leaddbs`,
+  //     );
+  //     const rawdataExists = await window.electron.ipcRenderer.invoke(
+  //       'check-folder-exists',
+  //       `${path}/rawdata`,
+  //     );
+  //     const sourcedataExists = await window.electron.ipcRenderer.invoke(
+  //       'check-folder-exists',
+  //       `${path}/sourcedata`,
+  //     );
+  //     const isLeadGroup = path.includes('leadgroup');
 
-      // Set the state if all required folders are present
-      if (derivativesExists && rawdataExists && sourcedataExists) {
-        console.log('TRUE');
-        setIsLeadDBSFolder(true);
-      } else if (isLeadGroup) {
-        setIsLeadDBSFolder(true);
-      } else {
-        setIsLeadDBSFolder(false);
-      }
-    } catch (error) {
-      console.error('Error checking folder structure:', error);
-      setIsLeadDBSFolder(false);
-    }
-  };
+  //     // Set the state if all required folders are present
+  //     if (derivativesExists && rawdataExists && sourcedataExists) {
+  //       console.log('TRUE');
+  //       setIsLeadDBSFolder(true);
+  //     } else if (isLeadGroup) {
+  //       setIsLeadDBSFolder(true);
+  //     } else {
+  //       setIsLeadDBSFolder(false);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error checking folder structure:', error);
+  //     setIsLeadDBSFolder(false);
+  //   }
+  // };
 
   useEffect(() => {
     // Listen for the selected folder path when a new one is selected
@@ -102,7 +102,7 @@ export default function App() {
       (selectedPath) => {
         setDirectoryPath(selectedPath); // Set the selected folder path
         setRenderKey((prevKey) => prevKey + 1); // Use functional update to ensure it increments correctly
-        checkLeadDBSFolder(selectedPath); // Check if the folder is a Lead-DBS folder
+        // checkLeadDBSFolder(selectedPath); // Check if the folder is a Lead-DBS folder
       },
     );
 
@@ -114,7 +114,7 @@ export default function App() {
       if (savedPath) {
         setDirectoryPath(savedPath); // Set the saved folder path if it exists
         window.electron.ipcRenderer.sendMessage('select-folder', savedPath); // Request folder selection
-        checkLeadDBSFolder(savedPath); // Check if it's a Lead-DBS folder
+        // checkLeadDBSFolder(savedPath); // Check if it's a Lead-DBS folder
       }
     };
 

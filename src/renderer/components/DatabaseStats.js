@@ -70,6 +70,7 @@ function DatabaseStats({ directoryPath }) {
             id: patient.id,
             timelines: allFilteredTimelineNames[index] || [],
           }));
+          console.log(patientsWithTimelines);
           return setClinicalTimelines(patientsWithTimelines);
         })
         .catch((error) => {

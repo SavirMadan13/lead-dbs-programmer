@@ -25,7 +25,7 @@ ChartJS.register(
 
 function GroupLateralityAnalysisPlot({ clinicalData, scoretype }) {
   const [showPercentage, setShowPercentage] = useState(true);
-  const [showGroupAverage, setShowGroupAverage] = useState(false);
+  const [showGroupAverage, setShowGroupAverage] = useState(true);
 
   const leftSideItems = [
     '3.3c: Rigidity- LUE', '3.3e: Rigidity- LLE', '3.4b: Finger tapping- Left hand',
@@ -91,13 +91,13 @@ function GroupLateralityAnalysisPlot({ clinicalData, scoretype }) {
       if (!patientData.clinicalData[timeline]) return 0;
 
       const baselineScores = Object.entries(patientData.clinicalData['baseline'][scoretype] || {})
-        .filter(([item]) => leftSideItems.includes(item))
+        .filter(([item]) => leftSideItems.includes(item) && typeof patientData.clinicalData['baseline'][scoretype][item] === 'number')
         .map(([, score]) => score);
       const baselineTotal = baselineScores.reduce((sum, score) => sum + score, 0) || 1;
 
       const scores = patientData.clinicalData[timeline][scoretype]
         ? Object.entries(patientData.clinicalData[timeline][scoretype])
-            .filter(([item]) => leftSideItems.includes(item))
+            .filter(([item]) => leftSideItems.includes(item) && typeof patientData.clinicalData[timeline][scoretype][item] === 'number')
             .map(([, score]) => score)
         : [];
       const totalScore = scores.length > 0 ? scores.reduce((sum, score) => sum + score, 0) : 0;
@@ -105,19 +105,20 @@ function GroupLateralityAnalysisPlot({ clinicalData, scoretype }) {
       return showPercentage ? ((baselineTotal - totalScore) / baselineTotal) * 100 : totalScore;
     })
   );
+  console.log(leftPatientData);
 
   const rightPatientData = filteredClinicalData.map((patientData) =>
     orderedTimelines.map((timeline) => {
       if (!patientData.clinicalData[timeline]) return 0;
 
       const baselineScores = Object.entries(patientData.clinicalData['baseline'][scoretype] || {})
-        .filter(([item]) => rightSideItems.includes(item))
+        .filter(([item]) => rightSideItems.includes(item) && typeof patientData.clinicalData['baseline'][scoretype][item] === 'number')
         .map(([, score]) => score);
       const baselineTotal = baselineScores.reduce((sum, score) => sum + score, 0) || 1;
 
       const scores = patientData.clinicalData[timeline][scoretype]
         ? Object.entries(patientData.clinicalData[timeline][scoretype])
-            .filter(([item]) => rightSideItems.includes(item))
+            .filter(([item]) => rightSideItems.includes(item) && typeof patientData.clinicalData[timeline][scoretype][item] === 'number')
             .map(([, score]) => score)
         : [];
       const totalScore = scores.length > 0 ? scores.reduce((sum, score) => sum + score, 0) : 0;
@@ -125,7 +126,7 @@ function GroupLateralityAnalysisPlot({ clinicalData, scoretype }) {
       return showPercentage ? ((baselineTotal - totalScore) / baselineTotal) * 100 : totalScore;
     })
   );
-
+  console.log(rightPatientData);
   const leftAverages = orderedTimelines.map((_, i) => calculateStats(leftPatientData.map((patient) => patient[i])).mean);
   const leftStdDevs = orderedTimelines.map((_, i) => calculateStats(leftPatientData.map((patient) => patient[i])).stdDev);
 

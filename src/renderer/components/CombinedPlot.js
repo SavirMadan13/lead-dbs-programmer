@@ -25,7 +25,7 @@ ChartJS.register(
 
 function CombinedPlot({ clinicalData, scoretype }) {
   const [showPercentage, setShowPercentage] = useState(true);
-  const [showGroupAverage, setShowGroupAverage] = useState(false);
+  const [showGroupAverage, setShowGroupAverage] = useState(true);
   console.log('Patient data: ', clinicalData);
   // Define a clean color palette
   const colorPalette = [
@@ -79,24 +79,29 @@ function CombinedPlot({ clinicalData, scoretype }) {
   orderedTimelines.forEach((timeline) => {
     const values = clinicalData.map((patientData) => {
       // Check if the patient has clinical data for the baseline and the current timeline
+      if (patientData.clinicalData === {}) {
+        return null;
+      }
       const baselineData = patientData.clinicalData.baseline?.[scoretype];
       const timelineData = patientData.clinicalData[timeline]?.[scoretype];
-
+      console.log(baselineData, timelineData);
       if (!baselineData || !timelineData) {
         return null; // Return null if data is missing
       }
 
-      const baselineScores = Object.values(baselineData);
+      const baselineScores = Object.values(baselineData).filter(score => typeof score === 'number');
+
       const baselineTotal =
         baselineScores.reduce((sum, score) => sum + score, 0) || 1;
 
-      const scores = Object.values(timelineData);
+      const scores = Object.values(timelineData).filter(score => typeof score === 'number');
       const totalScore = scores.reduce((sum, score) => sum + score, 0);
+      console.log(baselineTotal, totalScore);
       return showPercentage
         ? ((baselineTotal - totalScore) / baselineTotal) * 100
         : totalScore;
-    }).filter(value => value !== null); // Filter out null values
-
+    }).filter(value => value !== null && !isNaN(value)); // Filter out null and NaN values
+    console.log(values);
     if (values.length === 0) {
       averages.push(0); // Handle case where no valid values are present
       stdDeviations.push(0);
@@ -118,7 +123,7 @@ function CombinedPlot({ clinicalData, scoretype }) {
     const patientID = patientData.id;
     const baselineScores = Object.values(
       patientData.clinicalData.baseline?.[scoretype] || {},
-    );
+    ).filter(score => typeof score === 'number');
     const baselineTotal =
       baselineScores.reduce((sum, score) => sum + score, 0) || 1;
 
@@ -127,12 +132,12 @@ function CombinedPlot({ clinicalData, scoretype }) {
       if (!timelineData) {
         return null; // Return null if timeline data is missing
       }
-      const scores = Object.values(timelineData);
+      const scores = Object.values(timelineData).filter(score => typeof score === 'number');
       const totalScore = scores.reduce((sum, score) => sum + score, 0);
       return showPercentage
         ? ((baselineTotal - totalScore) / baselineTotal) * 100
         : totalScore;
-    }).filter(value => value !== null); // Filter out null values
+    }).filter(value => value !== null && !isNaN(value)); // Filter out null and NaN values
 
     return {
       label: `Patient ${patientID}`,

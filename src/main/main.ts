@@ -105,9 +105,9 @@ app.on('ready', () => {
   console.log('File handlers registered.');
 });
 
-console.log = () => {};
-console.warn = () => {};
-console.error = () => {};
+// console.log = () => {};
+// console.warn = () => {};
+// console.error = () => {};
 
 // const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
 // console.log(args);
@@ -117,9 +117,9 @@ console.error = () => {};
 // const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
 // const inputPath = process.argv[1];
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
-const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
+// const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
 // const inputPath = null;
-// const inputPath = '/Volumes/OneTouch/MasterDataset/AllData';
+const inputPath = '/Volumes/OneTouch/MasterDataset/AllData';
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
 // const inputPath = '/Users/savirmadan/Documents/LeadGroupDemo/derivatives/leadgroup/20241007203440/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/stimulations/MNI152NLin2009bAsym/inputData.json';
@@ -182,11 +182,13 @@ ipcMain.on('import-inputdata-file', async (event, arg) => {
         const fileName = `${stimulationData.patientname}_ses-${label}_stimparameters.json`;
         const filePath = path.join(sessionDir, fileName);
         console.log(filePath);
-        if (!fs.existsSync(filePath)) {
+        try {
           if (!fs.existsSync(sessionDir)) {
             fs.mkdirSync(sessionDir, { recursive: true });
           }
           // Write data to the file
+        } catch (error) {
+          console.error('Error creating directory:', error);
         }
         fs.writeFileSync(
           filePath,
@@ -223,11 +225,13 @@ ipcMain.on('import-inputdata-file', async (event, arg) => {
           filePath = path.join(sessionDir, fileName);
         }
         console.log(filePath);
-        if (!fs.existsSync(filePath)) {
+        try {
           if (!fs.existsSync(sessionDir)) {
             fs.mkdirSync(sessionDir, { recursive: true });
           }
           // Write data to the file
+        } catch (error) {
+          console.error('Error creating directory:', error);
         }
         fs.writeFileSync(
           filePath,
@@ -804,7 +808,7 @@ const createWindow = async () => {
         leadDBSPath,
         folder,
         'patient_info.json',
-      ); // Assuming there’s a patient_info.json file in each folder
+      ); // Assuming there's a patient_info.json file in each folder
       let patientData = null;
 
       if (fs.existsSync(patientFilePath)) {
@@ -828,6 +832,10 @@ const createWindow = async () => {
       console.log('GET-TIMELINES: ', directoryPath, patientId, leadDBS);
       const patientFolder = getPatientFolder(directoryPath, patientId, leadDBS);
       console.log('Patient Folder: ', patientFolder);
+      if (!fs.existsSync(patientFolder)) {
+        console.log('Patient Folder does not exist');
+        return [];
+      }
       try {
         // If leadDBS is false, the process remains as before
         if (!leadDBS) {
@@ -860,6 +868,37 @@ const createWindow = async () => {
 
           return timelineData; // Return array with timelines and availability of clinical/stimulation data
         }
+        // if (leadDBS) {
+        //   // Read the patient folder
+        //   const timelines = await fs.promises.readdir(patientFolder);
+
+        //   // Prepare data structure to hold timelines with stimulation and clinical information
+        //   const timelineData = await Promise.all(
+        //     timelines
+        //       .filter((file) => file.startsWith('ses-'))
+        //       .map(async (sessionFolder) => {
+        //         console.log(sessionFolder);
+        //         const sessionPath = path.join(patientFolder, sessionFolder);
+        //         const sessionFiles = await fs.promises.readdir(sessionPath);
+
+        //         // Check for the presence of clinical and stimulation JSON files
+        //         const hasClinical = sessionFiles.some((file) =>
+        //           file.includes('clinical.json'),
+        //         );
+        //         const hasStimulation = sessionFiles.some((file) =>
+        //           file.includes('stimparameters.json'),
+        //         );
+
+        //         return {
+        //           timeline: sessionFolder.replace('ses-', ''), // Timeline name without 'ses-' prefix
+        //           hasClinical,
+        //           hasStimulation,
+        //         };
+        //       }),
+        //   );
+
+        //   return timelineData; // Return array with timelines and availability of clinical/stimulation data
+        // }
         if (leadDBS) {
           // Read the patient folder
           const timelines = await fs.promises.readdir(patientFolder);
@@ -869,8 +908,14 @@ const createWindow = async () => {
             timelines
               .filter((file) => file.startsWith('ses-'))
               .map(async (sessionFolder) => {
-                console.log(sessionFolder);
                 const sessionPath = path.join(patientFolder, sessionFolder);
+
+                // Check if the session path exists and is a directory
+                if (!fs.existsSync(sessionPath) || !fs.statSync(sessionPath).isDirectory()) {
+                  // console.log(`Skipping ${sessionFolder} as it does not exist or is not a directory.`);
+                  return null; // Skip this session
+                }
+
                 const sessionFiles = await fs.promises.readdir(sessionPath);
 
                 // Check for the presence of clinical and stimulation JSON files
@@ -889,7 +934,8 @@ const createWindow = async () => {
               }),
           );
 
-          return timelineData; // Return array with timelines and availability of clinical/stimulation data
+          // Filter out any null entries (sessions that were skipped)
+          return timelineData.filter((data) => data !== null);
         }
         // Logic for leadDBS = true (new logic to handle different folder structure)
         let stimSubDirs = await fs.promises.readdir(patientFolder);

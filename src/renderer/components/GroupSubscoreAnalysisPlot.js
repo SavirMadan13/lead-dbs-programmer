@@ -25,7 +25,7 @@ ChartJS.register(
 
 function GroupSubscoreAnalysisPlot({ clinicalData, scoretype }) {
   const [showPercentage, setShowPercentage] = useState(true);
-  const [showGroupAverage, setShowGroupAverage] = useState(false);
+  const [showGroupAverage, setShowGroupAverage] = useState(true);
 
   // Filter out patients with no clinical data
   const filteredClinicalData = clinicalData.filter(patient =>
@@ -110,12 +110,12 @@ function GroupSubscoreAnalysisPlot({ clinicalData, scoretype }) {
         if (!baselineData || !timelineData) return null; // Skip if data is missing
 
         const baselineScores = Object.entries(baselineData)
-          .filter(([item]) => items.includes(item))
+          .filter(([item]) => items.includes(item) && typeof baselineData[item] === 'number')
           .map(([, score]) => score);
         const baselineTotal = baselineScores.reduce((sum, score) => sum + score, 0) || 1;
 
         const scores = Object.entries(timelineData)
-          .filter(([item]) => items.includes(item))
+          .filter(([item]) => items.includes(item) && typeof timelineData[item] === 'number')
           .map(([, score]) => score);
         const totalScore = scores.reduce((sum, score) => sum + score, 0);
 

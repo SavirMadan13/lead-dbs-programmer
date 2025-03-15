@@ -414,6 +414,10 @@ function Import({ leadDBS }) {
     alert('Data submitted successfully!');
   };
 
+  const parseDemographics = (sheetData) => {
+    console.log('Demographics Data', sheetData);
+  };
+
   // Parse Excel file
   const parseFile = (uploadedFile, fileType) => {
     if (!uploadedFile) {
@@ -425,15 +429,27 @@ function Import({ leadDBS }) {
     reader.onload = (e) => {
       const data = new Uint8Array(e.target.result);
       const workbook = XLSX.read(data, { type: 'array' });
-      const sheetName = workbook.SheetNames[0];
-      const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-      if (fileType === 'clinical') {
-        handleSubmit(sheetData);
-      } else {
-        parseStimulations(sheetData);
-      }
+
+      workbook.SheetNames.forEach((sheetName) => {
+        const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+        if (fileType === 'clinical') {
+          handleSubmit(sheetData);
+        } else if (fileType === 'demographics') {
+          parseDemographics(sheetData);
+        } else {
+          parseStimulations(sheetData);
+        }
+      });
     };
     reader.readAsArrayBuffer(uploadedFile);
+  };
+
+  const handleDemographicsExcel = (e) => {
+    const uploadedFile = e.target.files[0];
+    if (uploadedFile) {
+      parseFile(uploadedFile, 'demographics');
+      e.target.value = ''; // Reset the file input
+    }
   };
 
   const handleStimulationParametersExcel = (e) => {
@@ -595,7 +611,7 @@ function Import({ leadDBS }) {
         </p>
         <div style={uploadContainerStyle}>
           <label style={uploadLabelStyle}>
-            <span>Choose Clinical Scores File</span>
+            <span>Upload Clinical Scores</span>
             <input
               type="file"
               accept=".xlsx, .xls"
@@ -604,11 +620,20 @@ function Import({ leadDBS }) {
             />
           </label>
           <label style={uploadLabelStyle}>
-            <span>Choose Stimulation Parameters File</span>
+            <span>Upload Stimulation Parameters</span>
             <input
               type="file"
               accept=".xlsx, .xls"
               onChange={handleStimulationParametersExcel}
+              style={fileInputStyle}
+            />
+          </label>
+          <label style={uploadLabelStyle}>
+            <span>Upload Demographics</span>
+            <input
+              type="file"
+              accept=".xlsx, .xls"
+              onChange={handleDemographicsExcel}
               style={fileInputStyle}
             />
           </label>
