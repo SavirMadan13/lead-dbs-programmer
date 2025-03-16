@@ -3278,6 +3278,7 @@ function PlyViewer({
       normalizedPlotNiiCoords,
       // normalizedTestCoords,
     );
+    console.log('Output V: ', outputV);
     const newOutputV = projectNumContacts(
       sphereCoords,
       outputV,

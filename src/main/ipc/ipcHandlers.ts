@@ -13,9 +13,16 @@ export default function registerFileHandlers() {
 
   // Handle writing the JSON file
   ipcMain.on('save-patients-json', (event, folderPath, patients) => {
-    const filePath = path.join(folderPath, 'participants.json');
-    console.log('File path: ', folderPath);
-    fs.writeFile(filePath, JSON.stringify(patients, null, 2), (err) => {
+    let filePath;
+    try {
+      filePath = path.join(folderPath, 'participants.json');
+    } catch (err) {
+      const stimulationData = getData('stimulationData');
+      console.log('Stimulation Data: ', stimulationData);
+      filePath = path.join(stimulationData.path, 'participants.json');
+    }
+      console.log('File path: ', filePath);
+      fs.writeFile(filePath, JSON.stringify(patients, null, 2), (err) => {
       if (err) {
         console.error('Error saving JSON file:', err);
         event.sender.send('json-save-error', 'Error saving file');
@@ -586,5 +593,15 @@ export default function registerFileHandlers() {
     // });
 
     return results;
+  });
+
+  ipcMain.handle('get-participants', async (event, text) => {
+    const stimulationData = getData('stimulationData');
+    const userDataPath = stimulationData.path;
+    const participantsFilePath = path.join(userDataPath, 'participants.json');
+    console.log('participantsFilePath: ', participantsFilePath);
+    const data = fs.readFileSync(participantsFilePath, 'utf8');
+    const participants = JSON.parse(data);
+    return participants;
   });
 }

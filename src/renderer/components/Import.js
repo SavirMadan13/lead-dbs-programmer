@@ -416,6 +416,40 @@ function Import({ leadDBS }) {
 
   const parseDemographics = (sheetData) => {
     console.log('Demographics Data', sheetData);
+    const participantsData = [];
+    // window.electron.ipcRenderer.invoke('get-participants', 'demographics').then((participants) => {
+    //   console.log('Participants: ', participants);
+    //   participantsData = participants;
+    // }).catch((error) => {
+    //   console.error('Error fetching participants:', error);
+    // });
+    const participants = allPatients.patients;
+    sheetData.forEach((row) => {
+      const participantIndex = participants.findIndex(
+        (p) => {
+          console.log(p);
+          return p.id === row.PatientID;
+        },
+      );
+      if (participantIndex !== -1) {
+        // Update existing participant information
+        console.log('Updating Participant: ', participants[participantIndex]);
+        const { PatientID, ...updatedRow } = row; // Exclude PatientID from being saved
+        participants[participantIndex] = {
+          ...participants[participantIndex],
+          ...updatedRow,
+        };
+      } else {
+        // Add new participant if not found
+        participants.push(row);
+      }
+    });
+    console.log('Participants: ', participants);
+    window.electron.ipcRenderer.sendMessage(
+      'save-patients-json',
+      null,
+      participants,
+    );
   };
 
   // Parse Excel file
@@ -556,7 +590,6 @@ function Import({ leadDBS }) {
     textAlign: 'center',
     transition: 'background-color 0.3s ease, transform 0.2s ease',
   };
-
 
   const downloadTemplateClinicalScores = () => {
     const link = document.createElement('a');

@@ -158,14 +158,18 @@ function DatabaseStats({ directoryPath }) {
               clinicalData={clinicalDataForPlotting}
               scoretype={scoretype}
             />
-            <GroupLateralityAnalysisPlot
-              clinicalData={clinicalDataForPlotting}
-              scoretype={scoretype}
-            />
-            <GroupSubscoreAnalysisPlot
-              clinicalData={clinicalDataForPlotting}
-              scoretype={scoretype}
-            />
+            {scoretype === 'UPDRS' && (
+              <>
+                <GroupLateralityAnalysisPlot
+                  clinicalData={clinicalDataForPlotting}
+                  scoretype={scoretype}
+                />
+                <GroupSubscoreAnalysisPlot
+                  clinicalData={clinicalDataForPlotting}
+                  scoretype={scoretype}
+                />
+              </>
+            )}
           </div>
         );
       case 'new':

@@ -26,6 +26,7 @@ import DatabaseStats from './DatabaseStats';
 
 function PatientDatabase({ key, directoryPath }) {
   const { patients, setPatients } = useContext(PatientContext);
+  console.log('Patients: ', patients);
   const [editRowId, setEditRowId] = useState(null); // Track the row being edited
   const [editedPatient, setEditedPatient] = useState({}); // Hold the patient data while editing
   const [searchTerm, setSearchTerm] = useState('');
@@ -33,13 +34,24 @@ function PatientDatabase({ key, directoryPath }) {
   const [orderBy, setOrderBy] = useState('id');
   const [editMode, setEditMode] = useState(false);
   const navigate = useNavigate();
-  const [columns, setColumns] = useState([
-    // { id: 'id', label: 'ID' },
-    { id: 'name', label: 'Name' },
-    { id: 'age', label: 'Age' },
-    { id: 'gender', label: 'Gender' },
-    { id: 'diagnosis', label: 'Diagnosis' },
-  ]);
+  // const [columns, setColumns] = useState([
+  //   // { id: 'id', label: 'ID' },
+  //   // { id: 'name', label: 'Name' },
+  //   // { id: 'age', label: 'Age' },
+  //   // { id: 'gender', label: 'Gender' },
+  //   // { id: 'diagnosis', label: 'Diagnosis' },
+  // ]);
+  const [columns, setColumns] = useState(() => {
+    if (patients.length > 0) {
+      return Object.keys(patients[0])
+        .filter((columnKey) => columnKey !== 'id') // Rename 'key' to 'columnKey'
+        .map((columnKey) => ({
+          id: columnKey,
+          label: columnKey.charAt(0).toUpperCase() + columnKey.slice(1), // Capitalize the first letter
+        }));
+    }
+    return [];
+  });
   const [newColumnId, setNewColumnId] = useState('');
   const [newColumnLabel, setNewColumnLabel] = useState('');
   const [columnToDelete, setColumnToDelete] = useState('');
@@ -87,7 +99,7 @@ function PatientDatabase({ key, directoryPath }) {
       p.id === editRowId ? editedPatient : p,
     );
     setPatients(updatedPatients);
-    savePatientsToJson(updatedPatients); // Save to JSON
+    savePatientsToJson(updatedPatients, directoryPath); // Save to JSON
     setEditRowId(null); // Exit edit mode
   };
 
@@ -176,7 +188,7 @@ function PatientDatabase({ key, directoryPath }) {
     window.electron.ipcRenderer.on('file-read-success', (patientsData, directoryPath) => {
       console.log(patientsData);
       setPatients(patientsData); // Set the patients from the JSON file
-      savePatientsToJson(patientsData, directoryPath);
+      // savePatientsToJson(patientsData, directoryPath);
     });
 
     window.electron.ipcRenderer.on('file-not-found', () => {
@@ -254,15 +266,15 @@ function PatientDatabase({ key, directoryPath }) {
   const addPatient = () => {
     const newPatient = {
       id: Date.now().toString(), // Generate a unique ID
-      name: '',
-      age: '',
-      gender: '',
-      diagnosis: '',
+      // name: '',
+      // age: '',
+      // gender: '',
+      // diagnosis: '',
     };
 
     const updatedPatients = [...patients, newPatient];
     setPatients(updatedPatients);
-    savePatientsToJson(updatedPatients); // Save to JSON
+    savePatientsToJson(updatedPatients, directoryPath); // Save to JSON
   };
 
   // Update a patient and save JSON file
@@ -271,7 +283,7 @@ function PatientDatabase({ key, directoryPath }) {
       p.id === originalId ? currentPatient : p,
     );
     setPatients(updatedPatients);
-    savePatientsToJson(updatedPatients); // Save to JSON
+    savePatientsToJson(updatedPatients, directoryPath); // Save to JSON
     clearForm();
     setOpenDialog(false);
   };
@@ -280,7 +292,7 @@ function PatientDatabase({ key, directoryPath }) {
   const deletePatient = (id) => {
     const updatedPatients = patients.filter((p) => p.id !== id);
     setPatients(updatedPatients);
-    savePatientsToJson(updatedPatients); // Save to JSON
+    savePatientsToJson(updatedPatients, directoryPath); // Save to JSON
   };
 
   // Clear the form
@@ -300,6 +312,11 @@ function PatientDatabase({ key, directoryPath }) {
 
   const removeColumn = (id) => {
     setColumns(columns.filter((column) => column.id !== id));
+    Object.keys(patients).forEach((patient) => {
+      delete patients[patient][id];
+    });
+    console.log('Patients: ', patients);
+    savePatientsToJson(patients, directoryPath);
   };
 
   return (
