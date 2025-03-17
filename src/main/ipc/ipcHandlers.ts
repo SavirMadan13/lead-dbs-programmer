@@ -604,4 +604,14 @@ export default function registerFileHandlers() {
     const participants = JSON.parse(data);
     return participants;
   });
+
+  ipcMain.handle('read-file', async (event, filePath) => {
+    try {
+      const data = await fs.promises.readFile(filePath);
+      return data;
+    } catch (error) {
+      console.error('Error reading file:', error);
+      throw error;
+    }
+  });
 }

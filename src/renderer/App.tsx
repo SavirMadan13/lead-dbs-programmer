@@ -16,7 +16,7 @@ import GroupStats from './components/GroupStats';
 import DatabaseStats from './components/DatabaseStats';
 import Import from './components/Import';
 import NiiViewer from './components/NiiViewer';
-import TestApp from './niivue/ui/TestApp';
+import TestAppGroup from './niivue/ui/TestAppGroup';
 import SEEG from './components/SEEG';
 
 export default function App() {
@@ -26,7 +26,10 @@ export default function App() {
   const [isLeadDBSFolder, setIsLeadDBSFolder] = useState(true); // New state to track if it's a Lead-DBS folder
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const containerRef = useRef(null);
-
+  const plyFilePaths = [
+    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/anatomy.ply',
+    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply'
+  ];
   const updateWindowSize = () => {
     if (containerRef.current) {
       const { width, height } = containerRef.current.getBoundingClientRect();
@@ -258,7 +261,7 @@ export default function App() {
                 <div>
                   {/* <Navbar text="" color1="#375D7A" /> */}
                   <div style={{ marginTop: '100px' }}>
-                    <TestApp />
+                    <TestAppGroup plyFilePaths={plyFilePaths} />
                   </div>
                 </div>
               }

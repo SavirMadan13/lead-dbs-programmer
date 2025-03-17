@@ -17,7 +17,7 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import * as XLSX from 'xlsx';
 import * as nifti from 'nifti-reader-js';
-import { Niivue, SLICE_TYPE } from "@niivue/niivue";
+import { Niivue, SLICE_TYPE } from '@niivue/niivue';
 import DatabasePlot from './DatabasePlot';
 import GroupAveragePlot from './GroupAveragePlot';
 import { PatientContext } from './PatientContext';
@@ -45,6 +45,7 @@ function DatabaseStats({ directoryPath }) {
   const [displayedPatients, setDisplayedPatients] = useState([]);
   const [filters, setFilters] = useState({});
   const [scoretype, setScoretype] = useState('UPDRS');
+  const [scoreTypes, setScoreTypes] = useState(['UPDRS', 'Y-BOCS']); // Default score types
 
   useEffect(() => {
     if (directoryPath && filteredPatients.length > 0) {
@@ -186,7 +187,7 @@ function DatabaseStats({ directoryPath }) {
   const detectAttributeTypes = () => {
     if (patients.length === 0) return {};
 
-    const samplePatient = patients[0];
+    const samplePatient = patients[2];
     const attributeTypes = {};
 
     Object.keys(samplePatient).forEach((key) => {
@@ -347,6 +348,10 @@ function DatabaseStats({ directoryPath }) {
         const filter = filters[key];
         const value = patient[key];
 
+        if (value === undefined || value === null) {
+          return false; // Exclude patients without information for the key
+        }
+
         if (typeof filter === 'object') {
           // Numeric filter
           const [min, max] = filter;
@@ -374,6 +379,22 @@ function DatabaseStats({ directoryPath }) {
       setClinicalDataForPlotting(filteredClinicalData);
     }
   }, [filters]);
+
+  useEffect(() => {
+    if (clinicalDataForPlotting) {
+      // Extract unique score types from clinical data
+      const uniqueScoreTypes = new Set();
+      clinicalData.forEach((patientData) => {
+        Object.keys(patientData.clinicalData).forEach((timeline) => {
+          const timelineData = patientData.clinicalData[timeline];
+          Object.keys(timelineData).forEach((scoreType) => {
+            uniqueScoreTypes.add(scoreType);
+          });
+        });
+      });
+      setScoreTypes(Array.from(uniqueScoreTypes));
+    }
+  }, [clinicalDataForPlotting]);
 
   const handleNiiUpload = async (event) => {
     try {
@@ -561,14 +582,27 @@ function DatabaseStats({ directoryPath }) {
         </AccordionDetails>
       </Accordion>
       <div>
-        <Select
+        {/* <Select
           value={scoretype}
           onChange={(e) => setScoretype(e.target.value)}
           className="analysis-select"
         >
           <MenuItem value="UPDRS">UPDRS</MenuItem>
           <MenuItem value="Y-BOCS">Y-BOCS</MenuItem>
-        </Select>
+        </Select> */}
+        <div>
+          <Select
+            value={scoretype}
+            onChange={(e) => setScoretype(e.target.value)}
+            className="analysis-select"
+          >
+            {scoreTypes.map((type) => (
+              <MenuItem key={type} value={type}>
+                {type}
+              </MenuItem>
+            ))}
+          </Select>
+        </div>
       </div>
       {clinicalDataForPlotting && filteredPatients && (
         <div className="analysis-section">
@@ -620,14 +654,14 @@ function DatabaseStats({ directoryPath }) {
           </Dropdown.Menu>
         </Dropdown.Toggle>
       </Dropdown> */}
-      <div style={{ padding: '20px', borderRadius: '8px', marginTop: '150px' }}>
+      {/* <div style={{ padding: '20px', borderRadius: '8px', marginTop: '150px' }}>
         {filteredPatients && (
           <GroupViewer
             filteredPatients={filteredPatients}
             directoryPath={directoryPath}
           />
         )}
-      </div>
+      </div> */}
 
       {/* {filteredPatients && (
         <GroupViewer

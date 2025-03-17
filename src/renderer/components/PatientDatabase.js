@@ -43,7 +43,7 @@ function PatientDatabase({ key, directoryPath }) {
   // ]);
   const [columns, setColumns] = useState(() => {
     if (patients.length > 0) {
-      return Object.keys(patients[0])
+      return Object.keys(patients[2])
         .filter((columnKey) => columnKey !== 'id') // Rename 'key' to 'columnKey'
         .map((columnKey) => ({
           id: columnKey,
