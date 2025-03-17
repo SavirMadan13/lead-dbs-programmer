@@ -697,20 +697,118 @@ function TestAppGroup({ plyFilePaths }) {
     };
   }, [nv]);
 
-  useEffect(() => {
-    if (plyFilePaths && plyFilePaths.length > 0) {
-      loadPlyFiles(plyFilePaths);
+  async function handleFileProcessing(filePath, index) {
+    try {
+      const buffer = await window.electron.ipcRenderer.invoke('read-file', filePath);
+      // console.log('filePath: ', filePath);
+      // // const niivueObject = NVMesh.loadFromFile(filePath, nv.gl, 'plyfile')
+      // const buffer = await NVMesh.readFileAsync(filePath)
+      const rgba255 = [255, 255, 255, 255];
+      const visible = true;
+      const opacity = 1;
+      const name = 'file.ply';
+      const nvmesh = await NVMesh.readMesh(buffer, name, nv.gl, opacity, new Uint8Array(rgba255), visible);
+      nv.meshes.push(nvmesh);
+      nv.drawScene(); // Redraw the scene to include the new mesh
+
+        console.log(nvmesh);
+    } catch (err) {
+      console.log(err);
     }
-  }, [plyFilePaths, loadPlyFiles]);
+
+    // try {
+    //   // Use Electron's ipcRenderer to read the file
+
+    //   console.log('Mesh: ', nv.meshes);
+    //   // Process the buffer as a mesh layer
+    //   let mesh = nv.meshes;
+    //   console.log('Mesh: ', mesh);
+    //   const currentLayerCount = 0;
+    //   const newImages = getImageList();
+    //   const newMeshes = getMeshList();
+    //   console.log('New Images: ', newImages);
+    //   console.log('New Meshes: ', newMeshes);
+    //   const k = await NVMeshLoaders.readLayer(filePath, buffer, mesh);
+    //   console.log('K: ', k);
+    //   const newLayerCount = mesh.layers.length;
+
+    //   if (newLayerCount > currentLayerCount) {
+    //     let layer = mesh.layers[currentLayerCount];
+    //     layer.name = filePath.replace(/^.*[\\/]/, "");
+    //     layer.url = filePath;
+    //     console.log("layer", layer);
+    //     mesh.updateMesh(nv.gl);
+    //     nv.drawScene();
+    //     getMeshList();
+    //     setActiveImageType(MESH_LAYER);
+    //     setActiveLayer(mesh.layers.length - 1);
+    //     layers.set(
+    //       mesh.id,
+    //       mesh.layers.map((l) => ({
+    //         name: l.name,
+    //         url: l.url,
+    //         visible: true,
+    //         opacity: l.opacity,
+    //         colormap: l.colormap,
+    //       }))
+    //     );
+    //     setMeshOpacity(layers.get(mesh.id)[activeLayer].opacity);
+    //   }
+    //   console.log("mesh", mesh);
+    // } catch (error) {
+    //   console.error('Failed to process file:', error);
+    // }
+  }
+
+  // Example usage
+  const handleButtonClick = async () => {
+    handleDrop();
+    Object.keys(plyFilePaths).forEach((key) => {
+      handleFileProcessing(plyFilePaths[key], activeMesh);
+    });
+  };
+
+  // useEffect(() => {
+  //   if (plyFilePaths && plyFilePaths.length > 0) {
+  //     // loadPlyFiles(plyFilePaths);
+  //     Object.keys(plyFilePaths).forEach((key) => {
+  //       console.log('key', key);
+  //       console.log('value', plyFilePaths[key]);
+  //       addMesh(plyFilePaths[key]);
+  //     });
+  //   }
+  // }, [plyFilePaths, loadPlyFiles]);
+
+  // const handleButtonClick = () => {
+  //   // Object.keys(plyFilePaths).forEach((key) => {
+  //   //   console.log('key', key);
+  //   //   console.log('value', plyFilePaths[key]);
+  //   //   addMesh(plyFilePaths[key]);
+  //   // });
+  //   const filePath = plyFilePaths[0];
+  //   const data = await window.electron.ipcRenderer.invoke('read-file', filePath).then()
+  // }
 
   useEffect(() => {
     console.log('commsInfo', commsInfo);
   }, [commsInfo]);
 
   // ------------ Helper Functions ------------
+  // function makeNiivueUrl(path, commsInfo) {
+  //   console.log('commsInfo', commsInfo);
+  //   const newCommsInfo =
+  //   return `http://${commsInfo.host}:${commsInfo.fileServerPort}/${commsInfo.route}?${commsInfo.queryKey}=${path}`;
+  // }
+
   function makeNiivueUrl(path, commsInfo) {
     console.log('commsInfo', commsInfo);
-    return `http://${commsInfo.host}:${commsInfo.fileServerPort}/${commsInfo.route}?${commsInfo.queryKey}=${path}`;
+    const newCommsInfo = {
+      fileServerPort: 1212,
+      host: 'localhost',
+      route: 'getMesh',
+      queryKey: 'path'
+    }
+    return `http://${newCommsInfo.host}:${newCommsInfo.fileServerPort}/${newCommsInfo.route}?${newCommsInfo.queryKey}=${path}`;
   }
 
   const toggleActive = useCallback(
@@ -1317,6 +1415,9 @@ function TestAppGroup({ plyFilePaths }) {
         <Box display={"flex"} flexDirection={"row"} height={"100%"} gap={"20px"} width={"100vw"} >
           {/* Sidebar: is the left panel that shows all files and image/scene widgets */}
           {sideBar}
+          <button onClick={() => {handleButtonClick()}}>
+            Click me
+          </button>
           {/* Niivue Canvas: where things are rendered :) */}
           <NiivueCanvas nv={nv} flex={"1"} />
           <ColorPickerDialog

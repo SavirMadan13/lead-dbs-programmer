@@ -93,8 +93,15 @@ function GroupSubscoreAnalysisPlot({ clinicalData, scoretype }) {
   });
 
   const calculateStats = (values) => {
-    const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
-    const stdDev = Math.sqrt(values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length);
+    console.log('Values: ', values);
+
+    // Filter out undefined values
+    const filteredValues = values.filter(val => val !== undefined);
+
+    const mean = filteredValues.reduce((sum, val) => sum + val, 0) / filteredValues.length;
+    const stdDev = Math.sqrt(
+      filteredValues.reduce((sum, val) => sum + (val - mean) ** 2, 0) / filteredValues.length
+    );
     return { mean, stdDev };
   };
 
@@ -138,7 +145,8 @@ function GroupSubscoreAnalysisPlot({ clinicalData, scoretype }) {
     } else {
       const averages = orderedTimelines.map((_, i) => calculateStats(patientData.map((patient) => patient[i])).mean);
       const stdDevs = orderedTimelines.map((_, i) => calculateStats(patientData.map((patient) => patient[i])).stdDev);
-
+      console.log('Averages: ', averages);
+      console.log('StDevs: ', stdDevs);
       datasets.push({
         label: `${name} Average`,
         data: averages,

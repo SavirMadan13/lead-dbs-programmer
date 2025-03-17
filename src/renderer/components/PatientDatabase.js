@@ -17,6 +17,7 @@ import {
   MenuItem,
   AppBar,
   Toolbar,
+  Checkbox,
 } from '@mui/material';
 import { Edit, Delete, Save, Cancel } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -34,13 +35,6 @@ function PatientDatabase({ key, directoryPath }) {
   const [orderBy, setOrderBy] = useState('id');
   const [editMode, setEditMode] = useState(false);
   const navigate = useNavigate();
-  // const [columns, setColumns] = useState([
-  //   // { id: 'id', label: 'ID' },
-  //   // { id: 'name', label: 'Name' },
-  //   // { id: 'age', label: 'Age' },
-  //   // { id: 'gender', label: 'Gender' },
-  //   // { id: 'diagnosis', label: 'Diagnosis' },
-  // ]);
   const [columns, setColumns] = useState(() => {
     if (patients.length > 0) {
       return Object.keys(patients[2])
@@ -55,6 +49,7 @@ function PatientDatabase({ key, directoryPath }) {
   const [newColumnId, setNewColumnId] = useState('');
   const [newColumnLabel, setNewColumnLabel] = useState('');
   const [columnToDelete, setColumnToDelete] = useState('');
+  const [selectedPatients, setSelectedPatients] = useState(new Set());
 
   const fileInputRef = useRef(null);
 
@@ -185,11 +180,14 @@ function PatientDatabase({ key, directoryPath }) {
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    window.electron.ipcRenderer.on('file-read-success', (patientsData, directoryPath) => {
-      console.log(patientsData);
-      setPatients(patientsData); // Set the patients from the JSON file
-      // savePatientsToJson(patientsData, directoryPath);
-    });
+    window.electron.ipcRenderer.on(
+      'file-read-success',
+      (patientsData, directoryPath) => {
+        console.log(patientsData);
+        setPatients(patientsData); // Set the patients from the JSON file
+        // savePatientsToJson(patientsData, directoryPath);
+      },
+    );
 
     window.electron.ipcRenderer.on('file-not-found', () => {
       console.log(
@@ -221,7 +219,7 @@ function PatientDatabase({ key, directoryPath }) {
                 if (patients[patient].id === arg.patientname) {
                   outputPatient = patients[patient];
                   outputTimeline = arg.labels ? arg.labels[0] : arg.label;
-                  let leadDBS = true;
+                  const leadDBS = true;
                   navigate('/programmer', {
                     state: {
                       patient: outputPatient,
@@ -317,6 +315,49 @@ function PatientDatabase({ key, directoryPath }) {
     });
     console.log('Patients: ', patients);
     savePatientsToJson(patients, directoryPath);
+  };
+
+  const handleCheckboxChange = (id) => {
+    setSelectedPatients((prevSelected) => {
+      const newSelected = new Set(prevSelected);
+      if (newSelected.has(id)) {
+        newSelected.delete(id);
+      } else {
+        newSelected.add(id);
+      }
+      return newSelected;
+    });
+  };
+
+  const handleSelectAllClick = (event) => {
+    if (event.target.checked) {
+      const newSelected = new Set(filteredPatients.map((p) => p.id));
+      setSelectedPatients(newSelected);
+    } else {
+      setSelectedPatients(new Set());
+    }
+  };
+
+  const handleCreateMiniset = () => {
+    window.electron.ipcRenderer
+      .invoke('file-reader')
+      .then((folderPath) => {
+        if (folderPath) {
+          console.log('Selected folder path:', folderPath);
+          // You can now use the folderPath to save or manipulate files
+          window.electron.ipcRenderer.sendMessage(
+            'create-miniset',
+            folderPath,
+            selectedPatients,
+          );
+        } else {
+          console.log('No folder selected');
+        }
+      })
+      .catch((error) => {
+        console.error('Error selecting folder:', error);
+      });
+    console.log(selectedPatients);
   };
 
   return (
@@ -486,7 +527,19 @@ function PatientDatabase({ key, directoryPath }) {
           <Table>
             <TableHead>
               <TableRow>
-                {/* <TableCell>ID</TableCell> */}
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    indeterminate={
+                      selectedPatients.size > 0 &&
+                      selectedPatients.size < filteredPatients.length
+                    }
+                    checked={
+                      filteredPatients.length > 0 &&
+                      selectedPatients.size === filteredPatients.length
+                    }
+                    onChange={handleSelectAllClick}
+                  />
+                </TableCell>
                 <TableCell>
                   <TableSortLabel
                     active={orderBy === 'id'}
@@ -513,6 +566,12 @@ function PatientDatabase({ key, directoryPath }) {
             <TableBody>
               {filteredPatients.map((patient) => (
                 <TableRow key={patient.id}>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selectedPatients.has(patient.id)}
+                      onChange={() => handleCheckboxChange(patient.id)}
+                    />
+                  </TableCell>
                   <TableCell
                     style={{
                       cursor: editRowId === patient.id ? 'default' : 'pointer',
@@ -591,6 +650,7 @@ function PatientDatabase({ key, directoryPath }) {
           // <DatabaseStats patients={patients} directoryPath={directoryPath} />
           <button onClick={() => navigate('/groupstats')}>Group Stats</button>
         )} */}
+        <Button onClick={() => handleCreateMiniset()}>Create Miniset</Button>
       </div>
     </div>
   );

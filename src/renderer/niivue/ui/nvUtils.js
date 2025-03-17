@@ -149,11 +149,12 @@ nvUtils.removeExtension = function (str, ext = ".nii") {
  * // { fileServerPort: 12345, host: 'localhost' }
  */
 nvUtils.getCommsInfo = async function () {
-  if (isFunction(NIIVUE.getCommsInfo)) {
-    return await NIIVUE.getCommsInfo();
-  } else {
-    return NIIVUE.getCommsInfo;
-  }
+  // if (isFunction(NIIVUE.getCommsInfo)) {
+  //   return await NIIVUE.getCommsInfo();
+  // } else {
+  //   return NIIVUE.getCommsInfo;
+  // }
+  return { fileServerPort: 1212, host: 'localhost' };
 };
 
 nvUtils.onLoadVolumes = function (callback) {

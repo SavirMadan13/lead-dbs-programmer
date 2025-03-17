@@ -203,7 +203,7 @@
     "webpack-merge": "^5.9.0"
   },
   "build": {
-    "productName": "LeadDbsProgrammer",
+    "productName": "LeadDBSProgrammer",
     "appId": "org.erb.ElectronReact",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",

@@ -28,7 +28,16 @@ export default function App() {
   const containerRef = useRef(null);
   const plyFilePaths = [
     '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/anatomy.ply',
-    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply'
+    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
+    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
+    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
+    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
+    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
+    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
+    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
+    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
+    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
+    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
   ];
   const updateWindowSize = () => {
     if (containerRef.current) {

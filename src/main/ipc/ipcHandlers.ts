@@ -1,8 +1,10 @@
-import { app, ipcMain } from 'electron';
+import { app, ipcMain, dialog } from 'electron';
 import path from 'path';
 import zlib from 'zlib';
 import { getData, setData } from '../data/data';
 import { getPatientFolder, getPatientFolderPly } from '../helpers/helpers';
+
+const { execSync } = require('child_process');
 
 const fs = require('fs');
 
@@ -608,10 +610,56 @@ export default function registerFileHandlers() {
   ipcMain.handle('read-file', async (event, filePath) => {
     try {
       const data = await fs.promises.readFile(filePath);
-      return data;
+      return data.buffer;
     } catch (error) {
       console.error('Error reading file:', error);
       throw error;
+    }
+  });
+
+  ipcMain.handle('file-reader', async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openDirectory']
+    });
+    return result.canceled ? null : result.filePaths[0];
+  });
+
+  ipcMain.on('create-miniset', async (event, folderPath, selectedPatients) => {
+    console.log('folderPath: ', folderPath);
+    console.log('selectedPatients: ', selectedPatients);
+    const stimulationData = getData('stimulationData');
+    const userDataPath = stimulationData.path;
+
+    for (const patientId of selectedPatients) {
+      const patientFolder = path.join(userDataPath, 'derivatives', 'leaddbs', patientId);
+      const newPatientFolder = path.join(folderPath, 'derivatives', 'leaddbs', patientId);
+
+      // Ensure the new patient directory exists
+      if (!fs.existsSync(newPatientFolder)) {
+        fs.mkdirSync(newPatientFolder, { recursive: true });
+      }
+
+      // Define the subfolders to copy
+      const subfolders = ['clinical', 'stimulations', 'export', 'reconstruction'];
+
+      // Use system command to copy each subfolder
+      subfolders.forEach((subfolder) => {
+        const srcFolder = path.join(patientFolder, subfolder);
+        const destFolder = path.join(newPatientFolder, subfolder);
+
+        try {
+          if (process.platform === 'win32') {
+            // Windows
+            execSync(`xcopy "${srcFolder}" "${destFolder}" /E /I /Y`);
+          } else {
+            // Unix-like (Linux, macOS)
+            execSync(`cp -R "${srcFolder}/." "${destFolder}/"`);
+          }
+          console.log(`Copied ${subfolder} data to: `, destFolder);
+        } catch (error) {
+          console.error(`Error copying ${subfolder} directory:`, error);
+        }
+      });
     }
   });
 }
