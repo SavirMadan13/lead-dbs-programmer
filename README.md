@@ -30,7 +30,7 @@ The **Lead-DBS Programmer Tool** is an Electron React desktop application design
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/lead-dbs-programmer.git
+   git clone https://github.com/SavirMadan13/lead-dbs-programmer.git
    cd lead-dbs-programmer
    ```
 
