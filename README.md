@@ -48,11 +48,3 @@ The **Lead-DBS Programmer Tool** is an Electron React desktop application design
    ```bash
    npm run package
    ```
-
-## Contributing
-
-We welcome contributions! If you'd like to contribute to the project, please submit an issue or a pull request.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
