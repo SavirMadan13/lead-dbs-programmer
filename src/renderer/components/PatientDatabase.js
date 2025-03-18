@@ -560,7 +560,7 @@ function PatientDatabase({ key, directoryPath }) {
                     </TableSortLabel>
                   </TableCell>
                 ))}
-                <TableCell>Actions</TableCell>
+                <TableCell style={{}}>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

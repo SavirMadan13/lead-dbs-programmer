@@ -116,11 +116,11 @@ app.on('ready', () => {
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0374Output/derivatives/leaddbs/sub-CbctDbs0374/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
 // const inputPath = process.argv[1];
-// const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
-const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
+// const inputPath = '/Users/savirmadan/Documents/Localizations/Patient0395Output';
+// const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
 // const inputPath = null;
 // const inputPath = '/Volumes/OneTouch/MasterDataset/AllData';
-// const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
+const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
 // const inputPath = '/Users/savirmadan/Documents/LeadGroupDemo/derivatives/leadgroup/20241007203440/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons/derivatives/leadgroup/BwhParkinsons/inputData.json';
@@ -149,6 +149,8 @@ ipcMain.on('import-inputdata-file', async (event, arg) => {
     // Normalize the lead path
     // let normalLeadPath = leadPath.replace(/\\\//g, '/');
     // let filePath = path.join(normalLeadPath, 'programmer/inputData.json');
+    console.log(inputPath);
+    console.log(process.argv[1]);
     const stats = fs.statSync(inputPath);
     if (stats.isDirectory()) {
       stimulationData.mode = 'standalone';
@@ -746,19 +748,17 @@ const createWindow = async () => {
 
   const loadDirectoryPath = () => {
     console.log('load directory path');
-    if (fs.existsSync(jsonFilePath)) {
-      console.log(jsonFilePath);
-      const data = fs.readFileSync(jsonFilePath, 'utf-8');
-      // return JSON.parse(data).directoryPath;
-      // console.log(stimulationData.filepath);
-      if (!stimulationData.filepath) {
-        return inputPath;
-      }
-      return stimulationData.filepath;
-    }
+    // if (fs.existsSync(jsonFilePath)) {
+    //   console.log(jsonFilePath);
+    //   const data = fs.readFileSync(jsonFilePath, 'utf-8');
+    //   // return JSON.parse(data).directoryPath;
+    //   // console.log(stimulationData.filepath);
+    //   if (!stimulationData.filepath) {
+    //     return inputPath;
+    //   }
+    //   return stimulationData.filepath;
+    // }
     return inputPath;
-
-    return null;
   };
 
   // Helper function to check if the folder has the Lead-DBS structure
@@ -770,13 +770,14 @@ const createWindow = async () => {
   // };
 
   const isLeadDBSFolder = (directoryPath) => {
-    const requiredFolders = ['derivatives/leaddbs', 'leadgroup'];
-    if (directoryPath.includes('leadgroup')) {
-      return true;
-    }
-    return requiredFolders.some((folder) =>
-      fs.existsSync(path.join(directoryPath, folder)),
-    );
+    // const requiredFolders = ['derivatives/leaddbs', 'leadgroup'];
+    // if (directoryPath.includes('leadgroup')) {
+    //   return true;
+    // }
+    // return requiredFolders.some((folder) =>
+    //   fs.existsSync(path.join(directoryPath, folder)),
+    // );
+    return true;
   };
 
   const loadLeadGroupPatients = (directoryPath) => {
@@ -805,8 +806,7 @@ const createWindow = async () => {
     const patients = filteredFolders.map((folder) => {
       const patientId = folder;
       const patientFilePath = path.join(
-        leadDBSPath,
-        folder,
+        directoryPath,
         'patient_info.json',
       ); // Assuming there's a patient_info.json file in each folder
       let patientData = null;
@@ -1052,8 +1052,9 @@ const createWindow = async () => {
               const patients = JSON.parse(data);
               console.log('PATIENTS: ', patients);
               event.sender.send('folder-selected', directoryPath, patients);
-              handleMasterDataFill(directoryPath, patients);
+              // handleMasterDataFill(directoryPath, patients);
               event.sender.send('file-read-success', patients, directoryPath);
+              return;
               // Exit the ipcMain process after sending the event
             } catch (error) {
               console.error('Error parsing JSON file:', error);
@@ -1062,15 +1063,16 @@ const createWindow = async () => {
           });
         }
         console.log('At this step');
-        const patients = loadLeadDBSPatients(directoryPath);
+        // const patients = loadLeadDBSPatients(directoryPath);
+        const patients = fs.readFileSync(path.join(directoryPath, 'participants.json'));
         console.log('PATIENTS: ', patients);
         patients.forEach((patient, index) => {
           console.log('STIMULATION DATA: ', stimulationData);
-          console.log(
-            'STIMULATION DATA ELECTRODE MODELS: ',
-            stimulationData.electrodeModels,
-          );
-          patient.elmodel = stimulationData.electrodeModels;
+          // console.log(
+          //   'STIMULATION DATA ELECTRODE MODELS: ',
+          //   stimulationData.electrodeModels,
+          // );
+          patient.elmodel = stimulationData.elmodel;
           console.log('PATIENT: ', patient);
         });
         console.log('Directory Path: ', directoryPath);
@@ -1190,11 +1192,12 @@ const createWindow = async () => {
   }
 
   const gatherPlyFiles = () => {
-    const jsonData = readJSON(jsonFilePath);
-    const { directoryPath } = jsonData;
+    console.log('GATHER PLY FILES');
+    // const jsonData = readJSON(jsonFilePath);
+    // const { directoryPath } = jsonData;
 
-    // Step 2: Read the dataset description file to get Lead_Path
-    console.log(directoryPath);
+    // // Step 2: Read the dataset description file to get Lead_Path
+    // console.log(directoryPath);
     // const datasetDescriptionPath = path.join(
     //   directoryPath,
     //   'dataset_description.json',

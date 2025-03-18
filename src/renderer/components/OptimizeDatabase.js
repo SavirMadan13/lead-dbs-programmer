@@ -576,14 +576,14 @@ const handleNiiMap = (elecCoords, importedCoords, elspec) => {
     normalizedPlotNiiCoords,
     // normalizedTestCoords,
   );
-  const newOutputV = projectNumContacts(
-    sphereCoords,
-    outputV,
-    2,
-    normalizedPlotNiiCoords,
-  );
-  console.log(newOutputV);
-  return newOutputV;
+  // const newOutputV = projectNumContacts(
+  //   sphereCoords,
+  //   outputV,
+  //   2,
+  //   normalizedPlotNiiCoords,
+  // );
+  // console.log(newOutputV);
+  return outputV;
   // setNiiSolution(outputV);
 };
 

@@ -23,21 +23,16 @@ export default function App() {
   const [directoryPath, setDirectoryPath] = useState(null);
   const [showSettings, setShowSettings] = useState(false); // New state to control visibility
   const [renderKey, setRenderKey] = useState(0);
-  const [isLeadDBSFolder, setIsLeadDBSFolder] = useState(true); // New state to track if it's a Lead-DBS folder
+  const [isLeadDBSFolder, setIsLeadDBSFolder] = useState(null); // New state to track if it's a Lead-DBS folder
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const containerRef = useRef(null);
   const plyFilePaths = [
     '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/anatomy.ply',
     '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
-    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
-    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
-    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
-    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
-    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
-    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
-    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
-    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
-    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
+    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-29781/export/ply/combined_electrodes.ply',
+    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-33544/export/ply/combined_electrodes.ply',
+    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-80206/export/ply/combined_electrodes.ply',
+    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-93127/export/ply/combined_electrodes.ply',
   ];
   const updateWindowSize = () => {
     if (containerRef.current) {
@@ -115,6 +110,7 @@ export default function App() {
         setDirectoryPath(selectedPath); // Set the selected folder path
         setRenderKey((prevKey) => prevKey + 1); // Use functional update to ensure it increments correctly
         // checkLeadDBSFolder(selectedPath); // Check if the folder is a Lead-DBS folder
+        setIsLeadDBSFolder(true);
       },
     );
 

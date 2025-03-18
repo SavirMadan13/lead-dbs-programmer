@@ -153,7 +153,8 @@ export default function registerFileHandlers() {
   ipcMain.on('save-file-test', (event, data) => {
     const dataString = JSON.stringify(data);
     // const newStimFilePath = path.join(stimulationDirectory, 'data.json');
-    const newStimFilePath = '/Users/savirmadan/Documents/twocontact.json';
+    const newStimFilePath =
+      '/Volumes/PdBwh/CompleteParkinsons/optimized_output.json';
     try {
       // fs.writeFileSync(filePath, dataString);
       console.log(newStimFilePath);

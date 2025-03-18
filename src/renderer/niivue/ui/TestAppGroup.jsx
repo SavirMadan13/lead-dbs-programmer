@@ -706,15 +706,28 @@ function TestAppGroup({ plyFilePaths }) {
       const rgba255 = [255, 255, 255, 255];
       const visible = true;
       const opacity = 1;
-      const name = 'file.ply';
+      const name = filePath;
       const nvmesh = await NVMesh.readMesh(buffer, name, nv.gl, opacity, new Uint8Array(rgba255), visible);
       nv.meshes.push(nvmesh);
       nv.drawScene(); // Redraw the scene to include the new mesh
-
+      setMeshes((prevMeshes) => [
+        ...prevMeshes,
+        {
+          id: nvmesh.id,
+          name: nvmesh.name,
+          opacity: nvmesh.opacity,
+          meshShaderIndex: nvmesh.meshShaderIndex,
+          colormap: nvmesh.colormap,
+          active: false, // or true if you want it to be active by default
+          // index: nv.meshes.length - 1,
+          index,
+        },
+      ]);
         console.log(nvmesh);
     } catch (err) {
       console.log(err);
     }
+
 
     // try {
     //   // Use Electron's ipcRenderer to read the file
@@ -759,6 +772,10 @@ function TestAppGroup({ plyFilePaths }) {
     //   console.error('Failed to process file:', error);
     // }
   }
+
+  useEffect(() => {
+    console.log('meshes', meshes);
+  }, [meshes]);
 
   // Example usage
   const handleButtonClick = async () => {
