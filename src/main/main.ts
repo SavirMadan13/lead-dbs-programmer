@@ -115,12 +115,13 @@ app.on('ready', () => {
 // const inputPath = '/Users/savirmadan/Downloads/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0374Output/derivatives/leaddbs/sub-CbctDbs0374/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
-// const inputPath = process.argv[1];
+const inputPath = process.argv[1];
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Patient0395Output';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
 // const inputPath = null;
+// const inputPath = '/Volumes/PdBwh/Patient0395Output';
 // const inputPath = '/Volumes/OneTouch/MasterDataset/AllData';
-const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
+// const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
 // const inputPath = '/Users/savirmadan/Documents/LeadGroupDemo/derivatives/leadgroup/20241007203440/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons/derivatives/leadgroup/BwhParkinsons/inputData.json';
@@ -709,21 +710,21 @@ const createWindow = async () => {
     app.getPath('userData'),
     '.lead-dbs-programmer',
   );
-  const jsonFilePath = path.join(hiddenDirPath, 'config.json');
-  console.log('Saved File', jsonFilePath);
-  // Ensure the hidden directory exists
-  const ensureDirectoryExists = (dirPath: string) => {
-    if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath, { recursive: true });
-    }
-  };
+  // const jsonFilePath = path.join(hiddenDirPath, 'config.json');
+  // console.log('Saved File', jsonFilePath);
+  // // Ensure the hidden directory exists
+  // const ensureDirectoryExists = (dirPath: string) => {
+  //   if (!fs.existsSync(dirPath)) {
+  //     fs.mkdirSync(dirPath, { recursive: true });
+  //   }
+  // };
 
   // Save the directory path to the JSON file
-  const saveDirectoryPath = (directoryPath: string) => {
-    ensureDirectoryExists(hiddenDirPath);
-    const data = { directoryPath };
-    fs.writeFileSync(jsonFilePath, JSON.stringify(data), 'utf-8');
-  };
+  // const saveDirectoryPath = (directoryPath: string) => {
+  //   ensureDirectoryExists(hiddenDirPath);
+  //   const data = { directoryPath };
+  //   fs.writeFileSync(jsonFilePath, JSON.stringify(data), 'utf-8');
+  // };
 
   // Load the saved directory path from the JSON file
   // const loadDirectoryPath = () => {
@@ -1112,7 +1113,7 @@ const createWindow = async () => {
         console.log('Selected folder: ', folderPath);
 
         // Save the selected directory path
-        saveDirectoryPath(folderPath);
+        // saveDirectoryPath(folderPath);
 
         // Check if the folder matches Lead-DBS structure
         if (isLeadDBSFolder(folderPath)) {

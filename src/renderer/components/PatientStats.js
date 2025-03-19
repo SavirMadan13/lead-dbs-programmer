@@ -281,7 +281,10 @@ function PatientStats({ patient, timeline, directoryPath, leadDBS }) {
       patient.id,
       true,
     );
-    timelinePromises.then((result) => setClinicalTimelines(result));
+    timelinePromises.then((result) => {
+      console.log(result);
+      setClinicalTimelines(result);
+    });
     // Promise.all(timelinePromises)
     //   .then((allReceivedTimelines) => {
     //     const allFilteredTimelineNames = allReceivedTimelines.map(
@@ -302,6 +305,19 @@ function PatientStats({ patient, timeline, directoryPath, leadDBS }) {
     //   console.error('Error fetching timelines for all patients:', error);
     // });
   }, [patients]);
+  // const [dataReady, setDataReady] = useState(false);
+  // useEffect(() => {
+  //   if (clinicalTimelines) {
+  //     Object.keys(clinicalTimelines).forEach((key) => {
+  //       console.log(clinicalTimelines[key].hasClinical);
+  //       console.log(patients[0][clinicalTimelines[key].timeline]);
+  //       if (!clinicalTimelines[key].hasClinical) {
+  //         delete patients[0][clinicalTimelines[key].timeline];
+  //         console.log(clinicalTimelines[key].timeline);
+  //       }
+  //     });
+  //   }
+  // }, [clinicalTimelines]);
 
   return (
     <div>
@@ -316,16 +332,23 @@ function PatientStats({ patient, timeline, directoryPath, leadDBS }) {
               margin: '0 10px',
             }}
           /> */}
-          <Form.Select
-            value={selectedScoreType}
-            onChange={(e) => handleScoreChange(e.target.value)}
+          {clinicalTimelines && clinicalTimelines.length === 0 && (
+            <div>
+              <p style={{ color: 'Black', fontWeight: 'bold' }}>No clinical timelines found...</p>
+            </div>
+          )}
+          {clinicalTimelines && clinicalTimelines.length > 0 && (
+            <Form.Select
+              value={selectedScoreType}
+              onChange={(e) => handleScoreChange(e.target.value)}
           >
             {scoreTypes.map((type, index) => (
               <option key={index} value={type}>
                 {type}
               </option>
-            ))}
-          </Form.Select>
+              ))}
+            </Form.Select>
+          )}
           {/* <Button
             variant="secondary"
             onClick={() => document.getElementById('baseline-upload').click()}
@@ -349,7 +372,7 @@ function PatientStats({ patient, timeline, directoryPath, leadDBS }) {
           />
         </Container>
         <div style={{ display: 'flex', flexDirection: 'column', width: '700px', height: '500px', overflowY: 'scroll' }}>
-          {currentStage === 'analyze' && clinicalTimelines && selectedScoreType === 'UPDRS' && (
+          {currentStage === 'analyze' && clinicalTimelines && clinicalTimelines.length > 0 && selectedScoreType === 'UPDRS' && (
             <UPDRSAnalysisComponent
               currentStage={currentStage}
               rawData={patients}
@@ -357,7 +380,7 @@ function PatientStats({ patient, timeline, directoryPath, leadDBS }) {
               scoretype={selectedScoreType}
             />
           )}
-          {currentStage === 'analyze' && clinicalTimelines && selectedScoreType !== 'UPDRS' && (
+          {currentStage === 'analyze' && clinicalTimelines && clinicalTimelines.length > 0 && selectedScoreType !== 'UPDRS' && (
             <UPDRSAnalysisComponent
               currentStage={currentStage}
               rawData={patients}

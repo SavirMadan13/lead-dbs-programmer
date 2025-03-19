@@ -3279,14 +3279,14 @@ function PlyViewer({
       // normalizedTestCoords,
     );
     console.log('Output V: ', outputV);
-    const newOutputV = projectNumContacts(
-      sphereCoords,
-      outputV,
-      1,
-      normalizedPlotNiiCoords,
-    );
-    console.log(outputV);
-    handleNiftiQuantityStateChange(newOutputV);
+    // const newOutputV = projectNumContacts(
+    //   sphereCoords,
+    //   outputV,
+    //   1,
+    //   normalizedPlotNiiCoords,
+    // );
+    // console.log(outputV);
+    handleNiftiQuantityStateChange(outputV);
 
     // setNiiSolution(outputV);
   };

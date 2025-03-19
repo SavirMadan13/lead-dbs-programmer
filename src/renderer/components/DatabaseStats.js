@@ -187,7 +187,7 @@ function DatabaseStats({ directoryPath }) {
   const detectAttributeTypes = () => {
     if (patients.length === 0) return {};
 
-    const samplePatient = patients[2];
+    const samplePatient = patients[0];
     const attributeTypes = {};
 
     Object.keys(samplePatient).forEach((key) => {
@@ -590,45 +590,46 @@ function DatabaseStats({ directoryPath }) {
           <MenuItem value="UPDRS">UPDRS</MenuItem>
           <MenuItem value="Y-BOCS">Y-BOCS</MenuItem>
         </Select> */}
-        <div>
-          <Select
-            value={scoretype}
-            onChange={(e) => setScoretype(e.target.value)}
-            className="analysis-select"
-          >
-            {scoreTypes.map((type) => (
-              <MenuItem key={type} value={type}>
-                {type}
-              </MenuItem>
-            ))}
-          </Select>
-        </div>
       </div>
-      {clinicalDataForPlotting && filteredPatients && (
-        <div className="analysis-section">
-          <select
-            value={analysisType}
-            onChange={handleAnalysisChange}
-            className="analysis-select"
-          >
-            <option value="none">Choose an option</option>
-            {/* <option value="raincloud">Trendline</option>
+      {clinicalDataForPlotting &&
+        filteredPatients && (
+          <div className="analysis-section">
+            <div>
+              <Select
+                value={scoretype}
+                onChange={(e) => setScoretype(e.target.value)}
+                className="analysis-select"
+              >
+                {scoreTypes.map((type) => (
+                  <MenuItem key={type} value={type}>
+                    {type}
+                  </MenuItem>
+                ))}
+              </Select>
+            </div>
+            <select
+              value={analysisType}
+              onChange={handleAnalysisChange}
+              className="analysis-select"
+            >
+              <option value="none">Choose an option</option>
+              {/* <option value="raincloud">Trendline</option>
             <option value="average">Group Average</option> */}
-            <option value="new">Trendlines</option>
-            <option value="laterality">Laterality Analysis</option>
-            <option value="subscore">Subscores</option>
-            <option value="all">View All Plots</option>
-          </select>
-          {renderAnalysis()}
-        </div>
-      )}
+              <option value="new">Trendlines</option>
+              <option value="laterality">Laterality Analysis</option>
+              <option value="subscore">Subscores</option>
+              <option value="all">View All Plots</option>
+            </select>
+            {renderAnalysis()}
+          </div>
+        )}
       <button onClick={handleExportToExcel} className="export-button">
         Export to Excel
       </button>
       {/* <button onClick={handleNiiUpload} className="export-button">
         Calculate stimulation parameters
       </button> */}
-      <Button
+      {/* <Button
         variant="primary"
         onClick={() => document.getElementById('nifti-upload').click()}
         className="mb-4 mx-2"
@@ -641,7 +642,7 @@ function DatabaseStats({ directoryPath }) {
         style={{ display: 'none' }}
         accept=".nii"
         onChange={(e) => handleNiiUpload(e)}
-      />
+      /> */}
       {/* <Dropdown>
         <Dropdown.Toggle variant="success" id="dropdown-basic">
           <Dropdown.Menu>
