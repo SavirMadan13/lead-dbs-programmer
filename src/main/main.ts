@@ -118,6 +118,7 @@ app.on('ready', () => {
 // const inputPath = process.argv[1];
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Patient0395Output';
 const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
+// const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/Patient2Output';
 // const inputPath = null;
 // const inputPath = '/Volumes/PdBwh/Patient0395Output';
@@ -246,6 +247,7 @@ ipcMain.on('import-inputdata-file', async (event, arg) => {
         );
       });
     }
+    console.log('Stimulation Data Sent: ', jsonData);
     event.reply('import-inputdata-file', jsonData);
   } catch (err) {
     // Handle specific errors
@@ -762,6 +764,9 @@ const createWindow = async () => {
     //   }
     //   return stimulationData.filepath;
     // }
+    if (stimulationData.mode !== 'standalone') {
+      return stimulationData.filepath;
+    }
     return inputPath;
   };
 

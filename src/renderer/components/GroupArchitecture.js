@@ -30,7 +30,8 @@ function GroupArchitecture({
 }) {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showViewer, setShowViewer] = useState(false);
-  console.log(patients);
+  console.log('Patients: ', patients);
+  console.log('Patient States: ', patientStates);
   const location = useLocation();
   const patientInfo = location.state || {};
   console.log('patientInfo: ', patientInfo);
@@ -212,16 +213,52 @@ function GroupArchitecture({
     setRenderKey(renderKey + 1);
   };
 
+  const [navbardata, setNavbardata] = useState({
+    text: '',
+    text2: '',
+    color1: '',
+    color2: '',
+  });
+
+  useEffect(() => {
+    if (patientInfo && selectedPatient) {
+      console.log('patientInfo: ', patientInfo);
+      console.log('selectedPatient: ', selectedPatient);
+      console.log('currentPatientState: ', patientStates[selectedPatient]);
+      console.log('currentPatientState.model: ', patientStates[selectedPatient].model);
+      console.log('mode: ', mode);
+      const text = type === 'leadgroup' ? selectedPatient : patientInfo.patient.id;
+      const text2 = type === 'leadgroup' ? patientStates[selectedPatient].model : patientInfo.patient.elmodel;
+      const color1 = '#375D7A';
+      const color2 = 'lightgrey';
+      console.log('navbardata: ', navbardata);
+      setNavbardata({
+        text,
+        text2,
+        color1,
+        color2,
+      });
+    }
+  }, [patientInfo, selectedPatient, renderKey]);
+
   return (
     <div style={{ marginLeft: '-300px', marginTop: '200px' }}>
-      {patientInfo && (
+      {patientInfo && selectedPatient && navbardata && (
+        // <Navbar
+        //   text={
+        //     mode === 'leadgroup' ? { selectedPatient } : patientInfo.patient.id
+        //   }
+        //   color1="#375D7A"
+        //   text2={
+        //     mode === 'leadgroup' ? { selectedPatient } : patientInfo.patient.elmodel
+        //   }
+        //   color2="lightgrey"
+        // />
         <Navbar
-          text={
-            mode === 'leadgroup' ? { selectedPatient } : patientInfo.patient.id
-          }
-        color1="#375D7A"
-        text2={patientInfo.patient.elmodel}
-          color2="lightgrey"
+          text={navbardata.text}
+          color1={navbardata.color1}
+          text2={navbardata.text2}
+          color2={navbardata.color2}
         />
       )}
       {/* <div style={{ paddingLeft: '45px', marginBottom: '-100px' }}>

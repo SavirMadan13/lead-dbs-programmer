@@ -383,6 +383,7 @@ function Programmer() {
           visModel: processedS.outputVisModel,
           allVolAmpToggles: processedS.newAllVolAmpToggles,
           allTogglePositions: processedS.newAllTogglePositions,
+          model: electrodes,
         };
       }
       // Iterate over each key in the timelineOutput object
@@ -419,6 +420,7 @@ function Programmer() {
           visModel: processedS.outputVisModel,
           allVolAmpToggles: processedS.newAllVolAmpToggles,
           allTogglePositions: processedS.newAllTogglePositions,
+          model: electrodes,
         };
       });
       return initialStates;
@@ -470,6 +472,7 @@ function Programmer() {
           visModel: processedS.outputVisModel,
           allVolAmpToggles: processedS.newAllVolAmpToggles,
           allTogglePositions: processedS.newAllTogglePositions,
+          model: electrodes,
         };
       });
       if (!timelineOutput[timeline]) {
@@ -537,6 +540,7 @@ function Programmer() {
           visModel: processedS.outputVisModel,
           allVolAmpToggles: processedS.newAllVolAmpToggles,
           allTogglePositions: processedS.newAllTogglePositions,
+          model: electrodes,
         };
       });
     }

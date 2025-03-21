@@ -26,6 +26,7 @@ import { PatientContext } from './PatientContext';
 import DatabaseStats from './DatabaseStats';
 
 function PatientDatabase({ key, directoryPath }) {
+  window.electron.ipcRenderer.sendMessage('import-inputdata-file', ['ping']);
   const { patients, setPatients } = useContext(PatientContext);
   console.log('Patients: ', patients);
   const [editRowId, setEditRowId] = useState(null); // Track the row being edited
@@ -202,8 +203,11 @@ function PatientDatabase({ key, directoryPath }) {
 
   useEffect(() => {
     // console.log(window.electron.ipcRenderer);
-    if (window.electron && window.electron.ipcRenderer && patients.length > 0) {
+    console.log('Patients: ', patients);
+    console.log('Patients Length: ', patients.length);
+    if (patients.length > 0) {
       window.electron.ipcRenderer.once('import-inputdata-file', (arg) => {
+        console.log('Received: ', arg);
         try {
           console.log('Received: ', arg);
           if (arg.mode === 'stimulate') {
