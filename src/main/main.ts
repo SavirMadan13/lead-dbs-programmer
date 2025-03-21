@@ -115,9 +115,10 @@ app.on('ready', () => {
 // const inputPath = '/Users/savirmadan/Downloads/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0374Output/derivatives/leaddbs/sub-CbctDbs0374/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
-const inputPath = process.argv[1];
+// const inputPath = process.argv[1];
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Patient0395Output';
-// const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
+const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
+// const inputPath = '/Users/savirmadan/Downloads/Patient2Output';
 // const inputPath = null;
 // const inputPath = '/Volumes/PdBwh/Patient0395Output';
 // const inputPath = '/Volumes/OneTouch/MasterDataset/AllData';
@@ -139,6 +140,11 @@ class AppUpdater {
   }
 }
 
+console.log('Binary path: ', app.getPath('exe'));
+console.log('Resources path: ', process.resourcesPath);
+console.log('CWD: ', process.cwd());
+console.log('Directory: ', __dirname);
+
 let mainWindow: BrowserWindow | null = null;
 let stimulationDirectory = '';
 let stimulationData = {};
@@ -147,9 +153,6 @@ ipcMain.on('import-inputdata-file', async (event, arg) => {
   const fs = require('fs');
 
   try {
-    // Normalize the lead path
-    // let normalLeadPath = leadPath.replace(/\\\//g, '/');
-    // let filePath = path.join(normalLeadPath, 'programmer/inputData.json');
     console.log(inputPath);
     console.log(process.argv[1]);
     const stats = fs.statSync(inputPath);
@@ -1207,9 +1210,19 @@ const createWindow = async () => {
     // const leadPath = datasetDescription[0].Lead_Path;
     // console.log('Lead Path: ', leadPath);
     // const stimulationData = getData('stimulationData');
-    const leadPath = stimulationData.leadpath;
-    console.log(stimulationData);
-    console.log(leadPath);
+    let leadPath = null;
+    try {
+      let appDirectory = __dirname;
+      appDirectory = path.resolve(appDirectory, '../../../../../..');
+      const preferences = path.join(appDirectory, 'Preferences.json');
+      const preferencesData = JSON.parse(fs.readFileSync(preferences, 'utf8'));
+      leadPath = preferencesData.LeadDBS_Path;
+      leadPath = leadPath.replace(/\\/g, '/');
+    } catch (err) {
+      const stimulationData = getData('stimulationData');
+      leadPath = stimulationData.leadpath;
+    }
+
     // const leadPath = '/Users/savirmadan/Documents/GitHub/leaddbs';
     // Step 3: Go to the 'atlases' folder within the Lead_Path
     const atlasesPath = path.join(

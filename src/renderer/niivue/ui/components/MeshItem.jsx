@@ -18,7 +18,6 @@ import Collapse from "@mui/material/Collapse";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import StarBorder from "@mui/icons-material/StarBorder";
-import Slider from "@mui/material/Slider";
 
 export function MeshItem({
   name,
@@ -33,8 +32,6 @@ export function MeshItem({
   setActiveLayer = () => {},
   onAddLayer = () => {},
   layers,
-  meshes,
-  onSetColor = () => {},
   ...props
 }) {
   const ref = useRef(null);
@@ -43,17 +40,12 @@ export function MeshItem({
   const [files, setFiles] = useState([]);
   // const [layers, setLayers] = useState([]);
   const [open, setOpen] = useState(false);
-  const [color, setColor] = useState("#000000"); // Default color
-  const [opacity, setOpacity] = useState(1.0); // Default opacity
 
   const handleClick = () => {
-    console.log('Layers', layers);
-    console.log('Meshes', meshes);
     setOpen(!open);
   };
 
   function toggleVisibility() {
-    console.log("toggleVisibility", index, visible);
     onSetVisibility(index, visible === true ? 0 : 1);
     setVisible(!visible);
   }
@@ -109,19 +101,6 @@ export function MeshItem({
     console.log("droppedFiles", droppedFiles);
   };
 
-  const handleColorChange = (event, newValue) => {
-    setColor(newValue);
-    onSetColor(index, newValue);
-    // Update the layer color here if needed
-  };
-
-  const handleOpacityChange = (event, newValue) => {
-    setOpacity(newValue);
-    console.log('newValue', newValue);
-    onSetVisibility(index, newValue);
-    // Update the layer opacity here if needed
-  };
-
   return (
     <Box
       sx={{
@@ -150,7 +129,7 @@ export function MeshItem({
                 wordBreak: "break-word", // wrap long names
                 flexBasis: "75%", // allow for name wrapping for long names and alignment to the button
               }}
-              // onClick={toggleActive}
+              onClick={toggleActive}
               // onMouseUp={toggleActive}
               onContextMenu={handleContextMenu}
             >
@@ -159,7 +138,7 @@ export function MeshItem({
           </Tooltip>
           {open ? <ExpandLess align="right" /> : <ExpandMore align="right" />}
         </ListItemButton>
-        {/* <Menu
+        <Menu
           open={contextMenu !== null}
           onClose={handleClose}
           anchorReference="anchorPosition"
@@ -171,10 +150,10 @@ export function MeshItem({
         >
           <MenuItem onClick={handleAddLayer}>Add Layer</MenuItem>
           <MenuItem onClick={handleRemove}>Remove</MenuItem>
-        </Menu> */}
+        </Menu>
         <Collapse in={open} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
-            {/* {layers.map((item, layerIndex) => (
+            {layers.map((item, layerIndex) => (
               <ListItemButton
                 sx={{ pl: 4 }}
                 key={item.url}
@@ -191,54 +170,7 @@ export function MeshItem({
                   {item.visible ? <VisibilityIcon /> : <VisibilityOffIcon />}
                 </IconButton>
                 <ListItemText primary={item.name} />
-                <Slider
-                  value={opacity}
-                  onChange={handleOpacityChange}
-                  aria-labelledby="opacity-slider"
-                  min={0}
-                  max={1}
-                  step={0.01}
-                  sx={{ width: 100, ml: 2 }}
-                />
-                <input
-                  type="color"
-                  value={color}
-                  onChange={handleColorChange}
-                  style={{ marginLeft: "16px" }}
-                />
               </ListItemButton>
-            ))} */}
-            {meshes.map((item, meshIndex) => (
-              meshIndex === index && (
-                <ListItemButton
-                  sx={{ pl: 4 }}
-                  key={item.id}
-                  // onClick={() => {
-                  //   setActiveLayer(index, meshIndex);
-                  //   // setLayerVisibility(
-                  //   //   index,
-                  //   //   meshIndex,
-                  //   //   meshes[meshIndex].opacity,
-                  //   // );
-                  // }}
-                >
-                  <Slider
-                    value={opacity}
-                    onChange={handleOpacityChange}
-                    aria-labelledby="opacity-slider"
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    sx={{ width: 100, ml: 2 }}
-                  />
-                  <input
-                    type="color"
-                    value={color}
-                    onChange={handleColorChange}
-                    style={{ marginLeft: "16px" }}
-                  />
-                </ListItemButton>
-              )
             ))}
           </List>
         </Collapse>

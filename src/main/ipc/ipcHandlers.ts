@@ -394,33 +394,54 @@ export default function registerFileHandlers() {
     return 'No coords found'; // Return as ArrayBuffer // send the file contents back to renderer process
   });
 
+  // ipcMain.handle('load-ply-file-2', async (event, filePath) => {
+
+  //   const niiFiles = [];
+  //   const atlasesPath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI152NLin2009bAsym/atlases';
+  //   try {
+  //     const findNiiFiles = (dirPath) => {
+  //       const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+  //       for (const entry of entries) {
+  //         const fullPath = path.join(dirPath, entry.name);
+  //         if (entry.isDirectory()) {
+  //           findNiiFiles(fullPath);
+  //         } else if (entry.isFile() && (entry.name.endsWith('.nii') || entry.name.endsWith('.nii.gz'))) {
+  //           niiFiles.push({
+  //             fileName: entry.name,
+  //             filePath: fullPath,
+  //           });
+  //         }
+  //       }
+  //     };
+
+  //     findNiiFiles(atlasesPath);
+  //     console.log(niiFiles);
+  //   } catch (error) {
+  //     console.error('Error reading atlas folders:', error);
+  //   }
+  //   console.log(niiFiles);
+  //   return niiFiles;
+  //   // try {
+  //   //   // const stnFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI_ICBM_2009b_NLIN_ASYM/atlases/DISTAL Nano (Ewert 2017)/lh/STN.nii';
+  //   //   // const fileData = fs.readFileSync(stnFilePath);
+  //   //   const stnFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI_ICBM_2009b_NLIN_ASYM/atlases/DISTAL Nano (Ewert 2017)/lh/STN.nii.gz';
+  //   //   const compressedData = fs.readFileSync(stnFilePath);
+  //   //   const fileData = zlib.gunzipSync(compressedData); // Decompress the .nii.gz file
+  //   //   return fileData.buffer;
+  //   //   // const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
+  //   //   // return fileData.buffer; // Return as ArrayBuffer
+  //   // } catch (error) {
+  //   //   return null;
+  //   // }
+  // });
+
   ipcMain.handle('load-ply-file-2', async (event, filePath) => {
-
-    const niiFiles = [];
-    const atlasesPath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI152NLin2009bAsym/atlases';
     try {
-      const findNiiFiles = (dirPath) => {
-        const entries = fs.readdirSync(dirPath, { withFileTypes: true });
-        for (const entry of entries) {
-          const fullPath = path.join(dirPath, entry.name);
-          if (entry.isDirectory()) {
-            findNiiFiles(fullPath);
-          } else if (entry.isFile() && (entry.name.endsWith('.nii') || entry.name.endsWith('.nii.gz'))) {
-            niiFiles.push({
-              fileName: entry.name,
-              filePath: fullPath,
-            });
-          }
-        }
-      };
-
-      findNiiFiles(atlasesPath);
-      console.log(niiFiles);
+      const plyData = fs.readFileSync(filePath);
+      return plyData.buffer;
     } catch (error) {
       console.error('Error reading atlas folders:', error);
     }
-    console.log(niiFiles);
-    return niiFiles;
     // try {
     //   // const stnFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI_ICBM_2009b_NLIN_ASYM/atlases/DISTAL Nano (Ewert 2017)/lh/STN.nii';
     //   // const fileData = fs.readFileSync(stnFilePath);
@@ -579,7 +600,8 @@ export default function registerFileHandlers() {
     for (let i = 1; i <= numContacts; i++) {
       const contactFolder = path.join(OSSFolder, `ResultsE1C${i}`);
       const niiFilePath = path.join(contactFolder, 'E_field_solution_Lattice.nii');
-
+      // const fileName = `sub-15454_sim-4D_efield_model-ossdbs_hemi-R_desc-C${i}.nii`;
+      // const niiFilePath = path.join(patientFolder, fileName);
       try {
         const fileBuffer = fs.readFileSync(niiFilePath);
         results[i-1] = fileBuffer.buffer;

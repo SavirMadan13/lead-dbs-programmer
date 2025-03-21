@@ -18,6 +18,7 @@ import Import from './components/Import';
 import NiiViewer from './components/NiiViewer';
 import TestAppGroup from './niivue/ui/TestAppGroup';
 import SEEG from './components/SEEG';
+import TestApp from './niivue/ui/TestApp';
 
 export default function App() {
   const [directoryPath, setDirectoryPath] = useState(null);
@@ -266,7 +267,7 @@ export default function App() {
                 <div>
                   {/* <Navbar text="" color1="#375D7A" /> */}
                   <div style={{ marginTop: '100px' }}>
-                    <TestAppGroup plyFilePaths={plyFilePaths} />
+                    <TestApp plyFilePaths={plyFilePaths} />
                   </div>
                 </div>
               }

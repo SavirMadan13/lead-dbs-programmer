@@ -1725,8 +1725,9 @@ function PlyViewer({
 
   async function loadNiftiAsVolume(arrayBuffer, scene) {
     // Initialize Niivue
-    let nv = new Niivue();
-    // await nv.loadVolumes([{ data: arrayBuffer, colormap: 'gray' }]);
+    // let nv = new Niivue();
+    // setPlotNiiCoords(arrayBuffer);
+    // // await nv.loadVolumes([{ data: arrayBuffer, colormap: 'gray' }]);
 
     // // Get the volume data
     // let volume = nv.volumes[0];
@@ -1806,9 +1807,10 @@ function PlyViewer({
   //     const output = computeSuperimposedEField(quantitiesArray, unitSolutions);
   //     console.log('output: ', output);
 
-  //     const img = output.eFieldSuperimposed;
+  //     const img = output.eFieldMagnitude;
+  //     // const img = output.eFieldSuperimposed;
   //     const dimensions = output.header.dims.slice(1, 4);
-
+  //     console.log('img: ', img);
   //     // Generate voxel coordinates
   //     const voxelCoordinates = [];
   //     img.forEach((value, index) => {
@@ -1832,17 +1834,17 @@ function PlyViewer({
   //     });
 
   //     console.log('mniCoordinates: ', mniCoordinates);
-  //     // Binarize the mniCoordinates values
-  //     const threshold = 0.5; // Define a threshold value for binarization
-  //     const binarizedMniCoordinates = mniCoordinates.map(([x, y, z, value]) => {
-  //       const binarizedValue = value > threshold ? 1 : 0;
-  //       return [x, y, z, binarizedValue];
-  //     });
+  //     // // Binarize the mniCoordinates values
+  //     // const threshold = 0.5; // Define a threshold value for binarization
+  //     // const binarizedMniCoordinates = mniCoordinates.map(([x, y, z, value]) => {
+  //     //   const binarizedValue = value > threshold ? 1 : 0;
+  //     //   return [x, y, z, binarizedValue];
+  //     // });
 
-  //     console.log('binarizedMniCoordinates: ', binarizedMniCoordinates);
-  //     const vertices = binarizedMniCoordinates.map(
-  //       ([x, y, z]) => new THREE.Vector3(x, y, z),
-  //     );
+  //     // console.log('binarizedMniCoordinates: ', binarizedMniCoordinates);
+  //     // const vertices = binarizedMniCoordinates.map(
+  //     //   ([x, y, z]) => new THREE.Vector3(x, y, z),
+  //     // );
   //     // Create a Delaunay triangulation from the vertices
   //     //       const delaunay = Delaunator.from(vertices.map(v => [v.x, v.y, v.z]));
   //     //       const indices = delaunay.triangles;
@@ -1893,11 +1895,13 @@ function PlyViewer({
   //     // eslint-disable-next-line no-use-before-define
   //     // addMeshToScene('PLY Scene', geometry, material);
   //     const scene = sceneRef.current;
-  //     const niiPath = binarizedMniCoordinates;
-  //     loadNiftiAsVolume(niiPath, scene);
+  //     // const niiPath = binarizedMniCoordinates;
+  //     loadNiftiAsVolume(mniCoordinates, scene);
   //   }
   // }, [quantities, amplitude, unitSolutions]);
 
+
+  ////////////////////////////////////////////////////////////////
   // useEffect(() => {
   //   const scene = sceneRef.current;
   //   try {
@@ -2017,7 +2021,7 @@ function PlyViewer({
   //     }
 
   //     // Visualization: Subset data for rendering
-  //     const samplingRate = 0.1; // Render 10% of points
+  //     const samplingRate = 1; // Render 10% of points
   //     const sampledPlotNiiCoords = plotNiiCoords.filter(() => Math.random() < samplingRate);
   //     console.log('Number of Sampled Points:', sampledPlotNiiCoords.length);
 
@@ -2078,31 +2082,34 @@ function PlyViewer({
     try {
       // Step 1: Filter extreme R values
       const filteredCoords = plotNiiCoords.filter(
-        ([x, y, z, r]) => r > 1e-5 && r < 1e5,
+        ([x, y, z, r]) => r > 1000000 && !isNaN(r) && r !== Infinity,
       );
+
 
       // Step 2: Extract and clamp R values
-      const rValues = filteredCoords.map(([x, y, z, r]) => r);
-      const clampedRValues = rValues.map((r) =>
-        Math.max(1e-5, Math.min(r, 1e5)),
-      );
+      const rValues = filteredCoords.map(([, , , r]) => r);
+      // const rValues = filteredCoords.map(([, , , r]) => r);
+      // const clampedRValues = rValues.map((r) =>
+      //   Math.max(1e-5, Math.min(r, 1e5)),
+      // );
 
-      // Step 3: Normalize R values linearly
-      const minR = Math.min(...clampedRValues);
-      const maxR = Math.max(...clampedRValues);
-      const normalizedRValues = clampedRValues.map(
-        (r) => (r - minR) / (maxR - minR),
-      );
+      // // Step 3: Normalize R values linearly
+      // const minR = Math.min(...clampedRValues);
+      // const maxR = Math.max(...clampedRValues);
+      // const normalizedRValues = clampedRValues.map(
+      //   (r) => (r - minR) / (maxR - minR),
+      // );
 
-      console.log('Filtered and Normalized R Values:', normalizedRValues);
+      // console.log('Filtered and Normalized R Values:', normalizedRValues);
 
       // Step 4: Create vertices and geometry
-      const vertices = filteredCoords.map(
+      // const vertices = filteredCoords.map(
+      //   ([x, y, z]) => new THREE.Vector3(x, y, z),
+      // );
+      const testVertices = filteredCoords.map(
         ([x, y, z]) => new THREE.Vector3(x, y, z),
       );
-      const testVertices = plotNiiCoords.map(
-        ([x, y, z]) => new THREE.Vector3(x, y, z),
-      );
+      console.log('Number of vertices:', testVertices.length);
       // const geometry = new THREE.BufferGeometry().setFromPoints(vertices);
       const geometry = new THREE.BufferGeometry().setFromPoints(testVertices);
 
@@ -2120,9 +2127,12 @@ function PlyViewer({
       rValues.forEach((r, i) => {
         const color = new THREE.Color();
         color.setHSL(0.1 + 0.3 * r, 1.0, 0.6); // Yellow to red
-        colors[i * 3] = color.r;
-        colors[i * 3 + 1] = color.g;
-        colors[i * 3 + 2] = color.b;
+        // colors[i * 3] = color.r;
+        // colors[i * 3 + 1] = color.g;
+        // colors[i * 3 + 2] = color.b;
+        colors[i * 3] = 1.0;
+        colors[i * 3 + 1] = 1.0;
+        colors[i * 3 + 2] = 0.0;
       });
 
       // Add colors to geometry
@@ -2132,6 +2142,9 @@ function PlyViewer({
       const material = new THREE.PointsMaterial({
         vertexColors: true,
         size: 5.0,
+        transparent: true,
+        opacity: 0.2,
+        blending: THREE.NormalBlending,
       });
       const points = new THREE.Points(geometry, material);
       scene.add(points);
@@ -3279,14 +3292,16 @@ function PlyViewer({
       // normalizedTestCoords,
     );
     console.log('Output V: ', outputV);
-    // const newOutputV = projectNumContacts(
-    //   sphereCoords,
-    //   outputV,
-    //   1,
-    //   normalizedPlotNiiCoords,
-    // );
+    const newOutputV = projectNumContacts(
+      sphereCoords,
+      outputV,
+      2,
+      normalizedPlotNiiCoords,
+    );
+    console.log('New Output V: ', newOutputV);
     // console.log(outputV);
     handleNiftiQuantityStateChange(outputV);
+    // handleNiftiQuantityStateChange(newOutputV);
 
     // setNiiSolution(outputV);
   };

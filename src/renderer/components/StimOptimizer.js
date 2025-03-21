@@ -875,10 +875,10 @@ const optimizeSphereValues = (
     checkStopConditions(currentV, gradientVector, l1Tolerance); // Check Stop
     iteration += 1;
   }
-  // return currentV;
-  console.log(`Optimization completed after ${iteration} iterations.`);
-  const finalV = projectAmpConstraints(currentV);
-  return finalV; // projectConstraints(currentV, maxTotal=5);
+  return currentV;
+  // console.log(`Optimization completed after ${iteration} iterations.`);
+  // const finalV = projectAmpConstraints(currentV);
+  // return finalV; // projectConstraints(currentV, maxTotal=5);
 };
 
 /**
@@ -898,7 +898,7 @@ const projectNumContacts = (sphereCoords, v, numContacts, L, lambda = 1) => {
     // get loss for each contact
     let vSingle = new Array(v.length).fill(0); // set all other contacts to 0
     vSingle[idx] = value; // set this contact ot active value
-    return { idx, loss: lossFunction(sphereCoords, v, L, lambda) }; // get loss for this contact
+    return { idx, loss: lossFunction(sphereCoords, vSingle, L, lambda) }; // get loss for this contact
   });
   losses.sort((a, b) => b.loss - a.loss); // sort by loss (descending order)
   const selectedIndices = losses
@@ -906,7 +906,7 @@ const projectNumContacts = (sphereCoords, v, numContacts, L, lambda = 1) => {
     .map((entry) => entry.idx); // Top numContacts losses are selected
   const mask = v.map((_, idx) => (selectedIndices.includes(idx) ? 1 : 0)); // Create a mask for selected contacts
   const projectedV = v.map((val, idx) => mask[idx] * val); // Apply mask to threshold v back to constraints
-  const minThreshold = 2;
+  const minThreshold = 0;
   const adjustedV = projectedV.map((value) => Math.max(value, minThreshold));
   return adjustedV;
 };

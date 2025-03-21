@@ -18,6 +18,7 @@ import IconButton from '@mui/material/IconButton';
 // import '../BostonCartesiaTest.css';
 // import './ElecModelStyling/boston_vercise_directed.css';
 import './ElecModelStyling/Styling.css';
+import { math } from 'mathjs';
 import { ReactComponent as IPG1 } from '../images/IPG.svg';
 // import { ReactComponent as RightContact } from '../images/RightContact.svg';
 // import { ReactComponent as LeftContact } from '../images/LeftContact.svg';
@@ -484,49 +485,8 @@ function Electrode({
     setNames(newNames);
   }, []);
 
-  // const [percAmpToggle, setPercAmpToggle] = useState(
-  //   percAmpToggle || 'left',
-  // );
-
-  // if (!percAmpToggle || percAmpToggle.length === 0) {
-  //   setPercAmpToggle('left');
-  // }
-
-  // const [volAmpToggle, setVolAmpToggle] = useState(
-  //   volAmpToggle || 'center',
-  // );
-
-  // if (!volAmpToggle || volAmpToggle.length === 0) {
-  //   setVolAmpToggle('center');
-  // }
-
   const [researchToggle, setResearchToggle] = useState('left');
-
-  // const [IPGforOutput, setIPGforOutput] = useState(outputIPG);
-
-  const [calculateQuantities, setCalculateQuantities] = useState(false);
-
-  const handleCalculateQuantitiesButtonClick = () => {
-    setCalculateQuantities((prev) => !prev);
-  };
-
   const [lastChangedKey, setLastChangedKey] = useState(null);
-
-  const calculateZIndex = (key) => {
-    // Define a mapping of key to z-index
-    const zIndexMap = {
-      8: 2,
-      5: 2,
-      2: 2,
-      1: 2,
-      0: 2,
-      // Add more key-to-z-index mappings as needed
-    };
-
-    // Return the calculated z-index or a default value
-    return zIndexMap[key] || 0;
-  };
-
   const initialSelectedValues = { 0: 'right' };
   const initialQuantityBoston = { 0: 100 };
   const initialQuantity = { 0: 0 };
@@ -540,58 +500,6 @@ function Electrode({
 
   const [animation, setAnimation] = useState(initialAnimation);
 
-  const newInitialQuantities =
-    IPG === 'Boston' ? initialQuantityBoston : initialQuantity;
-
-  // const [quantities, setQuantities] = useState(
-  //   quantities || newInitialQuantities,
-  // );
-
-  // if (!quantities || quantities.length === 0) {
-  //   setQuantities(newInitialQuantities);
-  // }
-
-  // const [quantities, setQuantities] = useState(
-  //   quantities ||
-  //   {
-  //     0: 100,
-  //     1: 0,
-  //     2: 0,
-  //     3: 0,
-  //     4: 0,
-  //     5: 0,
-  //     6: 0,
-  //     7: 0,
-  //     8: 0,
-  //   },
-  // );
-
-  // const [parameters, setParameters] = useState(
-  //   parameters || {
-  //     parameter1: '60',
-  //     parameter2: '130',
-  //     parameter3: '0',
-  //   },
-  // );
-
-  // if (!parameters || parameters.length === 0) {
-  //   const initialParameters = {
-  //     parameter1: '60',
-  //     parameter2: '130',
-  //     parameter3: '0',
-  //   };
-  //   setParameters(initialParameters);
-  // }
-
-  // const [visModel, setVisModel] = useState(visModel || '3');
-
-  // if (!visModel || visModel.length === 0) {
-  //   setVisModel('3');
-  // };
-
-  // const [sessionTitle, setSessionTitle] = useState(sessionTitle || '');
-
-  const totalQuantity = quantities.plus + quantities.minus;
   let isAssisted = false;
 
   const [lastChangedInstance, setLastChangedInstance] = useState({
@@ -614,57 +522,6 @@ function Electrode({
       // console.log(levelQuantities);
     });
     return levelTotals;
-  };
-
-  const calculateQuantitiesForTwo = () => {
-    // Calculate the quantity increment for 'center' and 'right' values
-    // This is effectively the number of TripleToggle components that have a value of 'center'
-    let total = 0;
-    if (percAmpToggle === 'left') {
-      total = 100;
-    } else if (percAmpToggle === 'center') {
-      total = totalAmplitude;
-    }
-    const centerCount = Object.values(selectedValues).filter(
-      (value) => value === 'center',
-    ).length;
-    let centerQuantityIncrement = centerCount > 0 ? total / centerCount : 0;
-    // THis is effectively the number of TripleToggle components that have a value of 'right'
-    const rightCount = Object.values(selectedValues).filter(
-      (value) => value === 'right',
-    ).length;
-    let rightQuantityIncrement = rightCount > 0 ? total / rightCount : 0;
-
-    // This finds the difference between
-    if (lastChangedInstance.value === 'center') {
-      centerQuantityIncrement =
-        centerCount > 0
-          ? (100 - lastChangedInstance.animation) / centerCount
-          : 0;
-    } else if (lastChangedInstance.value === 'right') {
-      rightQuantityIncrement =
-        rightCount > 0 ? (100 - lastChangedInstance.animation) / rightCount : 0;
-    } else if (lastChangedInstance.value === 'left') {
-      centerQuantityIncrement = centerCount > 0 ? 100 / centerCount : 0;
-      rightQuantityIncrement = rightCount > 0 ? 100 / rightCount : 0;
-    }
-
-    Object.keys(selectedValues).forEach((key) => {
-      const value = selectedValues[key];
-      // if (key !== lastChangedInstance.key) {
-      if (value === 'left') {
-        quantities[value] = 0;
-      } else if (value === 'center') {
-        quantities[value] = centerQuantityIncrement;
-      } else if (value === 'right') {
-        quantities[value] = rightQuantityIncrement;
-      }
-      // } else if (key === lastChangedInstance.key) {
-      //   quantities[value] = lastChangedInstance.quantity;
-      // }
-    });
-
-    return quantities;
   };
 
   const calculateQuantitiesWithDistribution = () => {
@@ -718,56 +575,6 @@ function Electrode({
     // Update the state with the new quantities
   };
 
-  // const calculateQuantitiesWithDistributionAbbott = () => {
-  //   // Calculate the quantity increment for 'center' and 'right' values
-  //   const total = totalAmplitude;
-
-  //   // total = totalAmplitude;
-  //   console.log('total: ', total);
-  //   const centerCount = Object.values(selectedValues).filter(
-  //     (value) => value === 'center',
-  //   ).length;
-  //   const centerQuantityIncrement = centerCount > 0 ? total / centerCount : 0;
-  //   // console.log('CenterCount: ', centerCount);
-
-  //   const rightCount = Object.values(selectedValues).filter(
-  //     (value) => value === 'right',
-  //   ).length;
-  //   const rightQuantityIncrement = rightCount > 0 ? total / rightCount : 0;
-
-  //   const updatedQuantities = { ...quantities }; // Create a copy of the quantities object
-
-  //   // Update the quantities based on selected values
-  //   Object.keys(selectedValues).forEach((key) => {
-  //     const value = selectedValues[key];
-  //     // console.log("key="+key + ", value=" + value);
-  //     if (value === 'left') {
-  //       updatedQuantities[key] = 0;
-  //     } else if (value === 'center') {
-  //       console.log('CENTER: ', centerQuantityIncrement);
-  //       updatedQuantities[key] = centerQuantityIncrement;
-  //       console.log('updated: ', updatedQuantities);
-  //     } else if (value === 'right') {
-  //       updatedQuantities[key] = rightQuantityIncrement;
-  //     }
-  //     // updatedQuantities[key] = 20;
-  //   });
-
-  //   // console.log(quantities);
-  //   setQuantities(updatedQuantities);
-  //   // setSelectedValues(selectedValue);
-
-  //   console.log(quantities);
-  //   // Update the state with the new quantities
-  // };
-
-  const handleIPGLogic = () => {
-    if (IPG === 'Abbott') {
-      setPercAmpToggle('right');
-      calculateQuantitiesWithDistribution();
-    }
-  };
-
   const handleTripleToggleChange = (value, anime, key) => {
     const updatedSelectedValues = { ...selectedValues, [key]: value };
     const updatedAnimationValues = { ...animation, [key]: anime };
@@ -776,28 +583,19 @@ function Electrode({
     setAnimation(updatedAnimationValues);
     console.log(animation);
     if (IPG === 'Abbott') {
-      console.log('1');
-      console.log(selectedValues);
       Object.keys(updatedSelectedValues).forEach((thing) => {
         const newvalue = updatedSelectedValues[thing];
-        // console.log("key="+key + ", value=" + value);
         if (newvalue === 'left') {
           updatedQuantities[key] = 0;
         } else if (newvalue === 'center') {
-          // console.log('CENTER: ', centerQuantityIncrement);
           updatedQuantities[key] = 10;
-          console.log('updated: ', updatedQuantities);
         } else if (newvalue === 'right') {
           updatedQuantities[key] = 10;
-          console.log('updated: ', updatedQuantities);
         }
       });
-      console.log('2');
     }
     setQuantities(updatedQuantities);
     setLastChangedKey(key);
-    // console.log('quani: ', quantities);
-    // // handleIPGLogic();
   };
 
   const roundToHundred = () => {
@@ -2014,6 +1812,9 @@ function Electrode({
     const previousLevel = Math.ceil(vectorLevel);
     vectorLevel -= levelIncrement;
     const currentLevel = Math.ceil(vectorLevel);
+    if (currentLevel === 1) {
+      return;
+    }
     console.log('currentLevel: ', currentLevel);
     console.log('previousLevel: ', previousLevel);
     const levelAbove =
@@ -2128,6 +1929,9 @@ function Electrode({
     const currentLevel = Math.ceil(vectorLevel);
     console.log('currentLevel: ', currentLevel);
     console.log('previousLevel: ', previousLevel);
+    if (currentLevel === 1) {
+      return;
+    }
     const levelAbove =
       currentLevel !== previousLevel ? previousLevel : Math.ceil(vectorLevel);
     // const levelBelow = Math.floor(vectorLevel);

@@ -123,7 +123,8 @@ function computeSuperimposedEField(stimVector, efieldContactSolutions) {
   if (nifti.isNIFTI(efieldContactSolutions[0])) {
     const firstNifti = nifti.readHeader(efieldContactSolutions[0]);
     let firstData = nifti.readImage(firstNifti, efieldContactSolutions[0]);
-
+    console.log('firstNifti', firstNifti);
+    console.log('firstData', firstData);
     // Ensure `firstData` is an ArrayBuffer
     // if (!(firstData instanceof ArrayBuffer)) {
     //   firstData = new Uint8Array(firstData).buffer;
@@ -142,10 +143,10 @@ function computeSuperimposedEField(stimVector, efieldContactSolutions) {
     }
 
     // Apply scaling factors
-    const { scl_slope = 1, scl_inter = 0 } = firstNifti;
-    firstData = new Float32Array(
-      firstData.map((value) => value * scl_slope + scl_inter),
-    );
+    // const { scl_slope = 1, scl_inter = 0 } = firstNifti;
+    // firstData = new Float32Array(
+    //   firstData.map((value) => value * scl_slope + scl_inter),
+    // );
 
     niftiHeader = firstNifti;
     dimensions = firstNifti.dims.slice(1, 4); // Get spatial dimensions
@@ -153,10 +154,15 @@ function computeSuperimposedEField(stimVector, efieldContactSolutions) {
 
     // Initialize superimposed E-field array (4D)
     niftiData = new Float32Array(voxelCount * 3); // Assuming 3 components per voxel
-
+    console.log('StimVector', stimVector);
+    console.log('StimVector[0]', stimVector[0]);
     // Scale first contact field
     for (let i = 0; i < niftiData.length; i++) {
-      niftiData[i] = firstData[i] * stimVector[0];
+      try {
+        niftiData[i] = Math.abs(firstData[i] * stimVector[0]);
+      } catch (error) {
+        niftiData[i] = 0;
+      }
     }
   } else {
     throw new Error('Invalid NIfTI file provided.');
@@ -187,13 +193,7 @@ function computeSuperimposedEField(stimVector, efieldContactSolutions) {
       } else {
         contactData = new Float32Array(contactData);
       }
-
-      // Apply scaling factors
-      const { scl_slope = 1, scl_inter = 0 } = niftiHeader;
-      contactData = new Float32Array(
-        contactData.map((value) => value * scl_slope + scl_inter),
-      );
-
+      console.log('niftiData.length', niftiData.length);
       for (let i = 0; i < niftiData.length; i++) {
         niftiData[i] += contactData[i] * stimVector[contactIdx];
       }
@@ -203,17 +203,19 @@ function computeSuperimposedEField(stimVector, efieldContactSolutions) {
   }
 
   // Compute magnitude of the final E-field (3D output)
-  const eFieldMagnitude = new Float32Array(
-    dimensions.reduce((a, b) => a * b, 1),
-  );
+  // const eFieldMagnitude = new Float32Array(
+  //   dimensions.reduce((a, b) => a * b, 1),
+  // );
+  let eFieldMagnitude = new Float32Array(niftiData.length);
+
   for (let i = 0; i < eFieldMagnitude.length; i++) {
-    const ex = niftiData[i * 3];
-    const ey = niftiData[i * 3 + 1];
-    const ez = niftiData[i * 3 + 2];
-
+    let ex = niftiData[i * 3];
+    let ey = niftiData[i * 3 + 1];
+    let ez = niftiData[i * 3 + 2];
     eFieldMagnitude[i] = Math.sqrt(ex * ex + ey * ey + ez * ez) * 1000.0; // Convert to V/m
+    // eFieldMagnitude[i] = Math.abs(niftiData[i])*1000;
   }
-
+  console.log('eFieldSuperimposed', niftiData);
   // const plyData = eFieldToSurfacePLY(niftiData, eFieldMagnitude, dimensions, niftiHeader);
 
   return {
