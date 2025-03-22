@@ -150,7 +150,7 @@ function UPDRSAnalysisComponent({ currentStage, rawData, clinicalTimelines, scor
 
   return (
     <div>
-      <h2>UPDRS III Analysis</h2>
+      <h2>{scoretype} Analysis</h2>
       {/* <div>
         <select value={analysisType} onChange={handleAnalysisChange}>
           <option value="raincloud">Trendline</option>

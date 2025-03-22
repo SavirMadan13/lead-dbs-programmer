@@ -204,7 +204,7 @@ function GroupSubscoreAnalysisPlot({ clinicalData, scoretype }) {
       },
       title: {
         display: true,
-        text: showGroupAverage ? 'Group Subscore Analysis - Averages' : 'Group Subscore Analysis - Individual',
+        text: showGroupAverage ? 'Subscores' : 'Subscores',
         font: { size: 18 },
       },
     },

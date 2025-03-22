@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
 import Dropdown from 'react-bootstrap/Dropdown';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
   Slider,
   TextField,
@@ -189,10 +190,11 @@ function DatabaseStats({ directoryPath }) {
 
     const samplePatient = patients[0];
     const attributeTypes = {};
-
+    console.log('Sample Patient: ', samplePatient);
     Object.keys(samplePatient).forEach((key) => {
       const value = samplePatient[key];
-      if (typeof value === 'number') {
+      console.log('Value: ', value);
+      if (typeof value === 'number' || !isNaN(parseFloat(value))) {
         attributeTypes[key] = 'number';
       } else if (typeof value === 'string') {
         attributeTypes[key] = 'string';
@@ -208,53 +210,6 @@ function DatabaseStats({ directoryPath }) {
     console.log('Attribute Types:', attributeTypes);
     return Object.keys(attributeTypes).map((key) => {
       const type = attributeTypes[key];
-      // if (type === 'number') {
-      //   return (
-      //     <div key={key} className="filter-group">
-      //       <h1 style={{ fontSize: '10px' }}>{key}:</h1>
-      //       <input
-      //         type="number"
-      //         value={filters[key]?.min || ''}
-      //         placeholder="Min"
-      //         onChange={(e) =>
-      //           setFilters((prev) => ({
-      //             ...prev,
-      //             [key]: { ...prev[key], min: Number(e.target.value) },
-      //           }))
-      //         }
-      //       />
-      //       <input
-      //         type="number"
-      //         value={filters[key]?.max || ''}
-      //         placeholder="Max"
-      //         onChange={(e) =>
-      //           setFilters((prev) => ({
-      //             ...prev,
-      //             [key]: { ...prev[key], max: Number(e.target.value) },
-      //           }))
-      //         }
-      //       />
-      //     </div>
-      //   );
-      // }
-      // if (type === 'string') {
-      //   return (
-      //     <div key={key} className="filter-group">
-      //       <h3 style={{ fontSize: '10px' }}>{key}:</h3>
-      //       <input
-      //         type="text"
-      //         value={filters[key] || ''}
-      //         onChange={(e) =>
-      //           setFilters((prev) => ({
-      //             ...prev,
-      //             [key]: e.target.value,
-      //           }))
-      //         }
-      //       />
-      //     </div>
-      //   );
-      // }
-
       if (type === 'number') {
         return (
           <Box key={key} className="filter-group" sx={{ mb: 2 }}>
@@ -508,6 +463,8 @@ function DatabaseStats({ directoryPath }) {
     optimizeDatabase(patients, directoryPath, electrodeModels, niiCoords);
   };
 
+  const [showGroupViewer, setShowGroupViewer] = useState(false);
+
   return (
     <div className="database-stats-container">
       <HomeIcon onClick={() => navigate('/')} className="home-icon" />
@@ -623,9 +580,10 @@ function DatabaseStats({ directoryPath }) {
             {renderAnalysis()}
           </div>
         )}
-      <button onClick={handleExportToExcel} className="export-button">
+      <button onClick={handleExportToExcel} className="export-button" style={{ float: 'right' }}>
         Export to Excel
       </button>
+
       {/* <button onClick={handleNiiUpload} className="export-button">
         Calculate stimulation parameters
       </button> */}
@@ -643,18 +601,17 @@ function DatabaseStats({ directoryPath }) {
         accept=".nii"
         onChange={(e) => handleNiiUpload(e)}
       /> */}
-      {/* <Dropdown>
-        <Dropdown.Toggle variant="success" id="dropdown-basic">
-          <Dropdown.Menu>
-            {filteredPatients && (
-              <GroupViewer
-                filteredPatients={filteredPatients}
-                directoryPath={directoryPath}
-              />
-            )}
-          </Dropdown.Menu>
-        </Dropdown.Toggle>
-      </Dropdown> */}
+      <VisibilityIcon onClick={() => setShowGroupViewer((prev) => !prev)} />
+      {showGroupViewer && (
+        <div>
+          {filteredPatients && (
+            <GroupViewer
+              filteredPatients={filteredPatients}
+              directoryPath={directoryPath}
+            />
+          )}
+        </div>
+      )}
       {/* <div style={{ padding: '20px', borderRadius: '8px', marginTop: '150px' }}>
         {filteredPatients && (
           <GroupViewer

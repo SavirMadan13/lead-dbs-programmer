@@ -593,8 +593,8 @@ function Import({ leadDBS }) {
 
   const downloadTemplateClinicalScores = () => {
     const link = document.createElement('a');
-    link.href = '/MDS-UPDRSIII_Template.xlsx'; // Relative path to the file in the public directory
-    link.download = 'MDS-UPDRSIII_Template.xlsx';
+    link.href = '/Clinical_Scores_Template.xlsx'; // Relative path to the file in the public directory
+    link.download = 'Clinical_Scores_Template.xlsx';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -604,6 +604,15 @@ function Import({ leadDBS }) {
     const link = document.createElement('a');
     link.href = '/Stimulation_Parameters_Template.xlsx'; // Relative path to the file in the public directory
     link.download = 'Stimulation_Parameters_Template.xlsx';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const downloadTemplateDemographics = () => {
+    const link = document.createElement('a');
+    link.href = '/Demographics_Template.xlsx'; // Relative path to the file in the public directory
+    link.download = 'Demographics_Template.xlsx';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -625,13 +634,19 @@ function Import({ leadDBS }) {
             style={actionButtonStyle}
             onClick={downloadTemplateClinicalScores}
           >
-            Download MDS-UPDRS III Template
+            Download Clinical Scores Template
           </button>
           <button
             style={actionButtonStyle}
             onClick={downloadTemplateStimulationParameters}
           >
             Download Stimulation Parameters Template
+          </button>
+          <button
+            style={actionButtonStyle}
+            onClick={downloadTemplateDemographics}
+          >
+            Download Demographics Template
           </button>
         </div>
       </div>

@@ -456,7 +456,7 @@ function PatientDatabase({ key, directoryPath }) {
           {/* Add Patient Button */}
           {!editMode && (
             <div>
-              <Button
+              {/* <Button
                 // variant="contained"
                 // color="primary"
                 onClick={addPatient}
@@ -467,23 +467,23 @@ function PatientDatabase({ key, directoryPath }) {
                 }}
               >
                 Add Patient
-              </Button>
-              <Button
+              </Button> */}
+              {/* <Button
                 // variant="contained"
                 // color="default"
                 onClick={() => navigate('/niivue')}
                 style={{ marginLeft: '5px' }}
               >
                 NiiVue
-              </Button>
-              <Button
+              </Button> */}
+              {/* <Button
                 // variant="contained"
                 // color="default"
                 onClick={() => navigate('/seeg')}
                 style={{ marginLeft: '5px' }}
               >
                 SEEG
-              </Button>
+              </Button> */}
               <Button
                 // variant="contained"
                 // color="default"

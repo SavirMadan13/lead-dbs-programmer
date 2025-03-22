@@ -1284,7 +1284,7 @@ function PlyViewer({
         // Apply the rotation to the directionOffset using the quaternion
         directionOffset.applyQuaternion(rotationQuaternion);
 
-        // Apply the direction offset to the newPosition relative to the electrode’s orientation
+        // Apply the direction offset to the newPosition relative to the electrode's orientation
         newPosition.x +=
           right.x * directionOffset.x +
           forward.x * directionOffset.y +
@@ -2253,7 +2253,7 @@ function PlyViewer({
       changeCameraAngle();
       // changePrimaryCameraAngle();
     }
-  }, [recoData]);
+  }, [recoData, side]);
 
   const findNearestCoordinate = (target, coordinates) => {
     const [x1, y1, z1] = target;
@@ -2574,7 +2574,7 @@ function PlyViewer({
       // Apply the rotation to the directionOffset using the quaternion
       directionOffset.applyQuaternion(rotationQuaternion);
 
-      // Apply the direction offset to the newPosition relative to the electrode’s orientation
+      // Apply the direction offset to the newPosition relative to the electrode's orientation
       newPosition.x +=
         right.x * directionOffset.x +
         forward.x * directionOffset.y +
@@ -2754,7 +2754,7 @@ function PlyViewer({
         // Apply the rotation to the directionOffset using the quaternion
         directionOffset.applyQuaternion(rotationQuaternion);
 
-        // Apply the direction offset to the newPosition relative to the electrode’s orientation
+        // Apply the direction offset to the newPosition relative to the electrode's orientation
         newPosition.x +=
           right.x * directionOffset.x +
           forward.x * directionOffset.y +
@@ -3470,6 +3470,10 @@ function PlyViewer({
       reader.readAsArrayBuffer(file);
     } catch (error) {
       console.error('Error loading NIfTI file:', error);
+    } finally {
+      setIsLoading(false); // Hide spinner
+      // Reset the file input value to allow re-uploading the same file
+      event.target.value = null;
     }
   };
 
@@ -3881,8 +3885,6 @@ function PlyViewer({
         </div>
       )} */}
       <div style={viewerContainerStyle}>
-        {/* <div ref={mountRef} /> */}
-        {/* <Button onClick={changeCameraAngle}>View from top</Button> */}
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <div
             ref={mountRef}
@@ -3892,46 +3894,41 @@ function PlyViewer({
           />
           <div ref={secondaryMountRef} />
         </div>
-        {/* <Button
-          variant="outline-secondary"
-          onClick={() => setOpen(!open)}
-          aria-controls="tabs-collapse"
-          aria-expanded={open}
-          style={{ marginBottom: '10px' }}
-        >
-          <SettingsIcon />
-        </Button> */}
-        {/* <button onClick={logCameraSettings}>Log Camera Settings</button>
-        <button onClick={changeCameraAngle}>Change Camera</button> */}
         <Dropdown drop="start">
           <Dropdown.Toggle variant="secondary" style={{ marginLeft: '-100px' }}>
             <SettingsIcon />
           </Dropdown.Toggle>
           <Dropdown.Menu
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.44)',
-              border: 'none',
+              backgroundColor: 'rgba(255, 255, 255, 0.8)', // Slightly more opaque for better readability
+              border: '1px solid rgba(0, 0, 0, 0.1)', // Light border for definition
+              borderRadius: '8px', // Rounded corners for a softer look
+              padding: '10px', // Padding for spacing
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow for depth
             }}
           >
             <div id="tabs-collapse">
               <Tabs
                 defaultActiveKey="meshes"
                 id="mesh-controls-tab"
-                // className="mb-3"
-                style={{ backgroundColor: 'rgba(255, 255, 255, 0.44)' }}
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)', // Consistent background color
+                  borderRadius: '8px', // Match the dropdown menu
+                  padding: '10px', // Consistent padding
+                }}
               >
                 <Tab eventKey="meshes" title="Meshes">
                   <div style={controlPanelStyle}>
                     {meshes.map((mesh, index) => (
                       <div key={mesh.name} style={meshControlStyle}>
                         <h5 style={meshNameStyle}>{mesh.name}</h5>
-                        <h3 style={{ fontSize: '12px' }}>Visibility</h3>
+                        <h3 style={{ fontSize: '12px', color: '#333' }}>Visibility</h3>
                         <Form.Check
                           type="switch"
                           checked={meshProperties[mesh.name]?.visible}
                           onChange={() => handleVisibilityChange(mesh.name)}
                         />
-                        <h3 style={{ fontSize: '12px' }}>Opacity</h3>
+                        <h3 style={{ fontSize: '12px', color: '#333' }}>Opacity</h3>
                         <Form.Range
                           min={0}
                           max={1}
@@ -3952,33 +3949,16 @@ function PlyViewer({
 
                 <Tab eventKey="atlases" title="Atlases">
                   <div style={controlPanelStyle2}>
-                    {/* <input
-                      type="text"
-                      placeholder="Enter coordinates (x,y,z)"
-                      value={searchCoordinate}
-                      onChange={(e) => setSearchCoordinate(e.target.value)}
-                      style={{ marginBottom: '10px', width: '300px' }}
-                    />
-                    <button onClick={handleCoordinateSearch}>Search</button>
-                    <div style={{ marginTop: '20px' }}>
-                      <h4>Matching Atlases:</h4>
-                      {matchingAtlases.length > 0 ? (
-                        <ul>
-                          {matchingAtlases.map((file, index) => (
-                            <li key={index}>{file.name}</li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p>No matching atlases found.</p>
-                      )}
-                    </div> */}
                     <select
                       onChange={handleFileChange}
                       multiple
                       style={{
                         height: '500px',
                         width: '300px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.44)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)', // Consistent background color
+                        border: '1px solid rgba(0, 0, 0, 0.1)', // Light border
+                        borderRadius: '8px', // Rounded corners
+                        padding: '5px', // Padding for spacing
                       }}
                     >
                       {plyFiles.map((file, index) => (
@@ -3997,7 +3977,10 @@ function PlyViewer({
                       style={{
                         height: '500px',
                         width: '300px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.44)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)', // Consistent background color
+                        border: '1px solid rgba(0, 0, 0, 0.1)', // Light border
+                        borderRadius: '8px', // Rounded corners
+                        padding: '5px', // Padding for spacing
                       }}
                     >
                       {priorStims &&
@@ -4029,7 +4012,10 @@ function PlyViewer({
                           style={{
                             height: '500px',
                             width: '300px',
-                            backgroundColor: 'rgba(255, 255, 255, 0.44)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.8)', // Consistent background color
+                            border: '1px solid rgba(0, 0, 0, 0.1)', // Light border
+                            borderRadius: '8px', // Rounded corners
+                            padding: '5px', // Padding for spacing
                           }}
                         >
                           {tremorData.map((tremor, index) => (
@@ -4134,7 +4120,10 @@ function PlyViewer({
                           style={{
                             height: '500px',
                             width: '300px',
-                            backgroundColor: 'rgba(255, 255, 255, 0.44)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.8)', // Consistent background color
+                            border: '1px solid rgba(0, 0, 0, 0.1)', // Light border
+                            borderRadius: '8px', // Rounded corners
+                            padding: '5px', // Padding for spacing
                           }}
                         >
                           {pdData.map((tremor, index) => (
@@ -4235,10 +4224,16 @@ function PlyViewer({
                 </Tab>
                 <Tab eventKey="solution" title="Automatic Solution">
                   <div style={controlPanelStyle2}>
-                    <h3 style={{ fontSize: '14px' }}>Optimize for:</h3>
+                    <h3 style={{ fontSize: '14px', color: '#333' }}>Optimize for:</h3>
                     <select
                       id="options"
-                      style={{ width: '200px' }}
+                      style={{
+                        width: '200px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)', // Consistent background color
+                        border: '1px solid rgba(0, 0, 0, 0.1)', // Light border
+                        borderRadius: '8px', // Rounded corners
+                        padding: '5px', // Padding for spacing
+                      }}
                       value={roi}
                       onChange={handleRoiChange}
                     >
@@ -4265,10 +4260,16 @@ function PlyViewer({
                         Provide Solution
                       </Button>
                     </div>
-                    <h3 style={{ fontSize: '14px' }}>Avoid:</h3>
+                    <h3 style={{ fontSize: '14px', color: '#333' }}>Avoid:</h3>
                     <select
                       id="options"
-                      style={{ width: '200px' }}
+                      style={{
+                        width: '200px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)', // Consistent background color
+                        border: '1px solid rgba(0, 0, 0, 0.1)', // Light border
+                        borderRadius: '8px', // Rounded corners
+                        padding: '5px', // Padding for spacing
+                      }}
                       value={avoidRoi}
                       onChange={handleAvoidanceRoiChange}
                     >
@@ -4332,7 +4333,7 @@ function PlyViewer({
                             </div>
                           </div>
                         )}
-                        <span>{niiSolution}</span>
+                        {/* <span>{niiSolution}</span>
                         <Button onClick={saveCurrentSpheres}>
                           Save Spheres
                         </Button>
@@ -4342,7 +4343,7 @@ function PlyViewer({
                           }
                         >
                           Compare Overlap
-                        </Button>
+                        </Button> */}
                       </div>
                     </div>
                   </div>

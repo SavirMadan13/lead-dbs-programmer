@@ -341,6 +341,7 @@ function PatientStats({ patient, timeline, directoryPath, leadDBS }) {
             <Form.Select
               value={selectedScoreType}
               onChange={(e) => handleScoreChange(e.target.value)}
+              style={{ marginLeft: '30px', width: '200px' }}
           >
             {scoreTypes.map((type, index) => (
               <option key={index} value={type}>

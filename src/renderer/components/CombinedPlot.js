@@ -205,8 +205,9 @@ function CombinedPlot({ clinicalData, scoretype }) {
       title: {
         display: true,
         text: showGroupAverage
-          ? 'Group Average with Standard Deviation'
-          : 'Clinical Data Visualization',
+          ? 'Scores'
+          : 'Scores',
+        font: { size: 18 },
       },
       tooltip: {
         callbacks: {

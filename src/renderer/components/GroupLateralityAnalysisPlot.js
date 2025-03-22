@@ -258,7 +258,7 @@ function GroupLateralityAnalysisPlot({ clinicalData, scoretype }) {
       },
       title: {
         display: true,
-        text: showGroupAverage ? 'Group Laterality Analysis - Averages' : 'Group Laterality Analysis - Individual',
+        text: showGroupAverage ? 'Laterality' : 'Laterality',
         font: { size: 18 },
       },
     },

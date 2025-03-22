@@ -652,10 +652,10 @@ export default function registerFileHandlers() {
     console.log('selectedPatients: ', selectedPatients);
     const stimulationData = getData('stimulationData');
     const userDataPath = stimulationData.path;
-
+    const uniqueFolderName = `miniset_${Date.now()}`;
     for (const patientId of selectedPatients) {
       const patientFolder = path.join(userDataPath, 'derivatives', 'leaddbs', patientId);
-      const newPatientFolder = path.join(folderPath, 'derivatives', 'leaddbs', patientId);
+      const newPatientFolder = path.join(folderPath, uniqueFolderName, 'derivatives', 'leaddbs', patientId);
 
       // Ensure the new patient directory exists
       if (!fs.existsSync(newPatientFolder)) {

@@ -381,14 +381,11 @@ function GroupViewer({
 
   const handlePriorStimChange = async (outputPatientID) => {
     const electrodeLoader = new PLYLoader();
-    const anatomyLoader = new PLYLoader();
 
     try {
       // Load and parse the PLY file from Electron's IPC
       const fileData = await window.electron.ipcRenderer.invoke(
         'load-reconstruction',
-        // selectedPatientID,
-        // selectedSession,
         outputPatientID,
         directoryPath,
       );
@@ -397,10 +394,10 @@ function GroupViewer({
       );
       console.log('ELECTRODE GEOMETRY: ', electrodeGeometry);
       console.log('Output patient id: ', outputPatientID);
+
       // Create a material for the mesh
       const material = new THREE.MeshStandardMaterial({
-        // vertexColors: electrodeGeometry.hasAttribute('color'),
-        color: new THREE.Color(0.1, 0.5, 0.8),
+        vertexColors: electrodeGeometry.hasAttribute('color'),
         flatShading: true,
         metalness: 0.1,
         roughness: 0.5,
@@ -414,16 +411,15 @@ function GroupViewer({
         electrodeGeometry,
         material,
       );
-      // addMeshToScene(`${selectedPatientID}-electrodes`)
     } catch (error) {
       console.error('Error loading PLY file:', error);
     }
   };
 
   useEffect(() => {
-    console.log('Filtered patients: ', filteredPatients);
     if (sceneRef.current && mountRef.current) {
       // Remove all previously rendered patients
+      console.log('Loading electrodes');
       sceneRef.current.children = sceneRef.current.children.filter(
         (child) => !child.name.includes('-electrodes')
       );
@@ -433,7 +429,7 @@ function GroupViewer({
         handlePriorStimChange(patient.id);
       });
     }
-  }, [filteredPatients]);
+  }, [filteredPatients, sceneRef.current, mountRef.current]);
 
   // useEffect(() => {
   //   if (mountRef.current && secondaryMountRef.current) {
