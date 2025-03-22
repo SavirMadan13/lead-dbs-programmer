@@ -288,7 +288,8 @@ function Electrode({
       //   // face={face}
       //   fill="transparent"
       // />,
-      <NewBottomContact key="tail" fill="rgb(122, 125, 131)" />,
+      // <NewBottomContact key="tail" fill="rgb(122, 125, 131)" />,
+      <NewBottomContact key="tail" fill="rgb(27, 27, 27)" />,
     );
   }
   // parsedEtageidx.forEach((sharedLevel, levelIndex) => {
@@ -483,7 +484,7 @@ function Electrode({
     }
 
     setNames(newNames);
-  }, []);
+  }, [contactNaming]);
 
   const [researchToggle, setResearchToggle] = useState('left');
   const [lastChangedKey, setLastChangedKey] = useState(null);
@@ -3484,7 +3485,7 @@ function Electrode({
             )}
           </div>
           <div className="toggle-controls">
-            <div className="input-field">
+            <div className="input-field" style={{ fontSize: '18px' }}>
               <input
                 className="amplitude-input"
                 type="number"
@@ -3494,8 +3495,9 @@ function Electrode({
                 min="0"
                 value={totalAmplitude}
                 onChange={handleTotalAmplitudeChange}
+                style={{ fontSize: '18px', padding: '10px' }}
               />
-              <span className="input-label">{currentLabel}</span>
+              <span className="input-label" style={{ fontSize: '18px' }}>{currentLabel}</span>
             </div>
             <div style={{ marginTop: '-15px' }}>
               {IPG === 'Boston' && (

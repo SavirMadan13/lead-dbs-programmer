@@ -1234,7 +1234,7 @@ const createWindow = async () => {
       leadPath,
       'templates',
       'space',
-      'MNI_ICBM_2009b_NLIN_ASYM',
+      'MNI152NLin2009bAsym',
       'atlases',
     );
 
