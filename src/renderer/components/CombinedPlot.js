@@ -11,6 +11,7 @@ import {
   Legend,
   Filler,
 } from 'chart.js';
+import { Select, MenuItem, Checkbox, ListItemText } from '@mui/material';
 
 ChartJS.register(
   CategoryScale,
@@ -26,6 +27,7 @@ ChartJS.register(
 function CombinedPlot({ clinicalData, scoretype }) {
   const [showPercentage, setShowPercentage] = useState(true);
   const [showGroupAverage, setShowGroupAverage] = useState(true);
+  const [selectedTimelines, setSelectedTimelines] = useState(new Set());
   console.log('Patient data: ', clinicalData);
   // Define a clean color palette
   const colorPalette = [
@@ -42,12 +44,25 @@ function CombinedPlot({ clinicalData, scoretype }) {
   ];
 
   // Collect all timelines and sort with 'baseline' first
+  // const timelines = [
+  //   ...new Set(
+  //     clinicalData.flatMap((patient) => Object.keys(patient.clinicalData)),
+  //   ),
+  // ];
   const timelines = [
     ...new Set(
-      clinicalData.flatMap((patient) => Object.keys(patient.clinicalData)),
+      clinicalData.flatMap((patient) =>
+        Object.keys(patient.clinicalData).filter(timeline =>
+          patient.clinicalData[timeline]?.[scoretype] !== undefined
+        ),
+      ),
     ),
   ];
   console.log('Timelines: ', timelines);
+  // Initialize selectedTimelines with all timelines if not set
+  if (selectedTimelines.size === 0) {
+    setSelectedTimelines(new Set(timelines));
+  }
   const orderedTimelines = timelines.sort((a, b) => {
     if (a === 'baseline') return -1;
     if (b === 'baseline') return 1;
@@ -72,11 +87,13 @@ function CombinedPlot({ clinicalData, scoretype }) {
     });
   });
   console.log('Ordered timelines: ', orderedTimelines);
+  // Filter orderedTimelines based on selectedTimelines
+  const filteredTimelines = orderedTimelines.filter(timeline => selectedTimelines.has(timeline));
   // Calculate average and standard deviation for each timeline
   const averages = [];
   const stdDeviations = [];
 
-  orderedTimelines.forEach((timeline) => {
+  filteredTimelines.forEach((timeline) => {
     const values = clinicalData.map((patientData) => {
       // Check if the patient has clinical data for the baseline and the current timeline
       if (patientData.clinicalData === {}) {
@@ -127,7 +144,7 @@ function CombinedPlot({ clinicalData, scoretype }) {
     const baselineTotal =
       baselineScores.reduce((sum, score) => sum + score, 0) || 1;
 
-    const data = orderedTimelines.map((timeline) => {
+    const data = filteredTimelines.map((timeline) => {
       const timelineData = patientData.clinicalData[timeline]?.[scoretype];
       if (!timelineData) {
         return null; // Return null if timeline data is missing
@@ -181,7 +198,7 @@ function CombinedPlot({ clinicalData, scoretype }) {
   ];
 
   const data = {
-    labels: orderedTimelines,
+    labels: filteredTimelines,
     datasets: showGroupAverage ? groupAverageDataset : patientDatasets,
   };
 
@@ -234,6 +251,19 @@ function CombinedPlot({ clinicalData, scoretype }) {
     },
   };
 
+  // Function to handle timeline selection
+  const handleTimelineChange = (timeline) => {
+    setSelectedTimelines(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(timeline)) {
+        newSet.delete(timeline);
+      } else {
+        newSet.add(timeline);
+      }
+      return newSet;
+    });
+  };
+
   return (
     <div>
       <div style={{ marginBottom: '10px' }}>
@@ -253,6 +283,26 @@ function CombinedPlot({ clinicalData, scoretype }) {
           />
           Show Group Average
         </h3>
+        <div>
+          {/* <h4>Select Timelines:</h4> */}
+          <Select
+            multiple
+            value={Array.from(selectedTimelines)}
+            onChange={(event) => {
+              const value = event.target.value;
+              setSelectedTimelines(new Set(value));
+            }}
+            renderValue={(selected) => selected.join(', ')}
+            style={{ minWidth: 200 }}
+          >
+            {orderedTimelines.map((timeline) => (
+              <MenuItem key={timeline} value={timeline}>
+                <Checkbox checked={selectedTimelines.has(timeline)} />
+                <ListItemText primary={timeline} />
+              </MenuItem>
+            ))}
+          </Select>
+        </div>
       </div>
       <Line data={data} options={options} />
     </div>

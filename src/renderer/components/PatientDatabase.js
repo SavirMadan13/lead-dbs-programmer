@@ -18,7 +18,11 @@ import {
   AppBar,
   Toolbar,
   Checkbox,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Edit, Delete, Save, Cancel } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
@@ -36,17 +40,54 @@ function PatientDatabase({ key, directoryPath }) {
   const [orderBy, setOrderBy] = useState('id');
   const [editMode, setEditMode] = useState(false);
   const navigate = useNavigate();
-  const [columns, setColumns] = useState(() => {
+  // const [columns, setColumns] = useState(() => {
+  //   if (patients.length > 0) {
+  //     return Object.keys(patients[0])
+  //       .filter((columnKey) => columnKey !== 'id') // Rename 'key' to 'columnKey'
+  //       .map((columnKey) => ({
+  //         id: columnKey,
+  //         label: columnKey.charAt(0).toUpperCase() + columnKey.slice(1), // Capitalize the first letter
+  //       }));
+  //   }
+  //   return [];
+  // });
+
+  const [columns, setColumns] = useState([]);
+  const [visibleColumns, setVisibleColumns] = useState(new Set());
+
+  useEffect(() => {
     if (patients.length > 0) {
-      return Object.keys(patients[0])
-        .filter((columnKey) => columnKey !== 'id') // Rename 'key' to 'columnKey'
-        .map((columnKey) => ({
-          id: columnKey,
-          label: columnKey.charAt(0).toUpperCase() + columnKey.slice(1), // Capitalize the first letter
-        }));
+      const allColumnKeys = new Set();
+      patients.forEach((patient) => {
+        Object.keys(patient).forEach((key) => {
+          if (key !== 'PatientID' && key !== 'id') {
+            allColumnKeys.add(key);
+          }
+        });
+      });
+
+      const updatedColumns = Array.from(allColumnKeys).map((columnKey) => ({
+        id: columnKey,
+        label: columnKey.charAt(0).toUpperCase() + columnKey.slice(1),
+      }));
+
+      setColumns(updatedColumns);
+      setVisibleColumns(new Set(['elmodel', 'Age', 'Sex', 'Condition'])); // Initialize only specific columns as visible
     }
-    return [];
-  });
+  }, [patients]);
+
+  const toggleColumnVisibility = (columnId) => {
+    setVisibleColumns((prevVisibleColumns) => {
+      const newVisibleColumns = new Set(prevVisibleColumns);
+      if (newVisibleColumns.has(columnId)) {
+        newVisibleColumns.delete(columnId);
+      } else {
+        newVisibleColumns.add(columnId);
+      }
+      return newVisibleColumns;
+    });
+  };
+
   const [newColumnId, setNewColumnId] = useState('');
   const [newColumnLabel, setNewColumnLabel] = useState('');
   const [columnToDelete, setColumnToDelete] = useState('');
@@ -450,6 +491,30 @@ function PatientDatabase({ key, directoryPath }) {
               >
                 Remove Column
               </Button>
+              <div>
+                <Accordion>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1a-content"
+                    id="panel1a-header"
+                  >
+                    <Typography variant="subtitle1">
+                      Column Visibility
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    {columns.map((column) => (
+                      <div key={column.id}>
+                        <Checkbox
+                          checked={visibleColumns.has(column.id)}
+                          onChange={() => toggleColumnVisibility(column.id)}
+                        />
+                        {column.label}
+                      </div>
+                    ))}
+                  </AccordionDetails>
+                </Accordion>
+              </div>
             </>
           )}
 
@@ -553,7 +618,7 @@ function PatientDatabase({ key, directoryPath }) {
                     ID
                   </TableSortLabel>
                 </TableCell>
-                {columns.map((column) => (
+                {/* {columns.map((column) => (
                   <TableCell key={column.id}>
                     <TableSortLabel
                       active={orderBy === column.id}
@@ -563,7 +628,21 @@ function PatientDatabase({ key, directoryPath }) {
                       {column.label}
                     </TableSortLabel>
                   </TableCell>
-                ))}
+                ))} */}
+                {columns.map(
+                  (column) =>
+                    visibleColumns.has(column.id) && (
+                      <TableCell key={column.id}>
+                        <TableSortLabel
+                          active={orderBy === column.id}
+                          direction={orderBy === column.id ? order : 'asc'}
+                          onClick={() => handleRequestSort(column.id)}
+                        >
+                          {column.label}
+                        </TableSortLabel>
+                      </TableCell>
+                    ),
+                )}
                 <TableCell style={{}}>Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -600,7 +679,7 @@ function PatientDatabase({ key, directoryPath }) {
                       patient.id
                     )}
                   </TableCell>
-                  {columns.map((column) => (
+                  {/* {columns.map((column) => (
                     <TableCell key={column.id}>
                       {editRowId === patient.id ? (
                         <TextField
@@ -610,9 +689,23 @@ function PatientDatabase({ key, directoryPath }) {
                         />
                       ) : (
                         patient[column.id]
-                      )}
-                    </TableCell>
-                  ))}
+                      )} */}
+                  {columns.map(
+                    (column) =>
+                      visibleColumns.has(column.id) && (
+                        <TableCell key={column.id}>
+                          {editRowId === patient.id ? (
+                            <TextField
+                              value={editedPatient[column.id] || ''}
+                              name={column.id}
+                              onChange={handleEditChange}
+                            />
+                          ) : (
+                            patient[column.id]
+                          )}
+                        </TableCell>
+                      ),
+                  )}
                   <TableCell>
                     {editRowId === patient.id ? (
                       <>

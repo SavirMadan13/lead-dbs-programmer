@@ -1700,7 +1700,6 @@ function PlyViewer({
   //   }
   // }, [plyFile]);
 
-
   useEffect(() => {
     if (atlas && sceneRef.current) {
       const scene = sceneRef.current;
@@ -1737,7 +1736,6 @@ function PlyViewer({
   }, [quantities, amplitude]);
 
   const [unitSolutions, setUnitSolutions] = useState(null);
-
 
   async function loadNiftiAsVolume(arrayBuffer, scene) {
     // Initialize Niivue
@@ -1915,7 +1913,6 @@ function PlyViewer({
   //     loadNiftiAsVolume(mniCoordinates, scene);
   //   }
   // }, [quantities, amplitude, unitSolutions]);
-
 
   ////////////////////////////////////////////////////////////////
   // useEffect(() => {
@@ -2100,7 +2097,6 @@ function PlyViewer({
       const filteredCoords = plotNiiCoords.filter(
         ([x, y, z, r]) => r > 1000000 && !isNaN(r) && r !== Infinity,
       );
-
 
       // Step 2: Extract and clamp R values
       const rValues = filteredCoords.map(([, , , r]) => r);
@@ -3303,7 +3299,8 @@ function PlyViewer({
 
     const outputV = optimizeSphereValues(
       sphereCoords,
-      updatedV,
+      // updatedV,
+      [1, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 1],
       normalizedPlotNiiCoords,
       // normalizedTestCoords,
     );
@@ -3311,12 +3308,14 @@ function PlyViewer({
     const newOutputV = projectNumContacts(
       sphereCoords,
       outputV,
-      2,
+      1,
       normalizedPlotNiiCoords,
     );
     console.log('New Output V: ', newOutputV);
+    const roundedOutputV = outputV.map(value => Math.round(value * 10) / 10);
+    console.log('Rounded Output V: ', roundedOutputV);
     // console.log(outputV);
-    handleNiftiQuantityStateChange(outputV);
+    handleNiftiQuantityStateChange(roundedOutputV);
     // handleNiftiQuantityStateChange(newOutputV);
 
     // setNiiSolution(outputV);
@@ -3922,13 +3921,17 @@ function PlyViewer({
                     {meshes.map((mesh, index) => (
                       <div key={mesh.name} style={meshControlStyle}>
                         <h5 style={meshNameStyle}>{mesh.name}</h5>
-                        <h3 style={{ fontSize: '12px', color: '#333' }}>Visibility</h3>
+                        <h3 style={{ fontSize: '12px', color: '#333' }}>
+                          Visibility
+                        </h3>
                         <Form.Check
                           type="switch"
                           checked={meshProperties[mesh.name]?.visible}
                           onChange={() => handleVisibilityChange(mesh.name)}
                         />
-                        <h3 style={{ fontSize: '12px', color: '#333' }}>Opacity</h3>
+                        <h3 style={{ fontSize: '12px', color: '#333' }}>
+                          Opacity
+                        </h3>
                         <Form.Range
                           min={0}
                           max={1}
@@ -3946,29 +3949,30 @@ function PlyViewer({
                     ))}
                   </div>
                 </Tab>
-
-                <Tab eventKey="atlases" title="Atlases">
-                  <div style={controlPanelStyle2}>
-                    <select
-                      onChange={handleFileChange}
-                      multiple
-                      style={{
-                        height: '500px',
-                        width: '300px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.8)', // Consistent background color
-                        border: '1px solid rgba(0, 0, 0, 0.1)', // Light border
-                        borderRadius: '8px', // Rounded corners
-                        padding: '5px', // Padding for spacing
-                      }}
-                    >
-                      {plyFiles.map((file, index) => (
-                        <option key={index} value={index}>
-                          {file.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </Tab>
+                {plyFiles.length > 0 && (
+                  <Tab eventKey="atlases" title="Atlases">
+                    <div style={controlPanelStyle2}>
+                      <select
+                        onChange={handleFileChange}
+                        multiple
+                        style={{
+                          height: '500px',
+                          width: '300px',
+                          backgroundColor: 'rgba(255, 255, 255, 0.8)', // Consistent background color
+                          border: '1px solid rgba(0, 0, 0, 0.1)', // Light border
+                          borderRadius: '8px', // Rounded corners
+                          padding: '5px', // Padding for spacing
+                        }}
+                      >
+                        {plyFiles.map((file, index) => (
+                          <option key={index} value={index}>
+                            {file.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </Tab>
+                )}
                 <Tab eventKey="priorStims" title="Patient Database">
                   <div style={controlPanelStyle2}>
                     <select
@@ -4224,7 +4228,9 @@ function PlyViewer({
                 </Tab>
                 <Tab eventKey="solution" title="Automatic Solution">
                   <div style={controlPanelStyle2}>
-                    <h3 style={{ fontSize: '14px', color: '#333' }}>Optimize for:</h3>
+                    <h3 style={{ fontSize: '14px', color: '#333' }}>
+                      Optimize for:
+                    </h3>
                     <select
                       id="options"
                       style={{

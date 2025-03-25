@@ -83,6 +83,7 @@ function DatabaseStats({ directoryPath }) {
 
   useEffect(() => {
     if (clinicalTimelines) {
+      console.log('Clinical Timelines: ', clinicalTimelines);
       window.electron.ipcRenderer
         .invoke('get-clinical-data', directoryPath, clinicalTimelines)
         .then((clinicalData) => {
