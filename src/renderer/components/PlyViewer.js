@@ -1727,13 +1727,19 @@ function PlyViewer({
   }, [selectedTremor]);
 
   useEffect(() => {
+    if (sceneRef.current) {
+      updateSpherePosition();
+    }
+  }, [recoData]);
+
+  useEffect(() => {
     if (quantities) {
       updateSpherePosition(); // Update the sphere position based on quantities
       // Object.keys(contactDirections).forEach((contactId) => {
       //   updateSpherePosition(contactId); // Create or update each sphere for every contactId
       // });
     }
-  }, [quantities, amplitude]);
+  }, [quantities, amplitude, sceneRef]);
 
   const [unitSolutions, setUnitSolutions] = useState(null);
 

@@ -105,9 +105,9 @@ app.on('ready', () => {
   console.log('File handlers registered.');
 });
 
-console.log = () => {};
-console.warn = () => {};
-console.error = () => {};
+// console.log = () => {};
+// console.warn = () => {};
+// console.error = () => {};
 
 // const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
 // console.log(args);
@@ -118,15 +118,15 @@ console.error = () => {};
 // const inputPath = process.argv[1];
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Patient0406Output';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Patient0395Output';
-const inputPath = '/Users/savirmadan/Partners HealthCare Dropbox/Savir Madan/datasets/CbctDbs0282';
+// const inputPath = '/Users/savirmadan/Partners HealthCare Dropbox/Savir Madan/datasets/CbctDbs0282';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/Patient2Output';
 // const inputPath = null;
 // const inputPath = '/Volumes/PdBwh/Patient0395Output';
-// const inputPath = '/Volumes/OneTouch/MasterDataset/AllData';
+const inputPath = '/Volumes/OneTouch/MasterDataset/AllData';
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
 // const inputPath = '/Users/savirmadan/Documents/LeadGroupDemo/derivatives/leadgroup/20241007203440/inputData.json';
-// const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/stimulations/MNI152NLin2009bAsym/inputData.json';
+// const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons/derivatives/leadgroup/BwhParkinsons/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataBwh.json';
 // const inputPath = '/Users/savirmadan/Documents/SanteGroup/derivatives/leadgroup/2024nov5V2/inputData.json';
@@ -1380,7 +1380,7 @@ const createWindow = async () => {
     console.log('HERE');
     try {
       const plyFiles = gatherPlyFilesDatabase();
-      console.log('Dataset Master: ', plyFiles); // Your function for gathering files
+      // console.log('Dataset Master: ', plyFiles); // Your function for gathering files
       return plyFiles;
     } catch (error) {
       console.error('Error:', error);

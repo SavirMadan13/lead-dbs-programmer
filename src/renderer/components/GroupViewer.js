@@ -400,9 +400,12 @@ function GroupViewer({
         vertexColors: electrodeGeometry.hasAttribute('color'),
         flatShading: true,
         metalness: 0.1,
-        roughness: 0.5,
+        roughness: 0.2,
         transparent: true,
-        opacity: 0.8,
+        opacity: 1,
+        emissive: new THREE.Color(0x000000), // Emissive color
+        wireframe: false, // Render geometry as wireframe
+        side: THREE.DoubleSide, // Render both sides of the geometry
       });
 
       // Add the mesh to the scene
@@ -522,7 +525,29 @@ function GroupViewer({
       scene.background = new THREE.Color(0xffffff); // White background
 
       // Create an OrthographicCamera
-      const aspect = 500 / 500;
+      // const aspect = 500 / 500;
+      // const frustumSize = 45; // Adjust this value to control zoom
+      // const camera = new THREE.OrthographicCamera(
+      //   (frustumSize * aspect) / -2, // left
+      //   (frustumSize * aspect) / 2, // right
+      //   frustumSize / 2, // top
+      //   frustumSize / -2, // bottom
+      //   0.1, // near plane
+      //   1000, // far plane
+      // );
+
+      // const renderer = new THREE.WebGLRenderer({ antialias: true });
+      // renderer.setSize(500, 500);
+      // mountRef.current.appendChild(renderer.domElement);
+
+      // const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+      // scene.add(ambientLight);
+
+      // const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+      // directionalLight.position.set(5, 5, 5).normalize();
+      // scene.add(directionalLight);
+
+      const aspect = 800 / 500; // Set a wider aspect ratio
       const frustumSize = 45; // Adjust this value to control zoom
       const camera = new THREE.OrthographicCamera(
         (frustumSize * aspect) / -2, // left
@@ -534,15 +559,24 @@ function GroupViewer({
       );
 
       const renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(500, 500);
+      renderer.setSize(800, 500); // Set a wider size for the renderer
       mountRef.current.appendChild(renderer.domElement);
 
-      const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1.5); // Reduced intensity
       scene.add(ambientLight);
 
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8); // Reduced intensity
       directionalLight.position.set(5, 5, 5).normalize();
       scene.add(directionalLight);
+
+      // Add a PointLight for more dynamic lighting
+      const pointLight = new THREE.PointLight(0xff0000, 1, 100); // Red light
+      pointLight.position.set(10, 10, 10);
+      scene.add(pointLight);
+
+      // Add a HemisphereLight for a more natural lighting effect
+      const hemisphereLight = new THREE.HemisphereLight(0x4040ff, 0x404040, 0.5); // Blue sky, grey ground
+      scene.add(hemisphereLight);
 
       // OrbitControls setup (only initialize once)
       const controls = new OrbitControls(camera, renderer.domElement);

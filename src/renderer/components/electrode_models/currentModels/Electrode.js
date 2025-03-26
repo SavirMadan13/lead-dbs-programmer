@@ -482,7 +482,7 @@ function Electrode({
         }
       }
     }
-
+    console.log('New Names: ', newNames);
     setNames(newNames);
   }, [contactNaming]);
 

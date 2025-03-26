@@ -49,7 +49,7 @@ function DatabaseStats({ directoryPath }) {
   const [scoreTypes, setScoreTypes] = useState(['UPDRS', 'Y-BOCS']); // Default score types
 
   useEffect(() => {
-    if (directoryPath && filteredPatients.length > 0) {
+    if (directoryPath && filteredPatients.length > 0 && patients[0].id !== 'sub-01') {
       const timelinePromises = filteredPatients.map((patient) =>
         window.electron.ipcRenderer.invoke(
           'get-timelines',
@@ -82,13 +82,14 @@ function DatabaseStats({ directoryPath }) {
   }, [directoryPath, filteredPatients]);
 
   useEffect(() => {
-    if (clinicalTimelines) {
+    if (clinicalTimelines && patients[0].id !== 'sub-01') {
       console.log('Clinical Timelines: ', clinicalTimelines);
       window.electron.ipcRenderer
         .invoke('get-clinical-data', directoryPath, clinicalTimelines)
         .then((clinicalData) => {
           setClinicalData(clinicalData);
           setClinicalDataForPlotting(clinicalData);
+          // window.electron.ipcRenderer.sendMessage('download-clinical-data', clinicalData);
           return clinicalData;
         })
         .catch((error) => {
@@ -96,6 +97,15 @@ function DatabaseStats({ directoryPath }) {
         });
     }
   }, [clinicalTimelines]);
+
+  useEffect(() => {
+      window.electron.ipcRenderer.invoke('get-clinical-data-for-plotting', 'test').then((clinicalData) => {
+        setClinicalData(clinicalData);
+        setClinicalDataForPlotting(clinicalData);
+      }).catch((error) => {
+        console.error('Error retrieving clinical data:', error);
+      });
+  }, []);
 
   useEffect(() => {
     let filtered = patients.filter((patient) => {
@@ -186,21 +196,43 @@ function DatabaseStats({ directoryPath }) {
     setAnalysisType(e.target.value);
   };
 
+  // const detectAttributeTypes = () => {
+  //   if (patients.length === 0) return {};
+
+  //   const samplePatient = patients[0];
+  //   const attributeTypes = {};
+  //   console.log('Sample Patient: ', samplePatient);
+  //   Object.keys(samplePatient).forEach((key) => {
+  //     const value = samplePatient[key];
+  //     console.log('Value: ', value);
+  //     if (typeof value === 'number' || !isNaN(parseFloat(value))) {
+  //       attributeTypes[key] = 'number';
+  //     } else if (typeof value === 'string') {
+  //       attributeTypes[key] = 'string';
+  //     }
+  //     // Add more type checks as needed
+  //   });
+
+  //   return attributeTypes;
+  // };
+
   const detectAttributeTypes = () => {
     if (patients.length === 0) return {};
 
-    const samplePatient = patients[0];
     const attributeTypes = {};
-    console.log('Sample Patient: ', samplePatient);
-    Object.keys(samplePatient).forEach((key) => {
-      const value = samplePatient[key];
-      console.log('Value: ', value);
-      if (typeof value === 'number' || !isNaN(parseFloat(value))) {
-        attributeTypes[key] = 'number';
-      } else if (typeof value === 'string') {
-        attributeTypes[key] = 'string';
-      }
-      // Add more type checks as needed
+    patients.forEach((patient) => {
+      Object.keys(patient).forEach((key) => {
+        const value = patient[key];
+        if (key === 'PatientID' || key === 'DOB') {
+          return;
+        }
+        if (typeof value === 'number' || !isNaN(parseFloat(value))) {
+          attributeTypes[key] = 'number';
+        } else if (typeof value === 'string') {
+          attributeTypes[key] = 'string';
+        }
+        // Add more type checks as needed
+      });
     });
 
     return attributeTypes;
@@ -209,48 +241,54 @@ function DatabaseStats({ directoryPath }) {
   const generateFilterUI = () => {
     const attributeTypes = detectAttributeTypes();
     console.log('Attribute Types:', attributeTypes);
-    return Object.keys(attributeTypes).map((key) => {
-      const type = attributeTypes[key];
-      if (type === 'number') {
-        return (
-          <Box key={key} className="filter-group" sx={{ mb: 2 }}>
-            <Typography variant="subtitle1">{key}:</Typography>
-            <Slider
-              value={filters[key] || [0, 120]}
-              onChange={(e, newValue) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  [key]: newValue,
-                }))
-              }
-              valueLabelDisplay="auto"
-              min={0}
-              max={120}
-            />
-          </Box>
-        );
-      }
-      if (type === 'string') {
-        return (
-          <Box key={key} className="filter-group" sx={{ mb: 2 }}>
-            <Typography variant="subtitle1">{key}:</Typography>
-            <TextField
-              value={filters[key] || ''}
-              onChange={(e) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  [key]: e.target.value,
-                }))
-              }
-              variant="outlined"
-              fullWidth
-              placeholder="none"
-            />
-          </Box>
-        );
-      }
-      return null;
-    });
+    return (
+      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 2 }}>
+        {Object.keys(attributeTypes).map((key) => {
+          const type = attributeTypes[key];
+          if (type === 'number') {
+            return (
+              <Box key={key} className="filter-group" sx={{ mb: 1 }}>
+                <Typography variant="subtitle2" sx={{ fontSize: '0.8rem' }}>{key}:</Typography>
+                <Slider
+                  value={filters[key] || [0, 120]}
+                  onChange={(e, newValue) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      [key]: newValue,
+                    }))
+                  }
+                  valueLabelDisplay="auto"
+                  min={0}
+                  max={120}
+                  sx={{ mt: 1 }}
+                />
+              </Box>
+            );
+          }
+          if (type === 'string') {
+            return (
+              <Box key={key} className="filter-group" sx={{ mb: 1 }}>
+                <Typography variant="subtitle2" sx={{ fontSize: '0.8rem' }}>{key}:</Typography>
+                <TextField
+                  value={filters[key] || ''}
+                  onChange={(e) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      [key]: e.target.value,
+                    }))
+                  }
+                  variant="outlined"
+                  fullWidth
+                  placeholder="none"
+                  sx={{ mt: 1 }}
+                />
+              </Box>
+            );
+          }
+          return null;
+        })}
+      </Box>
+    );
   };
 
   // const generateFilterUI = () => {
@@ -339,6 +377,7 @@ function DatabaseStats({ directoryPath }) {
   useEffect(() => {
     if (clinicalDataForPlotting) {
       // Extract unique score types from clinical data
+      console.log('Clinical Data For Plotting: ', clinicalDataForPlotting);
       const uniqueScoreTypes = new Set();
       clinicalData.forEach((patientData) => {
         Object.keys(patientData.clinicalData).forEach((timeline) => {
@@ -565,19 +604,17 @@ function DatabaseStats({ directoryPath }) {
                 ))}
               </Select>
             </div>
-            <select
+            {/* <select
               value={analysisType}
               onChange={handleAnalysisChange}
               className="analysis-select"
             >
               <option value="none">Choose an option</option>
-              {/* <option value="raincloud">Trendline</option>
-            <option value="average">Group Average</option> */}
               <option value="new">Trendlines</option>
               <option value="laterality">Laterality Analysis</option>
               <option value="subscore">Subscores</option>
               <option value="all">View All Plots</option>
-            </select>
+            </select> */}
             {renderAnalysis()}
           </div>
         )}

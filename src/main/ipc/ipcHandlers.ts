@@ -474,7 +474,9 @@ export default function registerFileHandlers() {
     console.log(Object.keys(data));
     Object.keys(data).forEach((key) => {
       const { id, timeline, scores } = data[key];
-      const patientFolder = getPatientFolder(directoryPath, id, leadDBS);
+      console.log('ID: ', id);
+      const tempId = id.trim();
+      const patientFolder = getPatientFolder(directoryPath, tempId, leadDBS);
       console.log('Patient Folder: ', patientFolder);
       console.log('Scores: ', scores);
       const scoretype = scores['Score Type'];
@@ -490,9 +492,9 @@ export default function registerFileHandlers() {
         // Convert the data to a string format (JSON)
         const dataString = JSON.stringify(scores, null, 2);
         // Dynamically name the file based on patient and timeline
-        let fileName = `sub-${id}_ses-${timeline}_clinical.json`;
+        let fileName = `sub-${tempId}_ses-${timeline}_clinical.json`;
         if (leadDBS) {
-          fileName = `${id}_ses-${timeline}_clinical.json`;
+          fileName = `${tempId}_ses-${timeline}_clinical.json`;
         }
         const filePath = path.join(sessionDir, fileName);
         // Write the data to the file
@@ -685,4 +687,33 @@ export default function registerFileHandlers() {
       });
     }
   });
+
+  ipcMain.on('download-clinical-data', async (event, clinicalData) => {
+    console.log('clinicalData: ', clinicalData);
+
+    // Define the file path where you want to save the JSON data
+    const filePath = path.join('/Users/savirmadan/Downloads', 'clinicalDataForPlotting.json');
+
+    try {
+      // Convert the clinicalData to a JSON string
+      const dataString = JSON.stringify(clinicalData, null, 2);
+
+      // Write the JSON string to the file
+      fs.writeFileSync(filePath, dataString);
+
+      console.log(`Clinical data saved successfully to ${filePath}`);
+      event.reply('download-clinical-data-success', filePath);
+    } catch (error) {
+      console.error('Error saving clinical data:', error);
+      event.reply('download-clinical-data-error', error.message);
+    }
+  });
+
+  ipcMain.handle('get-clinical-data-for-plotting', async (event, message) => {
+    const clinicalDataPath = path.join('/Users/savirmadan/Downloads', 'clinicalDataForPlotting.json');
+    const data = fs.readFileSync(clinicalDataPath, 'utf8');
+    const clinicalData = JSON.parse(data);
+    return clinicalData;
+  });
+
 }

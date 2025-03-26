@@ -292,7 +292,8 @@ function CombinedPlot({ clinicalData, scoretype }) {
               const value = event.target.value;
               setSelectedTimelines(new Set(value));
             }}
-            renderValue={(selected) => selected.join(', ')}
+            // renderValue={(selected) => selected.join(', ')}
+            renderValue={() => 'Timelines'} // Change this line
             style={{ minWidth: 200 }}
           >
             {orderedTimelines.map((timeline) => (

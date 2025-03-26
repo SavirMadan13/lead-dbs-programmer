@@ -72,7 +72,7 @@ function PatientDatabase({ key, directoryPath }) {
       }));
 
       setColumns(updatedColumns);
-      setVisibleColumns(new Set(['elmodel', 'Age', 'Sex', 'Condition'])); // Initialize only specific columns as visible
+      setVisibleColumns(new Set(['elmodel', 'Age' || 'age', 'Sex' || 'sex', 'Condition' || 'diagnosis'])); // Initialize only specific columns as visible
     }
   }, [patients]);
 
@@ -550,6 +550,12 @@ function PatientDatabase({ key, directoryPath }) {
                 SEEG
               </Button> */}
               <Button
+                onClick={() => handleCreateMiniset()}
+                style={{ marginLeft: '5px' }}
+              >
+                Create Miniset
+              </Button>
+              <Button
                 // variant="contained"
                 // color="default"
                 onClick={() => navigate('/groupstats')}
@@ -747,7 +753,7 @@ function PatientDatabase({ key, directoryPath }) {
           // <DatabaseStats patients={patients} directoryPath={directoryPath} />
           <button onClick={() => navigate('/groupstats')}>Group Stats</button>
         )} */}
-        <Button onClick={() => handleCreateMiniset()}>Create Miniset</Button>
+        {/* <Button onClick={() => handleCreateMiniset()}>Create Miniset</Button> */}
       </div>
     </div>
   );

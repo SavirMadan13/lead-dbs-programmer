@@ -428,7 +428,7 @@ function Import({ leadDBS }) {
       const participantIndex = participants.findIndex(
         (p) => {
           console.log(p);
-          return p.id === row.PatientID;
+          return p.id === row.PatientID.trim();
         },
       );
       if (participantIndex !== -1) {

@@ -361,6 +361,7 @@ function Programmer() {
           timeline,
           electrodeModels[outputElectrode].numel,
         );
+        console.log('Patient Data: ', patientData);
         const processedS = patientData
           ? gatherImportedDataNew(patientData, electrodes)
           : {
@@ -392,10 +393,10 @@ function Programmer() {
         console.log('Timeline Output: ', timelineOutput);
         let electrodes = patient.elmodel || 'Boston Vercise Directed';
         const currentTimeline = key;
-        const patientData = timelineOutput[key].S;
+        const patientData = timelineOutput[key].S ? timelineOutput[key].S : timelineOutput[key];
 
         const outputElectrode = handleImportedElectrode(electrodes);
-
+        console.log('Patient Data: ', patientData);
         const processedS = patientData
           ? gatherImportedDataNew(patientData, electrodes)
           : {
@@ -423,6 +424,7 @@ function Programmer() {
           model: electrodes,
         };
       });
+      console.log('Initial States: ', initialStates);
       return initialStates;
     }
 
