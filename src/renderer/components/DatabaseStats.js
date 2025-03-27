@@ -30,6 +30,7 @@ import { optimizeDatabase } from './OptimizeDatabase';
 import electrodeModels from './electrodeModels.json';
 import * as math from 'mathjs';
 import GroupViewer from './GroupViewer';
+import Raincloud from './Raincloud';
 
 function DatabaseStats({ directoryPath }) {
   const { patients } = useContext(PatientContext);
@@ -48,6 +49,7 @@ function DatabaseStats({ directoryPath }) {
   const [scoretype, setScoretype] = useState('UPDRS');
   const [scoreTypes, setScoreTypes] = useState(['UPDRS', 'Y-BOCS']); // Default score types
 
+  console.log('Patients for real: ', patients);
   useEffect(() => {
     if (directoryPath && filteredPatients.length > 0 && patients[0].id !== 'sub-01') {
       const timelinePromises = filteredPatients.map((patient) =>
@@ -251,7 +253,7 @@ function DatabaseStats({ directoryPath }) {
                 <Typography variant="subtitle2" sx={{ fontSize: '0.8rem' }}>{key}:</Typography>
                 <Slider
                   value={filters[key] || [0, 120]}
-                  onChange={(e, newValue) =>
+                  onChangeCommitted={(e, newValue) =>
                     setFilters((prev) => ({
                       ...prev,
                       [key]: newValue,
@@ -271,17 +273,30 @@ function DatabaseStats({ directoryPath }) {
                 <Typography variant="subtitle2" sx={{ fontSize: '0.8rem' }}>{key}:</Typography>
                 <TextField
                   value={filters[key] || ''}
-                  onChange={(e) =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      [key]: e.target.value,
-                    }))
-                  }
+                  onChange={(e) => {
+                      const newValue = e.target.value;
+                      setFilters((prev) => ({
+                          ...prev,
+                          [key]: newValue,
+                      }));
+                  }}
+                  onBlur={(e) => {
+                      const newValue = e.target.value;
+                      setFilters((prev) => {
+                          const updatedFilters = { ...prev };
+                          if (newValue === '') {
+                              delete updatedFilters[key];
+                          } else {
+                              updatedFilters[key] = newValue;
+                          }
+                          return updatedFilters;
+                      });
+                  }}
                   variant="outlined"
                   fullWidth
                   placeholder="none"
                   sx={{ mt: 1 }}
-                />
+              />
               </Box>
             );
           }
@@ -616,6 +631,10 @@ function DatabaseStats({ directoryPath }) {
               <option value="all">View All Plots</option>
             </select> */}
             {renderAnalysis()}
+            {/* <Raincloud
+              clinicalData={clinicalDataForPlotting}
+              scoretype={scoretype}
+            /> */}
           </div>
         )}
       <button onClick={handleExportToExcel} className="export-button" style={{ float: 'right' }}>
@@ -646,6 +665,7 @@ function DatabaseStats({ directoryPath }) {
             <GroupViewer
               filteredPatients={filteredPatients}
               directoryPath={directoryPath}
+              filters={filters}
             />
           )}
         </div>

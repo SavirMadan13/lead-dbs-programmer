@@ -22,6 +22,7 @@ import * as math from 'mathjs';
 function GroupViewer({
   filteredPatients,
   directoryPath,
+  filters,
 }) {
   const [plyFile, setPlyFile] = useState(null);
   const mountRef = useRef(null);
@@ -79,6 +80,22 @@ function GroupViewer({
 
   //   loadPlyFile(); // Call the async function
   // }, []);
+
+  console.log('Filtered Patients: ', filteredPatients);
+  console.log('Filters: ', filters);
+  const publicationColors = {
+    'Hollunder 2024': '#F4C27A', // Soft Orange
+    'Rajamani 2024': '#5A9EAE', // Teal Blue
+    'Irmen 2020': '#8A9A95', // Muted Green
+    'Meyer 2023': '#F28C82', // Soft Coral
+    'Sobesky 2022': '#92A8D1', // Light Blue
+    'Li 2020': '#F0E68C', // Khaki
+    'Li 2021': '#FFB347', // Apricot
+    'Horn 2022': '#B565A7', // Lavender
+    'Horn 2017': '#009688', // Teal
+    'Other': '#B0B0B0', // Light Gray
+    // Add more publications and colors as needed
+  };
 
   useEffect(() => {
     // This loads the anatomy.ply scene
@@ -379,7 +396,31 @@ function GroupViewer({
     return Math.floor(Math.random() * 16777215); // Generate a random number between 0 and 0xFFFFFF
   }
 
-  const handlePriorStimChange = async (outputPatientID) => {
+  const getColor = (patient) => {
+    const filter = 'Netstim / CBCT Publications';
+    let color = publicationColors['Other'];
+    const publication = patient[filter] ? patient[filter].split(',').map(p => p.trim()) : null;
+    if (filters[filter] && filters[filter].length > 0) {
+      console.log('Publication: ', publication);
+      const selectedPublication = filters[filter];
+      if (publication && publication.includes(selectedPublication)) {
+        color = publicationColors[selectedPublication];
+      } else if (publication.length >= 1) {
+        color = publicationColors[publication[0]];
+      }
+    } else if (publication) {
+      console.log('Publication: ', publication);
+      if (publication.length >= 1) {
+        color = publicationColors[publication[0]];
+        console.log('Color: ', color);
+      } else {
+        color = publicationColors[publication];
+      }
+    }
+    return color;
+  };
+
+  const handlePriorStimChange = async (outputPatientID, color) => {
     const electrodeLoader = new PLYLoader();
 
     try {
@@ -397,13 +438,14 @@ function GroupViewer({
 
       // Create a material for the mesh
       const material = new THREE.MeshStandardMaterial({
-        vertexColors: electrodeGeometry.hasAttribute('color'),
+        // vertexColors: electrodeGeometry.hasAttribute('color'),
+        color: color,
         flatShading: true,
         metalness: 0.1,
         roughness: 0.2,
         transparent: true,
         opacity: 1,
-        emissive: new THREE.Color(0x000000), // Emissive color
+        // emissive: new THREE.Color(0x000000), // Emissive color
         wireframe: false, // Render geometry as wireframe
         side: THREE.DoubleSide, // Render both sides of the geometry
       });
@@ -429,7 +471,8 @@ function GroupViewer({
 
       // Render the filtered patients
       filteredPatients.forEach((patient) => {
-        handlePriorStimChange(patient.id);
+        const color = getColor(patient);
+        handlePriorStimChange(patient.id, color);
       });
     }
   }, [filteredPatients, sceneRef.current, mountRef.current]);

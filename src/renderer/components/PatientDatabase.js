@@ -72,7 +72,8 @@ function PatientDatabase({ key, directoryPath }) {
       }));
 
       setColumns(updatedColumns);
-      setVisibleColumns(new Set(['elmodel', 'Age' || 'age', 'Sex' || 'sex', 'Condition' || 'diagnosis'])); // Initialize only specific columns as visible
+      // setVisibleColumns(new Set(['elmodel', 'Age' || 'age', 'Sex' || 'sex', 'Condition' || 'diagnosis'])); // Initialize only specific columns as visible
+      setVisibleColumns(new Set(['City', 'Netstim / CBCT Publications', 'Condition', 'Target', 'elmodel']));
     }
   }, [patients]);
 
@@ -154,9 +155,31 @@ function PatientDatabase({ key, directoryPath }) {
   };
 
   // Sort patients based on the column and order
+  // const sortPatients = (patients, comparator) => {
+  //   const stabilizedPatients = patients.map((el, index) => [el, index]);
+  //   stabilizedPatients.sort((a, b) => {
+  //     const order = comparator(a[0], b[0]);
+  //     if (order !== 0) return order;
+  //     return a[1] - b[1];
+  //   });
+  //   return stabilizedPatients.map((el) => el[0]);
+  // };
+
+  const countNonEmptyFields = (patient) => {
+    return Object.values(patient).filter((value) => value !== null && value !== '').length;
+  };
+
+  // Sort patients based on the column and order
   const sortPatients = (patients, comparator) => {
     const stabilizedPatients = patients.map((el, index) => [el, index]);
     stabilizedPatients.sort((a, b) => {
+      // First, sort by the number of non-empty fields
+      const countA = countNonEmptyFields(a[0]);
+      const countB = countNonEmptyFields(b[0]);
+      if (countA !== countB) {
+        return countB - countA; // Descending order
+      }
+      // If counts are equal, use the provided comparator
       const order = comparator(a[0], b[0]);
       if (order !== 0) return order;
       return a[1] - b[1];
