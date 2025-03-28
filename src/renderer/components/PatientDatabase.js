@@ -438,7 +438,7 @@ function PatientDatabase({ key, directoryPath }) {
           textAlign: 'center',
         }}
       >
-        DBS Patient Database
+        Netstim / CBCT DBS Datasets
       </Typography>
 
       <Container style={{ display: 'flex', flexDirection: 'column' }}>
