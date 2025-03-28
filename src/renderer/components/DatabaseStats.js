@@ -173,7 +173,7 @@ function DatabaseStats({ directoryPath }) {
               clinicalData={clinicalDataForPlotting}
               scoretype={scoretype}
             />
-            {scoretype === 'UPDRS' && (
+            {/* {scoretype === 'UPDRS' && (
               <>
                 <GroupLateralityAnalysisPlot
                   clinicalData={clinicalDataForPlotting}
@@ -184,7 +184,7 @@ function DatabaseStats({ directoryPath }) {
                   scoretype={scoretype}
                 />
               </>
-            )}
+            )} */}
           </div>
         );
       case 'new':
@@ -242,7 +242,20 @@ function DatabaseStats({ directoryPath }) {
 
   const generateFilterUI = () => {
     const attributeTypes = detectAttributeTypes();
-    console.log('Attribute Types:', attributeTypes);
+    const uniqueValues = {};
+
+    // Collect unique values for string attributes
+    patients.forEach((patient) => {
+      Object.keys(attributeTypes).forEach((key) => {
+        if (attributeTypes[key] === 'string') {
+          if (!uniqueValues[key]) {
+            uniqueValues[key] = new Set();
+          }
+          uniqueValues[key].add(patient[key]);
+        }
+      });
+    });
+
     return (
       <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 2 }}>
         {Object.keys(attributeTypes).map((key) => {
@@ -658,7 +671,18 @@ function DatabaseStats({ directoryPath }) {
         accept=".nii"
         onChange={(e) => handleNiiUpload(e)}
       /> */}
-      <VisibilityIcon onClick={() => setShowGroupViewer((prev) => !prev)} />
+      <VisibilityIcon
+        onClick={() => setShowGroupViewer((prev) => !prev)}
+        style={{
+          cursor: 'pointer',
+          // padding: '10px',
+          borderRadius: '8px',
+          backgroundColor: '#f0f0f0',
+          transition: 'background-color 0.3s',
+        }}
+        onMouseEnter={(e) => e.target.style.backgroundColor = '#e0e0e0'}
+        onMouseLeave={(e) => e.target.style.backgroundColor = '#f0f0f0'}
+      />
       {showGroupViewer && (
         <div>
           {filteredPatients && (

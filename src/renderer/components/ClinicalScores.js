@@ -56,6 +56,8 @@ function ClinicalScores() {
   const [initialScores, setInitialScores] = useState(UPDRS);
   const [allScores, setAllScores] = useState([]);
 
+  /* Setting up loading in of preloaded score types that exist for this particular patient */
+
   useEffect(() => {
     const loadScores = async () => {
       console.log('Loading scores...');
@@ -66,8 +68,8 @@ function ClinicalScores() {
       if (scores) {
         console.log('scores: ', scores);
         setScoreTypes(Object.keys(scores));
-        setSelectedScoreType(Object.keys(scores)[0]);
-        setInitialScores(scores[Object.keys(scores)[0]]);
+        // setSelectedScoreType(Object.keys(scores)[0]);
+        // setInitialScores(scores[Object.keys(scores)[0]]);
         setTotalScores(scores);
         // setPatients([
         //   {
@@ -224,10 +226,20 @@ function ClinicalScores() {
         };
         Object.keys(importedScores).forEach((score) => {
           console.log('score: ', score);
+
           newAllScores[score] = importedScores[score];
+          if (newAllScores[score].hasOwnProperty('Timeline')) {
+            delete newAllScores[score].Timeline;
+          }
+          if (newAllScores[score].hasOwnProperty('Levodopa Equivalent Dose of DBS')) {
+            const updatedLEDD = {};
+            updatedLEDD['Levodopa Equivalent Daily Dose'] = newAllScores[score]['Levodopa Equivalent Dose of DBS'];
+            newAllScores[score] = updatedLEDD;
+          }
         });
         console.log('newAllScores: ', newAllScores);
         setAllScores(newAllScores);
+        setScoreTypes(Object.keys(newAllScores));
         setPatients([
           {
             id: patient.id,
@@ -236,6 +248,7 @@ function ClinicalScores() {
           },
         ]);
         setSelectedScoreType(Object.keys(importedScores)[0]);
+        setInitialScores(importedScores[Object.keys(importedScores)[0]]);
         // const matchingScores = Object.keys(totalScores).find((score) => {
         //   const totalScoreItems = Object.keys(totalScores[score]);
         //   const importedScoreItems = Object.keys(importedScores);

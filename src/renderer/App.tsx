@@ -247,7 +247,7 @@ export default function App() {
             <Route
               path="/groupstats"
               element={
-                <div style={{ maxWidth: '1000px' }}>
+                <div style={{}}>
                   <Navbar text="" color1="#375D7A" />
                   <DatabaseStats directoryPath={directoryPath} />
                 </div>
