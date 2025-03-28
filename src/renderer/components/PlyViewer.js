@@ -427,23 +427,23 @@ function PlyViewer({
 
   const [priorStims, setPriorStims] = useState(null);
 
-  useEffect(() => {
-    // Gathers other stimulations from the database
-    const fetchPlyFiles = async () => {
-      try {
-        // Request the PLY file paths from the main process using invoke/handle
-        const files = await window.electron.ipcRenderer.invoke(
-          'get-ply-files-database',
-        );
-        console.log('FILES: ', files);
-        setPriorStims(files);
-      } catch (error) {
-        console.error('Error fetching PLY files:', error);
-      }
-    };
+  // useEffect(() => {
+  //   // Gathers other stimulations from the database
+  //   const fetchPlyFiles = async () => {
+  //     try {
+  //       // Request the PLY file paths from the main process using invoke/handle
+  //       const files = await window.electron.ipcRenderer.invoke(
+  //         'get-ply-files-database',
+  //       );
+  //       console.log('FILES: ', files);
+  //       setPriorStims(files);
+  //     } catch (error) {
+  //       console.error('Error fetching PLY files:', error);
+  //     }
+  //   };
 
-    fetchPlyFiles();
-  }, []); // Empty dependency array ensures this runs only on mount
+  //   fetchPlyFiles();
+  // }, []); // Empty dependency array ensures this runs only on mount
 
   const [selectedFilePath, setSelectedFilePath] = useState(''); // Selected file path
 
