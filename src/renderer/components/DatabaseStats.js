@@ -228,6 +228,10 @@ function DatabaseStats({ directoryPath }) {
         if (key === 'PatientID' || key === 'DOB' || key === 'City ') {
           return;
         }
+        if (key === 'DOIs') {
+          attributeTypes[key] = 'string';
+          return;
+        }
         if (typeof value === 'number' || !isNaN(parseFloat(value))) {
           attributeTypes[key] = 'number';
         } else if (typeof value === 'string') {

@@ -142,46 +142,6 @@ export default function App() {
 
   return (
     <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
-      <div className="Navbar">
-        {/* <SettingsIcon
-          className="settings-icon"
-          onClick={() => setShowSettings(!showSettings)}
-          style={{
-            cursor: 'pointer',
-            fontSize: '24px',
-            color: '#6c757d',
-            zIndex: '10',
-          }} // Optional styling
-        />
-        <MoreVertIcon
-          className="settings-icon"
-          onClick={() => setShowSettings(!showSettings)}
-          style={{
-            cursor: 'pointer',
-            fontSize: '24px',
-            color: '#6c757d',
-            zIndex: '10',
-          }} // Optional styling
-        /> */}
-
-        {showSettings && (
-          <div className="settings-panel">
-            <button className="select-button" onClick={selectFolder}>
-              Select Save Directory
-            </button>
-            {directoryPath && (
-              <p className="selected-directory">
-                Selected Directory: {directoryPath}
-              </p>
-            )}
-            {isLeadDBSFolder ? (
-              <p className="lead-dbs-status">This is a Lead-DBS folder.</p>
-            ) : (
-              <p className="lead-dbs-status">This is not a Lead-DBS folder.</p>
-            )}
-          </div>
-        )}
-      </div>
       <PatientProvider>
         <Router>
           <Routes>
@@ -190,6 +150,48 @@ export default function App() {
               element={
                 <div style={{ marginTop: '0px' }}>
                   <Navbar text="" color1="#375D7A" />
+                  <div className="Navbar">
+                    <SettingsIcon
+                      className="settings-icon"
+                      onClick={() => setShowSettings(!showSettings)}
+                      style={{
+                        cursor: 'pointer',
+                        fontSize: '24px',
+                        color: '#6c757d',
+                        zIndex: '10',
+                        marginLeft: '-70px',
+                        // marginTop: '-50px',
+                      }} // Optional styling
+                    />
+                    {/* <MoreVertIcon
+                      className="settings-icon"
+                      onClick={() => setShowSettings(!showSettings)}
+                      style={{
+                        cursor: 'pointer',
+                        fontSize: '24px',
+                        color: '#6c757d',
+                        zIndex: '10',
+                      }} // Optional styling
+                    /> */}
+
+                    {showSettings && (
+                      <div className="settings-panel">
+                        <button className="select-button" onClick={selectFolder}>
+                          Change Directory
+                        </button>
+                        {directoryPath && (
+                          <p className="selected-directory">
+                            Selected Directory: {directoryPath}
+                          </p>
+                        )}
+                        {isLeadDBSFolder ? (
+                          <p className="lead-dbs-status">This is a Lead-DBS folder.</p>
+                        ) : (
+                          <p className="lead-dbs-status">This is not a Lead-DBS folder.</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
                   <PatientDatabase
                     key={renderKey}
                     directoryPath={directoryPath}
@@ -202,6 +204,7 @@ export default function App() {
               element={
                 <div>
                   <Navbar text="" color1="#375D7A" />
+                  <div style={{paddingTop: '50px'}}></div>
                   <PatientDetails
                     directoryPath={directoryPath}
                     leadDBS={isLeadDBSFolder}
@@ -249,6 +252,7 @@ export default function App() {
               element={
                 <div style={{}}>
                   <Navbar text="" color1="#375D7A" />
+                  <div style={{paddingTop: '100px'}}></div>
                   <DatabaseStats directoryPath={directoryPath} />
                 </div>
               }
