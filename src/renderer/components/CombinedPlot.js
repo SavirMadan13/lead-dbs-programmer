@@ -207,6 +207,7 @@ function CombinedPlot({ clinicalData, scoretype }) {
     plugins: {
       legend: {
         display: !showGroupAverage,
+        // display: false,
         position: 'top',
         labels: {
           generateLabels: (chart) => {
@@ -228,10 +229,14 @@ function CombinedPlot({ clinicalData, scoretype }) {
       },
       tooltip: {
         callbacks: {
-          label: (tooltipItem) =>
-            showPercentage
-              ? `Percentage Improvement: ${tooltipItem.raw.toFixed(2)}%`
-              : `Score: ${tooltipItem.raw.toFixed(2)}`,
+          label: (tooltipItem) => {
+            const dataset = tooltipItem.dataset;
+            const patientLabel = dataset.label || 'Unknown';
+            const value = tooltipItem.raw.toFixed(2);
+            return showPercentage
+              ? `Patient: ${patientLabel}, Percentage Improvement: ${value}%`
+              : `Patient: ${patientLabel}, Score: ${value}`;
+          },
         },
       },
     },

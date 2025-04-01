@@ -438,16 +438,16 @@ function GroupViewer({
 
       // Create a material for the mesh
       const material = new THREE.MeshStandardMaterial({
-        // vertexColors: electrodeGeometry.hasAttribute('color'),
-        color: color,
+        vertexColors: electrodeGeometry.hasAttribute('color'),
+        // color: color,
         flatShading: true,
         metalness: 0.1,
-        roughness: 0.2,
+        roughness: 0.5,
         transparent: true,
-        opacity: 1,
+        opacity: 0.8,
         // emissive: new THREE.Color(0x000000), // Emissive color
-        wireframe: false, // Render geometry as wireframe
-        side: THREE.DoubleSide, // Render both sides of the geometry
+        // wireframe: false, // Render geometry as wireframe
+        // side: THREE.DoubleSide, // Render both sides of the geometry
       });
 
       // Add the mesh to the scene
@@ -1102,261 +1102,6 @@ function GroupViewer({
                     ))}
                   </div>
                 </Tab>
-
-                <Tab eventKey="atlases" title="Atlases">
-                  <div style={controlPanelStyle2}>
-                    <input
-                      type="text"
-                      placeholder="Enter coordinates (x,y,z)"
-                      value={searchCoordinate}
-                      onChange={(e) => setSearchCoordinate(e.target.value)}
-                      style={{ marginBottom: '10px', width: '300px' }}
-                    />
-                    <button onClick={handleCoordinateSearch}>Search</button>
-                    <div style={{ marginTop: '20px' }}>
-                      <h4>Matching Atlases:</h4>
-                      {matchingAtlases.length > 0 ? (
-                        <ul>
-                          {matchingAtlases.map((file, index) => (
-                            <li key={index}>{file.name}</li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p>No matching atlases found.</p>
-                      )}
-                    </div>
-                    <select
-                      onChange={handleFileChange}
-                      multiple
-                      style={{
-                        height: '500px',
-                        width: '300px',
-                        backgroundColor: 'transparent',
-                      }}
-                    >
-                      {plyFiles.map((file, index) => (
-                        <option key={index} value={index}>
-                          {file.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </Tab>
-
-                <Tab eventKey="sweetspots" title="Sweetspots">
-                  <Tabs defaultActiveKey="tremor" id="nested-tabs-inside">
-                    <Tab eventKey="tremor" title="Tremor">
-                      <div style={controlPanelStyle2}>
-                        <select
-                          onChange={handleTremorChange}
-                          multiple
-                          style={{
-                            height: '500px',
-                            width: '300px',
-                            backgroundColor: 'transparent',
-                          }}
-                        >
-                          {tremorData.map((tremor, index) => (
-                            <option key={index} value={index}>
-                              {tremor.name}
-                            </option>
-                          ))}
-                        </select>
-                        <Button
-                          variant="primary"
-                          onClick={() => setShowModal(true)}
-                        >
-                          Add Coordinates
-                        </Button>
-                        <Modal
-                          show={showModal}
-                          onHide={() => setShowModal(false)}
-                        >
-                          <Modal.Header closeButton>
-                            <Modal.Title>Add New Coordinates</Modal.Title>
-                          </Modal.Header>
-                          <Modal.Body>
-                            <input
-                              type="text"
-                              name="name"
-                              placeholder="Name"
-                              value={newTremor.name}
-                              onChange={handleNewTremorChange}
-                              className="form-control"
-                            />
-                            <input
-                              type="number"
-                              name="coords"
-                              placeholder="X"
-                              value={newTremor.coords[0]}
-                              onChange={(e) =>
-                                setNewTremor({
-                                  ...newTremor,
-                                  coords: [
-                                    e.target.value,
-                                    newTremor.coords[1],
-                                    newTremor.coords[2],
-                                  ],
-                                })
-                              }
-                              className="form-control mt-2"
-                            />
-                            <input
-                              type="number"
-                              name="coords"
-                              placeholder="Y"
-                              value={newTremor.coords[1]}
-                              onChange={(e) =>
-                                setNewTremor({
-                                  ...newTremor,
-                                  coords: [
-                                    newTremor.coords[0],
-                                    e.target.value,
-                                    newTremor.coords[2],
-                                  ],
-                                })
-                              }
-                              className="form-control mt-2"
-                            />
-                            <input
-                              type="number"
-                              name="coords"
-                              placeholder="Z"
-                              value={newTremor.coords[2]}
-                              onChange={(e) =>
-                                setNewTremor({
-                                  ...newTremor,
-                                  coords: [
-                                    newTremor.coords[0],
-                                    newTremor.coords[1],
-                                    e.target.value,
-                                  ],
-                                })
-                              }
-                              className="form-control mt-2"
-                            />
-                          </Modal.Body>
-                          <Modal.Footer>
-                            <Button
-                              variant="secondary"
-                              onClick={() => setShowModal(false)}
-                            >
-                              Close
-                            </Button>
-                            <Button variant="primary" onClick={addNewTremor}>
-                              Add
-                            </Button>
-                          </Modal.Footer>
-                        </Modal>
-                      </div>
-                    </Tab>
-                    <Tab eventKey="pd" title="PD">
-                      <div style={controlPanelStyle2}>
-                        <select
-                          onChange={handlePDChange}
-                          multiple
-                          style={{
-                            height: '500px',
-                            width: '300px',
-                            backgroundColor: 'transparent',
-                          }}
-                        >
-                          {pdData.map((tremor, index) => (
-                            <option key={index} value={index}>
-                              {tremor.name}
-                            </option>
-                          ))}
-                        </select>
-                        <Button
-                          variant="primary"
-                          onClick={() => setShowPDModal(true)}
-                        >
-                          Add Coordinates
-                        </Button>
-                        <Modal
-                          show={showPDModal}
-                          onHide={() => setShowPDModal(false)}
-                        >
-                          <Modal.Header closeButton>
-                            <Modal.Title>Add New Coordinates</Modal.Title>
-                          </Modal.Header>
-                          <Modal.Body>
-                            <input
-                              type="text"
-                              name="name"
-                              placeholder="Name"
-                              value={newPD.name}
-                              onChange={handleNewPDChange}
-                              className="form-control"
-                            />
-                            <input
-                              type="number"
-                              name="coords"
-                              placeholder="X"
-                              value={newPD.coords[0]}
-                              onChange={(e) =>
-                                setNewPD({
-                                  ...newPD,
-                                  coords: [
-                                    e.target.value,
-                                    newPD.coords[1],
-                                    newPD.coords[2],
-                                  ],
-                                })
-                              }
-                              className="form-control mt-2"
-                            />
-                            <input
-                              type="number"
-                              name="coords"
-                              placeholder="Y"
-                              value={newPD.coords[1]}
-                              onChange={(e) =>
-                                setNewTremor({
-                                  ...newPD,
-                                  coords: [
-                                    newPD.coords[0],
-                                    e.target.value,
-                                    newPD.coords[2],
-                                  ],
-                                })
-                              }
-                              className="form-control mt-2"
-                            />
-                            <input
-                              type="number"
-                              name="coords"
-                              placeholder="Z"
-                              value={newPD.coords[2]}
-                              onChange={(e) =>
-                                setNewTremor({
-                                  ...newPD,
-                                  coords: [
-                                    newPD.coords[0],
-                                    newPD.coords[1],
-                                    e.target.value,
-                                  ],
-                                })
-                              }
-                              className="form-control mt-2"
-                            />
-                          </Modal.Body>
-                          <Modal.Footer>
-                            <Button
-                              variant="secondary"
-                              onClick={() => setShowPDModal(false)}
-                            >
-                              Close
-                            </Button>
-                            <Button variant="primary" onClick={addNewPD}>
-                              Add
-                            </Button>
-                          </Modal.Footer>
-                        </Modal>
-                      </div>
-                    </Tab>
-                  </Tabs>
-                </Tab>
               </Tabs>
             </div>
           </Dropdown.Menu>
@@ -1398,7 +1143,8 @@ const controlPanelStyle2 = {
   padding: '10px',
   border: 'none',
   // backgroundColor: '#f5f5f5',
-  backgroundColor: 'transparent', // Semi-transparent background color
+  // backgroundColor: 'transparent', // Semi-transparent background color
+  backgroundColor: 'rgba(255, 255, 255, 0.44)',
 };
 
 const controlPanelStyle = {
@@ -1412,7 +1158,8 @@ const controlPanelStyle = {
   borderRadius: '8px',
   // boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
   padding: '20px',
-  backgroundColor: 'transparent', // Semi-transparent background color
+  // backgroundColor: 'transparent', // Semi-transparent background color
+  backgroundColor: 'rgba(255, 255, 255, 0.84)',
   // backgroundColor: 'green',
 };
 
@@ -1424,7 +1171,8 @@ const meshNameStyle = {
   fontSize: '16px',
   fontWeight: 'bold',
   marginBottom: '10px', // Add space below the mesh name
-  backgroundColor: 'rgba(245, 245, 245, 0.2)', // Semi-transparent background color
+  // backgroundColor: 'rgba(245, 245, 245, 0.2)', // Semi-transparent background color
+  backgroundColor: 'rgba(255, 255, 255, 0.44)',
 };
 
 export default GroupViewer;

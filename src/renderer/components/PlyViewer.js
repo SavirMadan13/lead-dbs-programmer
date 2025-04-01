@@ -3979,7 +3979,7 @@ function PlyViewer({
                     </div>
                   </Tab>
                 )}
-                <Tab eventKey="priorStims" title="Patient Database">
+                {/* <Tab eventKey="priorStims" title="Patient Database">
                   <div style={controlPanelStyle2}>
                     <select
                       onChange={handlePriorStimChange}
@@ -4010,7 +4010,7 @@ function PlyViewer({
                         ))}
                     </select>
                   </div>
-                </Tab>
+                </Tab> */}
 
                 <Tab eventKey="sweetspots" title="Sweetspots">
                   <Tabs defaultActiveKey="tremor" id="nested-tabs-inside">
