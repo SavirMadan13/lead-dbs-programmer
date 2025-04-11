@@ -57,25 +57,52 @@ function Raincloud({ clinicalData, scoretype }) {
       if (!timelineData) {
         return null;
       }
-      return Object.values(timelineData).filter(score => typeof score === 'number');
-    }).filter(values => values !== null);
+      // Sum all numeric scores for this timeline
+      const numericScores = Object.values(timelineData).filter(score => typeof score === 'number');
+      return numericScores.length > 0 ? numericScores.reduce((sum, score) => sum + score, 0) : null;
+    }).filter(value => value !== null);
   });
 
   // Create traces for raincloud plot using filtered timelines
   const traces = raincloudData.map((data, index) => {
-    const yData = data.flat();
+    const timelineName = filteredTimelines[index];
+    const isBaseline = timelineName === 'baseline';
+    const isPostop = timelineName === 'postop';
+
     return {
       type: 'violin',
-      y: yData,
-      name: filteredTimelines[index],
+      y: data,
+      name: timelineName,
       box: {
-        visible: true
+        visible: true,
+        width: 0.2,
+        fillcolor: isBaseline ? 'rgba(31, 119, 180, 0.7)' : 'rgba(255, 127, 14, 0.7)',
+        line: {
+          color: isBaseline ? 'rgb(31, 119, 180)' : 'rgb(255, 127, 14)',
+          width: 2
+        }
       },
       line: {
-        color: 'blue'
+        color: isBaseline ? 'rgb(31, 119, 180)' : 'rgb(255, 127, 14)',
+        width: 2
       },
+      fillcolor: isBaseline ? 'rgba(31, 119, 180, 0.3)' : 'rgba(255, 127, 14, 0.3)',
       meanline: {
-        visible: true
+        visible: true,
+        color: isBaseline ? 'rgb(31, 119, 180)' : 'rgb(255, 127, 14)',
+        width: 2
+      },
+      points: 'all',
+      jitter: 0.2,
+      pointpos: 0,
+      marker: {
+        size: 6,
+        opacity: 0.6,
+        color: isBaseline ? 'rgb(31, 119, 180)' : 'rgb(255, 127, 14)',
+        line: {
+          color: 'white',
+          width: 1
+        }
       }
     };
   });
@@ -88,25 +115,28 @@ function Raincloud({ clinicalData, scoretype }) {
     const baselineData = raincloudData[baselineIndex];
     const postopData = raincloudData[postopIndex];
 
-    baselineData.forEach((baselineScores, i) => {
-      const postopScores = postopData[i];
-      if (baselineScores && postopScores) {
-        baselineScores.forEach((score, j) => {
-          traces.push({
-            type: 'scatter',
-            mode: 'lines+markers',
-            x: ['baseline', 'postop'],
-            y: [score, postopScores[j]],
-            line: {
-              color: 'red',
-              width: 1
-            },
-            marker: {
-              color: 'red',
-              size: 5
-            },
-            name: `Line ${i}-${j}`
-          });
+    // Draw one line per patient connecting their baseline to postop total scores
+    baselineData.forEach((baselineScore, i) => {
+      const postopScore = postopData[i];
+      if (baselineScore !== null && postopScore !== null) {
+        traces.push({
+          type: 'scatter',
+          mode: 'lines+markers',
+          x: ['baseline', 'postop'],
+          y: [baselineScore, postopScore],
+          line: {
+            color: 'rgba(128, 128, 128, 0.4)',
+            width: 1,
+          },
+          marker: {
+            // color: 'rgba(128, 128, 128, 0.6)',
+            color: 'transparent',
+            size: 4,
+          },
+          name: `Patient ${i + 1}`,
+          showlegend: false,
+          hoverinfo: 'y',
+          hovertemplate: 'Score: %{y:.1f}<extra></extra>'
         });
       }
     });
@@ -151,16 +181,79 @@ function Raincloud({ clinicalData, scoretype }) {
       <Plot
         data={traces}
         layout={{
-          title: 'Raincloud Plot',
+          title: {
+            text: 'Score Distribution Over Time',
+            font: {
+              size: 24,
+              family: 'Arial, sans-serif'
+            },
+            x: 0.5,
+            y: 0.95
+          },
           yaxis: {
-            title: 'Scores',
+            title: {
+              text: 'Total Score',
+              font: {
+                size: 16,
+                family: 'Arial, sans-serif'
+              }
+            },
+            gridcolor: 'rgba(128, 128, 128, 0.1)',
+            zerolinecolor: 'rgba(128, 128, 128, 0.2)',
+            tickfont: {
+              family: 'Arial, sans-serif',
+              size: 12
+            }
           },
           xaxis: {
-            title: 'Timelines',
+            title: {
+              text: 'Timeline',
+              font: {
+                size: 16,
+                family: 'Arial, sans-serif'
+              }
+            },
+            gridcolor: 'rgba(128, 128, 128, 0.1)',
+            zerolinecolor: 'rgba(128, 128, 128, 0.2)',
+            tickfont: {
+              family: 'Arial, sans-serif',
+              size: 12
+            }
           },
           showlegend: true,
+          legend: {
+            x: 1,
+            xanchor: 'right',
+            y: 1,
+            yanchor: 'top',
+            font: {
+              family: 'Arial, sans-serif',
+              size: 12
+            }
+          },
+          paper_bgcolor: 'rgba(0,0,0,0)',
+          plot_bgcolor: 'rgba(0,0,0,0)',
+          margin: {
+            l: 60,
+            r: 60,
+            t: 80,
+            b: 60,
+            pad: 10
+          },
+          hovermode: 'closest',
+          hoverlabel: {
+            bgcolor: 'white',
+            font: {
+              family: 'Arial, sans-serif',
+              size: 12
+            }
+          }
         }}
-        style={{ width: '100%', height: '500px' }}
+        style={{ width: '100%', height: '600px' }}
+        config={{
+          responsive: true,
+          displayModeBar: false
+        }}
       />
     </div>
   );

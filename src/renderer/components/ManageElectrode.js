@@ -697,6 +697,7 @@ function ManageElectrode({
         rightAmplitude.push(0);
       }
     }
+    console.log('Amplitude: ', allTotalAmplitudes);
     // data.S.amplitude = { rightAmplitude, leftAmplitude };
     // data.S.amplitude = exportAmplitudeData;
     // console.log(exportAmplitudeData);

@@ -350,7 +350,7 @@ function ClinicalScores() {
     };
 
     return (
-      <div style={{ overflowX: 'auto', maxHeight: '700px' }}>
+      <div style={{ overflowX: 'auto', maxHeight: '1000px' }}>
         {headerChunks.map((headerChunk, chunkIndex) => (
           <div key={chunkIndex} style={{ marginBottom: '20px' }}>
             <Table striped bordered hover responsive>
@@ -360,7 +360,7 @@ function ClinicalScores() {
                   {headerChunk.map((key) => (
                     <th
                       key={key}
-                      style={{ whiteSpace: 'wrap', minWidth: '80px' }}
+                      style={{ whiteSpace: 'wrap', minWidth: '80px', border: 'none' }}
                     >
                       {/* {key} */}
                       {selectedScoreType === 'UPDRS' && (

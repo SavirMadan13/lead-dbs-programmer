@@ -246,6 +246,17 @@ function CombinedPlot({ clinicalData, scoretype }) {
           display: true,
           text: 'Time',
         },
+        ticks: {
+          callback: function(value, index, values) {
+            // Replace 'postop' with '6months'
+            if (this.getLabelForValue(value) === 'postop') {
+              return '6months';
+            } else if (this.getLabelForValue(value) === 'baseline-med ON') {
+              return '3months';
+            }
+            return this.getLabelForValue(value); // Default label
+          },
+        },
       },
       y: {
         title: {

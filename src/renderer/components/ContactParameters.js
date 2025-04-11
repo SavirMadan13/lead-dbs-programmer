@@ -87,8 +87,8 @@ function ContactParameters({
   };
 
   const handleQuantityChange = (event) => {
-    const quantityValue = parseInt(event.target.value, 10) || 0;
-
+    const quantityValue = parseFloat(event.target.value) || 0;
+    console.log('Quantity Value:', quantityValue);
     if (quantityValue !== 0 && currentPosition === 'left') {
       setCurrentPosition('center'); // Automatically switch to 'center' if quantity is adjusted from 'left'
       onChange('center');
@@ -96,6 +96,7 @@ function ContactParameters({
 
     setCurrentQuantity(quantityValue);
     onQuantityChange(currentPosition, quantityValue);
+    // onQuantityChange(quantityValue, currentPosition);
   };
 
   return (
@@ -133,7 +134,7 @@ function ContactParameters({
       >
         <StyledTextField
           type="number"
-          inputProps={{ min: 0 }}
+          inputProps={{ min: 0, step: "any" }}
           value={currentQuantity}
           onChange={handleQuantityChange}
           size="small"

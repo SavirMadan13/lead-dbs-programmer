@@ -576,13 +576,13 @@ function Electrode({
     // Update the state with the new quantities
   };
 
-  const handleTripleToggleChange = (value, anime, key) => {
+  const handleTripleToggleChange = (value, key) => {
     const updatedSelectedValues = { ...selectedValues, [key]: value };
-    const updatedAnimationValues = { ...animation, [key]: anime };
+    // const updatedAnimationValues = { ...animation, [key]: anime };
     const updatedQuantities = { ...quantities };
     setSelectedValues(updatedSelectedValues);
-    setAnimation(updatedAnimationValues);
-    console.log(animation);
+    // setAnimation(updatedAnimationValues);
+    // console.log(animation);
     if (IPG === 'Abbott') {
       Object.keys(updatedSelectedValues).forEach((thing) => {
         const newvalue = updatedSelectedValues[thing];
@@ -2500,11 +2500,14 @@ function Electrode({
 
   const handleQuantityChange = (quantity, key) => {
     const updatedQuantities = { ...quantities, [key]: quantity };
+    console.log('key: ', key);
+    console.log('quantity: ', quantity);
+    console.log('updatedQuantities: ', updatedQuantities);
     /// /////Steering for two components logic///////
-    if (assistedModeEnabled) {
-      const newQuantities = assistedMode();
-      setQuantities(newQuantities);
-    }
+    // if (assistedModeEnabled) {
+    //   const newQuantities = assistedMode();
+    //   setQuantities(newQuantities);
+    // }
     setQuantities(updatedQuantities);
     setLastChangedKey(key);
     console.log('lastChangedKey: ', lastChangedKey);
@@ -3497,7 +3500,9 @@ function Electrode({
                 onChange={handleTotalAmplitudeChange}
                 style={{ fontSize: '18px', padding: '10px' }}
               />
-              <span className="input-label" style={{ fontSize: '18px' }}>{currentLabel}</span>
+              <span className="input-label" style={{ fontSize: '18px' }}>
+                {currentLabel}
+              </span>
             </div>
             <div style={{ marginTop: '-15px' }}>
               {IPG === 'Boston' && (
@@ -3869,7 +3874,7 @@ function Electrode({
                     })}
                     {!isNaN(Number(Lcon.key)) && (
                       <div className="triple-toggle-boston-test-left">
-                        <ContactParameters
+                        {/* <ContactParameters
                           key={Lcon.key}
                           value={selectedValues[Lcon.key]}
                           switchPosition={selectedValues[Lcon.key]}
@@ -3879,6 +3884,22 @@ function Electrode({
                           }
                           onQuantityChange={(value, anime, quantity) =>
                             handleQuantityChange(quantity, Lcon.key)
+                          }
+                        /> */}
+                        <ContactParameters
+                          key={Lcon.key}
+                          value={selectedValues[Lcon.key]}
+                          switchPosition={selectedValues[Lcon.key]}
+                          quantity={quantities[Lcon.key]}
+                          onChange={(newPosition) =>
+                            handleTripleToggleChange(newPosition, Lcon.key)
+                          }
+                          onQuantityChange={(currentPosition, quantityValue) =>
+                            handleQuantityChange(
+                              quantityValue,
+                              // currentPosition,
+                              Lcon.key,
+                            )
                           }
                         />
                       </div>
@@ -3912,7 +3933,7 @@ function Electrode({
                   })}
                   {!isNaN(Number(svg.key)) && (
                     <div className="triple-toggle-boston-test-2">
-                      <ContactParameters
+                      {/* <ContactParameters
                         key={svg.key}
                         value={selectedValues[svg.key]}
                         switchPosition={selectedValues[svg.key]}
@@ -3922,6 +3943,22 @@ function Electrode({
                         }
                         onQuantityChange={(value, anime, quantity) =>
                           handleQuantityChange(quantity, svg.key)
+                        }
+                      /> */}
+                      <ContactParameters
+                        key={svg.key}
+                        value={selectedValues[svg.key]}
+                        switchPosition={selectedValues[svg.key]}
+                        quantity={quantities[svg.key]}
+                        onChange={(newPosition) =>
+                          handleTripleToggleChange(newPosition, svg.key)
+                        }
+                        onQuantityChange={(currentPosition, quantityValue) =>
+                          handleQuantityChange(
+                            quantityValue,
+                            // currentPosition,
+                            svg.key,
+                          )
                         }
                       />
                     </div>
@@ -3950,7 +3987,7 @@ function Electrode({
                   })}
                   {!isNaN(Number(rCon.key)) && (
                     <div className="triple-toggle-boston-test-right">
-                      <ContactParameters
+                      {/* <ContactParameters
                         key={rCon.key}
                         value={selectedValues[rCon.key]}
                         switchPosition={selectedValues[rCon.key]}
@@ -3960,6 +3997,22 @@ function Electrode({
                         }
                         onQuantityChange={(value, anime, quantity) =>
                           handleQuantityChange(quantity, rCon.key)
+                        }
+                      /> */}
+                      <ContactParameters
+                        key={rCon.key}
+                        value={selectedValues[rCon.key]}
+                        switchPosition={selectedValues[rCon.key]}
+                        quantity={quantities[rCon.key]}
+                        onChange={(newPosition) =>
+                          handleTripleToggleChange(newPosition, rCon.key)
+                        }
+                        onQuantityChange={(currentPosition, quantityValue) =>
+                          handleQuantityChange(
+                            quantityValue,
+                            // currentPosition,
+                            rCon.key,
+                          )
                         }
                       />
                     </div>

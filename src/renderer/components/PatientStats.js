@@ -156,7 +156,7 @@ function PatientStats({ patient, timeline, directoryPath, leadDBS }) {
 
   const renderTable = (timePoint) => {
     return (
-      <div style={{ overflowX: 'auto', maxHeight: '700px' }}>
+      <div style={{ overflowX: 'auto', maxHeight: '1200px' }}>
         {headerChunks.map((headerChunk, chunkIndex) => (
           <div key={chunkIndex} style={{ marginBottom: '20px' }}>
             <Table striped bordered hover responsive>
@@ -372,7 +372,7 @@ function PatientStats({ patient, timeline, directoryPath, leadDBS }) {
             onChange={(e) => handleFileUpload(e, 'postop')}
           />
         </Container>
-        <div style={{ display: 'flex', flexDirection: 'column', width: '700px', height: '500px', overflowY: 'scroll' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', width: '700px', height: '1000px', overflowY: 'scroll' }}>
           {currentStage === 'analyze' && clinicalTimelines && clinicalTimelines.length > 0 && selectedScoreType === 'UPDRS' && (
             <UPDRSAnalysisComponent
               currentStage={currentStage}

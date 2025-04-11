@@ -123,12 +123,12 @@ app.on('ready', () => {
 // const inputPath = '/Users/savirmadan/Downloads/Patient2Output';
 // const inputPath = null;
 // const inputPath = '/Volumes/PdBwh/Patient0395Output';
-const inputPath = '/Volumes/OneTouch/MasterDataset/AllData';
-// const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
+// const inputPath = '/Volumes/OneTouch/MasterDataset/AllData';
+const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
 // const inputPath = '/Users/savirmadan/Documents/LeadGroupDemo/derivatives/leadgroup/20241007203440/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons/derivatives/leadgroup/BwhParkinsons/inputData.json';
-// const inputPath = '/Users/savirmadan/Downloads/inputDataBwh.json';
+// const inputPath = '/Users/savirmadan/Partners HealthCare Dropbox/Savir Madan/BIDMCDBS';
 // const inputPath = '/Users/savirmadan/Documents/SanteGroup/derivatives/leadgroup/2024nov5V2/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/LeadGroupDemo/derivatives/leadgroup/20241007203440/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0362Output/derivatives/leaddbs/sub-CbctDbs0362/stimulations/MNI152NLin2009bAsym/inputData.json';
@@ -1424,13 +1424,12 @@ const createWindow = async () => {
   //   return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
   // });
 
-  // ipcMain.handle('load-test-file', async (event, historical) => {
-  //   const { patient, timeline, directoryPath, leadDBS } = historical;
-  //   const filePath = '/Users/savirmadan/Downloads/potential_test.ply';
-  //   console.log(filePath);
-  //   const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
-  //   return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
-  // });
+  ipcMain.handle('load-test-file', async (event, historical) => {
+    const filePath = '/Users/savirmadan/Documents/OptimizerAnalysis/pos_neg_maps/masked_positive_map.nii';
+    console.log(filePath);
+    const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
+    return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
+  });
 
   // ipcMain.handle(
   //   'load-ply-file-database',

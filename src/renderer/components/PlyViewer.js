@@ -2,11 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import * as THREE from 'three';
 import { PLYLoader, OrbitControls } from 'three-stdlib';
-import Delaunator from 'delaunator';
-import { Niivue } from '@niivue/niivue';
 // import { Niivue } from 'niivue/niivue';
 // import * as nifti from 'nifti-reader-js'; // Correctly importing the nifti module
 import * as nifti from 'nifti-reader-js';
+import isosurface from 'isosurface';
 // import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 import {
   Tabs,
@@ -22,6 +21,7 @@ import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings
 import * as math from 'mathjs';
 import { optimizeSphereValues, projectNumContacts } from './StimOptimizer';
 import { computeSuperimposedEField } from './OssDbsStimsets';
+// import { processNii } from './ProcessNii';
 // import { remote } from 'electron'; // Use 'electron' for Electron v12+
 
 function PlyViewer({
@@ -231,6 +231,7 @@ function PlyViewer({
         // setPlyFile(fileData);
         const loader = new PLYLoader();
         const geometry = loader.parse(fileData);
+        console.log('geometry: ', geometry);
 
         const material = new THREE.MeshStandardMaterial({
           vertexColors: geometry.hasAttribute('color'),
@@ -268,35 +269,38 @@ function PlyViewer({
     loadPlyFile(); // Call the async function
   }, []);
 
-  // useEffect(() => {
-  //   // This loads in the combined electrodes for the selected patient
-  //   const loadPlyFile = async () => {
-  //     try {
-  //       const fileData = await window.electron.ipcRenderer.invoke(
-  //         'load-test-file',
-  //         historical,
-  //       );
-  //       // setPlyFile(fileData);
-  //       const loader = new PLYLoader();
-  //       const geometry = loader.parse(fileData);
+  useEffect(() => {
+    // This loads in the combined electrodes for the selected patient
+    const loadNiiFile = async () => {
+      try {
+        const fileData = await window.electron.ipcRenderer.invoke(
+          'load-test-file',
+          historical,
+        );
 
-  //       const material = new THREE.MeshStandardMaterial({
-  //         vertexColors: geometry.hasAttribute('color'),
-  //         flatShading: true,
-  //         metalness: 0.1, // More reflective
-  //         roughness: 0.5, // Shinier surface
-  //         transparent: true, // Enable transparency
-  //         opacity: 0.8, // Set opacity to 60%
-  //       });
-  //       // eslint-disable-next-line no-use-before-define
-  //       addMeshToScene('Test OSS VTA', geometry, material);
-  //     } catch (error) {
-  //       console.error('Error loading PLY file:', error);
-  //     }
-  //   };
+        // Convert NIfTI data to a mesh using marching cubes with custom parameters
+        // You can adjust these parameters based on your data
+        const threshold = 0.3; // Lower threshold to capture more of the volume
+        const colorMap = 'rainbow'; // Options: 'rainbow', 'grayscale', 'red', 'green', 'blue'
 
-  //   loadPlyFile(); // Call the async function
-  // }, []);
+        const mesh = await convertNiftiToMesh(fileData, threshold, colorMap);
+
+        // Add the mesh to the scene
+        if (mesh) {
+          addMeshToScene('NIfTI Volume', mesh.geometry, mesh.material);
+
+          // Log information about the mesh
+          console.log('Mesh added to scene:', mesh.geometry.attributes.position.count, 'vertices');
+        } else {
+          console.error('Failed to create mesh from NIfTI data');
+        }
+      } catch (error) {
+        console.error('Error loading NIfTI file:', error);
+      }
+    };
+
+    loadNiiFile(); // Call the async function
+  }, []);
 
   // New states for visibility and thresholding
 
@@ -1110,7 +1114,7 @@ function PlyViewer({
   const calculatePercentageFromAmplitude = () => {
     const updatedQuantities = { ...quantities };
     Object.keys(updatedQuantities).forEach((key) => {
-      updatedQuantities[key] = (updatedQuantities[key] * 100) / amplitude;
+      updatedQuantities[key] = (parseFloat(updatedQuantities[key]) * 100) / parseFloat(amplitude);
     });
     return updatedQuantities;
   };
@@ -1223,7 +1227,17 @@ function PlyViewer({
 
     // Loop through all contact directions to handle adding and updating spheres
     Object.keys(contactDirections).forEach((contactId) => {
-      console.log(togglePosition);
+      console.log('Toggle postition: ', togglePosition);
+      console.log('Quantities: ', quantities);
+      // eslint-disable-next-line no-param-reassign
+      // quantities = {
+      //   0: 3.9,
+      //   1: 1.5,
+      //   2: 1.4,
+      //   3: 0.6,
+      //   4: 0.5,
+      //   5:
+      // };
       let contactQuantity = parseFloat(quantities[contactId]);
       if (togglePosition === 'center') {
         const newQuantities = calculatePercentageFromAmplitude();
@@ -3879,6 +3893,180 @@ function PlyViewer({
       }
     }
     return false;
+  };
+
+  // Function to convert NIfTI data to a mesh using marching cubes
+  const convertNiftiToMesh = async (niftiData, threshold = 0.5, colorMap = 'rainbow') => {
+    try {
+      // Validate if the file is a valid NIfTI file
+      if (!nifti.isNIFTI(niftiData)) {
+        throw new Error('File is not a valid NIfTI file');
+      }
+
+      const header = nifti.readHeader(niftiData);
+      let image = nifti.readImage(header, niftiData);
+
+      // Ensure `image` is a valid ArrayBuffer
+      if (!(image instanceof ArrayBuffer)) {
+        console.log('Adjusting image to ArrayBuffer...');
+        image = new Uint8Array(image).buffer;
+      }
+
+      // Handle endian mismatch
+      if (!header.littleEndian) {
+        console.warn('File is in big-endian format. Adjusting...');
+        const dataView = new DataView(image);
+        const correctedData = new Float32Array(image.byteLength / 4);
+        for (let i = 0; i < correctedData.length; i++) {
+          correctedData[i] = dataView.getFloat32(i * 4, false); // false = big-endian
+        }
+        image = correctedData;
+      } else {
+        image = new Float32Array(image);
+      }
+
+      // Apply scaling factors
+      const { scl_slope = 1, scl_inter = 0 } = header;
+      const img = new Float32Array(
+        image.map((value) => value * scl_slope + scl_inter),
+      );
+
+      // Extract dimensions
+      const dimensions = header.dims.slice(1, 4);
+      console.log('Dimensions:', dimensions);
+
+      // Create a 3D array for the marching cubes algorithm
+      const [dimX, dimY, dimZ] = dimensions;
+      const data = new Float32Array(dimX * dimY * dimZ);
+
+      // Copy the image data to the 3D array
+      for (let i = 0; i < img.length; i++) {
+        data[i] = img[i];
+      }
+
+      // Find min and max values for normalization
+      // Apply arctan normalization to all values
+      // for (let i = 0; i < data.length; i++) {
+      //   data[i] = Math.atan(data[i]);
+      // }
+      let minValue = Infinity;
+      let maxValue = -Infinity;
+      for (let i = 0; i < data.length; i++) {
+        if (data[i] < minValue) minValue = data[i];
+        if (data[i] > maxValue) maxValue = data[i];
+      }
+      console.log(`Data range: ${minValue} to ${maxValue}`);
+
+      // Normalize data to [0, 1] range
+      for (let i = 0; i < data.length; i++) {
+        data[i] = (data[i] - minValue) / (maxValue - minValue);
+      }
+      console.log('Running Marching Cubes...');
+
+      // Generate surface mesh using Marching Cubes algorithm
+      const mesh = isosurface.marchingCubes(
+        [dimX, dimY, dimZ],
+        (x, y, z) => {
+          if (x < 0 || x >= dimX || y < 0 || y >= dimY || z < 0 || z >= dimZ) {
+            return 0;
+          }
+          const index = x + dimX * (y + dimY * z);
+          return data[index] || 0;
+        },
+        threshold,
+      );
+
+      console.log(`Generated ${mesh.positions.length} vertices and ${mesh.cells.length} faces.`);
+
+      if (mesh.positions.length === 0) {
+        throw new Error('No surface extracted. Check data values and threshold.');
+      }
+
+      // Create a Three.js geometry from the marching cubes mesh
+      const geometry = new THREE.BufferGeometry();
+
+      // Add positions
+      const positions = new Float32Array(mesh.positions.flat());
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+      // Add faces (indices)
+      const indices = new Uint32Array(mesh.cells.flat());
+      geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+
+      // Compute vertex normals
+      geometry.computeVertexNormals();
+
+      // Create colors based on intensity values
+      const colors = new Float32Array(mesh.positions.length * 3);
+      const color = new THREE.Color();
+
+      // For each vertex, find its corresponding intensity value
+      for (let i = 0; i < mesh.positions.length; i++) {
+        const [x, y, z] = mesh.positions[i];
+
+        // Find the closest voxel in the original data
+        const voxelX = Math.floor(x);
+        const voxelY = Math.floor(y);
+        const voxelZ = Math.floor(z);
+
+        // Make sure we're within bounds
+        if (voxelX >= 0 && voxelX < dimX &&
+            voxelY >= 0 && voxelY < dimY &&
+            voxelZ >= 0 && voxelZ < dimZ) {
+
+          const index = voxelX + dimX * (voxelY + dimY * voxelZ);
+          const intensity = data[index];
+
+          // Normalize intensity to [0, 1]
+          const normalizedIntensity = (intensity - minValue) / (maxValue - minValue);
+
+          // Map intensity to color based on the selected color map
+          switch (colorMap) {
+            case 'rainbow':
+              color.setHSL(0.7 * (1 - normalizedIntensity), 1, 0.5);
+              break;
+            case 'grayscale':
+              color.setRGB(normalizedIntensity, normalizedIntensity, normalizedIntensity);
+              break;
+            case 'red':
+              color.setRGB(normalizedIntensity, 0, 0);
+              break;
+            case 'green':
+              color.setRGB(0, normalizedIntensity, 0);
+              break;
+            case 'blue':
+              color.setRGB(0, 0, normalizedIntensity);
+              break;
+            default:
+              color.setHSL(0.7 * (1 - normalizedIntensity), 1, 0.5);
+          }
+        } else {
+          // Default color for out-of-bounds vertices
+          color.setRGB(0.5, 0.5, 0.5);
+        }
+
+        // Set the color for this vertex
+        colors[i * 3] = color.r;
+        colors[i * 3 + 1] = color.g;
+        colors[i * 3 + 2] = color.b;
+      }
+
+      // Add colors to the geometry
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      // Create a material for the mesh
+      const material = new THREE.MeshStandardMaterial({
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.8,
+        flatShading: true,
+      });
+
+      return { geometry, material };
+    } catch (error) {
+      console.error('Error converting NIfTI to mesh:', error);
+      return null;
+    }
   };
 
   return (

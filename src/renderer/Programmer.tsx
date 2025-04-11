@@ -215,8 +215,8 @@ function Programmer() {
     console.log('Imported Amplitude: ', jsonData.amplitude);
 
     for (let j = 1; j < 5; j++) {
-      newTotalAmplitude[j] = jsonData.amplitude[1][j - 1];
-      newTotalAmplitude[j + 4] = jsonData.amplitude[0][j - 1];
+      newTotalAmplitude[j+4] = jsonData.amplitude[1][j - 1];
+      newTotalAmplitude[j] = jsonData.amplitude[0][j - 1];
 
       console.log('newTotalAmplitude: ', newTotalAmplitude);
 
