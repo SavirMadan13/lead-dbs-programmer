@@ -5,7 +5,10 @@ import { PLYLoader, OrbitControls } from 'three-stdlib';
 // import { Niivue } from 'niivue/niivue';
 // import * as nifti from 'nifti-reader-js'; // Correctly importing the nifti module
 import * as nifti from 'nifti-reader-js';
-import isosurface from 'isosurface';
+import { getTypedArray } from 'nifti-reader-js';
+import * as iso from 'isosurface';
+import ndarray from 'ndarray';
+import * as fflate from 'fflate';
 // import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 import {
   Tabs,
@@ -21,6 +24,7 @@ import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings
 import * as math from 'mathjs';
 import { optimizeSphereValues, projectNumContacts } from './StimOptimizer';
 import { computeSuperimposedEField } from './OssDbsStimsets';
+import nii2Mesh from './NiftiUtils';
 // import { processNii } from './ProcessNii';
 // import { remote } from 'electron'; // Use 'electron' for Electron v12+
 
@@ -282,15 +286,19 @@ function PlyViewer({
         // You can adjust these parameters based on your data
         const threshold = 0.3; // Lower threshold to capture more of the volume
         const colorMap = 'rainbow'; // Options: 'rainbow', 'grayscale', 'red', 'green', 'blue'
-
-        const mesh = await convertNiftiToMesh(fileData, threshold, colorMap);
+        const mesh = await nii2Mesh(fileData);
+        // const mesh = await convertNiftiToMesh(fileData, threshold, colorMap);
 
         // Add the mesh to the scene
         if (mesh) {
           addMeshToScene('NIfTI Volume', mesh.geometry, mesh.material);
 
           // Log information about the mesh
-          console.log('Mesh added to scene:', mesh.geometry.attributes.position.count, 'vertices');
+          console.log(
+            'Mesh added to scene:',
+            mesh.geometry.attributes.position.count,
+            'vertices',
+          );
         } else {
           console.error('Failed to create mesh from NIfTI data');
         }
@@ -659,17 +667,17 @@ function PlyViewer({
     });
   };
 
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: '.ply',
-    onDrop: (acceptedFiles) => {
-      const file = acceptedFiles[0];
-      const reader = new FileReader();
-      reader.onload = () => {
-        setPlyFile(reader.result);
-      };
-      reader.readAsArrayBuffer(file);
-    },
-  });
+  // const { getRootProps, getInputProps } = useDropzone({
+  //   accept: '.ply',
+  //   onDrop: (acceptedFiles) => {
+  //     const file = acceptedFiles[0];
+  //     const reader = new FileReader();
+  //     reader.onload = () => {
+  //       setPlyFile(reader.result);
+  //     };
+  //     reader.readAsArrayBuffer(file);
+  //   },
+  // });
   let contactDirections = {
     1: { x: 0, y: 0, z: 0 },
     2: { x: 0, y: 0, z: 0 },
@@ -1114,7 +1122,8 @@ function PlyViewer({
   const calculatePercentageFromAmplitude = () => {
     const updatedQuantities = { ...quantities };
     Object.keys(updatedQuantities).forEach((key) => {
-      updatedQuantities[key] = (parseFloat(updatedQuantities[key]) * 100) / parseFloat(amplitude);
+      updatedQuantities[key] =
+        (parseFloat(updatedQuantities[key]) * 100) / parseFloat(amplitude);
     });
     return updatedQuantities;
   };
@@ -3332,7 +3341,7 @@ function PlyViewer({
       normalizedPlotNiiCoords,
     );
     console.log('New Output V: ', newOutputV);
-    const roundedOutputV = outputV.map(value => Math.round(value * 10) / 10);
+    const roundedOutputV = outputV.map((value) => Math.round(value * 10) / 10);
     console.log('Rounded Output V: ', roundedOutputV);
     // console.log(outputV);
     handleNiftiQuantityStateChange(roundedOutputV);
@@ -3896,7 +3905,11 @@ function PlyViewer({
   };
 
   // Function to convert NIfTI data to a mesh using marching cubes
-  const convertNiftiToMesh = async (niftiData, threshold = 0.5, colorMap = 'rainbow') => {
+  const convertNiftiToMesh = async (
+    niftiData,
+    threshold = 0.5,
+    colorMap = 'rainbow',
+  ) => {
     try {
       // Validate if the file is a valid NIfTI file
       if (!nifti.isNIFTI(niftiData)) {
@@ -3934,16 +3947,16 @@ function PlyViewer({
       // Extract dimensions
       const dimensions = header.dims.slice(1, 4);
       console.log('Dimensions:', dimensions);
-
+      console.log('img: ', img);
       // Create a 3D array for the marching cubes algorithm
       const [dimX, dimY, dimZ] = dimensions;
-      const data = new Float32Array(dimX * dimY * dimZ);
+      const data = new Float32Array((dimX * dimY * dimZ) / 2);
 
       // Copy the image data to the 3D array
       for (let i = 0; i < img.length; i++) {
         data[i] = img[i];
       }
-
+      console.log('data: ', data);
       // Find min and max values for normalization
       // Apply arctan normalization to all values
       // for (let i = 0; i < data.length; i++) {
@@ -3961,25 +3974,36 @@ function PlyViewer({
       for (let i = 0; i < data.length; i++) {
         data[i] = (data[i] - minValue) / (maxValue - minValue);
       }
+      for (let i = 0; i < data.length; i++) {
+        if (data[i] < minValue) minValue = data[i];
+        if (data[i] > maxValue) maxValue = data[i];
+      }
+      console.log(`Data range: ${minValue} to ${maxValue}`);
       console.log('Running Marching Cubes...');
-
+      // console.log('Isosurface: ', isosurface);
+      const vol = new Float32Array(image.buffer);
+      // const vox = ndarray(vol, dims);
       // Generate surface mesh using Marching Cubes algorithm
-      const mesh = isosurface.marchingCubes(
-        [dimX, dimY, dimZ],
-        (x, y, z) => {
-          if (x < 0 || x >= dimX || y < 0 || y >= dimY || z < 0 || z >= dimZ) {
-            return 0;
-          }
-          const index = x + dimX * (y + dimY * z);
-          return data[index] || 0;
-        },
-        threshold,
-      );
+      // const isoLevel = 1;
+      // const mesh = iso.marchingCubes(
+      //   dims,
+      //   (x, y, z) => vox.get(x, y, z) - isoLevel   // signed distance
+      // );
+      const [nx, ny, nz] = header.dims.slice(1, 4); // volume dims
+      const isoLevel = 0.5; // surface value
 
-      console.log(`Generated ${mesh.positions.length} vertices and ${mesh.cells.length} faces.`);
+      // ---------- marching cubes WITHOUT ndarray ----------
+      const scalar = (x, y, z) => {
+        return vol[x + nx * (y + ny * z)] - isoLevel; // <‑‑ direct indexing
+      };
+
+      const mesh = iso.marchingCubes([nx, ny, nz], scalar);
+      console.log('Mesh: ', mesh);
 
       if (mesh.positions.length === 0) {
-        throw new Error('No surface extracted. Check data values and threshold.');
+        throw new Error(
+          'No surface extracted. Check data values and threshold.',
+        );
       }
 
       // Create a Three.js geometry from the marching cubes mesh
@@ -3987,7 +4011,10 @@ function PlyViewer({
 
       // Add positions
       const positions = new Float32Array(mesh.positions.flat());
-      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute(
+        'position',
+        new THREE.BufferAttribute(positions, 3),
+      );
 
       // Add faces (indices)
       const indices = new Uint32Array(mesh.cells.flat());
@@ -4010,15 +4037,20 @@ function PlyViewer({
         const voxelZ = Math.floor(z);
 
         // Make sure we're within bounds
-        if (voxelX >= 0 && voxelX < dimX &&
-            voxelY >= 0 && voxelY < dimY &&
-            voxelZ >= 0 && voxelZ < dimZ) {
-
+        if (
+          voxelX >= 0 &&
+          voxelX < dimX &&
+          voxelY >= 0 &&
+          voxelY < dimY &&
+          voxelZ >= 0 &&
+          voxelZ < dimZ
+        ) {
           const index = voxelX + dimX * (voxelY + dimY * voxelZ);
           const intensity = data[index];
 
           // Normalize intensity to [0, 1]
-          const normalizedIntensity = (intensity - minValue) / (maxValue - minValue);
+          const normalizedIntensity =
+            (intensity - minValue) / (maxValue - minValue);
 
           // Map intensity to color based on the selected color map
           switch (colorMap) {
@@ -4026,7 +4058,11 @@ function PlyViewer({
               color.setHSL(0.7 * (1 - normalizedIntensity), 1, 0.5);
               break;
             case 'grayscale':
-              color.setRGB(normalizedIntensity, normalizedIntensity, normalizedIntensity);
+              color.setRGB(
+                normalizedIntensity,
+                normalizedIntensity,
+                normalizedIntensity,
+              );
               break;
             case 'red':
               color.setRGB(normalizedIntensity, 0, 0);
@@ -4069,6 +4105,62 @@ function PlyViewer({
     }
   };
 
+  const handleFile = (file) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const fileData = event.target.result;
+      // Check if the file is a zip
+      if (file.name.endsWith('.gz')) {
+        // Use fflate to unzip the file
+        fflate.gunzip(new Uint8Array(fileData), (err, unzipped) => {
+          if (err) {
+            console.error('Error unzipping file:', err);
+            return;
+          }
+          Object.keys(unzipped).forEach((filename) => {
+            if (filename.endsWith('.nii')) {
+              const unzippedFileData = unzipped[filename];
+              // Process the unzipped NIfTI file
+              console.log('Unzipped NIfTI file:', filename);
+              return reader.readAsArrayBuffer(unzippedFileData);
+              // You can trigger any function here to process the unzipped NIfTI file
+            }
+          });
+        });
+      } else {
+        console.log('File is not a gzip:', file.name);
+        // You can trigger any function here to process the non-gzipped file
+      }
+    };
+    return reader.readAsArrayBuffer(file);
+  };
+
+  const onDrop = (acceptedFiles) => {
+    // Handle the dropped files here
+    const file = acceptedFiles[0];
+    const fileData = handleFile(file);
+    const mesh = nii2Mesh(fileData);
+    // const mesh = await convertNiftiToMesh(fileData, threshold, colorMap);
+
+    // Add the mesh to the scene
+    if (mesh) {
+      addMeshToScene('NIfTI Volume', mesh.geometry, mesh.material);
+
+      // Log information about the mesh
+      console.log(
+        'Mesh added to scene:',
+        mesh.geometry.attributes.position.count,
+        'vertices',
+      );
+    } else {
+      console.error('Failed to create mesh from NIfTI data');
+    }
+    // You can trigger any function here to process the files
+  };
+
+  const { getRootProps, getInputProps } = useDropzone({ onDrop });
+
+
   return (
     <div style={{ marginTop: '-120px' }}>
       {/* {!plyFile && (
@@ -4079,6 +4171,10 @@ function PlyViewer({
       )} */}
       <div style={viewerContainerStyle}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {/* <div {...getRootProps()} style={dropzoneStyle}>
+          <input {...getInputProps()} />
+          <p>DRAG AND DROP A FILE</p>
+        </div> */}
           <div
             ref={mountRef}
             style={{
@@ -4558,18 +4654,21 @@ function PlyViewer({
 }
 
 const dropzoneStyle = {
-  // width: '100%',
-  height: '150px',
-  border: '3px dashed #007bff',
+  position: 'absolute', // Overlay on top of other elements
+  top: 0,
+  // left: 0,
+  right: 0,
+  bottom: 0,
+  height: '500px',
+  border: 'transparent',
   borderRadius: '10px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  // backgroundColor: '#f8f9fa',
-  // transition: 'background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
-  marginBottom: '20px',
+  pointerEvents: 'auto', // Ensure it doesn't interfere with underlying elements
   cursor: 'pointer',
   boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+  color: 'transparent',
 };
 
 const viewerContainerStyle = {

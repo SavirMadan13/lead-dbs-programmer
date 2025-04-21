@@ -50,64 +50,64 @@ function DatabaseStats({ directoryPath }) {
   const [scoreTypes, setScoreTypes] = useState(['UPDRS', 'Y-BOCS']); // Default score types
 
   console.log('Patients for real: ', patients);
-  useEffect(() => {
-    if (directoryPath && filteredPatients.length > 0 && patients[0].id !== 'sub-01') {
-      const timelinePromises = filteredPatients.map((patient) =>
-        window.electron.ipcRenderer.invoke(
-          'get-timelines',
-          directoryPath,
-          patient.id,
-          true,
-        ),
-      );
-      Promise.all(timelinePromises)
-        .then((allReceivedTimelines) => {
-          const allFilteredTimelineNames = allReceivedTimelines.map(
-            (receivedTimelines) =>
-              receivedTimelines
-                .filter((timelineData) => timelineData.hasClinical)
-                .map((timelineData) => timelineData.timeline),
-          );
+  // useEffect(() => {
+  //   if (directoryPath && filteredPatients.length > 0 && patients[0].id !== 'sub-01') {
+  //     const timelinePromises = filteredPatients.map((patient) =>
+  //       window.electron.ipcRenderer.invoke(
+  //         'get-timelines',
+  //         directoryPath,
+  //         patient.id,
+  //         true,
+  //       ),
+  //     );
+  //     Promise.all(timelinePromises)
+  //       .then((allReceivedTimelines) => {
+  //         const allFilteredTimelineNames = allReceivedTimelines.map(
+  //           (receivedTimelines) =>
+  //             receivedTimelines
+  //               .filter((timelineData) => timelineData.hasClinical)
+  //               .map((timelineData) => timelineData.timeline),
+  //         );
 
-          const patientsArray = filteredPatients;
-          const patientsWithTimelines = patientsArray.map((patient, index) => ({
-            id: patient.id,
-            timelines: allFilteredTimelineNames[index] || [],
-          }));
-          console.log(patientsWithTimelines);
-          return setClinicalTimelines(patientsWithTimelines);
-        })
-        .catch((error) => {
-          console.error('Error fetching timelines for all patients:', error);
-        });
-    }
-  }, [directoryPath, filteredPatients]);
-
-  useEffect(() => {
-    if (clinicalTimelines && patients[0].id !== 'sub-01') {
-      console.log('Clinical Timelines: ', clinicalTimelines);
-      window.electron.ipcRenderer
-        .invoke('get-clinical-data', directoryPath, clinicalTimelines)
-        .then((clinicalData) => {
-          setClinicalData(clinicalData);
-          setClinicalDataForPlotting(clinicalData);
-          // window.electron.ipcRenderer.sendMessage('download-clinical-data', clinicalData);
-          return clinicalData;
-        })
-        .catch((error) => {
-          console.error('Error retrieving clinical data:', error);
-        });
-    }
-  }, [clinicalTimelines]);
+  //         const patientsArray = filteredPatients;
+  //         const patientsWithTimelines = patientsArray.map((patient, index) => ({
+  //           id: patient.id,
+  //           timelines: allFilteredTimelineNames[index] || [],
+  //         }));
+  //         console.log(patientsWithTimelines);
+  //         return setClinicalTimelines(patientsWithTimelines);
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error fetching timelines for all patients:', error);
+  //       });
+  //   }
+  // }, [directoryPath, filteredPatients]);
 
   // useEffect(() => {
-  //     window.electron.ipcRenderer.invoke('get-clinical-data-for-plotting', 'test').then((clinicalData) => {
-  //       setClinicalData(clinicalData);
-  //       setClinicalDataForPlotting(clinicalData);
-  //     }).catch((error) => {
-  //       console.error('Error retrieving clinical data:', error);
-  //     });
-  // }, []);
+  //   if (clinicalTimelines && patients[0].id !== 'sub-01') {
+  //     console.log('Clinical Timelines: ', clinicalTimelines);
+  //     window.electron.ipcRenderer
+  //       .invoke('get-clinical-data', directoryPath, clinicalTimelines)
+  //       .then((clinicalData) => {
+  //         setClinicalData(clinicalData);
+  //         setClinicalDataForPlotting(clinicalData);
+  //         // window.electron.ipcRenderer.sendMessage('download-clinical-data', clinicalData);
+  //         return clinicalData;
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error retrieving clinical data:', error);
+  //       });
+  //   }
+  // }, [clinicalTimelines]);
+
+  useEffect(() => {
+      window.electron.ipcRenderer.invoke('get-clinical-data-for-plotting', 'test').then((clinicalData) => {
+        setClinicalData(clinicalData);
+        setClinicalDataForPlotting(clinicalData);
+      }).catch((error) => {
+        console.error('Error retrieving clinical data:', error);
+      });
+  }, []);
 
   useEffect(() => {
     let filtered = patients.filter((patient) => {

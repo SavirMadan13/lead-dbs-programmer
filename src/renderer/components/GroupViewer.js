@@ -17,6 +17,7 @@ import {
 } from 'react-bootstrap';
 import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings icon
 import * as math from 'mathjs';
+import BigBrain from './untitled.jpg';
 // import { remote } from 'electron'; // Use 'electron' for Electron v12+
 
 function GroupViewer({
@@ -433,8 +434,6 @@ function GroupViewer({
       const electrodeGeometry = electrodeLoader.parse(
         fileData.combinedElectrodesPly,
       );
-      console.log('ELECTRODE GEOMETRY: ', electrodeGeometry);
-      console.log('Output patient id: ', outputPatientID);
 
       // Create a material for the mesh
       const material = new THREE.MeshStandardMaterial({
@@ -640,6 +639,19 @@ function GroupViewer({
         renderer.render(sceneRef.current, camera);
       };
       animate();
+
+      // Load the image as a texture
+      const textureLoader = new THREE.TextureLoader();
+      textureLoader.load(BigBrain, (texture) => {
+        // Create a plane geometry
+        const planeGeometry = new THREE.PlaneGeometry(256, 256); // Size of a brain in MNI space (approx 200mm x 250mm)
+        const planeMaterial = new THREE.MeshBasicMaterial({ map: texture });
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+
+        // Position the plane in the scene
+        plane.position.set(0, -15, -12); // Adjust position as needed
+        scene.add(plane);
+      });
 
       return () => {
         renderer.dispose();

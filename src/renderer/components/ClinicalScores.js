@@ -94,7 +94,7 @@ function ClinicalScores() {
   }
 
   const UPDRSImages = importAll(
-    require.context('./icons', false, /\.(PNG|jpe?g|svg)$/),
+    require.context('./icons/new', false, /\.(PNG|jpe?g|svg|png)$/),
   );
   console.log('UPDRSImages: ', UPDRSImages);
   const YBOCS = {
@@ -346,6 +346,7 @@ function ClinicalScores() {
       const minOpacity = 0.2;
       const maxOpacity = 1.0;
       const maxScore = 4; // Adjust this based on your scoring system
+      return 1;
       return minOpacity + (score / maxScore) * (maxOpacity - minOpacity);
     };
 
@@ -376,7 +377,8 @@ function ClinicalScores() {
                               ),
                             }}
                           />
-                          {/* <span className="tooltip-text">{key}</span> */}
+                          <br />
+                          <span className="tooltip-text">{key}</span>
                         </div>
                       )}
                       {selectedScoreType !== 'UPDRS' && (
