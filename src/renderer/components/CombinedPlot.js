@@ -177,24 +177,24 @@ function CombinedPlot({ clinicalData, scoretype }) {
       tension: 0.3,
       pointRadius: 3,
     },
-    {
-      label: 'Standard Deviation',
-      data: averages.map((avg, i) => avg + stdDeviations[i]),
-      backgroundColor: 'rgba(173, 216, 230, 0.3)',
-      borderWidth: 0,
-      fill: '+1',
-      tension: 0.3,
-      pointRadius: 0,
-    },
-    {
-      label: '',
-      data: averages.map((avg, i) => avg - stdDeviations[i]),
-      backgroundColor: 'rgba(173, 216, 230, 0.3)',
-      borderWidth: 0,
-      fill: false,
-      tension: 0.3,
-      pointRadius: 0,
-    },
+    // {
+    //   label: 'Standard Deviation',
+    //   data: averages.map((avg, i) => avg + stdDeviations[i]),
+    //   backgroundColor: 'rgba(173, 216, 230, 0.3)',
+    //   borderWidth: 0,
+    //   fill: '+1',
+    //   tension: 0.3,
+    //   pointRadius: 0,
+    // },
+    // {
+    //   label: '',
+    //   data: averages.map((avg, i) => avg - stdDeviations[i]),
+    //   backgroundColor: 'rgba(173, 216, 230, 0.3)',
+    //   borderWidth: 0,
+    //   fill: false,
+    //   tension: 0.3,
+    //   pointRadius: 0,
+    // },
   ];
 
   const data = {
@@ -250,7 +250,7 @@ function CombinedPlot({ clinicalData, scoretype }) {
           callback: function(value, index, values) {
             // Replace 'postop' with '6months'
             if (this.getLabelForValue(value) === 'postop') {
-              return '6months';
+              return 'postop';
             } else if (this.getLabelForValue(value) === 'baseline-med ON') {
               return '3months';
             }

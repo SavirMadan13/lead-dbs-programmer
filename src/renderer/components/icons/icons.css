@@ -19,6 +19,8 @@
 
 .tooltip-text {
   visibility: visible;
+  font-family: avenir;
+  /* weight 400 regular */
   /* width: 120px;
   background-color: black;
   color: #fff;

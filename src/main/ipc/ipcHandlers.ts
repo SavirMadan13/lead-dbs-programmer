@@ -692,7 +692,7 @@ export default function registerFileHandlers() {
     console.log('clinicalData: ', clinicalData);
 
     // Define the file path where you want to save the JSON data
-    const filePath = path.join('/Users/savirmadan/Downloads', 'clinicalDataForPlotting.json');
+    const filePath = path.join('/Users/savirmadan/Downloads', 'allClinicalScores.json');
 
     try {
       // Convert the clinicalData to a JSON string

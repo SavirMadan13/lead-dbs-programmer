@@ -93,7 +93,8 @@ function GroupLateralityAnalysisPlot({ clinicalData, scoretype }) {
       const baselineScores = Object.entries(patientData.clinicalData['baseline'][scoretype] || {})
         .filter(([item]) => leftSideItems.includes(item) && typeof patientData.clinicalData['baseline'][scoretype][item] === 'number')
         .map(([, score]) => score);
-      const baselineTotal = baselineScores.reduce((sum, score) => sum + score, 0) || 1;
+      const baselineTotal = baselineScores.reduce((sum, score) => sum + score, 0);
+      if (baselineTotal === 0) return null; // Skip if the sum of baseline scores is zero
 
       const scores = patientData.clinicalData[timeline][scoretype]
         ? Object.entries(patientData.clinicalData[timeline][scoretype])
@@ -114,7 +115,8 @@ function GroupLateralityAnalysisPlot({ clinicalData, scoretype }) {
       const baselineScores = Object.entries(patientData.clinicalData['baseline'][scoretype] || {})
         .filter(([item]) => rightSideItems.includes(item) && typeof patientData.clinicalData['baseline'][scoretype][item] === 'number')
         .map(([, score]) => score);
-      const baselineTotal = baselineScores.reduce((sum, score) => sum + score, 0) || 1;
+      const baselineTotal = baselineScores.reduce((sum, score) => sum + score, 0);
+      if (baselineTotal === 0) return null; // Skip if the sum of baseline scores is zero
 
       const scores = patientData.clinicalData[timeline][scoretype]
         ? Object.entries(patientData.clinicalData[timeline][scoretype])
@@ -178,46 +180,46 @@ function GroupLateralityAnalysisPlot({ clinicalData, scoretype }) {
       pointRadius: 3,
       order: 1,
     },
-    {
-      label: 'Left Side Std Dev Upper',
-      data: leftAverages.map((avg, i) => avg + leftStdDevs[i]),
-      backgroundColor: 'rgba(78, 121, 167, 0.1)',
-      borderWidth: 0,
-      fill: '+1',
-      tension: 0.3,
-      pointRadius: 0,
-      order: 0,
-    },
-    {
-      label: 'Left Side Std Dev Lower',
-      data: leftAverages.map((avg, i) => avg - leftStdDevs[i]),
-      backgroundColor: 'rgba(78, 121, 167, 0.1)',
-      borderWidth: 0,
-      fill: false,
-      tension: 0.3,
-      pointRadius: 0,
-      order: 0,
-    },
-    {
-      label: 'Right Side Std Dev Upper',
-      data: rightAverages.map((avg, i) => avg + rightStdDevs[i]),
-      backgroundColor: 'rgba(242, 142, 43, 0.1)',
-      borderWidth: 0,
-      fill: '+1',
-      tension: 0.3,
-      pointRadius: 0,
-      order: 0,
-    },
-    {
-      label: 'Right Side Std Dev Lower',
-      data: rightAverages.map((avg, i) => avg - rightStdDevs[i]),
-      backgroundColor: 'rgba(242, 142, 43, 0.1)',
-      borderWidth: 0,
-      fill: false,
-      tension: 0.3,
-      pointRadius: 0,
-      order: 0,
-    },
+    // {
+    //   label: 'Left Side Std Dev Upper',
+    //   data: leftAverages.map((avg, i) => avg + leftStdDevs[i]),
+    //   backgroundColor: 'rgba(78, 121, 167, 0.1)',
+    //   borderWidth: 0,
+    //   fill: '+1',
+    //   tension: 0.3,
+    //   pointRadius: 0,
+    //   order: 0,
+    // },
+    // {
+    //   label: 'Left Side Std Dev Lower',
+    //   data: leftAverages.map((avg, i) => avg - leftStdDevs[i]),
+    //   backgroundColor: 'rgba(78, 121, 167, 0.1)',
+    //   borderWidth: 0,
+    //   fill: false,
+    //   tension: 0.3,
+    //   pointRadius: 0,
+    //   order: 0,
+    // },
+    // {
+    //   label: 'Right Side Std Dev Upper',
+    //   data: rightAverages.map((avg, i) => avg + rightStdDevs[i]),
+    //   backgroundColor: 'rgba(242, 142, 43, 0.1)',
+    //   borderWidth: 0,
+    //   fill: '+1',
+    //   tension: 0.3,
+    //   pointRadius: 0,
+    //   order: 0,
+    // },
+    // {
+    //   label: 'Right Side Std Dev Lower',
+    //   data: rightAverages.map((avg, i) => avg - rightStdDevs[i]),
+    //   backgroundColor: 'rgba(242, 142, 43, 0.1)',
+    //   borderWidth: 0,
+    //   fill: false,
+    //   tension: 0.3,
+    //   pointRadius: 0,
+    //   order: 0,
+    // },
   ];
 
   const data = {

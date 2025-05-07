@@ -119,7 +119,9 @@ function GroupSubscoreAnalysisPlot({ clinicalData, scoretype }) {
         const baselineScores = Object.entries(baselineData)
           .filter(([item]) => items.includes(item) && typeof baselineData[item] === 'number')
           .map(([, score]) => score);
-        const baselineTotal = baselineScores.reduce((sum, score) => sum + score, 0) || 1;
+        console.log('Baseline Scores: ', baselineScores);
+        const baselineTotal = baselineScores.reduce((sum, score) => sum + score, 0);
+        if (baselineTotal === 0) return null; // Skip if the sum of baseline scores is zero
 
         const scores = Object.entries(timelineData)
           .filter(([item]) => items.includes(item) && typeof timelineData[item] === 'number')
@@ -158,23 +160,23 @@ function GroupSubscoreAnalysisPlot({ clinicalData, scoretype }) {
         pointRadius: 3,
       });
 
-      datasets.push({
-        label: `${name} Std Dev Upper`,
-        data: averages.map((avg, i) => avg + stdDevs[i]),
-        backgroundColor: `${color}33`,
-        borderWidth: 0,
-        fill: '+1',
-        pointRadius: 0,
-      });
+      // datasets.push({
+      //   label: `${name} Std Dev Upper`,
+      //   data: averages.map((avg, i) => avg + stdDevs[i]),
+      //   backgroundColor: `${color}33`,
+      //   borderWidth: 0,
+      //   fill: '+1',
+      //   pointRadius: 0,
+      // });
 
-      datasets.push({
-        label: `${name} Std Dev Lower`,
-        data: averages.map((avg, i) => avg - stdDevs[i]),
-        backgroundColor: `${color}33`,
-        borderWidth: 0,
-        fill: false,
-        pointRadius: 0,
-      });
+      // datasets.push({
+      //   label: `${name} Std Dev Lower`,
+      //   data: averages.map((avg, i) => avg - stdDevs[i]),
+      //   backgroundColor: `${color}33`,
+      //   borderWidth: 0,
+      //   fill: false,
+      //   pointRadius: 0,
+      // });
     }
   });
 

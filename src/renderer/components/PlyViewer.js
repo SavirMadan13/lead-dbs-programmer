@@ -24,9 +24,12 @@ import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings
 import * as math from 'mathjs';
 import { optimizeSphereValues, projectNumContacts } from './StimOptimizer';
 import { computeSuperimposedEField } from './OssDbsStimsets';
-import nii2Mesh from './NiftiUtils';
+import { nii2Mesh, processNifti } from './NiftiUtils';
 // import { processNii } from './ProcessNii';
 // import { remote } from 'electron'; // Use 'electron' for Electron v12+
+import IconButton from '@mui/material/IconButton';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 
 function PlyViewer({
   quantities,
@@ -281,13 +284,15 @@ function PlyViewer({
           'load-test-file',
           historical,
         );
-
+        // processNifti(fileData, sceneRef.current);
         // Convert NIfTI data to a mesh using marching cubes with custom parameters
         // You can adjust these parameters based on your data
         const threshold = 0.3; // Lower threshold to capture more of the volume
         const colorMap = 'rainbow'; // Options: 'rainbow', 'grayscale', 'red', 'green', 'blue'
-        const mesh = await nii2Mesh(fileData);
+        let mesh = null;
+        // mesh = await nii2Mesh(fileData);
         // const mesh = await convertNiftiToMesh(fileData, threshold, colorMap);
+        mesh = processNifti(fileData, threshold, colorMap);
 
         // Add the mesh to the scene
         if (mesh) {
@@ -1240,12 +1245,15 @@ function PlyViewer({
       console.log('Quantities: ', quantities);
       // eslint-disable-next-line no-param-reassign
       // quantities = {
-      //   0: 3.9,
-      //   1: 1.5,
-      //   2: 1.4,
-      //   3: 0.6,
-      //   4: 0.5,
-      //   5:
+      //   0: 100,
+      //   1: 60,
+      //   2: 20,
+      //   3: 0,
+      //   4: 0,
+      //   5: 0,
+      //   6: 0,
+      //   7: 0,
+      //   8: 20,
       // };
       let contactQuantity = parseFloat(quantities[contactId]);
       if (togglePosition === 'center') {
@@ -1538,7 +1546,7 @@ function PlyViewer({
 
       const texture = new THREE.CanvasTexture(canvas);
       // scene.background = texture;
-      scene.background = new THREE.Color('black'); // White background
+      scene.background = new THREE.Color('white'); // White background
 
       // Create an OrthographicCamera
       const aspect = 500 / 500;
@@ -2802,292 +2810,6 @@ function PlyViewer({
       console.log(err);
     }
   }, [recoData]);
-  /**
-   * Validates input parameters for the optimizeSphereValues function.
-   * @param {Array} sphereCoords - Array of sphere centers, each center is an [x, y, z] coordinate.
-   * @param {Array} v - Array of contact values (e.g., [q1, q2, q3, q4]).
-   * @param {Array} L - Flattened landscape values, each row is [x, y, z, magnitude].
-   * @throws {Error} - If any validation check fails.
-   */
-  // const validateInputs = (sphereCoords, v, L) => {
-  //   // Check that all inputs are arrays
-  //   if (!Array.isArray(sphereCoords)) {
-  //     throw new Error('sphereCoords must be an array.');
-  //   }
-  //   if (!Array.isArray(v)) {
-  //     throw new Error('v must be an array.');
-  //   }
-  //   if (!Array.isArray(L)) {
-  //     throw new Error('L must be an array.');
-  //   }
-
-  //   // Check that arrays are not empty
-  //   if (sphereCoords.length === 0) {
-  //     throw new Error('sphereCoords array cannot be empty.');
-  //   }
-  //   if (v.length === 0) {
-  //     throw new Error('v array cannot be empty.');
-  //   }
-  //   if (L.length === 0) {
-  //     throw new Error('L array cannot be empty.');
-  //   }
-
-  //   // Check length consistency
-  //   if (sphereCoords.length !== v.length) {
-  //     throw new Error('sphereCoords and v must have the same length.');
-  //   }
-
-  //   // Check that at least one v is greater than 0.1
-  //   const hasVOverThreshold = v.some(
-  //     (value) => typeof value === 'number' && value > 0.1,
-  //   );
-  //   if (!hasVOverThreshold) {
-  //     throw new Error(
-  //       'At least one contact value in v must be greater than 0.1.',
-  //     );
-  //   }
-
-  //   // Validate each sphere coordinate
-  //   sphereCoords.forEach((coord, index) => {
-  //     if (!Array.isArray(coord) || coord.length !== 3) {
-  //       throw new Error(
-  //         `sphereCoords[${index}] must be an array of three numeric values [x, y, z].`,
-  //       );
-  //     }
-  //     coord.forEach((val, subIndex) => {
-  //       if (typeof val !== 'number' || isNaN(val)) {
-  //         throw new Error(
-  //           `sphereCoords[${index}][${subIndex}] must be a valid number.`,
-  //         );
-  //       }
-  //     });
-  //   });
-
-  //   // Validate each contact value
-  //   v.forEach((value, index) => {
-  //     if (typeof value !== 'number' || isNaN(value) || value < 0) {
-  //       throw new Error(`v[${index}] must be a non-negative number.`);
-  //     }
-  //   });
-
-  //   // Validate each landscape point
-  //   L.forEach((point, index) => {
-  //     if (!Array.isArray(point) || point.length !== 4) {
-  //       throw new Error(
-  //         `L[${index}] must be an array of four numeric values [x, y, z, magnitude].`,
-  //       );
-  //     }
-  //     point.forEach((val, subIndex) => {
-  //       if (typeof val !== 'number' || isNaN(val)) {
-  //         throw new Error(`L[${index}][${subIndex}] must be a valid number.`);
-  //       }
-  //     });
-  //   });
-  // };
-
-  // /**
-  //  * Computes the radius of the sphere based on input millamps.
-  //  * @param {number} milliamps - Input value used to compute the radius.
-  //  * @returns {number} - Radius of the sphere.
-  //  */
-  // const computeRadius = (milliamps) => {
-  //   const radius = (milliamps - 0.1) / 0.22;
-  //   return milliamps > 0.1 ? math.sqrt(radius) : 0;
-  // };
-
-  // /**
-  //  * Assigns values to the entire landscape based on the sphere's center and radius.
-  //  * Uses vectorized operations with math.js for improved performance.
-  //  * @param {Array} L - Array of points, each row is a point with each column being an [x, y, z, magnitude].
-  //  * @param {Array} center - Center of the sphere [x0, y0, z0].
-  //  * @param {number} r - Radius of the sphere.
-  //  * @returns {Array} - Array of 0s and 1s representing whether each point lies inside the sphere.
-  //  */
-  // const assignSphereValues = (L, center, r) => {
-  //   const [x0, y0, z0] = center;
-  //   // Extract the x, y, z coordinates as separate arrays
-  //   const xCoords = math.column(L, 0);
-  //   const yCoords = math.column(L, 1);
-  //   const zCoords = math.column(L, 2);
-
-  //   // Compute the squared distance from each point to the sphere center
-  //   const dx = math.subtract(xCoords, x0);
-  //   const dy = math.subtract(yCoords, y0);
-  //   const dz = math.subtract(zCoords, z0);
-  //   const distanceSquared = math.add(
-  //     math.map(dx, (value) => value ** 2), // Element-wise square for dx
-  //     math.map(dy, (value) => value ** 2), // Element-wise square for dy
-  //     math.map(dz, (value) => value ** 2), // Element-wise square for dz
-  //   );
-
-  //   const radiusSquared = r ** 2; // Faster to square the radius for comparison than to root every squared distance.
-
-  //   // Perform element-wise comparison to get boolean array and convert to 0/1
-  //   const insideSphere = math.smaller(distanceSquared, radiusSquared); // Gets booleans via inequality
-  //   const sphereMask = math.multiply(insideSphere, 1); // Converts trues to 1s.
-  //   return sphereMask;
-  // };
-
-  // /**
-  //  * Calculates the dot product of the sphere assignment vector and the flattened landscape.
-  //  * @param {Array} S - Sphere assignment vector.
-  //  * @param {Array} L - Flattened landscape values array [x,y,z,magnitude]. Same organization of the above rows as points,
-  //  *                      but with a single column being value at that point.
-  //  *                      Each row should correspond with the row of the x,y,z in landscape for assignSphereValues
-  //  * @returns {number} - Dot product result.
-  //  */
-  // const dotProduct = (S, L) => {
-  //   console.log(S, L);
-  //   const magnitudes = math.column(L, 3);
-  //   return math.dot(S, magnitudes);
-  // };
-
-  // /**
-  //  * Calculates the target function value T(r), which is the density of 'high' values inside a sphere.
-  //  * @param {number} r - Radius of the sphere.
-  //  * @param {Array} S_r - Sphere assignment vector.
-  //  * @param {Array} L - Flattened landscape values.
-  //  * @returns {number} - Target function value.
-  //  */
-  // const targetFunction = (S_r, L, weight = 100) => {
-  //   return dotProduct(S_r, L) * weight;
-  // };
-
-  // /**
-  //  * Computes the sum of the target function values for an array of possible sphere coordinates.
-  //  * Only includes spheres where the corresponding value in v is non-zero.
-  //  * @param {Array} sphereCoords - Array of sphere centers, each center is an [x, y, z] coordinate.
-  //  * @param {Array} v - Array of contact values (e.g., [q1, q2, q3, q4]).
-  //  * @param {Array} L - Flattened landscape values.
-  //  * @returns {number} - Sum of the target function values for all valid spheres.
-  //  */
-  // const targetFunctionHandler = (sphereCoords, v, L) => {
-  //   let sumTargetValue = 0;
-  //   sphereCoords.forEach((center, index) => {
-  //     if (v[index] > 0) {
-  //       // Only compute if the corresponding v value is above 0.1 (which is minimum for VTA in our radius function)
-  //       const r = computeRadius(v[index]); // the value at index is our amperage. that is related to radius.
-  //       const S_r = assignSphereValues(L, center, r);
-  //       const targetValue = targetFunction(S_r, L);
-  //       sumTargetValue += targetValue;
-  //     }
-  //   });
-  //   return sumTargetValue;
-  // };
-
-  // /**
-  //  * Calculates the penalty for individual contacts. If contact current above 5mA, penalize.
-  //  * @param {number} v - Contact value (milliamperages)
-  //  * @param {number} lambda - Penalty coefficient.
-  //  * @returns {number} - Penalty value.
-  //  */
-  // const penaltyPerContact = (v, lambda) => lambda * Math.max(v - 0.1, 0);
-
-  // /**
-  //  * Handler function to compute the total penalty for a vector of contact values.
-  //  * @param {Array} v - Array of contact values (e.g., [q1, q2, q3, q4]).
-  //  * @param {number} lambda - Penalty coefficient.
-  //  * @returns {number} - Total penalty value for all contacts.
-  //  */
-  // const penaltyPerContactHandler = (v, lambda) => {
-  //   return v.reduce((sum, value) => sum + penaltyPerContact(value, lambda), 0);
-  // };
-
-  // /**
-  //  * Calculates the penalty across all  contacts. If total current above 6mA, penalize.
-  //  * @param {Array} v - Array of contact values (milliamperages)
-  //  * @param {number} lambda - Penalty coefficient.
-  //  * @returns {number} - Penalty value.
-  //  */
-  // const penaltyAllContacts = (v, lambda) =>
-  //   lambda * math.max(math.sum(v) - 0.1, 0);
-
-  // /**
-  //  * Computes the loss function value.
-  //  * @param {Array} sphereCoords - Array of sphere centers, each center is an [x, y, z] coordinate.
-  //  * @param {Array} v - Array of contact values (e.g., [q1, q2, q3, q4]). Organized like sphereCoords
-  //  * @param {Array} L - Flattened landscape values.
-  //  * @param {number} lambda - Penalty coefficient.
-  //  * @returns {number} - Loss function value.
-  //  */
-  // const lossFunction = (sphereCoords, v, L, lambda) => {
-  //   const T = targetFunctionHandler(sphereCoords, v, L); // Compute the total target value across all relevant spheres
-  //   const P1 = penaltyPerContactHandler(v, lambda); // Compute the penalty for individual contacts
-  //   const P2 = penaltyAllContacts(v, lambda); // Compute the overall penalty for the sum of contact values
-  //   return T - P1 - P2; // Return the loss function value
-  // };
-
-  // /**
-  //  * Computes the difference quotient (numerical derivative) for a given element in the vector v.
-  //  * @param {Array} v - Array of contact values (e.g., [q1, q2, q3, q4]).
-  //  * @param {number} lossCurrent - loss at the current array of v.
-  //  * @param {number} index - Index of the element to compute the derivative for.
-  //  * @param {number} h - Small step size for numerical differentiation.
-  //  * @param {Array} sphereCoords - Array of sphere centers.
-  //  * @param {Array} L - Flattened landscape values.
-  //  * @param {number} lambda - Penalty coefficient.
-  //  * @returns {number} - Numerical derivative at the specified index.
-  //  */
-  // const partialDifferenceQuotient = (
-  //   v,
-  //   lossCurrent,
-  //   index,
-  //   h,
-  //   sphereCoords,
-  //   L,
-  //   lambda,
-  // ) => {
-  //   const vForward = [...v]; // Create a copy of v
-  //   vForward[index] += h; // Perturb (step forward) by h only for the variable v at index i
-  //   const lossForward = lossFunction(sphereCoords, vForward, L, lambda);
-  //   const partialDifference = (lossForward - lossCurrent) / h;
-  //   return partialDifference;
-  // };
-
-  // /**
-  //  * Computes the gradient vector of the loss function across all elements in v.
-  //  * Uses the `partialDifferenceQuotient` function for numerical differentiation.
-  //  * @param {Array} v - Array of contact values (e.g., [q1, q2, q3, q4]).
-  //  * @param {number} h - Small step size for numerical differentiation.
-  //  * @param {Array} sphereCoords - Array of sphere centers.
-  //  * @param {Array} L - Flattened landscape values.
-  //  * @param {number} lambda - Penalty coefficient.
-  //  * @returns {Array} - Gradient vector of the loss function.
-  //  */
-  // const gradientVectorHandler = (v, h, sphereCoords, L, lambda) => {
-  //   const lossCurrent = lossFunction(sphereCoords, v, L, lambda); // Compute the current loss
-  //   const gradientVector = v.map(
-  //     (
-  //       v_i,
-  //       index, // Use `partialDifferenceQuotient` for each element in v to construct the gradient vector
-  //     ) =>
-  //       partialDifferenceQuotient(
-  //         v,
-  //         lossCurrent,
-  //         index,
-  //         h,
-  //         sphereCoords,
-  //         L,
-  //         lambda,
-  //       ),
-  //   );
-  //   console.log('Gradient vector: ', gradientVector);
-  //   return gradientVector;
-  // };
-
-  // /**
-  //  * Performs a single step of gradient ascent to update the contact values.
-  //  * Uses the computed gradient vector to adjust each element of v in the direction of increasing the loss function.
-  //  * @param {Array} gradientVector - The gradient vector of the loss function (numerical derivatives for each element of v).
-  //  * @param {Array} v - Array of contact values (e.g., [q1, q2, q3, q4]).
-  //  * @param {number} alpha - Learning rate for gradient ascent (step size).
-  //  * @returns {Array} - Updated array of contact values after the gradient ascent step.
-  //  */
-  // const gradientAscent = (gradientVector, v, alpha) => {
-  //   // Use element-wise addition with math.js for efficient vector operation
-  //   const updatedV = math.add(v, math.multiply(gradientVector, alpha));
-  //   return updatedV.map((v_i) => Math.max(v_i, 0)); //do not allow amps below 0.
-  // };
 
   const findClusters = (coordinates, epsilon) => {
     // Step 1: Filter for positive points
@@ -4160,30 +3882,59 @@ function PlyViewer({
 
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
+  const [isFullScreen, setIsFullScreen] = useState(false);
+
+  const toggleFullScreen = () => {
+    const renderer = rendererRef.current;
+    renderer.setSize(Math.min(window.innerWidth, window.innerHeight), Math.min(window.innerWidth, window.innerHeight));
+    const baseWidth = 500; // Base width
+    const baseHeight = 500; // Base height
+    const aspectRatio = baseWidth / baseHeight;
+
+    // Calculate the frustum size based on the desired aspect ratio
+    const frustumSize = 45; // Adjust this value to control zoom
+
+    // Calculate the left, right, top, and bottom based on the aspect ratio
+    const left = (frustumSize * aspectRatio) / -2;
+    const right = (frustumSize * aspectRatio) / 2;
+    const top = frustumSize / 2;
+    const bottom = frustumSize / -2;
+
+    // Initialize the OrthographicCamera
+    const camera = new THREE.OrthographicCamera(
+      left, // left
+      right, // right
+      top, // top
+      bottom, // bottom
+      0.1, // near plane
+      1000, // far plane
+    );
+    // cameraRef.current = camera;
+    setIsFullScreen(!isFullScreen);
+  };
 
   return (
     <div style={{ marginTop: '-120px' }}>
-      {/* {!plyFile && (
-        <div {...getRootProps({ className: 'dropzone' })} style={dropzoneStyle}>
-          <input {...getInputProps()} />
-          <p>Drag & drop a .ply file here</p>
-        </div>
-      )} */}
-      <div style={viewerContainerStyle}>
+      <div style={isFullScreen ? fullScreenStyle : viewerContainerStyle}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-        {/* <div {...getRootProps()} style={dropzoneStyle}>
-          <input {...getInputProps()} />
-          <p>DRAG AND DROP A FILE</p>
-        </div> */}
+          <IconButton
+            onClick={toggleFullScreen}
+            style={{ position: 'absolute', top: 20, right: 20, zIndex: 1000, color: 'white' }}
+          >
+            {isFullScreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+          </IconButton>
           <div
             ref={mountRef}
             style={{
-              borderRadius: '15px', // Add rounded corners
+              borderRadius: '15px',
+              // Adjust size based on full-screen state
+              width: isFullScreen ? '100vw' : 'auto',
+              height: isFullScreen ? '100vh' : 'auto',
             }}
           />
           <div ref={secondaryMountRef} />
         </div>
-        <Dropdown drop="start">
+        <Dropdown drop="start" style={{zIndex: 1001}}>
           <Dropdown.Toggle variant="secondary" style={{ marginLeft: '-100px' }}>
             <SettingsIcon />
           </Dropdown.Toggle>
@@ -4194,6 +3945,7 @@ function PlyViewer({
               borderRadius: '8px', // Rounded corners for a softer look
               padding: '10px', // Padding for spacing
               boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow for depth
+              zIndex: 1001,
             }}
           >
             <div id="tabs-collapse">
@@ -4718,6 +4470,16 @@ const meshNameStyle = {
   marginBottom: '10px', // Add space below the mesh name
   // backgroundColor: 'rgba(245, 245, 245, 0.2)', // Semi-transparent background color
   backgroundColor: 'rgba(255, 255, 255, 0.44)',
+};
+
+const fullScreenStyle = {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '80vw',
+  height: '80vh',
+  zIndex: 1000, // Ensure it is on top of other elements
+  backgroundColor: 'white', // Optional: Set a background color
 };
 
 export default PlyViewer;
