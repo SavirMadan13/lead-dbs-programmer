@@ -24,7 +24,7 @@ import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings
 import * as math from 'mathjs';
 import { optimizeSphereValues, projectNumContacts } from './StimOptimizer';
 import { computeSuperimposedEField } from './OssDbsStimsets';
-import { nii2Mesh, processNifti } from './NiftiUtils';
+import { nii2Mesh, processNifti, testPlane, addSliceToSceneNew } from './NiftiUtils';
 // import { processNii } from './ProcessNii';
 // import { remote } from 'electron'; // Use 'electron' for Electron v12+
 import IconButton from '@mui/material/IconButton';
@@ -292,21 +292,22 @@ function PlyViewer({
         let mesh = null;
         // mesh = await nii2Mesh(fileData);
         // const mesh = await convertNiftiToMesh(fileData, threshold, colorMap);
-        mesh = processNifti(fileData, threshold, colorMap);
-
+        // mesh = processNifti(fileData, threshold, colorMap);
+        // mesh = testPlane(sceneRef.current);
+        mesh = addSliceToSceneNew(fileData, sceneRef.current);
         // Add the mesh to the scene
-        if (mesh) {
-          addMeshToScene('NIfTI Volume', mesh.geometry, mesh.material);
+        // if (mesh) {
+        //   addMeshToScene('NIfTI Volume', mesh.geometry, mesh.material);
 
-          // Log information about the mesh
-          console.log(
-            'Mesh added to scene:',
-            mesh.geometry.attributes.position.count,
-            'vertices',
-          );
-        } else {
-          console.error('Failed to create mesh from NIfTI data');
-        }
+        //   // Log information about the mesh
+        //   console.log(
+        //     'Mesh added to scene:',
+        //     mesh.geometry.attributes.position.count,
+        //     'vertices',
+        //   );
+        // } else {
+        //   console.error('Failed to create mesh from NIfTI data');
+        // }
       } catch (error) {
         console.error('Error loading NIfTI file:', error);
       }

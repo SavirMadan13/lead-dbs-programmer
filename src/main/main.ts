@@ -118,14 +118,14 @@ app.on('ready', () => {
 // const inputPath = process.argv[1];
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Patient0406Output';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Patient0395Output';
-// const inputPath = '/Users/savirmadan/Partners HealthCare Dropbox/Savir Madan/datasets/CbctDbs0282';
+const inputPath = '/Users/savirmadan/Partners HealthCare Dropbox/Savir Madan/datasets/CbctDbs0282';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/Patient2Output';
 // const inputPath = null;
 // const inputPath = '/Volumes/PdBwh/Patient0395Output';
 // const inputPath = '/Volumes/Expansion/AllData';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/CbctDbs0374';
-const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
+// const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
 // const inputPath = '/Users/savirmadan/Documents/LeadGroupDemo/derivatives/leadgroup/20241007203440/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
 // const inputPath = '/Volumes/PdBwh/CompleteParkinsons/derivatives/leadgroup/BwhParkinsons/inputData.json';
@@ -1426,7 +1426,8 @@ const createWindow = async () => {
   // });
 
   ipcMain.handle('load-test-file', async (event, historical) => {
-    const filePath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI152NLin2009bAsym/t1.nii';
+    // const filePath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI152NLin2009bAsym/t1.nii';
+    const filePath = '/Users/savirmadan/Downloads/BIDMCBERMDST_nosubj9_Gait_UPDRS_Rand_exch_vox_vstat_pcc_inverse_r_map.nii';
     // const filePath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI152NLin2009bAsym/atlases/STN Sweetspots (Dembek 2019)/lh/Rigidity_Clinical_MeanMapGradient.nii';
     console.log(filePath);
     const fileData = fs.readFileSync(filePath); // Read the PLY file as binary

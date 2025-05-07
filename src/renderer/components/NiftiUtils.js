@@ -432,7 +432,12 @@ function nii2mni(header, voxelCoordinates) {
   const mniCoordinates = voxelCoordinates.map(([x, y, z, value]) => {
     const voxelHomogeneous = [x, y, z, 1]; // Add 1 for homogeneous transformation
     const transformedVoxels = math.multiply(affineMatrix, voxelHomogeneous);
-    const [wx, wy, wz] = transformedVoxels.slice(0, 3);
+    let [wx, wy, wz] = transformedVoxels.slice(0, 3);
+    [wx, wy, wz] = [
+      Math.round(wx * 10) / 10,
+      Math.round(wy * 10) / 10,
+      Math.round(wz * 10) / 10,
+    ];
     return [wx, wy, wz, value];
   });
   // const normalizedMniCoords = mniCoordinates.map(([x, y, z, r]) => {
@@ -631,6 +636,45 @@ function addSliceTest(header, voxelCoordinates, scene) {
   // };
 }
 
+function addSlice(header) {
+  const nx = 10; // Number of columns
+  const ny = 10; // Number of rows
+
+  // Generate fake voxel data
+  const voxelCoordinates = [];
+  for (let y = 0; y < ny; y++) {
+    for (let x = 0; x < nx; x++) {
+      const value = Math.random() * 255; // Random value between 0 and 255
+      voxelCoordinates.push([x, y, 0, value]); // z is 0 for a 2D plane
+    }
+  }
+
+  // Create a Float32Array for colors
+  const colors = new Float32Array(voxelCoordinates.length * 3);
+  voxelCoordinates.forEach(([x, y, z, value], i) => {
+    const normalizedValue = value / 255;
+    colors[i * 3] = normalizedValue; // R
+    colors[i * 3 + 1] = normalizedValue; // G
+    colors[i * 3 + 2] = normalizedValue; // B
+  });
+
+  // Create the plane geometry
+  const geometry = new THREE.PlaneGeometry(nx, ny);
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+  // Create the material
+  const material = new THREE.MeshBasicMaterial({
+    vertexColors: true,
+    side: THREE.DoubleSide,
+  });
+
+  // Create the mesh
+  const mesh = new THREE.Mesh(geometry, material);
+
+
+  return mesh;
+}
+
 function processNifti(raw, scene) {
   const header = nifti.readHeader(raw);
   let image = nifti.readImage(header, raw);
@@ -689,9 +733,146 @@ function processNifti(raw, scene) {
   // console.log('MNI Coordinates:', mniCoordinates);
   // Add a slice to the scene using MNI coordinates
   // addSliceToScene(scene, vox, nx, ny, nz, 'z', Math.floor(nz / 2), affineMatrix);
-  const mesh = addSliceTest(header, voxelCoordinates, scene);
+  // const mesh = addSliceTest(header, voxelCoordinates, scene);
+  const mesh = addSlice(header);
   return mesh;
 }
 
-export { nii2Mesh, processNifti };
+function addSliceToSceneNew(raw, scene) {
+  const header = nifti.readHeader(raw);
+  let image = nifti.readImage(header, raw);
+  console.log('Header: ', header);
+  // Ensure `image` is a valid ArrayBuffer
+  if (!(image instanceof ArrayBuffer)) {
+    console.log('Adjusting image to ArrayBuffer...');
+    image = new Uint8Array(image).buffer;
+  }
+
+  // Handle endian mismatch
+  if (!header.littleEndian) {
+    console.warn('File is in big-endian format. Adjusting...');
+    const dataView = new DataView(image);
+    const correctedData = new Float32Array(image.byteLength / 4);
+    for (let i = 0; i < correctedData.length; i++) {
+      correctedData[i] = dataView.getFloat32(i * 4, false); // false = big-endian
+    }
+    image = correctedData;
+  } else {
+    image = new Float32Array(image);
+  }
+
+  // Apply scaling factors
+  const { scl_slope = 1, scl_inter = 0 } = header;
+  const img = new Float32Array(
+    image.map((value) => value * scl_slope + scl_inter),
+  );
+
+  // Extract dimensions
+  const dimensions = header.dims.slice(1, 4);
+  console.log('Dimensions:', dimensions);
+
+  // Generate voxel coordinates
+  const voxelCoordinates = [];
+  img.forEach((value, index) => {
+    if (!isNaN(value)) {
+      const z = Math.floor(index / (dimensions[0] * dimensions[1]));
+      const y = Math.floor(
+        (index % (dimensions[0] * dimensions[1])) / dimensions[0],
+      );
+      const x = index % dimensions[0];
+      voxelCoordinates.push([x, y, z, value]);
+    }
+  });
+
+  console.log('Voxel Coordinates:', voxelCoordinates);
+  const mniCoordinates = nii2mni(header, voxelCoordinates);
+  const [nx, ny, nz] = header.dims.slice(1, 4);
+  const plotCoords = [];
+  let zVal = -10;
+  for (let i = 0; i < mniCoordinates.length; i++) {
+    const [x, y, z, value] = mniCoordinates[i];
+    if (z === zVal) {
+      plotCoords.push([x, y, 0, value]); // z is 0 for a 2D plane
+    }
+  }
+  const values = plotCoords.map(([x, y, z, value]) => value);
+  const minValue = Math.min(...values);
+  const maxValue = Math.max(...values);
+  console.log('Plot Coordinates: ', plotCoords);
+  const colors = new Float32Array(plotCoords.length * 3);
+  // plotCoords.forEach(([x, y, z, value], i) => {
+  //   // Normalize the value based on the min and max
+  //   const normalizedValue = value / maxValue;
+  //   colors[i * 3] = normalizedValue; // R
+  //   colors[i * 3 + 1] = normalizedValue; // G
+  //   colors[i * 3 + 2] = normalizedValue; // B
+  // });
+  plotCoords.forEach(([x, y, z, value], i) => {
+    // const normalizedValue = value / maxValue; // Normalize the value to [0, 1]
+    const normalizedValue = (value - minValue) / (maxValue - minValue);
+    // Map normalizedValue to a blue-to-red gradient
+    const red = normalizedValue; // Red increases with the value
+    const blue = 1 - normalizedValue; // Blue decreases with the value
+    const green = 0; // No green component for a simple blue-to-red gradient
+
+    colors[i * 3] = red;     // R
+    colors[i * 3 + 1] = green; // G
+    colors[i * 3 + 2] = blue;  // B
+});
+  console.log('Colors: ', colors);
+  const geometry = new THREE.PlaneGeometry(nx, ny);
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  const material = new THREE.MeshBasicMaterial({
+    vertexColors: true,
+    side: THREE.DoubleSide,
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(0, 0, zVal); // Adjust the x, y, z values as needed
+  scene.add(mesh);
+  return mesh;
+}
+
+function testPlane(scene) {
+  const nx = 100; // Number of columns
+  const ny = 100; // Number of rows
+
+  // Generate fake voxel data
+  const voxelCoordinates = [];
+  for (let y = 0; y < ny; y++) {
+    for (let x = 0; x < nx; x++) {
+      const value = Math.random() * 255; // Random value between 0 and 255
+      voxelCoordinates.push([x, y, 0, value]); // z is 0 for a 2D plane
+    }
+  }
+
+  const colors = new Float32Array(voxelCoordinates.length * 3);
+  voxelCoordinates.forEach(([x, y, z, value], i) => {
+    const normalizedValue = value / 255;
+    colors[i * 3] = normalizedValue; // R
+    colors[i * 3 + 1] = normalizedValue; // G
+    colors[i * 3 + 2] = normalizedValue; // B
+  });
+
+  // Create the plane geometry
+  const geometry = new THREE.PlaneGeometry(nx, ny);
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+  // Create the material
+  const material = new THREE.MeshBasicMaterial({
+    vertexColors: true,
+    side: THREE.DoubleSide,
+  });
+
+  // Create the mesh
+  const mesh = new THREE.Mesh(geometry, material);
+
+  // Set the position of the plane in 3D space
+  mesh.position.set(0, 0, -10); // Adjust the x, y, z values as needed
+    // mesh.position.z -= 100; // Adjust the value as needed to move the plane down
+  console.log('Mesh: ', mesh);
+  scene.add(mesh);
+  return mesh;
+}
+
+export { nii2Mesh, processNifti, testPlane, addSliceToSceneNew };
 
