@@ -648,9 +648,13 @@ function Electrode({
             if (value === 'left') {
               roundUpdatedQuantities[key] = 0;
             } else if (value === 'center') {
-              console.log('CENTER QUANTITY INCREMENT: ', centerQuantityIncrement);
+              console.log(
+                'CENTER QUANTITY INCREMENT: ',
+                centerQuantityIncrement,
+              );
               roundUpdatedQuantities[key] =
-                parseFloat(roundUpdatedQuantities[key]) + centerQuantityIncrement;
+                parseFloat(roundUpdatedQuantities[key]) +
+                centerQuantityIncrement;
             }
           });
         }
@@ -1529,6 +1533,110 @@ function Electrode({
     return values;
   }
 
+  // const newHandleUpButton = () => {
+  //   // newRoundToHundred();
+  //   console.log('passed');
+  //   console.log('quantities: ', quantities);
+  //   vectorMakeUp();
+  //   const newQuantities = newRoundToHundred();
+  //   console.log('newQuantities: ', newQuantities);
+  //   const updatedQuantities = { ...newQuantities };
+  //   const updatedSelectedValues = { ...selectedValues };
+  //   const levelIncrement = 0.1;
+  //   const previousLevel = Math.floor(vectorLevel);
+  //   vectorLevel += levelIncrement;
+  //   const currentLevel = Math.floor(vectorLevel);
+
+  //   console.log('currentLevel: ', currentLevel);
+  //   console.log('previousLevel: ', previousLevel);
+  //   const levelBelow =
+  //     currentLevel !== previousLevel ? previousLevel : Math.floor(vectorLevel);
+  //   // const levelBelow = Math.floor(vectorLevel);
+  //   // const levelAbove = Math.ceil(vectorLevel);
+  //   const levelAbove = levelBelow + 1;
+  //   console.log('Level Below', levelBelow);
+  //   console.log('level Above', levelAbove);
+  //   const percDiff = vectorLevel - levelBelow;
+  //   const levelBelowQuantityTotal = 100 * (1 - percDiff);
+  //   const levelAboveQuantityTotal = 100 - levelBelowQuantityTotal;
+  //   // Want to figure out how many contacts are "on" at a level
+
+  //   const onContacts = getOnContacts(levelBelow);
+  //   const numOnContacts = getOnContacts(levelBelow).length;
+  //   const aboveOnContacts = getOnContacts(levelAbove);
+  //   const numAboveOnContacts = aboveOnContacts.length;
+  //   console.log('On Contacts', onContacts);
+  //   Object.keys(level).forEach((key) => {
+  //     // dealing with level below
+  //     // vectorMakeUp();
+  //     if (level[key] === levelBelow) {
+  //       if (face[key] === 'all') {
+  //         updatedQuantities[key] = levelBelowQuantityTotal;
+  //       } else if (
+  //         face[key] !== 'all' &&
+  //         numOnContacts !== 0 &&
+  //         updatedQuantities[key] !== 0
+  //       ) {
+  //         Object.keys(onContacts).forEach((contact) => {
+  //           console.log('key: ', key);
+  //           if (parseFloat(key) === onContacts[contact]) {
+  //             // console.log('madeItHere');
+  //             updatedQuantities[key] =
+  //               parseFloat(updatedQuantities[key]) -
+  //               (100 * levelIncrement) / numOnContacts;
+  //           }
+  //         });
+  //       }
+  //       // if (levelBelowQuantityTotal === 0) {
+  //       //   updatedSelectedValues[key] = 'left';
+  //       // }
+  //     }
+  //     if (level[key] === levelAbove) {
+  //       if (face[key] !== 'all') {
+  //         if (segmentedContact(levelBelow)) {
+  //           Object.keys(onContacts).forEach((contact) => {
+  //             if (face[key] === face[onContacts[contact]]) {
+  //               updatedQuantities[key] =
+  //                 parseFloat(updatedQuantities[key]) +
+  //                 (100 * levelIncrement) / numOnContacts;
+  //               updatedSelectedValues[key] =
+  //                 updatedSelectedValues[onContacts[contact]];
+  //             }
+  //           });
+  //         } else {
+  //           let levelBelowKey = 0;
+  //           Object.keys(level).forEach((keys) => {
+  //             if (level[keys] === levelBelow) {
+  //               levelBelowKey = keys;
+  //             }
+  //           });
+  //           updatedQuantities[key] =
+  //             parseFloat(updatedQuantities[key]) + (100 * levelIncrement) / 3;
+  //           updatedSelectedValues[key] = updatedSelectedValues[levelBelowKey];
+  //         }
+  //       }
+  //       if (face[key] === 'all') {
+  //         updatedQuantities[key] = levelAboveQuantityTotal;
+  //         updatedSelectedValues[key] = updatedSelectedValues[onContacts[0]];
+  //       }
+  //     }
+  //   });
+  //   setSelectedValues(updatedSelectedValues);
+  //   console.log('before level', previousLevel);
+  //   // roundAllocUp(
+  //   //   previousLevel,
+  //   //   levelAbove,
+  //   //   levelAboveQuantityTotal,
+  //   //   levelBelowQuantityTotal,
+  //   //   updatedQuantities,
+  //   //   numAboveOnContacts,
+  //   //   numOnContacts,
+  //   // );
+  //   easyRoundUp(updatedQuantities);
+  //   setQuantities(updatedQuantities);
+  //   checkQuantitiesAndValues(updatedQuantities, updatedSelectedValues);
+  // };
+
   const newHandleUpButton = () => {
     // newRoundToHundred();
     console.log('passed');
@@ -1825,7 +1933,7 @@ function Electrode({
     const previousLevel = Math.ceil(vectorLevel);
     vectorLevel -= levelIncrement;
     const currentLevel = Math.ceil(vectorLevel);
-    if (currentLevel === 1) {
+    if (vectorLevel < 1) {
       return;
     }
     console.log('currentLevel: ', currentLevel);
@@ -1940,11 +2048,14 @@ function Electrode({
     const previousLevel = Math.ceil(vectorLevel);
     vectorLevel -= levelIncrement;
     const currentLevel = Math.ceil(vectorLevel);
-    console.log('currentLevel: ', currentLevel);
-    console.log('previousLevel: ', previousLevel);
-    if (currentLevel === 1) {
+    if (vectorLevel < 1) {
       return;
     }
+    console.log('currentLevel: ', currentLevel);
+    console.log('previousLevel: ', previousLevel);
+    // if (currentLevel === 1) {
+    //   return;
+    // }
     const levelAbove =
       currentLevel !== previousLevel ? previousLevel : Math.ceil(vectorLevel);
     // const levelBelow = Math.floor(vectorLevel);
@@ -3852,7 +3963,7 @@ function Electrode({
                     })}
                     {!isNaN(Number(ipg.key)) && (
                       <div className="triple-toggle-ipg-boston-test">
-                        <ContactParameters
+                        {/* <ContactParameters
                           key={ipg.key}
                           value={selectedValues[ipg.key]}
                           switchPosition={selectedValues[ipg.key]}
@@ -3863,6 +3974,22 @@ function Electrode({
                           }
                           onQuantityChange={(value, anime, quantity) =>
                             handleQuantityChange(quantity, ipg.key)
+                          }
+                        /> */}
+                        <ContactParameters
+                          key={ipg.key}
+                          value={selectedValues[ipg.key]}
+                          switchPosition={selectedValues[ipg.key]}
+                          quantity={quantities[ipg.key]}
+                          onChange={(newPosition) =>
+                            handleTripleToggleChange(newPosition, ipg.key)
+                          }
+                          onQuantityChange={(currentPosition, quantityValue) =>
+                            handleQuantityChange(
+                              quantityValue,
+                              // currentPosition,
+                              ipg.key,
+                            )
                           }
                         />
                       </div>
