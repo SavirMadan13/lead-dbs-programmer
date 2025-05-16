@@ -98,6 +98,43 @@ function GroupViewer({
     // Add more publications and colors as needed
   };
 
+  // useEffect(() => {
+  //   // This loads the anatomy.ply scene
+  //   const loadPlyFile = async () => {
+  //     const historical = {
+  //       patient: filteredPatients[0],
+  //       timeline: 'none',
+  //       directoryPath,
+  //       leadDBS: true,
+  //     };
+  //     try {
+  //       const fileData = await window.electron.ipcRenderer.invoke(
+  //         'load-ply-file-anatomy',
+  //         historical,
+  //       );
+  //       // setPlyFile(fileData);
+  //       const loader = new PLYLoader();
+  //       const geometry = loader.parse(fileData);
+
+
+  //       const material = new THREE.MeshStandardMaterial({
+  //         vertexColors: geometry.hasAttribute('color'),
+  //         flatShading: true,
+  //         metalness: 0.1, // More reflective
+  //         roughness: 0.5, // Shinier surface
+  //         transparent: true, // Enable transparency
+  //         opacity: 0.8, // Set opacity to 60%
+  //       });
+  //       // eslint-disable-next-line no-use-before-define
+  //       addMeshToScene('Anatomy', geometry, material);
+  //     } catch (error) {
+  //       console.error('Error loading PLY file:', error);
+  //     }
+  //   };
+
+  //   loadPlyFile(); // Call the async function
+  // }, []);
+
   useEffect(() => {
     // This loads the anatomy.ply scene
     const loadPlyFile = async () => {
@@ -112,18 +149,41 @@ function GroupViewer({
           'load-ply-file-anatomy',
           historical,
         );
-        // setPlyFile(fileData);
         const loader = new PLYLoader();
         const geometry = loader.parse(fileData);
 
+        // Access the color attribute
+        const colors = geometry.attributes.color.array;
+        const newColors = new Float32Array(colors.length * 4 / 3);
+
+        // Iterate over the colors and make reddish tones transparent
+        for (let i = 0, j = 0; i < colors.length; i += 3, j += 4) {
+          const r = colors[i];
+          const g = colors[i + 1];
+          const b = colors[i + 2];
+
+          newColors[j] = r;
+          newColors[j + 1] = g;
+          newColors[j + 2] = b;
+
+          // Check if the color is reddish
+          if (r > 0.5 && g < 0.3 && b < 0.3) {
+            newColors[j + 3] = 0; // Set alpha to 0 for transparency
+          } else {
+            newColors[j + 3] = 1; // Fully opaque
+          }
+        }
+
+        geometry.setAttribute('color', new THREE.BufferAttribute(newColors, 4));
+
         const material = new THREE.MeshStandardMaterial({
-          vertexColors: geometry.hasAttribute('color'),
+          vertexColors: true,
           flatShading: true,
-          metalness: 0.1, // More reflective
-          roughness: 0.5, // Shinier surface
-          transparent: true, // Enable transparency
-          opacity: 0.8, // Set opacity to 60%
+          metalness: 0.1,
+          roughness: 0.5,
+          transparent: true,
         });
+
         // eslint-disable-next-line no-use-before-define
         addMeshToScene('Anatomy', geometry, material);
       } catch (error) {
@@ -435,16 +495,57 @@ function GroupViewer({
         fileData.combinedElectrodesPly,
       );
 
+      const colors = electrodeGeometry.attributes.color.array; // Access the existing color array
+
+      // Create a new colors array
+      const newColors = new Float32Array(colors.length);
+
+      // Define the RGB values for light grey
+      const lightGrey = [0.8, 0.8, 0.8]; // RGB for light grey
+
+      // Iterate over the colors array and replace yellow-like colors with light grey
+      for (let i = 0; i < colors.length; i += 3) {
+        const r = colors[i];
+        const g = colors[i + 1];
+        const b = colors[i + 2];
+
+        // Check if the color is close to yellow, lime green, magenta, or cyan
+        if (
+          (r > 0.9 && g > 0.9 && b < 0.6) || // Yellow-like
+          (r > 0.4 && r < 0.6 && g > 0.9 && b < 0.1) || // Lime green-like
+          (r > 0.9 && g < 0.1 && b > 0.4 && b < 0.6) || // Magenta-like
+          (r < 0.1 && g > 0.4 && g < 0.6 && b > 0.9) || // Cyan-like
+          (r < 0.1 && g < 0.1 && b > 0.4 && b < 0.6) || // Blue-like
+          (r < 0.1 && g < 0.1 && b > 0.5 && b < 0.6) ||
+          (b > 0.5 && b > r && b > g) // General blue-like
+        ) {
+          // If the color matches any of the specified colors, change it to light grey
+          newColors[i] = lightGrey[0];
+          newColors[i + 1] = lightGrey[1];
+          newColors[i + 2] = lightGrey[2];
+        } else {
+          // Otherwise, keep the original color
+          newColors[i] = r;
+          newColors[i + 1] = g;
+          newColors[i + 2] = b;
+        }
+      }
+
+      // Update the geometry with the new colors
+      electrodeGeometry.setAttribute('color', new THREE.BufferAttribute(newColors, 3));
+
+
       // Create a material for the mesh
       const material = new THREE.MeshStandardMaterial({
         vertexColors: electrodeGeometry.hasAttribute('color'),
+        // color: 0x808080,
         // color: color,
         flatShading: true,
-        metalness: 0.1,
-        roughness: 0.5,
-        transparent: true,
-        opacity: 0.8,
-        // emissive: new THREE.Color(0x000000), // Emissive color
+        metalness: 0.6,
+        roughness: 0.2,
+        transparent: false,
+        opacity: 1,
+        shininess: 300,
         // wireframe: false, // Render geometry as wireframe
         // side: THREE.DoubleSide, // Render both sides of the geometry
       });
@@ -471,6 +572,9 @@ function GroupViewer({
       // Render the filtered patients
       filteredPatients.forEach((patient) => {
         const color = getColor(patient);
+        if (patient.id === 'sub-CbctDbs0215') {
+          return;
+        }
         handlePriorStimChange(patient.id, color);
       });
     }
@@ -589,7 +693,7 @@ function GroupViewer({
       // directionalLight.position.set(5, 5, 5).normalize();
       // scene.add(directionalLight);
 
-      const aspect = 800 / 500; // Set a wider aspect ratio
+      const aspect = 1200 / 800; // Set a wider aspect ratio
       const frustumSize = 45; // Adjust this value to control zoom
       const camera = new THREE.OrthographicCamera(
         (frustumSize * aspect) / -2, // left
@@ -601,7 +705,7 @@ function GroupViewer({
       );
 
       const renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(800, 500); // Set a wider size for the renderer
+      renderer.setSize(1200, 800); // Set a wider size for the renderer
       mountRef.current.appendChild(renderer.domElement);
 
       const ambientLight = new THREE.AmbientLight(0xffffff, 1.5); // Reduced intensity
@@ -644,12 +748,16 @@ function GroupViewer({
       const textureLoader = new THREE.TextureLoader();
       textureLoader.load(BigBrain, (texture) => {
         // Create a plane geometry
-        const planeGeometry = new THREE.PlaneGeometry(256, 256); // Size of a brain in MNI space (approx 200mm x 250mm)
+        const aspectRatio = texture.image.width / texture.image.height;
+
+        // Create a plane geometry with the correct aspect ratio
+        const planeGeometry = new THREE.PlaneGeometry(256 * aspectRatio, 256);
+
         const planeMaterial = new THREE.MeshBasicMaterial({ map: texture });
         const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 
         // Position the plane in the scene
-        plane.position.set(0, -15, -12); // Adjust position as needed
+        plane.position.set(0, -15, -10); // Adjust position as needed
         scene.add(plane);
       });
 

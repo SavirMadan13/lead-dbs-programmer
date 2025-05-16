@@ -4,7 +4,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 // import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 // import { TreeView, TreeItem } from '@mui/x-tree-view';
-import { Dropdown } from 'react-bootstrap';
+import { Dropdown, Button } from 'react-bootstrap';
 import { RichTreeView } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -309,6 +309,11 @@ function PatientDetails({ directoryPath, leadDBS }) {
       {/* Another Divider */}
       <div className="divider"></div>
       <h2 className="section-title">Saved Sessions</h2>
+      {!timeline && (
+        <div>
+          <p>No timeline selected - Add a session below to get started</p>
+        </div>
+      )}
       {/* Divider */}
       <RichTreeView
         items={treeData}
@@ -320,34 +325,38 @@ function PatientDetails({ directoryPath, leadDBS }) {
         selectedItems={selectedItems} // Control the selected items
       />
       <div>
-        <button
-          onClick={() => handleAddStimulationParameters(timeline)}
-          style={{
-            borderRadius: '20px',
-            backgroundColor: 'white',
-            color: 'black',
-            fontWeight: 'bold',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
-            border: 'none',
-            marginRight: '10px',
-          }}
-        >
-          Add Stimulation Parameters
-        </button>
-        <button
-          onClick={() => handleAddClinicalScores(timeline)}
-          style={{
-            borderRadius: '20px',
-            backgroundColor: 'white',
-            color: 'black',
-            fontWeight: 'bold',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
-            border: 'none',
-            marginRight: '10px',
-          }}
-        >
-          Add Clinical Scores
-        </button>
+        {timeline && (
+          <Button
+            onClick={() => handleAddStimulationParameters(timeline)}
+            style={{
+              borderRadius: '20px',
+              backgroundColor: 'white',
+              color: 'black',
+              fontWeight: 'bold',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+              border: 'none',
+              marginRight: '10px',
+            }}
+          >
+            Add Stimulation Parameters
+          </Button>
+        )}
+        {timeline && (
+          <Button
+            onClick={() => handleAddClinicalScores(timeline)}
+            style={{
+              borderRadius: '20px',
+              backgroundColor: 'white',
+              color: 'black',
+              fontWeight: 'bold',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+              border: 'none',
+              marginRight: '10px',
+            }}
+          >
+            Add Clinical Scores
+          </Button>
+        )}
         {/* <button className="export-button" onClick={() => handleGroupStats()}>
           Stats
         </button> */}

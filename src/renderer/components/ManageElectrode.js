@@ -1078,7 +1078,7 @@ function ManageElectrode({
         <Button onClick={() => handleTabChange('5')}>Right Hemisphere</Button>
         <Button onClick={() => handleTabChange('1')}>Left Hemisphere</Button>
       </ButtonGroup> */}
-      <div style={{ position: 'absolute', zIndex: 1, marginTop: '200px' }}>
+      <div style={{ position: 'absolute', zIndex: 1, marginTop: '200px', marginLeft: '30px' }}>
         <p style={{ fontSize: '18px', marginBottom: '-10px' }}>Hemisphere</p>
         <ButtonGroup className="mb-2" style={{ gap: '10px' }}>
           {hemisphereButtons.map((radio, idx) => (

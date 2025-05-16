@@ -2,6 +2,7 @@ import * as nifti from 'nifti-reader-js';
 import * as iso from 'isosurface';
 import * as THREE from 'three';
 import * as math from 'mathjs';
+// import * as grayscaleColormap from 'grayscale-colormap';
 
 function typedArrayFor(code) {
   const n1 = nifti.NIFTI1; // enum with the standard codes
@@ -148,14 +149,14 @@ function nii2Mesh(raw) {
     const normalizedValue = Math.min(1, Math.max(0, value / 255)); // Normalize to [0, 1]
     colors.set([normalizedValue, normalizedValue, normalizedValue], i * 3); // Grayscale color
   }
-  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  // geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
   const material = new THREE.MeshStandardMaterial({
-    vertexColors: true,
-    transparent: false,
-    opacity: 1,
-    // smoothShading: true,
-    // color: 'red',
+    color: 'red',
+    shininess: 100, // Increase shininess for a smoother appearance
+    specular: 0x111111, // Specular color for highlights
+    transparent: true,
+    opacity: 0.8,
   });
 
   return { geometry, material };
@@ -741,6 +742,7 @@ function processNifti(raw, scene) {
 function addSliceToSceneNew(raw, scene) {
   const header = nifti.readHeader(raw);
   let image = nifti.readImage(header, raw);
+  // console.log('Image: ', image);
   console.log('Header: ', header);
   // Ensure `image` is a valid ArrayBuffer
   if (!(image instanceof ArrayBuffer)) {
@@ -758,15 +760,15 @@ function addSliceToSceneNew(raw, scene) {
     }
     image = correctedData;
   } else {
-    image = new Float32Array(image);
+    image = new Float64Array(image);
   }
 
   // Apply scaling factors
-  const { scl_slope = 1, scl_inter = 0 } = header;
-  const img = new Float32Array(
+  const { scl_slope, scl_inter } = header;
+  const img = new Float64Array(
     image.map((value) => value * scl_slope + scl_inter),
   );
-
+  console.log('Image: ', img);
   // Extract dimensions
   const dimensions = header.dims.slice(1, 4);
   console.log('Dimensions:', dimensions);
@@ -786,50 +788,83 @@ function addSliceToSceneNew(raw, scene) {
 
   console.log('Voxel Coordinates:', voxelCoordinates);
   const mniCoordinates = nii2mni(header, voxelCoordinates);
+  console.log('MNI Coordinates: ', mniCoordinates);
   const [nx, ny, nz] = header.dims.slice(1, 4);
   const plotCoords = [];
   let zVal = -10;
   for (let i = 0; i < mniCoordinates.length; i++) {
     const [x, y, z, value] = mniCoordinates[i];
     if (z === zVal) {
-      plotCoords.push([x, y, 0, value]); // z is 0 for a 2D plane
+      plotCoords.push([x, y, zVal, value]); // z is 0 for a 2D plane
     }
   }
   const values = plotCoords.map(([x, y, z, value]) => value);
   const minValue = Math.min(...values);
   const maxValue = Math.max(...values);
+  const meanValue = values.reduce((acc, val) => acc + val, 0) / values.length;
+  console.log('Max Value: ', maxValue, 'Mean Value: ', meanValue, 'Min Value: ', minValue);
   console.log('Plot Coordinates: ', plotCoords);
-  const colors = new Float32Array(plotCoords.length * 3);
-  // plotCoords.forEach(([x, y, z, value], i) => {
-  //   // Normalize the value based on the min and max
-  //   const normalizedValue = value / maxValue;
-  //   colors[i * 3] = normalizedValue; // R
-  //   colors[i * 3 + 1] = normalizedValue; // G
-  //   colors[i * 3 + 2] = normalizedValue; // B
-  // });
-  plotCoords.forEach(([x, y, z, value], i) => {
-    // const normalizedValue = value / maxValue; // Normalize the value to [0, 1]
-    const normalizedValue = (value - minValue) / (maxValue - minValue);
-    // Map normalizedValue to a blue-to-red gradient
-    const red = normalizedValue; // Red increases with the value
-    const blue = 1 - normalizedValue; // Blue decreases with the value
-    const green = 0; // No green component for a simple blue-to-red gradient
 
-    colors[i * 3] = red;     // R
-    colors[i * 3 + 1] = green; // G
-    colors[i * 3 + 2] = blue;  // B
-});
-  console.log('Colors: ', colors);
+  const depth = nz; // Number of slices
+  const size = nx * ny; // Number of pixels per slice
+  const data = new Uint8Array(size * depth * 4); // RGBA for each pixel
+
+  for (let i = 0; i < depth; i++) {
+    for (let j = 0; j < size; j++) {
+      const value = voxelCoordinates[i * size + j][3]; // Get the voxel value
+      const normalizedValue = (value - minValue) / (maxValue - minValue); // Normalize to [0, 1]
+      const intensity = Math.floor(normalizedValue * 255); // Convert to 0-255 range
+
+      const stride = (i * size + j) * 4;
+      data[stride] = intensity; // R
+      data[stride + 1] = intensity; // G
+      data[stride + 2] = intensity; // B
+      data[stride + 3] = 255; // A
+    }
+  }
+
+  // Create the DataArrayTexture
+  const texture = new THREE.DataArrayTexture(data, nx, ny, depth);
+  texture.format = THREE.RGBAFormat;
+  texture.type = THREE.UnsignedByteType;
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.needsUpdate = true;
+
+  // Create a plane geometry for a single slice
   const geometry = new THREE.PlaneGeometry(nx, ny);
-  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-  const material = new THREE.MeshBasicMaterial({
-    vertexColors: true,
+
+  // Use a shader material to select the correct slice
+  const material = new THREE.ShaderMaterial({
+    uniforms: {
+      uTex: { value: texture },
+      uSlice: { value: 0 } // Uniform to select the slice
+    },
     side: THREE.DoubleSide,
+    vertexShader: `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform sampler2DArray uTex;
+      uniform float uSlice;
+      varying vec2 vUv;
+      void main() {
+        vec4 color = texture(uTex, vec3(vUv, uSlice));
+        gl_FragColor = color;
+      }
+    `
   });
+
+  // Create the mesh
   const mesh = new THREE.Mesh(geometry, material);
-  mesh.position.set(0, 0, zVal); // Adjust the x, y, z values as needed
-  scene.add(mesh);
-  return mesh;
+  const position = [0, 0, zVal];
+  const sliceCoordinates = { mniCoordinates, header, voxelCoordinates };
+  // scene.add(mesh);
+  return [mesh, position, sliceCoordinates];
 }
 
 function testPlane(scene) {
@@ -845,7 +880,7 @@ function testPlane(scene) {
     }
   }
 
-  const colors = new Float32Array(voxelCoordinates.length * 3);
+  const colors = new Float64Array(voxelCoordinates.length * 3);
   voxelCoordinates.forEach(([x, y, z, value], i) => {
     const normalizedValue = value / 255;
     colors[i * 3] = normalizedValue; // R

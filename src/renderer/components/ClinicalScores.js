@@ -351,7 +351,7 @@ function ClinicalScores() {
     };
 
     return (
-      <div style={{ overflowX: 'auto', maxHeight: '1000px' }}>
+      <div style={{ overflowX: 'auto', maxHeight: '1500px' }}>
         {headerChunks.map((headerChunk, chunkIndex) => (
           <div key={chunkIndex} style={{ marginBottom: '20px' }}>
             <Table striped bordered hover responsive>

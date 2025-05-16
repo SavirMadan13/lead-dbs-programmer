@@ -608,7 +608,7 @@ function Electrode({
     let total = 0;
     if (percAmpToggle === 'left') {
       total = 100;
-    } else if (percAmpToggle === 'center') {
+    } else {
       total = totalAmplitude;
     }
 
@@ -641,7 +641,18 @@ function Electrode({
     if (centerCount > 1) {
       if (totalCenterSum < total) {
         if (selectedValues[lastChangedKey] === 'center') {
-          roundUpdatedQuantities[lastChangedKey] = total - totalCenterSum;
+          roundUpdatedQuantities[lastChangedKey] += total - totalCenterSum;
+        } else {
+          Object.keys(selectedValues).forEach((key) => {
+            const value = selectedValues[key];
+            if (value === 'left') {
+              roundUpdatedQuantities[key] = 0;
+            } else if (value === 'center') {
+              console.log('CENTER QUANTITY INCREMENT: ', centerQuantityIncrement);
+              roundUpdatedQuantities[key] =
+                parseFloat(roundUpdatedQuantities[key]) + centerQuantityIncrement;
+            }
+          });
         }
       } else {
         Object.keys(selectedValues).forEach((key) => {
@@ -649,6 +660,7 @@ function Electrode({
           if (value === 'left') {
             roundUpdatedQuantities[key] = 0;
           } else if (value === 'center') {
+            console.log('CENTER QUANTITY INCREMENT: ', centerQuantityIncrement);
             roundUpdatedQuantities[key] =
               parseFloat(roundUpdatedQuantities[key]) + centerQuantityIncrement;
           }

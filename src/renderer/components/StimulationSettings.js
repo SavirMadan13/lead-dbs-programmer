@@ -5,7 +5,7 @@ import React, { useState, useRef } from 'react';
 // import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import ToggleButton from 'react-bootstrap/ToggleButton';
-import { Dropdown } from 'react-bootstrap';
+import { Dropdown, Form } from 'react-bootstrap';
 import electrodeModels from './electrodeModels.json';
 import ManageElectrode from './ManageElectrode';
 import './StimulationSettings.css';
@@ -609,7 +609,7 @@ function StimulationSettings({
     <div>
       <div className="stimulationSettingsContainer">
         <div
-          style={{ zIndex: 2, paddingLeft: '100px', paddingTop: '10px' }}
+          style={{ zIndex: 2, paddingLeft: '130px', paddingTop: '10px' }}
         >
           <Dropdown>
             <Dropdown.Toggle
@@ -629,7 +629,7 @@ function StimulationSettings({
             </Dropdown.Toggle>
             <Dropdown.Menu style={{ width: '350px', paddingLeft: '10px' }}>
               <h2 style={{ fontSize: 16 }}>Left Electrode</h2>
-              <select
+              <Form.Select
                 value={leftElectrode}
                 onChange={(e) => handleLeftElectrodeChange(e)}
                 className="form-select"
@@ -642,16 +642,21 @@ function StimulationSettings({
                   backgroundColor: '#fff',
                   cursor: 'pointer',
                 }}
+                // disabled
               >
                 {varargout.map((electrode) => (
-                  <option key={electrode.value} value={electrode.value}>
+                  <option
+                    key={electrode.value}
+                    value={electrode.value}
+                    disabled
+                  >
                     {electrode.displayName}
                   </option>
                 ))}
-              </select>
+              </Form.Select>
               <div />
               <h2 style={{ fontSize: 16 }}>Right Electrode</h2>
-              <select
+              <Form.Select
                 value={rightElectrode}
                 onChange={(e) => handleRightElectrodeChange(e)}
                 className="form-select"
@@ -666,11 +671,11 @@ function StimulationSettings({
                 }}
               >
                 {varargout.map((electrode, index) => (
-                  <option key={index} value={electrode.value}>
+                  <option key={index} value={electrode.value} disabled>
                     {electrode.displayName}
                   </option>
                 ))}
-              </select>
+              </Form.Select>
               <div />
               <h2 style={{ fontSize: 16 }}>IPG</h2>
               <select

@@ -116,9 +116,9 @@ app.on('ready', () => {
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0374Output/derivatives/leaddbs/sub-CbctDbs0374/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
 // const inputPath = process.argv[1];
-// const inputPath = '/Users/savirmadan/Documents/Localizations/Patient0406Output';
+const inputPath = '/Users/savirmadan/Documents/Localizations/Patient0401Output';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Patient0395Output';
-const inputPath = '/Users/savirmadan/Partners HealthCare Dropbox/Savir Madan/datasets/CbctDbs0282';
+// const inputPath = '/Users/savirmadan/Partners HealthCare Dropbox/Savir Madan/datasets/CbctDbs0282';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/Patient2Output';
 // const inputPath = null;
@@ -1427,7 +1427,8 @@ const createWindow = async () => {
 
   ipcMain.handle('load-test-file', async (event, historical) => {
     // const filePath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI152NLin2009bAsym/t1.nii';
-    const filePath = '/Users/savirmadan/Downloads/BIDMCBERMDST_nosubj9_Gait_UPDRS_Rand_exch_vox_vstat_pcc_inverse_r_map.nii';
+    const filePath = '/Volumes/PdBwh/CompleteParkinsons/derivatives/leaddbs/sub-CBCTDBS0220/stimulations/MNI152NLin2009bAsym/20250513194638/sub-CBCTDBS0220_sim-binary_model-ossdbs_hemi-R.nii';
+    // const filePath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI152NLin2009bAsym/t1_resampled.nii';
     // const filePath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI152NLin2009bAsym/atlases/STN Sweetspots (Dembek 2019)/lh/Rigidity_Clinical_MeanMapGradient.nii';
     console.log(filePath);
     const fileData = fs.readFileSync(filePath); // Read the PLY file as binary

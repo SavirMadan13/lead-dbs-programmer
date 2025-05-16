@@ -30,6 +30,9 @@ import { nii2Mesh, processNifti, testPlane, addSliceToSceneNew } from './NiftiUt
 import IconButton from '@mui/material/IconButton';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
+import LockIcon from '@mui/icons-material/Lock';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
+import EdlowBrain from './Edlow_10mm.png';
 
 function PlyViewer({
   quantities,
@@ -69,6 +72,7 @@ function PlyViewer({
   const [niiCoords, setNiiCoords] = useState(null);
   const [plotNiiCoords, setPlotNiiCoords] = useState({});
   const [niiSolution, setNiiSolution] = useState('');
+  const [slice, setSlice] = useState([]);
   console.log('Historical ply: ', historical);
   // Thresholding/Modification stuff
 
@@ -85,14 +89,63 @@ function PlyViewer({
         console.log('fileData ply test', fileData);
         const loader = new PLYLoader();
         const geometry = loader.parse(fileData);
+        console.log('geometry: ', geometry);
+        const colors = geometry.attributes.color.array; // Access the existing color array
+
+        // Create a new colors array
+        const newColors = new Float32Array(colors.length);
+
+        // Define the RGB values for light grey
+        const lightGrey = [0.8, 0.8, 0.8]; // RGB for light grey
+
+        // Iterate over the colors array and replace yellow-like colors with light grey
+        for (let i = 0; i < colors.length; i += 3) {
+          const r = colors[i];
+          const g = colors[i + 1];
+          const b = colors[i + 2];
+
+          // Check if the color is close to yellow, lime green, magenta, or cyan
+          if (
+            (r > 0.9 && g > 0.9 && b < 0.6) || // Yellow-like
+            (r > 0.4 && r < 0.6 && g > 0.9 && b < 0.1) || // Lime green-like
+            (r > 0.9 && g < 0.1 && b > 0.4 && b < 0.6) || // Magenta-like
+            (r < 0.1 && g > 0.4 && g < 0.6 && b > 0.9) || // Cyan-like
+            (r < 0.1 && g < 0.1 && b > 0.4 && b < 0.6) || // Blue-like
+            (r < 0.1 && g < 0.1 && b > 0.5 && b < 0.6) ||
+            (b > 0.5 && b > r && b > g) // General blue-like
+            // Specific blue shade
+          ) {
+            // If the color matches any of the specified colors, change it to light grey
+            newColors[i] = lightGrey[0];
+            newColors[i + 1] = lightGrey[1];
+            newColors[i + 2] = lightGrey[2];
+          } else {
+            // Otherwise, keep the original color
+            newColors[i] = r;
+            newColors[i + 1] = g;
+            newColors[i + 2] = b;
+          }
+        }
+
+        // Update the geometry with the new colors
+        geometry.setAttribute('color', new THREE.BufferAttribute(newColors, 3));
+
+
+
+        // geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3)); // Add color attribute to geometry
+
 
         const material = new THREE.MeshStandardMaterial({
+          // color: new THREE.Color(0x808080), // Set the color to grey
           vertexColors: geometry.hasAttribute('color'),
-          flatShading: true,
-          metalness: 0.1, // More reflective
+          flatShading: false,
+          metalness: 0.5, // More reflective
           roughness: 0.5, // Shinier surface
-          transparent: true, // Enable transparency
-          opacity: 0.8, // Set opacity to 60%
+          transparent: false, // Enable transparency
+          opacity: 1, // Set opacity to 60%
+          // blending: THREE.AdditiveBlending,
+          // emissive: new THREE.Color(0x000000), // Reduce emissive color
+          // emissiveIntensity: 0.1, // Lower emissive intensity
         });
         // eslint-disable-next-line no-use-before-define
         addMeshToScene('Electrode Scene', geometry, material);
@@ -247,6 +300,10 @@ function PlyViewer({
           roughness: 0.5, // Shinier surface
           transparent: true, // Enable transparency
           opacity: 0.8, // Set opacity to 60%
+          // blending: THREE.AdditiveBlending,
+          // emissive: new THREE.Color(0x000000), // Reduce emissive color
+          // emissiveIntensity: 0.1, // Lower emissive intensity
+
         });
         // eslint-disable-next-line no-use-before-define
         addMeshToScene('Anatomy', geometry, material);
@@ -289,31 +346,34 @@ function PlyViewer({
         // You can adjust these parameters based on your data
         const threshold = 0.3; // Lower threshold to capture more of the volume
         const colorMap = 'rainbow'; // Options: 'rainbow', 'grayscale', 'red', 'green', 'blue'
-        let mesh = null;
-        // mesh = await nii2Mesh(fileData);
+        // let mesh = null;
+        const mesh = await nii2Mesh(fileData);
+        console.log('mesh: ', mesh);
         // const mesh = await convertNiftiToMesh(fileData, threshold, colorMap);
         // mesh = processNifti(fileData, threshold, colorMap);
         // mesh = testPlane(sceneRef.current);
-        mesh = addSliceToSceneNew(fileData, sceneRef.current);
+        // const [mesh, position, sliceCoordinates] = addSliceToSceneNew(fileData, sceneRef.current);
+        // setSlice(sliceCoordinates);
         // Add the mesh to the scene
-        // if (mesh) {
-        //   addMeshToScene('NIfTI Volume', mesh.geometry, mesh.material);
+        if (mesh) {
+          // addMeshToScene('NIfTI Volume', mesh.geometry, mesh.material, position);
+          addMeshToScene('NIfTI Volume', mesh.geometry, mesh.material);
 
-        //   // Log information about the mesh
-        //   console.log(
-        //     'Mesh added to scene:',
-        //     mesh.geometry.attributes.position.count,
-        //     'vertices',
-        //   );
-        // } else {
-        //   console.error('Failed to create mesh from NIfTI data');
-        // }
+          // Log information about the mesh
+          console.log(
+            'Mesh added to scene:',
+            mesh.geometry.attributes.position.count,
+            'vertices',
+          );
+        } else {
+          console.error('Failed to create mesh from NIfTI data');
+        }
       } catch (error) {
         console.error('Error loading NIfTI file:', error);
       }
     };
 
-    loadNiiFile(); // Call the async function
+    // loadNiiFile(); // Call the async function
   }, []);
 
   // New states for visibility and thresholding
@@ -1350,14 +1410,15 @@ function PlyViewer({
           flatShading: false, // Enable smooth shading for better visual quality
           // Emissive properties
           emissive: 0xff0000, // Red glow
-          emissiveIntensity: 0.2, // Controls the intensity of the emissive glow
+          emissiveIntensity: 0.1, // Controls the intensity of the emissive glow
           // Clearcoat for glossy surface
           // clearcoat: 1.0, // Max clearcoat effect
           // Specular highlights
+          // blending: THREE.AdditiveBlending,
           specular: 0xffffff, // White specular highlights
           shininess: 15, // Sharpness of specular highlights
           // Wireframe mode for structural view
-          wireframe: false, // Turn on wireframe if needed
+          // wireframe: true, // Turn on wireframe if needed
         });
         const sphere = new THREE.Mesh(geometry, material);
 
@@ -1547,7 +1608,7 @@ function PlyViewer({
 
       const texture = new THREE.CanvasTexture(canvas);
       // scene.background = texture;
-      scene.background = new THREE.Color('white'); // White background
+      scene.background = new THREE.Color('black'); // White background
 
       // Create an OrthographicCamera
       const aspect = 500 / 500;
@@ -1602,6 +1663,13 @@ function PlyViewer({
       controls.zoomSpeed = 0.5;
       controlsRef.current = controls;
 
+      const secondaryControls = new OrbitControls(secondaryCamera, secondaryRenderer.domElement);
+      secondaryControls.enableDamping = true;
+      secondaryControls.dampingFactor = 0.1;
+      secondaryControls.rotateSpeed = 0.8;
+      secondaryControls.zoomSpeed = 0.5;
+      secondaryControlsRef.current = secondaryControls;
+
       camera.position.set(0, -50, 50); // Zoomed out to start
 
       rendererRef.current = renderer;
@@ -1616,6 +1684,22 @@ function PlyViewer({
         secondaryRenderer.render(scene, secondaryCamera);
       };
       animate();
+
+      const textureLoader = new THREE.TextureLoader();
+      textureLoader.load(EdlowBrain, (texture) => {
+        // Calculate the aspect ratio of the texture
+        const aspectRatio = texture.image.width / texture.image.height;
+
+        // Create a plane geometry with the correct aspect ratio
+        const planeGeometry = new THREE.PlaneGeometry(256 * aspectRatio, 256);
+
+        const planeMaterial = new THREE.MeshBasicMaterial({ map: texture });
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+
+        // Position the plane in the scene
+        plane.position.set(-12, -15, -12); // Adjust position as needed
+        // scene.add(plane);
+      });
 
       return () => {
         // window.removeEventListener('resize', onWindowResize);
@@ -1853,39 +1937,41 @@ function PlyViewer({
   //     console.log('quantities temp vector: ', quantities);
   //     // Convert quantities struct to an array and remove the first index
   //     let quantitiesArray = Object.values(quantities).slice(1);
+  //     quantitiesArray = quantitiesArray.map((value) => value * (amplitude / 100));
   //     // Divide each element in quantitiesArray by 1000
   //     quantitiesArray = quantitiesArray.map((value) => value / 1000);
   //     console.log('quantitiesArray: ', quantitiesArray);
   //     const output = computeSuperimposedEField(quantitiesArray, unitSolutions);
   //     console.log('output: ', output);
+  //     const mesh = output.mesh;
+  //     addMeshToScene('OSS VTA', mesh.geometry, mesh.material);
+  //     // const img = output.eFieldMagnitude;
+  //     // // const img = output.eFieldSuperimposed;
+  //     // const dimensions = output.header.dims.slice(1, 4);
+  //     // console.log('img: ', img);
+  //     // // Generate voxel coordinates
+  //     // const voxelCoordinates = [];
+  //     // img.forEach((value, index) => {
+  //     //   if (!isNaN(value)) {
+  //     //     const z = Math.floor(index / (dimensions[0] * dimensions[1]));
+  //     //     const y = Math.floor(
+  //     //       (index % (dimensions[0] * dimensions[1])) / dimensions[0],
+  //     //     );
+  //     //     const x = index % dimensions[0];
+  //     //     voxelCoordinates.push([x, y, z, value]);
+  //     //   }
+  //     // });
+  //     // console.log('voxelCoordinates: ', voxelCoordinates);
 
-  //     const img = output.eFieldMagnitude;
-  //     // const img = output.eFieldSuperimposed;
-  //     const dimensions = output.header.dims.slice(1, 4);
-  //     console.log('img: ', img);
-  //     // Generate voxel coordinates
-  //     const voxelCoordinates = [];
-  //     img.forEach((value, index) => {
-  //       if (!isNaN(value)) {
-  //         const z = Math.floor(index / (dimensions[0] * dimensions[1]));
-  //         const y = Math.floor(
-  //           (index % (dimensions[0] * dimensions[1])) / dimensions[0],
-  //         );
-  //         const x = index % dimensions[0];
-  //         voxelCoordinates.push([x, y, z, value]);
-  //       }
-  //     });
-  //     console.log('voxelCoordinates: ', voxelCoordinates);
+  //     // const affineMatrix = output.header.affine;
+  //     // const mniCoordinates = voxelCoordinates.map(([x, y, z, value]) => {
+  //     //   const voxelHomogeneous = [x, y, z, 1]; // Add 1 for homogeneous transformation
+  //     //   const transformedVoxels = math.multiply(affineMatrix, voxelHomogeneous);
+  //     //   const [wx, wy, wz] = transformedVoxels.slice(0, 3);
+  //     //   return [wx, wy, wz, value];
+  //     // });
 
-  //     const affineMatrix = output.header.affine;
-  //     const mniCoordinates = voxelCoordinates.map(([x, y, z, value]) => {
-  //       const voxelHomogeneous = [x, y, z, 1]; // Add 1 for homogeneous transformation
-  //       const transformedVoxels = math.multiply(affineMatrix, voxelHomogeneous);
-  //       const [wx, wy, wz] = transformedVoxels.slice(0, 3);
-  //       return [wx, wy, wz, value];
-  //     });
-
-  //     console.log('mniCoordinates: ', mniCoordinates);
+  //     // console.log('mniCoordinates: ', mniCoordinates);
   //     // // Binarize the mniCoordinates values
   //     // const threshold = 0.5; // Define a threshold value for binarization
   //     // const binarizedMniCoordinates = mniCoordinates.map(([x, y, z, value]) => {
@@ -1946,9 +2032,9 @@ function PlyViewer({
   //     // });
   //     // eslint-disable-next-line no-use-before-define
   //     // addMeshToScene('PLY Scene', geometry, material);
-  //     const scene = sceneRef.current;
-  //     // const niiPath = binarizedMniCoordinates;
-  //     loadNiftiAsVolume(mniCoordinates, scene);
+  //     // const scene = sceneRef.current;
+  //     // // const niiPath = binarizedMniCoordinates;
+  //     // loadNiftiAsVolume(mniCoordinates, scene);
   //   }
   // }, [quantities, amplitude, unitSolutions]);
 
@@ -3914,6 +4000,155 @@ function PlyViewer({
     setIsFullScreen(!isFullScreen);
   };
 
+  const [isFrozen, setIsFrozen] = useState(false); // New state for freeze functionality
+
+  const toggleFreeze = () => {
+    setIsFrozen((prev) => !prev);
+    if (controlsRef.current) {
+      controlsRef.current.enabled = !isFrozen; // Disable controls if frozen
+    }
+    // Add logic here to disable/enable camera controls based on the isFrozen state
+  };
+
+  useEffect(() => {
+    if (controlsRef.current) {
+      controlsRef.current.enabled = !isFrozen; // Update controls based on freeze state
+    }
+  }, [isFrozen]);
+
+  const handleMouseHover = (event) => {
+    if (isFrozen) {
+      console.log('Mouse is hovering over the scene');
+      // Add your custom logic here
+    }
+  };
+  const [val, setVal] = useState(-10);
+  const handleSlideSlice = (val_import) => {
+    let zVal = val + val_import/100;
+    console.log('zVal: ', zVal);
+    const { mniCoordinates, header, voxelCoordinates } = slice;
+    const [nx, ny, nz] = header.dims.slice(1, 4);
+    const plotCoords = [];
+    for (let i = 0; i < mniCoordinates.length; i++) {
+      const [x, y, z, value] = mniCoordinates[i];
+      if (z === zVal) {
+        plotCoords.push([x, y, zVal, value]); // z is 0 for a 2D plane
+      }
+    }
+    console.log('plotCoords: ', plotCoords);
+    const values = plotCoords.map(([x, y, z, value]) => value);
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+    const meanValue = values.reduce((acc, val) => acc + val, 0) / values.length;
+    console.log(
+      'Max Value: ',
+      maxValue,
+      'Mean Value: ',
+      meanValue,
+      'Min Value: ',
+      minValue,
+    );
+    console.log('Plot Coordinates: ', plotCoords);
+
+    const depth = nz; // Number of slices
+    const size = nx * ny; // Number of pixels per slice
+    const data = new Uint8Array(size * depth * 4); // RGBA for each pixel
+
+    for (let i = 0; i < depth; i++) {
+      for (let j = 0; j < size; j++) {
+        const value = voxelCoordinates[i * size + j][3]; // Get the voxel value
+        const normalizedValue = (value - minValue) / (maxValue - minValue); // Normalize to [0, 1]
+        const intensity = Math.floor(normalizedValue * 255); // Convert to 0-255 range
+
+        const stride = (i * size + j) * 4;
+        data[stride] = intensity; // R
+        data[stride + 1] = intensity; // G
+        data[stride + 2] = intensity; // B
+        data[stride + 3] = 255; // A
+      }
+    }
+
+    // Create the DataArrayTexture
+    const texture = new THREE.DataArrayTexture(data, nx, ny, depth);
+    texture.format = THREE.RGBAFormat;
+    texture.type = THREE.UnsignedByteType;
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.needsUpdate = true;
+
+    // Create a plane geometry for a single slice
+    const geometry = new THREE.PlaneGeometry(nx, ny);
+
+    // Use a shader material to select the correct slice
+    const material = new THREE.ShaderMaterial({
+      uniforms: {
+        uTex: { value: texture },
+        uSlice: { value: 0 } // Uniform to select the slice
+      },
+      side: THREE.DoubleSide,
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2DArray uTex;
+        uniform float uSlice;
+        varying vec2 vUv;
+        void main() {
+          vec4 color = texture(uTex, vec3(vUv, uSlice));
+          gl_FragColor = color;
+        }
+      `
+    });
+
+    // Create the mesh
+    const mesh = new THREE.Mesh(geometry, material);
+    const position = [0, 0, zVal];
+
+    addMeshToScene('NIfTI Volume', mesh.geometry, mesh.material, position);
+  }
+
+  const handleZoom = (event) => {
+    if (isFrozen) {
+      console.log('Zoom action detected');
+      // Add your custom logic here
+      handleSlideSlice(event.deltaY / 100);
+      console.log(event.deltaY);
+    }
+  };
+
+  // Add event listeners when the component mounts
+  useEffect(() => {
+    const rendererElement = rendererRef.current.domElement; // Assuming you have a ref to the renderer
+
+    const onMouseMove = (event) => {
+      handleMouseHover(event);
+    };
+
+    const onWheel = (event) => {
+      handleZoom(event);
+    };
+
+    if (rendererElement) {
+      // rendererElement.addEventListener('mousemove', onMouseMove);
+      rendererElement.addEventListener('wheel', onWheel);
+
+    }
+
+    // Clean up event listeners on component unmount
+    return () => {
+      if (rendererElement) {
+        // rendererElement.removeEventListener('mousemove', onMouseMove);
+        rendererElement.addEventListener('wheel', onWheel);
+
+      }
+    };
+  }, [isFrozen]); // Re-run effect if isFrozen changes
+
+
   return (
     <div style={{ marginTop: '-120px' }}>
       <div style={isFullScreen ? fullScreenStyle : viewerContainerStyle}>
@@ -3924,6 +4159,13 @@ function PlyViewer({
           >
             {isFullScreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
           </IconButton>
+          <IconButton
+            onClick={toggleFreeze}
+            style={{ position: 'absolute', top: 20, right: 60, zIndex: 1000, color: 'white' }} // Adjusted position
+          >
+            {isFrozen ? <LockOpenIcon /> : <LockIcon />}
+          </IconButton>
+
           <div
             ref={mountRef}
             style={{

@@ -1,6 +1,107 @@
-const nifti = require('nifti-reader-js');
-const isosurface = require('isosurface');
-const math = require('mathjs');
+import * as iso from 'isosurface';
+import * as nifti from 'nifti-reader-js';
+import * as math from 'mathjs';
+import * as THREE from 'three';
+
+function typedArrayFor(code) {
+  const n1 = nifti.NIFTI1; // enum with the standard codes
+
+  switch (code) {
+    case n1.TYPE_UINT8:
+      return Uint8Array; // 2  → 8‑bit unsigned
+    case n1.TYPE_INT16:
+      return Int16Array; // 4  → 16‑bit signed
+    case n1.TYPE_INT32:
+      return Int32Array; // 8  → 32‑bit signed
+    case n1.TYPE_FLOAT32:
+      return Float32Array; // 16 → 32‑bit float
+    case n1.TYPE_FLOAT64:
+      return Float64Array; // 64 → 64‑bit float
+    /* add more cases (TYPE_UINT16, TYPE_INT8, …) if your data needs them */
+    default:
+      throw new Error(`Unsupported NIfTI datatype code: ${code}`);
+  }
+}
+
+function nii2Mesh(header, image) {
+  console.log('NII2MESH: ', header);
+  const Typed = typedArrayFor(header.datatypeCode);
+  let vox = new Typed(image);
+  console.log(vox);
+  const float32Array = new Float32Array(vox.length);
+  for (let i = 0; i < vox.length; i++) {
+    float32Array[i] = vox[i];
+  }
+  vox = float32Array;
+  const [nx, ny, nz] = header.dims.slice(1, 4);
+
+  // vox = gaussianSmooth(vox, nx, ny, nz);
+
+  const isoLevel = 0.3;
+  const scalar = (x, y, z) => vox[x + nx * (y + ny * z)] - isoLevel;
+  const mesh = iso.marchingCubes([nx, ny, nz], scalar);
+
+  if (mesh.positions.length === 0) {
+    throw new Error('No voxels ≥ isoLevel – check datatype / isoLevel.');
+  }
+
+  // Apply Gaussian smoothing
+
+  // --- scale vertices using affine matrix ---------------------------------
+  const affineMatrix = header.affine; // Assuming affine matrix is available
+  mesh.positions = mesh.positions.map(([x, y, z]) => {
+    const voxelHomogeneous = [x + 0.5, y + 0.5, z + 0.5, 1]; // Add 0.5 for center of voxel
+    const transformedVoxels = math.multiply(affineMatrix, voxelHomogeneous);
+    return transformedVoxels.slice(0, 3); // Return only x, y, z
+  });
+
+  // --- Three.js geometry ---------------------------------------------------
+  // const geo = new BufferGeometry();
+  // geo.setAttribute(
+  //   'position',
+  //   new Float32BufferAttribute(mesh.positions.flat(), 3),
+  // );
+  // geo.setIndex(new Uint32BufferAttribute(mesh.cells.flat(), 1));
+  // geo.computeVertexNormals();
+  // return geo;
+  const geometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(mesh.positions.flat());
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  // Add faces (indices)
+  // const indices = new Uint32Array(mesh.cells.flat());
+  // geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+
+  const indices = new Uint32Array(mesh.cells.flat());
+  for (let i = 0; i < indices.length; i += 3) {
+    // Swap the order of the indices to reverse the winding
+    const temp = indices[i];
+    indices[i] = indices[i + 1];
+    indices[i + 1] = temp;
+  }
+  geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+
+  // Compute vertex normals
+  geometry.computeVertexNormals();
+
+  // // Set vertex colors
+  const colors = new Float32Array(positions.length);
+  for (let i = 0; i < positions.length / 3; i++) {
+    const value = vox[i];
+    const normalizedValue = Math.min(1, Math.max(0, value / 255)); // Normalize to [0, 1]
+    colors.set([normalizedValue, normalizedValue, normalizedValue], i * 3); // Grayscale color
+  }
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+  const material = new THREE.MeshStandardMaterial({
+    vertexColors: true,
+    transparent: false,
+    opacity: 1,
+    // smoothShading: true,
+    color: 'red',
+  });
+
+  return { geometry, material };
+}
 
 /**
  * Converts superimposed E-field data into a PLY surface mesh for visualization.
@@ -107,93 +208,62 @@ end_header
  * @returns {Object} - Contains the superimposed E-field (`eFieldSuperimposed`) and its magnitude (`eFieldMagnitude`).
  */
 function computeSuperimposedEField(stimVector, efieldContactSolutions) {
-  // console.log('stimVector', stimVector.length);
-  // console.log('efieldContactSolutions', efieldContactSolutions.length);
-  // if (stimVector.length !== efieldContactSolutions.length) {
-  //   throw new Error(
-  //     'Mismatch: stimVector and efieldContactSolutions must have the same length.',
-  //   );
-  // }
-
   let niftiHeader = null;
   let niftiData = null;
   let dimensions = null;
-  console.log('efieldContactSolutions[0]', efieldContactSolutions[0]);
+
   // Load the first NIfTI file as the base field
   if (nifti.isNIFTI(efieldContactSolutions[0])) {
     const firstNifti = nifti.readHeader(efieldContactSolutions[0]);
     let firstData = nifti.readImage(firstNifti, efieldContactSolutions[0]);
-    console.log('firstNifti', firstNifti);
-    console.log('firstData', firstData);
-    // Ensure `firstData` is an ArrayBuffer
-    // if (!(firstData instanceof ArrayBuffer)) {
-    //   firstData = new Uint8Array(firstData).buffer;
-    // }
 
     // Handle endian mismatch
     if (!firstNifti.littleEndian) {
       const dataView = new DataView(firstData);
-      const correctedData = new Float32Array(firstData.byteLength / 4);
+      const correctedData = new Float64Array(firstData.byteLength / 8);
       for (let i = 0; i < correctedData.length; i++) {
-        correctedData[i] = dataView.getFloat32(i * 4, false); // false = big-endian
+        correctedData[i] = dataView.getFloat64(i * 8, false); // false = big-endian
       }
       firstData = correctedData;
     } else {
-      firstData = new Float32Array(firstData);
+      firstData = new Float64Array(firstData);
     }
-
-    // Apply scaling factors
-    // const { scl_slope = 1, scl_inter = 0 } = firstNifti;
-    // firstData = new Float32Array(
-    //   firstData.map((value) => value * scl_slope + scl_inter),
-    // );
 
     niftiHeader = firstNifti;
     dimensions = firstNifti.dims.slice(1, 4); // Get spatial dimensions
     const voxelCount = dimensions.reduce((a, b) => a * b, 1);
 
     // Initialize superimposed E-field array (4D)
-    niftiData = new Float32Array(voxelCount * 3); // Assuming 3 components per voxel
-    console.log('StimVector', stimVector);
-    console.log('StimVector[0]', stimVector[0]);
+    niftiData = new Float64Array(voxelCount * 3); // Assuming 3 components per voxel
+
     // Scale first contact field
     for (let i = 0; i < niftiData.length; i++) {
-      try {
-        niftiData[i] = Math.abs(firstData[i] * stimVector[0]);
-      } catch (error) {
-        niftiData[i] = 0;
-      }
+      niftiData[i] = firstData[i] * stimVector[0];
     }
   } else {
     throw new Error('Invalid NIfTI file provided.');
   }
 
-  // Loop through remaining contacts and add their scaled fields
+  // Superimpose the rest of the contacts
   for (let contactIdx = 1; contactIdx < stimVector.length; contactIdx++) {
     if (nifti.isNIFTI(efieldContactSolutions[contactIdx])) {
-      console.log('contactIdx', contactIdx);
       let contactData = nifti.readImage(
         nifti.readHeader(efieldContactSolutions[contactIdx]),
         efieldContactSolutions[contactIdx],
       );
 
-      // Ensure `contactData` is an ArrayBuffer
-      if (!(contactData instanceof ArrayBuffer)) {
-        contactData = new Uint8Array(contactData).buffer;
-      }
-
       // Handle endian mismatch
       if (!niftiHeader.littleEndian) {
         const dataView = new DataView(contactData);
-        const correctedData = new Float32Array(contactData.byteLength / 4);
+        const correctedData = new Float64Array(contactData.byteLength / 8);
         for (let i = 0; i < correctedData.length; i++) {
-          correctedData[i] = dataView.getFloat32(i * 4, false); // false = big-endian
+          correctedData[i] = dataView.getFloat64(i * 8, false); // false = big-endian
         }
         contactData = correctedData;
       } else {
-        contactData = new Float32Array(contactData);
+        contactData = new Float64Array(contactData);
       }
-      console.log('niftiData.length', niftiData.length);
+
       for (let i = 0; i < niftiData.length; i++) {
         niftiData[i] += contactData[i] * stimVector[contactIdx];
       }
@@ -202,28 +272,35 @@ function computeSuperimposedEField(stimVector, efieldContactSolutions) {
     }
   }
 
-  // Compute magnitude of the final E-field (3D output)
-  // const eFieldMagnitude = new Float32Array(
-  //   dimensions.reduce((a, b) => a * b, 1),
-  // );
-  let eFieldMagnitude = new Float32Array(niftiData.length);
+  // Determine an appropriate threshold based on niftiData values
+  const values = niftiData.map((value) => value);
+  const maxValue = Math.max(...values);
+  const minValue = Math.min(...values);
+  const threshold = (maxValue + minValue) / 2; // Example: midpoint threshold
 
+  // Binarize niftiData based on the calculated threshold
+  const binarizedData = new Float32Array(niftiData.length);
+  for (let i = 0; i < niftiData.length; i++) {
+    binarizedData[i] = niftiData[i] > threshold ? 1 : 0;
+  }
+
+  // Compute magnitude of the final E-field (3D output)
+  let eFieldMagnitude = new Float64Array(niftiData.length);
   for (let i = 0; i < eFieldMagnitude.length; i++) {
     let ex = niftiData[i * 3];
     let ey = niftiData[i * 3 + 1];
     let ez = niftiData[i * 3 + 2];
     eFieldMagnitude[i] = Math.sqrt(ex * ex + ey * ey + ez * ez) * 1000.0; // Convert to V/m
-    // eFieldMagnitude[i] = Math.abs(niftiData[i])*1000;
   }
-  console.log('eFieldSuperimposed', niftiData);
-  // const plyData = eFieldToSurfacePLY(niftiData, eFieldMagnitude, dimensions, niftiHeader);
+  console.log('binarizedData: ', binarizedData);
+  const mesh = nii2Mesh(niftiHeader, binarizedData);
 
   return {
-    eFieldSuperimposed: niftiData, // 4D vector field (Ex, Ey, Ez)
-    eFieldMagnitude: eFieldMagnitude, // 3D magnitude field
-    header: niftiHeader, // Original NIfTI header for reference
-    // plyData: plyData, // PLY data for visualization
+    eFieldSuperimposed: niftiData,
+    eFieldMagnitude: eFieldMagnitude,
+    header: niftiHeader,
+    mesh: mesh,
   };
 }
 
-module.exports = { computeSuperimposedEField, eFieldToSurfacePLY };
+export { computeSuperimposedEField, eFieldToSurfacePLY };

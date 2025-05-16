@@ -73,37 +73,37 @@ function Raincloud({ clinicalData, scoretype }) {
       type: 'violin',
       y: data,
       name: timelineName,
-      box: {
-        visible: true,
-        width: 0.2,
-        fillcolor: isBaseline ? 'rgba(31, 119, 180, 0.7)' : 'rgba(255, 127, 14, 0.7)',
-        line: {
-          color: isBaseline ? 'rgb(31, 119, 180)' : 'rgb(255, 127, 14)',
-          width: 2
-        }
-      },
-      line: {
-        color: isBaseline ? 'rgb(31, 119, 180)' : 'rgb(255, 127, 14)',
-        width: 2
-      },
-      fillcolor: isBaseline ? 'rgba(31, 119, 180, 0.3)' : 'rgba(255, 127, 14, 0.3)',
-      meanline: {
-        visible: true,
-        color: isBaseline ? 'rgb(31, 119, 180)' : 'rgb(255, 127, 14)',
-        width: 2
-      },
       points: 'all',
       jitter: 0.2,
       pointpos: 0,
       marker: {
         size: 6,
-        opacity: 0.6,
+        opacity: 0.5,
         color: isBaseline ? 'rgb(31, 119, 180)' : 'rgb(255, 127, 14)',
         line: {
           color: 'white',
           width: 1
         }
-      }
+      },
+      box: {
+        visible: true,
+        width: 0.2,
+        fillcolor: isBaseline ? 'rgba(75, 73, 73, 0.7)' : 'rgba(241, 185, 145, 0.7)',
+        line: {
+          color: isBaseline ? 'rgb(75, 73, 73)' : 'rgb(241, 185, 145)',
+          width: 2
+        }
+      },
+      line: {
+        color: isBaseline ? 'rgb(75, 73, 73)' : 'rgb(241, 185, 145)',
+        width: 3
+      },
+      fillcolor: isBaseline ? 'rgba(75, 73, 73, 0.3)' : 'rgba(241, 185, 145, 0.3)',
+      meanline: {
+        visible: true,
+        color: 'black',
+        width: 3,
+      },
     };
   });
 
@@ -220,7 +220,7 @@ function Raincloud({ clinicalData, scoretype }) {
               size: 12
             }
           },
-          showlegend: true,
+          showlegend: false,
           legend: {
             x: 1,
             xanchor: 'right',
@@ -234,8 +234,8 @@ function Raincloud({ clinicalData, scoretype }) {
           paper_bgcolor: 'rgba(0,0,0,0)',
           plot_bgcolor: 'rgba(0,0,0,0)',
           margin: {
-            l: 60,
-            r: 60,
+            l: 200, // Increase left margin
+            r: 200, // Increase right margin
             t: 80,
             b: 60,
             pad: 10
@@ -249,7 +249,7 @@ function Raincloud({ clinicalData, scoretype }) {
             }
           }
         }}
-        style={{ width: '100%', height: '600px' }}
+        // style={{ scale: 1.5 }}
         config={{
           responsive: true,
           displayModeBar: false

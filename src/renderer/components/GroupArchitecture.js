@@ -275,7 +275,7 @@ function GroupArchitecture({
             marginBottom: '-110px',
           }),
           marginTop: '-30px',
-          marginLeft: '100px',
+          marginLeft: '130px',
           zIndex: 5,
         }}
       >

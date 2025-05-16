@@ -593,7 +593,7 @@ export default function registerFileHandlers() {
   });
 
   ipcMain.handle('get-unit-solutions', async (event, filePath) => {
-    const patientFolder = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/stimulations/MNI152NLin2009bAsym/initialize';
+    const patientFolder = '/Users/savirmadan/Documents/Localizations/Patient0401Output/derivatives/leaddbs/sub-CbctDbs0401/stimulations/MNI152NLin2009bAsym/initialize';
     const side = 'rh';
     const OSSFolder = path.join(patientFolder, `OSS_sim_files_${side}`);
     const numContacts = 8;
@@ -710,7 +710,7 @@ export default function registerFileHandlers() {
   });
 
   ipcMain.handle('get-clinical-data-for-plotting', async (event, message) => {
-    const clinicalDataPath = path.join('/Users/savirmadan/Downloads', 'clinicalDataForPlotting.json');
+    const clinicalDataPath = path.join('/Users/savirmadan/Downloads', 'allClinicalScores.json');
     const data = fs.readFileSync(clinicalDataPath, 'utf8');
     const clinicalData = JSON.parse(data);
     return clinicalData;

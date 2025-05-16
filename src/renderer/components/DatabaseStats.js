@@ -50,64 +50,67 @@ function DatabaseStats({ directoryPath }) {
   const [scoreTypes, setScoreTypes] = useState(['UPDRS', 'Y-BOCS']); // Default score types
 
   console.log('Patients for real: ', patients);
-  useEffect(() => {
-    if (directoryPath && filteredPatients.length > 0 && patients[0].id !== 'sub-01') {
-      const timelinePromises = filteredPatients.map((patient) =>
-        window.electron.ipcRenderer.invoke(
-          'get-timelines',
-          directoryPath,
-          patient.id,
-          true,
-        ),
-      );
-      Promise.all(timelinePromises)
-        .then((allReceivedTimelines) => {
-          const allFilteredTimelineNames = allReceivedTimelines.map(
-            (receivedTimelines) =>
-              receivedTimelines
-                .filter((timelineData) => timelineData.hasClinical)
-                .map((timelineData) => timelineData.timeline),
-          );
+  // useEffect(() => {
+  //   if (directoryPath && filteredPatients.length > 0 && patients[0].id !== 'sub-01') {
+  //     const timelinePromises = filteredPatients.map((patient) =>
+  //       window.electron.ipcRenderer.invoke(
+  //         'get-timelines',
+  //         directoryPath,
+  //         patient.id,
+  //         true,
+  //       ),
+  //     );
+  //     Promise.all(timelinePromises)
+  //       .then((allReceivedTimelines) => {
+  //         const allFilteredTimelineNames = allReceivedTimelines.map(
+  //           (receivedTimelines) =>
+  //             receivedTimelines
+  //               .filter((timelineData) => timelineData.hasClinical)
+  //               .map((timelineData) => timelineData.timeline),
+  //         );
 
-          const patientsArray = filteredPatients;
-          const patientsWithTimelines = patientsArray.map((patient, index) => ({
-            id: patient.id,
-            timelines: allFilteredTimelineNames[index] || [],
-          }));
-          console.log(patientsWithTimelines);
-          return setClinicalTimelines(patientsWithTimelines);
-        })
-        .catch((error) => {
-          console.error('Error fetching timelines for all patients:', error);
-        });
-    }
-  }, [directoryPath, filteredPatients]);
-
-  useEffect(() => {
-    if (clinicalTimelines && patients[0].id !== 'sub-01') {
-      console.log('Clinical Timelines: ', clinicalTimelines);
-      window.electron.ipcRenderer
-        .invoke('get-clinical-data', directoryPath, clinicalTimelines)
-        .then((clinicalData) => {
-          setClinicalData(clinicalData);
-          setClinicalDataForPlotting(clinicalData);
-          window.electron.ipcRenderer.sendMessage('download-clinical-data', clinicalData);
-          return clinicalData;
-        })
-        .catch((error) => {
-          console.error('Error retrieving clinical data:', error);
-        });
-    }
-  }, [clinicalTimelines]);
+  //         const patientsArray = filteredPatients;
+  //         const patientsWithTimelines = patientsArray.map((patient, index) => ({
+  //           id: patient.id,
+  //           timelines: allFilteredTimelineNames[index] || [],
+  //         }));
+  //         console.log(patientsWithTimelines);
+  //         return setClinicalTimelines(patientsWithTimelines);
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error fetching timelines for all patients:', error);
+  //       });
+  //   }
+  // }, [directoryPath, filteredPatients]);
 
   // useEffect(() => {
-  //     window.electron.ipcRenderer.invoke('get-clinical-data-for-plotting', 'test').then((clinicalData) => {
-  //       setClinicalData(clinicalData);
-  //       setClinicalDataForPlotting(clinicalData);
-  //     }).catch((error) => {
-  //       console.error('Error retrieving clinical data:', error);
-  //     });
-  // }, []);
+  //   if (clinicalTimelines && patients[0].id !== 'sub-01') {
+  //     console.log('Clinical Timelines: ', clinicalTimelines);
+  //     window.electron.ipcRenderer
+  //       .invoke('get-clinical-data', directoryPath, clinicalTimelines)
+  //       .then((clinicalData) => {
+  //         setClinicalData(clinicalData);
+  //         setClinicalDataForPlotting(clinicalData);
+  //         window.electron.ipcRenderer.sendMessage('download-clinical-data', clinicalData);
+  //         return clinicalData;
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error retrieving clinical data:', error);
+  //       });
+  //   }
+  // }, [clinicalTimelines]);
+
+  useEffect(() => {
+    window.electron.ipcRenderer
+      .invoke('get-clinical-data-for-plotting', 'test')
+      .then((clinicalData) => {
+        setClinicalData(clinicalData);
+        setClinicalDataForPlotting(clinicalData);
+      })
+      .catch((error) => {
+        console.error('Error retrieving clinical data:', error);
+      });
+  }, []);
 
   useEffect(() => {
     let filtered = patients.filter((patient) => {
@@ -168,16 +171,20 @@ function DatabaseStats({ directoryPath }) {
         );
       case 'all':
         return (
-          <div className="analysis-container">
-            <CombinedPlot
+          <div className="analysis-container" style={{ height: '1000px' }}>
+            {/* <CombinedPlot
               clinicalData={clinicalDataForPlotting}
               scoretype={scoretype}
-            />
-            <Raincloud
-              clinicalData={clinicalDataForPlotting}
-              scoretype={scoretype}
-            />
-            {scoretype === 'UPDRS' && (
+            /> */}
+            <div style={{ scale: 2 }}>
+              {' '}
+              {/* Adjust width and height as needed */}
+              <Raincloud
+                clinicalData={clinicalDataForPlotting}
+                scoretype={scoretype}
+              />
+            </div>
+            {/* {scoretype === 'UPDRS' && (
               <>
                 <GroupLateralityAnalysisPlot
                   clinicalData={clinicalDataForPlotting}
@@ -188,7 +195,7 @@ function DatabaseStats({ directoryPath }) {
                   scoretype={scoretype}
                 />
               </>
-            )}
+            )} */}
           </div>
         );
       case 'new':
@@ -265,13 +272,21 @@ function DatabaseStats({ directoryPath }) {
     });
 
     return (
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 2 }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+          gap: 2,
+        }}
+      >
         {Object.keys(attributeTypes).map((key) => {
           const type = attributeTypes[key];
           if (type === 'number') {
             return (
               <Box key={key} className="filter-group" sx={{ mb: 1 }}>
-                <Typography variant="subtitle2" sx={{ fontSize: '0.8rem' }}>{key}:</Typography>
+                <Typography variant="subtitle2" sx={{ fontSize: '0.8rem' }}>
+                  {key}:
+                </Typography>
                 <Slider
                   value={filters[key] || [0, 120]}
                   onChangeCommitted={(e, newValue) =>
@@ -291,33 +306,35 @@ function DatabaseStats({ directoryPath }) {
           if (type === 'string') {
             return (
               <Box key={key} className="filter-group" sx={{ mb: 1 }}>
-                <Typography variant="subtitle2" sx={{ fontSize: '0.8rem' }}>{key}:</Typography>
+                <Typography variant="subtitle2" sx={{ fontSize: '0.8rem' }}>
+                  {key}:
+                </Typography>
                 <TextField
                   value={filters[key] || ''}
                   onChange={(e) => {
-                      const newValue = e.target.value;
-                      setFilters((prev) => ({
-                          ...prev,
-                          [key]: newValue,
-                      }));
+                    const newValue = e.target.value;
+                    setFilters((prev) => ({
+                      ...prev,
+                      [key]: newValue,
+                    }));
                   }}
                   onBlur={(e) => {
-                      const newValue = e.target.value;
-                      setFilters((prev) => {
-                          const updatedFilters = { ...prev };
-                          if (newValue === '') {
-                              delete updatedFilters[key];
-                          } else {
-                              updatedFilters[key] = newValue;
-                          }
-                          return updatedFilters;
-                      });
+                    const newValue = e.target.value;
+                    setFilters((prev) => {
+                      const updatedFilters = { ...prev };
+                      if (newValue === '') {
+                        delete updatedFilters[key];
+                      } else {
+                        updatedFilters[key] = newValue;
+                      }
+                      return updatedFilters;
+                    });
                   }}
                   variant="outlined"
                   fullWidth
                   placeholder="none"
                   sx={{ mt: 1 }}
-              />
+                />
               </Box>
             );
           }
@@ -624,23 +641,22 @@ function DatabaseStats({ directoryPath }) {
           <MenuItem value="Y-BOCS">Y-BOCS</MenuItem>
         </Select> */}
       </div>
-      {clinicalDataForPlotting &&
-        filteredPatients && (
-          <div className="analysis-section">
-            <div>
-              <Select
-                value={scoretype}
-                onChange={(e) => setScoretype(e.target.value)}
-                className="analysis-select"
-              >
-                {scoreTypes.map((type) => (
-                  <MenuItem key={type} value={type}>
-                    {type}
-                  </MenuItem>
-                ))}
-              </Select>
-            </div>
-            {/* <select
+      {clinicalDataForPlotting && filteredPatients && (
+        <div className="analysis-section">
+          <div>
+            <Select
+              value={scoretype}
+              onChange={(e) => setScoretype(e.target.value)}
+              className="analysis-select"
+            >
+              {scoreTypes.map((type) => (
+                <MenuItem key={type} value={type}>
+                  {type}
+                </MenuItem>
+              ))}
+            </Select>
+          </div>
+          {/* <select
               value={analysisType}
               onChange={handleAnalysisChange}
               className="analysis-select"
@@ -651,14 +667,18 @@ function DatabaseStats({ directoryPath }) {
               <option value="subscore">Subscores</option>
               <option value="all">View All Plots</option>
             </select> */}
-            {renderAnalysis()}
-            {/* <Raincloud
+          {renderAnalysis()}
+          {/* <Raincloud
               clinicalData={clinicalDataForPlotting}
               scoretype={scoretype}
             /> */}
-          </div>
-        )}
-      <button onClick={handleExportToExcel} className="export-button" style={{ float: 'right' }}>
+        </div>
+      )}
+      <button
+        onClick={handleExportToExcel}
+        className="export-button"
+        style={{ float: 'right' }}
+      >
         Export to Excel
       </button>
 
@@ -688,8 +708,8 @@ function DatabaseStats({ directoryPath }) {
           backgroundColor: '#f0f0f0',
           transition: 'background-color 0.3s',
         }}
-        onMouseEnter={(e) => e.target.style.backgroundColor = '#e0e0e0'}
-        onMouseLeave={(e) => e.target.style.backgroundColor = '#f0f0f0'}
+        onMouseEnter={(e) => (e.target.style.backgroundColor = '#e0e0e0')}
+        onMouseLeave={(e) => (e.target.style.backgroundColor = '#f0f0f0')}
       />
       {showGroupViewer && (
         <div>
