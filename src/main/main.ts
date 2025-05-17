@@ -105,9 +105,9 @@ app.on('ready', () => {
   console.log('File handlers registered.');
 });
 
-// console.log = () => {};
-// console.warn = () => {};
-// console.error = () => {};
+console.log = () => {};
+console.warn = () => {};
+console.error = () => {};
 
 // const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
 // console.log(args);
@@ -115,8 +115,8 @@ app.on('ready', () => {
 // const inputPath = '/Users/savirmadan/Downloads/inputData.json';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0374Output/derivatives/leaddbs/sub-CbctDbs0374/stimulations/MNI152NLin2009bAsym/inputData.json';
 // const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
-const inputPath = process.argv[1];
-// const inputPath = '/Users/savirmadan/Documents/Localizations/Patient0401Output';
+// const inputPath = process.argv[1];
+const inputPath = '/Users/savirmadan/Documents/Localizations/Patient0401Output';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/Patient0395Output';
 // const inputPath = '/Users/savirmadan/Partners HealthCare Dropbox/Savir Madan/datasets/CbctDbs0282';
 // const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/stimulations/MNI152NLin2009bAsym/inputData.json';

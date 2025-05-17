@@ -11,6 +11,10 @@ import Form from 'react-bootstrap/Form';
 import { render } from '@testing-library/react';
 import StimulationSettings from './StimulationSettings';
 import Navbar from './Navbar';
+import { Modal } from 'react-bootstrap';
+import EditIcon from '@mui/icons-material/Edit';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+
 // import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 
 function GroupArchitecture({
@@ -30,8 +34,12 @@ function GroupArchitecture({
 }) {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showViewer, setShowViewer] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [newPatientName, setNewPatientName] = useState('');
+  const [isRenaming, setIsRenaming] = useState(false);
   console.log('Patients: ', patients);
   console.log('Patient States: ', patientStates);
+  console.log('selectedPatient: ', selectedPatient);
   const location = useLocation();
   const patientInfo = location.state || {};
   console.log('patientInfo: ', patientInfo);
@@ -96,6 +104,26 @@ function GroupArchitecture({
     setZoomLevel(newValue);
     window.electron.zoom.setZoomLevel(newValue);
   };
+
+  function generateUniqueID() {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // Adding 1 because months are zero-based
+    const day = currentDate.getDate().toString().padStart(2, '0');
+    const randomNums = Math.floor(Math.random() * 1000000); // Generate random 4-digit number
+    return `${year}${month}${day}${randomNums}`;
+  }
+
+  const handleTabKeyPress = (event) => {
+    if (event.key === 'Tab') {
+      event.preventDefault(); // Prevent the default tab behavior
+      const uniqueID = generateUniqueID();
+      setNewPatientName(uniqueID);
+      // setNewStim(uniqueID);
+      // setNewStim(Date.now().toString());
+      // Set the input field value to the placeholder text
+    }
+  };
   // Don't forget this
 
   // useEffect(() => {
@@ -117,25 +145,6 @@ function GroupArchitecture({
     };
 
     const [newStim, setNewStim] = useState('');
-
-    function generateUniqueID() {
-      const currentDate = new Date();
-      const year = currentDate.getFullYear();
-      const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // Adding 1 because months are zero-based
-      const day = currentDate.getDate().toString().padStart(2, '0');
-      const randomNums = Math.floor(Math.random() * 1000000); // Generate random 4-digit number
-      return `${year}${month}${day}${randomNums}`;
-    }
-
-    const handleTabKeyPress = (event) => {
-      if (event.key === 'Tab') {
-        event.preventDefault(); // Prevent the default tab behavior
-        const uniqueID = generateUniqueID();
-        setNewStim(uniqueID);
-        // setNewStim(Date.now().toString());
-        // Set the input field value to the placeholder text
-      }
-    };
 
     const handleNewStimText = (event) => {
       setNewStim(event.target.value);
@@ -225,10 +234,17 @@ function GroupArchitecture({
       console.log('patientInfo: ', patientInfo);
       console.log('selectedPatient: ', selectedPatient);
       console.log('currentPatientState: ', patientStates[selectedPatient]);
-      console.log('currentPatientState.model: ', patientStates[selectedPatient].model);
+      console.log(
+        'currentPatientState.model: ',
+        patientStates[selectedPatient].model,
+      );
       console.log('mode: ', mode);
-      const text = type === 'leadgroup' ? selectedPatient : patientInfo.patient.id;
-      const text2 = type === 'leadgroup' ? patientStates[selectedPatient].model : patientInfo.patient.elmodel;
+      const text =
+        type === 'leadgroup' ? selectedPatient : patientInfo.patient.id;
+      const text2 =
+        type === 'leadgroup'
+          ? patientStates[selectedPatient].model
+          : patientInfo.patient.elmodel;
       const color1 = '#375D7A';
       const color2 = 'lightgrey';
       console.log('navbardata: ', navbardata);
@@ -240,6 +256,55 @@ function GroupArchitecture({
       });
     }
   }, [patientInfo, selectedPatient, renderKey]);
+
+
+
+  const handleEditPatients = () => {
+    setShowEditModal(true);
+  };
+
+  const handleModalClose = () => {
+    setShowEditModal(false);
+    setNewPatientName('');
+  };
+
+  const handleRenamePatient = () => {
+    const updatedPatients = patients.map((patient) =>
+      patient === selectedPatient ? newPatientName : patient,
+    );
+
+    // Update the patientStates object
+    const updatedPatientStates = { ...patientStates };
+    if (selectedPatient in updatedPatientStates) {
+      updatedPatientStates[newPatientName] = updatedPatientStates[selectedPatient];
+      delete updatedPatientStates[selectedPatient];
+    }
+
+    // Update the state with the new values
+    setPatients(updatedPatients);
+    setPatientStates(updatedPatientStates);
+    setSelectedPatient(newPatientName);
+    handleModalClose();
+  };
+
+  const handleNewPatient = () => {
+    // Ensure the existing patient ID is valid
+
+    // Add the new patient to the patients list
+    const updatedPatients = [...patients, newPatientName];
+
+    // Copy the state of the existing patient to the new patient
+    const updatedPatientStates = {
+      ...patientStates,
+      [newPatientName]: { ...patientStates[selectedPatient] },
+    };
+
+    // Update the state with the new values
+    setPatients(updatedPatients);
+    setPatientStates(updatedPatientStates);
+    setSelectedPatient(newPatientName);
+    handleModalClose();
+  };
 
   return (
     <div style={{ marginLeft: '-300px', marginTop: '200px' }}>
@@ -280,7 +345,13 @@ function GroupArchitecture({
         }}
       >
         {type === 'leadgroup' && (
-          <div style={{ display: 'flex', alignItems: 'center', marginTop: '-10px' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              marginTop: '-10px',
+            }}
+          >
             <Button
               // className="sticky-button"
               style={{
@@ -328,11 +399,40 @@ function GroupArchitecture({
         )}
 
         {type !== 'leadgroup' && (
-          <PatientSelector
-            selectedPatient={selectedPatient}
-            setSelectedPatient={setSelectedPatient}
-            setRenderKey={setRenderKey}
-          />
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              marginTop: '-10px',
+              marginLeft: '-2px',
+            }}
+          >
+            <PatientSelector
+              selectedPatient={selectedPatient}
+              setSelectedPatient={setSelectedPatient}
+              setRenderKey={setRenderKey}
+            />
+            <Button
+              variant="outline-secondary"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '50%',
+                width: '40px',
+                height: '40px',
+                padding: '5px',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                backgroundColor: 'white',
+                color: 'black',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+              onClick={handleEditPatients}
+            >
+              <EditIcon />
+            </Button>
+          </div>
         )}
       </div>
       <div>
@@ -434,6 +534,44 @@ function GroupArchitecture({
           />
         )}
       </div>
+      <Modal show={showEditModal} onHide={handleModalClose} style={{ marginTop: '200px' }}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Stimulation ID</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            {/* <Form.Label>Create a new ID or rename the current one</Form.Label> */}
+            <p style={{ margin: '0', fontSize: 'medium', color: 'gray' }}>
+              Create a new ID or rename the current one
+            </p>
+            <Form.Group controlId="formPatientName">
+              <Form.Control
+                type="text"
+                placeholder="Hit Tab for automatic ID"
+                value={newPatientName}
+                onChange={(e) => setNewPatientName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Tab') {
+                    e.preventDefault(); // Prevent the default tab behavior
+                    handleTabKeyPress(e);
+                  }
+                }}
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleModalClose}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleRenamePatient}>
+            Rename
+          </Button>
+          <Button variant="primary" onClick={handleNewPatient}>
+            Add
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
