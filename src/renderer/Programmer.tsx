@@ -65,10 +65,10 @@ function Programmer() {
       displayName: 'Boston Scientific Vercise Directed',
       value: 'boston_vercise_directed',
     },
-    // {
-    //   displayName: 'Boston Scientific Vercise Cartesia HX',
-    //   value: 'boston_vercise_cartesia_hx',
-    // },
+    {
+      displayName: 'Boston Scientific Vercise Cartesia HX',
+      value: 'boston_vercise_cartesia_hx',
+    },
     // {
     //   displayName: 'Boston Scientific Vercise Cartesia X',
     //   value: 'boston_vercise_cartesia_x',
@@ -215,8 +215,8 @@ function Programmer() {
     console.log('Imported Amplitude: ', jsonData.amplitude);
 
     for (let j = 1; j < 5; j++) {
-      newTotalAmplitude[j+4] = jsonData.amplitude[1][j - 1];
-      newTotalAmplitude[j] = jsonData.amplitude[0][j - 1];
+      newTotalAmplitude[j+4] = jsonData.amplitude[0][j - 1];
+      newTotalAmplitude[j] = jsonData.amplitude[1][j - 1];
 
       console.log('newTotalAmplitude: ', newTotalAmplitude);
 
@@ -971,6 +971,7 @@ function Programmer() {
     for (let i = 1; i < 5; i++) {
       if (allTotalAmplitudes[i]) {
         leftAmplitude.push(parseFloat(allTotalAmplitudes[i]));
+        data.S.amplitude[1][i - 1] = parseFloat(allTotalAmplitudes[i]);
       } else {
         leftAmplitude.push(0);
       }
@@ -978,6 +979,7 @@ function Programmer() {
     for (let i = 5; i < 9; i++) {
       if (allTotalAmplitudes[i]) {
         rightAmplitude.push(parseFloat(allTotalAmplitudes[i]));
+        data.S.amplitude[0][i - 5] = parseFloat(allTotalAmplitudes[i]);
       } else {
         rightAmplitude.push(0);
       }

@@ -648,7 +648,7 @@ function StimulationSettings({
                   <option
                     key={electrode.value}
                     value={electrode.value}
-                    disabled
+                    // disabled
                   >
                     {electrode.displayName}
                   </option>

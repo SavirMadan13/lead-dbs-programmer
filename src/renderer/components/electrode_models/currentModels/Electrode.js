@@ -218,6 +218,7 @@ function Electrode({
         // );
         const face = newFace[contactNum];
         newLevel[contactNum] = parseFloat(levelIndex) + 1;
+        // elspec.tipiscontact = 1;
         if (face === 'center' || face === 'all') {
           if (elspec.tipiscontact === 1 && contactNum === 1) {
             console.log(elspec.tipiscontact);
@@ -276,22 +277,22 @@ function Electrode({
         }
       });
     });
-  if (elspec.tipiscontact === 0) {
-    centerColumn.push(
-      // <Tail
-      //   key="tail"
-      //   // face={face}
-      //   fill="transparent"
-      // />,
-      // <Tail
-      //   key="tail"
-      //   // face={face}
-      //   fill="transparent"
-      // />,
-      // <NewBottomContact key="tail" fill="rgb(122, 125, 131)" />,
-      <NewBottomContact key="tail" fill="rgb(27, 27, 27)" />,
-    );
-  }
+  // if (elspec.tipiscontact === 0) {
+  //   centerColumn.push(
+  //     // <Tail
+  //     //   key="tail"
+  //     //   // face={face}
+  //     //   fill="transparent"
+  //     // />,
+  //     // <Tail
+  //     //   key="tail"
+  //     //   // face={face}
+  //     //   fill="transparent"
+  //     // />,
+  //     // <NewBottomContact key="tail" fill="rgb(122, 125, 131)" />,
+  //     <NewBottomContact key="tail" fill="rgb(27, 27, 27)" />,
+  //   );
+  // }
   // parsedEtageidx.forEach((sharedLevel, levelIndex) => {
   //   console.log('Shared Level : ', sharedLevel);
   //   console.log('Level index: ', levelIndex);

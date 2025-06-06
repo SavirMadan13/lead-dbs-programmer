@@ -501,8 +501,7 @@ function GroupViewer({
       const newColors = new Float32Array(colors.length);
 
       // Define the RGB values for light grey
-      const lightGrey = [0.8, 0.8, 0.8]; // RGB for light grey
-
+      const lightGrey = [0.7, 0.7, 0.75]; // Slightly bluish-grey for a more metallic look
       // Iterate over the colors array and replace yellow-like colors with light grey
       for (let i = 0; i < colors.length; i += 3) {
         const r = colors[i];
@@ -538,16 +537,12 @@ function GroupViewer({
       // Create a material for the mesh
       const material = new THREE.MeshStandardMaterial({
         vertexColors: electrodeGeometry.hasAttribute('color'),
-        // color: 0x808080,
-        // color: color,
-        flatShading: true,
-        metalness: 0.6,
-        roughness: 0.2,
+        metalness: 0, // High metalness for a metallic look
+        roughness: 0.1, // Low roughness for a shiny surface
         transparent: false,
         opacity: 1,
-        shininess: 300,
-        // wireframe: false, // Render geometry as wireframe
-        // side: THREE.DoubleSide, // Render both sides of the geometry
+        emissive: new THREE.Color(0x333333), // Add a slight emissive color for subtle glow
+        emissiveIntensity: 0.6, // Set emissive intensity
       });
 
       // Add the mesh to the scene
@@ -708,10 +703,17 @@ function GroupViewer({
       renderer.setSize(1200, 800); // Set a wider size for the renderer
       mountRef.current.appendChild(renderer.domElement);
 
-      const ambientLight = new THREE.AmbientLight(0xffffff, 1.5); // Reduced intensity
+      // const ambientLight = new THREE.AmbientLight(0xffffff, 1.5); // Reduced intensity
+      // scene.add(ambientLight);
+
+      // const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2); // Reduced intensity
+      // directionalLight.position.set(-5, -5, 5).normalize();
+      // scene.add(directionalLight);
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Lower intensity
       scene.add(ambientLight);
 
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8); // Reduced intensity
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0); // Adjust intensity
       directionalLight.position.set(5, 5, 5).normalize();
       scene.add(directionalLight);
 
@@ -723,6 +725,20 @@ function GroupViewer({
       // Add a HemisphereLight for a more natural lighting effect
       const hemisphereLight = new THREE.HemisphereLight(0x4040ff, 0x404040, 0.5); // Blue sky, grey ground
       scene.add(hemisphereLight);
+
+      const spotLight = new THREE.SpotLight(0xffffff, 1);
+      spotLight.position.set(15, 20, 10);
+      spotLight.angle = Math.PI / 6; // Adjust the angle of the spotlight
+      spotLight.penumbra = 0.1; // Soft edges
+      spotLight.decay = 2; // Light decay over distance
+      spotLight.distance = 200; // Maximum range of the light
+      scene.add(spotLight);
+
+      // Add a RectAreaLight for soft, even lighting
+      const rectLight = new THREE.RectAreaLight(0xffffff, 2, 10, 10);
+      rectLight.position.set(5, 5, 5);
+      rectLight.lookAt(0, 0, 0); // Point the light towards the center of the scene
+      scene.add(rectLight);
 
       // OrbitControls setup (only initialize once)
       const controls = new OrbitControls(camera, renderer.domElement);

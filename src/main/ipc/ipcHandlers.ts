@@ -665,7 +665,7 @@ export default function registerFileHandlers() {
       }
 
       // Define the subfolders to copy
-      const subfolders = ['clinical', 'stimulations', 'export', 'reconstruction'];
+      const subfolders = ['clinical', 'stimulations'];
 
       // Use system command to copy each subfolder
       subfolders.forEach((subfolder) => {

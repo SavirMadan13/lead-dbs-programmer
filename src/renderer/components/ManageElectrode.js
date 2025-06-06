@@ -684,7 +684,7 @@ function ManageElectrode({
     for (let i = 1; i < 5; i++) {
       if (allTotalAmplitudes[i]) {
         leftAmplitude.push(parseFloat(allTotalAmplitudes[i]));
-        data.S.amplitude[0][i - 1] = parseFloat(allTotalAmplitudes[i]);
+        data.S.amplitude[1][i - 1] = parseFloat(allTotalAmplitudes[i]);
       } else {
         leftAmplitude.push(0);
       }
@@ -692,7 +692,7 @@ function ManageElectrode({
     for (let i = 5; i < 9; i++) {
       if (allTotalAmplitudes[i]) {
         rightAmplitude.push(parseFloat(allTotalAmplitudes[i]));
-        data.S.amplitude[1][i - 5] = parseFloat(allTotalAmplitudes[i]);
+        data.S.amplitude[0][i - 5] = parseFloat(allTotalAmplitudes[i]);
       } else {
         rightAmplitude.push(0);
       }

@@ -135,17 +135,28 @@ function PlyViewer({
         // geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3)); // Add color attribute to geometry
 
 
+        // const material = new THREE.MeshStandardMaterial({
+        //   // color: new THREE.Color(0x808080), // Set the color to grey
+        //   vertexColors: geometry.hasAttribute('color'),
+        //   flatShading: false,
+        //   metalness: 0, // More reflective
+        //   roughness: 0.5, // Shinier surface
+        //   transparent: false, // Enable transparency
+        //   opacity: 1, // Set opacity to 60%
+        //   // blending: THREE.AdditiveBlending,
+        //   // emissive: new THREE.Color(0x000000), // Reduce emissive color
+        //   // emissiveIntensity: 0.1, // Lower emissive intensity
+        // });
         const material = new THREE.MeshStandardMaterial({
-          // color: new THREE.Color(0x808080), // Set the color to grey
+          // color: new THREE.Color(0xaaaaaa), // Set a base color for the electrode
           vertexColors: geometry.hasAttribute('color'),
           flatShading: false,
-          metalness: 0.5, // More reflective
-          roughness: 0.5, // Shinier surface
-          transparent: false, // Enable transparency
-          opacity: 1, // Set opacity to 60%
-          // blending: THREE.AdditiveBlending,
-          // emissive: new THREE.Color(0x000000), // Reduce emissive color
-          // emissiveIntensity: 0.1, // Lower emissive intensity
+          // metalness: 0.9, // Increase metalness for a more metallic look
+          roughness: 0.1, // Decrease roughness for a shinier surface
+          transparent: false,
+          opacity: 1,
+          emissive: new THREE.Color(0x333333), // Add a slight emissive color for subtle glow
+          emissiveIntensity: 0.6, // Set emissive intensity
         });
         // eslint-disable-next-line no-use-before-define
         addMeshToScene('Electrode Scene', geometry, material);
@@ -1652,7 +1663,7 @@ function PlyViewer({
       scene.add(ambientLight);
 
       const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
-      directionalLight.position.set(5, 5, 5).normalize();
+      directionalLight.position.set(-5, -5, 5).normalize();
       scene.add(directionalLight);
 
       // OrbitControls setup (only initialize once)

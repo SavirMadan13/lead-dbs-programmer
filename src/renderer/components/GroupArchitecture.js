@@ -142,6 +142,7 @@ function GroupArchitecture({
     const handleSelect = (eventKey) => {
       setSelectedPatient(eventKey);
       setRenderKey((prevKey) => prevKey + 1);
+      importNewS.label = eventKey;
     };
 
     const [newStim, setNewStim] = useState('');
@@ -289,15 +290,16 @@ function GroupArchitecture({
 
   const handleNewPatient = () => {
     // Ensure the existing patient ID is valid
-
+    console.log('Import Stimulation: ', importNewS);
     // Add the new patient to the patients list
     const updatedPatients = [...patients, newPatientName];
 
     // Copy the state of the existing patient to the new patient
     const updatedPatientStates = {
       ...patientStates,
-      [newPatientName]: { ...patientStates[selectedPatient] },
+      [newPatientName]: { ...patientStates[selectedPatient]},
     };
+    importNewS.label = newPatientName;
 
     // Update the state with the new values
     setPatients(updatedPatients);
