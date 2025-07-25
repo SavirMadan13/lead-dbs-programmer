@@ -657,15 +657,19 @@ export default function registerFileHandlers() {
     const uniqueFolderName = `miniset_${Date.now()}`;
     for (const patientId of selectedPatients) {
       const patientFolder = path.join(userDataPath, 'derivatives', 'leaddbs', patientId);
+      const rawdataFolder = path.join(userDataPath, 'rawdata', patientId);
       const newPatientFolder = path.join(folderPath, uniqueFolderName, 'derivatives', 'leaddbs', patientId);
-
+      const newRawdataFolder = path.join(folderPath, uniqueFolderName, 'rawdata', patientId);
       // Ensure the new patient directory exists
       if (!fs.existsSync(newPatientFolder)) {
         fs.mkdirSync(newPatientFolder, { recursive: true });
       }
+      if (!fs.existsSync(newRawdataFolder)) {
+        fs.mkdirSync(newRawdataFolder, { recursive: true });
+      }
 
       // Define the subfolders to copy
-      const subfolders = ['clinical', 'stimulations'];
+      const subfolders = ['clinical', 'stimulations', 'reconstruction'];
 
       // Use system command to copy each subfolder
       subfolders.forEach((subfolder) => {
@@ -684,7 +688,22 @@ export default function registerFileHandlers() {
         } catch (error) {
           console.error(`Error copying ${subfolder} directory:`, error);
         }
+
+
       });
+
+        // Define the subfolders to copy
+        const rawSubfolders = ['rawdata'];
+        const rawSrcFile = path.join(rawdataFolder, 'ses-preop', 'anat', `${patientId}_ses-preop_acq-iso_T1w.nii.gz`);
+        const rawDestFolder = newRawdataFolder;
+
+        // Ensure the raw destination directory exists
+        if (!fs.existsSync(rawDestFolder)) {
+          fs.mkdirSync(rawDestFolder, { recursive: true });
+        }
+
+        const rawDestFile = path.join(rawDestFolder, `${patientId}_ses-preop_acq-iso_T1w.nii.gz`);
+        fs.copyFileSync(rawSrcFile, rawDestFile);
     }
   });
 
