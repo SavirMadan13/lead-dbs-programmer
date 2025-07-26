@@ -17,6 +17,7 @@ import * as childProcess from 'child_process';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { FastAPIServerManager } from './pyserver';
+import registerProxyHandlers from './ipc/ipcProxyHandlers';
 import { getData, setData } from './data/data';
 import {
   getPatientFolder,
@@ -153,213 +154,50 @@ let stimulationData = {};
 const fastAPIServer = new FastAPIServerManager();
 
 ipcMain.on('import-inputdata-file', async (event, arg) => {
-  const fs = require('fs');
-
   try {
-    console.log(inputPath);
-    console.log(process.argv[1]);
-    const stats = fs.statSync(inputPath);
-    if (stats.isDirectory()) {
-      stimulationData.mode = 'standalone';
-      stimulationData.type = 'leaddbs';
-      stimulationData.path = inputPath; // change to process.argv[1]
-      setData('stimulationData', stimulationData);
-      event.reply('import-inputdata-file', stimulationData);
-      return;
-    }
-
-    // Read the file
-    const f = fs.readFileSync(inputPath);
-
-    // Parse the JSON data
-    const jsonData = JSON.parse(f);
-    stimulationData = jsonData;
+    console.log('Processing import-inputdata-file request via FastAPI backend...');
+    console.log('Input path:', inputPath);
+    
+    // Call the FastAPI backend to handle the import
+    const result = await fastAPIServer.apiRequest(`/api/files/import-inputdata?file_path=${encodeURIComponent(inputPath)}`, {
+      method: 'POST',
+    });
+    
+    // Update local data with the result
+    stimulationData = result;
     setData('stimulationData', stimulationData);
-    // stimulationData = getData('stimulationData');
-    stimulationDirectory = stimulationData.stimDir;
-    const leadDBS = true;
-    // Writing stimulation parameters to files in clinical folder
-    if (stimulationData.type === 'leaddbs') {
-      stimulationData.labels.forEach((label, index) => {
-        // let patientDir = path.join(stimulationData.filepath, `sub-${stimulationData.patientname}`);
-        const patientDir = getPatientFolder(
-          stimulationData.filepath,
-          stimulationData.patientname,
-          leadDBS,
-        );
-        const sessionDir = path.join(patientDir, `ses-${label}`);
-        const fileName = `${stimulationData.patientname}_ses-${label}_stimparameters.json`;
-        const filePath = path.join(sessionDir, fileName);
-        console.log(filePath);
-        try {
-          if (!fs.existsSync(sessionDir)) {
-            fs.mkdirSync(sessionDir, { recursive: true });
-          }
-          // Write data to the file
-        } catch (error) {
-          console.error('Error creating directory:', error);
-        }
-        fs.writeFileSync(
-          filePath,
-          JSON.stringify(
-            { S: stimulationData.S[index] || stimulationData.S },
-            null,
-            2,
-          ),
-          'utf8',
-        );
-      });
-    } else if (stimulationData.type === 'leadgroup') {
-      stimulationData.patientname.forEach((name, index) => {
-        // let patientDir = path.join(stimulationData.filepath, name);
-        console.log(stimulationData.patientfolders[index]);
-        let patientDir = path.join(
-          stimulationData.patientfolders[0][index],
-          name,
-        );
-
-        let sessionDir = path.join(patientDir, `ses-${stimulationData.label}`);
-        let fileName = `sub-${name}_ses-${stimulationData.label}_stim.json`;
-        let filePath = path.join(sessionDir, fileName);
-
-        if (leadDBS) {
-          const newDirectoryPath = path.join(
-            // stimulationData.filepath,
-            stimulationData.patientfolders[0][index],
-            'clinical',
-          );
-          patientDir = path.join(newDirectoryPath);
-          sessionDir = path.join(patientDir, `ses-${stimulationData.label}`);
-          fileName = `${name}_ses-${stimulationData.label}_stimparameters.json`;
-          filePath = path.join(sessionDir, fileName);
-        }
-        console.log(filePath);
-        try {
-          if (!fs.existsSync(sessionDir)) {
-            fs.mkdirSync(sessionDir, { recursive: true });
-          }
-          // Write data to the file
-        } catch (error) {
-          console.error('Error creating directory:', error);
-        }
-        fs.writeFileSync(
-          filePath,
-          JSON.stringify({ S: stimulationData.S[index] }, null, 2),
-          'utf8',
-        );
-      });
-    }
-    console.log('Stimulation Data Sent: ', jsonData);
-    event.reply('import-inputdata-file', jsonData);
-  } catch (err) {
-    // Handle specific errors
-    console.log(err);
+    stimulationDirectory = stimulationData.stimDir || '';
+    
+    console.log('Stimulation Data imported via FastAPI:', result);
+    event.reply('import-inputdata-file', result);
+  } catch (error) {
+    console.error('Error importing inputdata via FastAPI:', error);
+    event.reply('import-inputdata-file-error', error.message);
   }
 });
 
 ipcMain.on(
   'import-file',
   async (event, id, timeline, directoryPath, leadDBS) => {
-    const fs = require('fs');
     try {
-      // Validate id, timeline, and directoryPath
-      if (!id || !timeline || !directoryPath) {
-        console.error('Missing patient ID, timeline, or directoryPath');
-        event.reply(
-          'import-file-error',
-          'Missing patient ID, timeline, or directoryPath',
-        );
-        return;
-      }
-
-      // Construct the file path dynamically based on the directoryPath, patient id, and timeline
-      let patientDir = path.join(directoryPath, `sub-${id}`);
-      let sessionDir = path.join(patientDir, `ses-${timeline}`);
-      let fileName = `sub-${id}_ses-${timeline}_stim.json`;
-      let filePath = path.join(sessionDir, fileName);
-
-      if (leadDBS) {
-        const newDirectoryPath = path.join(
-          directoryPath,
-          'derivatives/leaddbs',
-          id,
-          'clinical',
-        );
-        patientDir = path.join(newDirectoryPath);
-        sessionDir = path.join(patientDir, `ses-${timeline}`);
-        fileName = `${id}_ses-${timeline}_stimparameters.json`;
-        filePath = path.join(sessionDir, fileName);
-      }
-
-      // Check if the file exists before trying to read it
-      if (!fs.existsSync(filePath)) {
-        if (leadDBS) {
-          if (
-            stimulationData.mode === 'stimulate' &&
-            (stimulationData.labels?.[0] || stimulationData.label) === timeline
-          ) {
-            if (!fs.existsSync(sessionDir)) {
-              fs.mkdirSync(sessionDir, { recursive: true });
-            }
-            // Write data to the file
-            fs.writeFileSync(
-              filePath,
-              JSON.stringify(stimulationData.S, null, 2),
-              'utf8',
-            );
-            event.reply('import-file', stimulationData);
-            return;
-          }
-          filePath = path.join(
-            directoryPath,
-            'derivatives/leaddbs',
-            id,
-            'clinical',
-            `${id}_desc-reconstruction.json`,
-          );
-          const fileData = fs.readFileSync(filePath, 'utf8'); // Read the PLY file as binary
-          const jsonData = JSON.parse(fileData); // Parse the string into a JSON object
-          if (!patientMasterData[id]) {
-            patientMasterData[id] = {}; // Initialize the object
-          }
-          // Now you can assign stimData to the id
-          patientMasterData[id].stimData = fileData;
-          console.log('Reached: ', patientMasterData);
-          event.reply('import-file', jsonData);
-          return;
-        }
-        event.reply('import-file', 'File Not Found');
-        return;
-      }
-      if (
-        stimulationData.mode === 'stimulate' &&
-        (stimulationData.labels?.[0] || stimulationData.label) === timeline
-      ) {
-        event.reply('import-file', stimulationData);
-        return;
-      }
-      console.log(filePath);
-      // Read the file
-      const fileData = fs.readFileSync(filePath);
-
-      // Parse the JSON data
-      const jsonData = JSON.parse(fileData);
-
-      // Log and send the data back to the renderer process
-      console.log(jsonData);
-      event.reply('import-file', jsonData);
-    } catch (err) {
-      // Handle specific errors
-      if (err.code === 'ENOENT') {
-        console.error('File not found:');
-        event.reply('import-file-error', 'File not found');
-      } else if (err.name === 'SyntaxError') {
-        console.error('Error parsing JSON:', err.message);
-        event.reply('import-file-error', 'Error parsing JSON');
-      } else {
-        console.error('An unexpected error occurred:', err);
-        event.reply('import-file-error', err.message);
-      }
+      console.log('Processing import-file request via FastAPI backend...');
+      
+      // Call the FastAPI backend to handle the file import
+      const result = await fastAPIServer.apiRequest('/api/files/import', {
+        method: 'POST',
+        body: JSON.stringify({ 
+          id: id, 
+          timeline: timeline, 
+          directoryPath: directoryPath, 
+          leadDBS: leadDBS 
+        }),
+      });
+      
+      console.log('File imported via FastAPI:', result);
+      event.reply('import-file', result);
+    } catch (error) {
+      console.error('Error importing file via FastAPI:', error);
+      event.reply('import-file-error', error.message);
     }
   },
 );
@@ -413,8 +251,20 @@ ipcMain.handle(
 );
 
 ipcMain.handle('get-stimulation-data', async (_, message) => {
-  // setData('stimulationData', stimulationData);
-  return stimulationData;
+  console.log('Getting stimulation data via FastAPI backend...');
+  try {
+    // Call the FastAPI backend to get stimulation data
+    const result = await fastAPIServer.apiRequest('/api/stimulation/data', {
+      method: 'GET',
+    });
+    
+    console.log('Stimulation data retrieved via FastAPI:', result);
+    return result;
+  } catch (error) {
+    console.error('Error getting stimulation data via FastAPI:', error);
+    // Fall back to local data if FastAPI fails
+    return stimulationData;
+  }
 });
 
 // Not sure what this is used for
@@ -653,6 +503,9 @@ const createWindow = async () => {
 
   console.log('FastAPI server started successfully!');
   console.log('Server URL:', fastAPIServer.getServerUrl());
+  
+  // Register IPC proxy handlers to forward remaining IPC calls to FastAPI backend
+  registerProxyHandlers(fastAPIServer);
 
   if (isDebug) {
     await installExtensions();
@@ -1007,178 +860,37 @@ const createWindow = async () => {
   };
 
   ipcMain.on('select-folder', async (event, directoryPath) => {
-    if (directoryPath) {
-      console.log('DIRECTORYPATH: ', directoryPath);
-
-      // Check if the folder matches Lead-DBS structure
-      if (isLeadDBSFolder(directoryPath)) {
-        console.log('Lead-DBS folder detected');
-        const participantsFilePath = path.join(
-          directoryPath,
-          'participants.json',
-        );
-        console.log('Stimulation data type: ', stimulationData.type);
-        if (stimulationData.type === 'leadgroup') {
-          if (fs.existsSync(participantsFilePath)) {
-            fs.readFile(participantsFilePath, 'utf-8', (err, data) => {
-              if (err) {
-                console.error('Error reading JSON file:', err);
-                event.sender.send('file-read-error', 'Error reading JSON file');
-              } else {
-                try {
-                  const patients = JSON.parse(data);
-                  console.log('PATIENTS: ', patients);
-                  event.sender.send('folder-selected', directoryPath, patients);
-                  handleMasterDataFill(directoryPath, patients);
-                  event.sender.send(
-                    'file-read-success',
-                    patients,
-                    directoryPath,
-                  );
-                } catch (error) {
-                  console.error('Error parsing JSON file:', error);
-                  event.sender.send(
-                    'file-read-error',
-                    'Error parsing JSON file',
-                  );
-                }
-              }
-            });
-          }
-          const patients = loadLeadGroupPatients(stimulationData.patientname);
-          patients.forEach((patient, index) => {
-            patient.elmodel = stimulationData.electrodeModels[index];
-          });
-          console.log('PATIENTS: ', patients);
-          event.sender.send('folder-selected', directoryPath, patients);
-          event.sender.send('file-read-success', patients, directoryPath);
-        }
-        console.log(participantsFilePath);
-        if (fs.existsSync(participantsFilePath)) {
-          console.log('Participants File Path: ', participantsFilePath);
-          fs.readFile(participantsFilePath, 'utf-8', (err, data) => {
-            // if (err) {
-            //   console.error('Error reading JSON file:', err);
-            //   event.sender.send('file-read-error', 'Error reading JSON file');
-            // } else {
-            //   try {
-            //     const patients = JSON.parse(data);
-            //     console.log('PATIENTS: ', patients);
-            //     event.sender.send('folder-selected', directoryPath, patients);
-            //     handleMasterDataFill(directoryPath, patients);
-            //     event.sender.send('file-read-success', patients, directoryPath);
-            //   } catch (error) {
-            //     console.error('Error parsing JSON file:', error);
-            //     event.sender.send('file-read-error', 'Error parsing JSON file');
-            //   }
-            // }
-            try {
-              const patients = JSON.parse(data);
-              console.log('PATIENTS: ', patients);
-              event.sender.send('folder-selected', directoryPath, patients);
-              // handleMasterDataFill(directoryPath, patients);
-              event.sender.send('file-read-success', patients, directoryPath);
-              return;
-              // Exit the ipcMain process after sending the event
-            } catch (error) {
-              console.error('Error parsing JSON file:', error);
-              event.sender.send('file-read-error', 'Error parsing JSON file');
-            }
-          });
-        }
-        console.log('At this step');
-        // const patients = loadLeadDBSPatients(directoryPath);
-        const patients = fs.readFileSync(path.join(directoryPath, 'participants.json'));
-        console.log('PATIENTS: ', patients);
-        patients.forEach((patient, index) => {
-          console.log('STIMULATION DATA: ', stimulationData);
-          // console.log(
-          //   'STIMULATION DATA ELECTRODE MODELS: ',
-          //   stimulationData.electrodeModels,
-          // );
-          patient.elmodel = stimulationData.elmodel;
-          console.log('PATIENT: ', patient);
-        });
-        console.log('Directory Path: ', directoryPath);
-        event.sender.send('folder-selected', directoryPath, patients);
-        event.sender.send('file-read-success', patients, directoryPath);
-      } else {
-        // Regular dataset_description.json loading if it's not Lead-DBS
-        const filePath = path.join(directoryPath, 'participants.json');
-        if (fs.existsSync(filePath)) {
-          fs.readFile(filePath, 'utf-8', (err, data) => {
-            if (err) {
-              console.error('Error reading JSON file:', err);
-              event.sender.send('file-read-error', 'Error reading JSON file');
-            } else {
-              try {
-                const patients = JSON.parse(data);
-                console.log('PATIENTS: ', patients);
-                event.sender.send('folder-selected', directoryPath, patients);
-                event.sender.send('file-read-success', patients, directoryPath);
-              } catch (error) {
-                console.error('Error parsing JSON file:', error);
-                event.sender.send('file-read-error', 'Error parsing JSON file');
-              }
-            }
-          });
-        } else {
-          event.sender.send('folder-selected', directoryPath);
-        }
-      }
-    } else {
-      const result = await dialog.showOpenDialog({
-        properties: ['openDirectory'],
+    try {
+      console.log('Processing select-folder request via FastAPI backend...');
+      console.log('Directory Path:', directoryPath);
+      
+      // Call the FastAPI backend to handle folder selection
+      const result = await fastAPIServer.apiRequest('/api/files/select-folder', {
+        method: 'POST',
+        body: JSON.stringify({ 
+          directory_path: directoryPath,
+          show_dialog: !directoryPath // Show dialog if no path provided
+        }),
       });
-
-      if (!result.canceled) {
-        const folderPath = result.filePaths[0];
-        console.log('Selected folder: ', folderPath);
-
-        // Save the selected directory path
-        // saveDirectoryPath(folderPath);
-
-        // Check if the folder matches Lead-DBS structure
-        if (isLeadDBSFolder(folderPath)) {
-          console.log('Lead-DBS folder detected');
-          const patients = loadLeadDBSPatients(folderPath);
-          console.log('PATIENTS: ', patients);
-          event.sender.send('folder-selected', folderPath, patients);
-          event.sender.send('file-read-success', patients, directoryPath);
-        } else {
-          // Regular dataset_description.json loading if it's not Lead-DBS
-          const filePath = path.join(folderPath, 'participants.json');
-          if (fs.existsSync(filePath)) {
-            fs.readFile(filePath, 'utf-8', (err, data) => {
-              if (err) {
-                console.error('Error reading JSON file:', err);
-                event.sender.send('file-read-error', 'Error reading JSON file');
-              } else {
-                try {
-                  const patients = JSON.parse(data);
-                  console.log('PATIENTS: ', patients);
-                  event.sender.send('folder-selected', folderPath, patients);
-                  event.sender.send(
-                    'file-read-success',
-                    patients,
-                    directoryPath,
-                  );
-                } catch (error) {
-                  console.error('Error parsing JSON file:', error);
-                  event.sender.send(
-                    'file-read-error',
-                    'Error parsing JSON file',
-                  );
-                }
-              }
-            });
-          } else {
-            event.sender.send('folder-selected', folderPath);
-          }
+      
+      console.log('Folder selected via FastAPI:', result);
+      
+      // Send the appropriate events based on the result
+      if (result.success) {
+        event.sender.send('folder-selected', result.selected_path, result.patients);
+        if (result.patients) {
+          event.sender.send('file-read-success', result.patients, result.selected_path);
         }
       } else {
         event.sender.send('folder-selected', null);
+        if (result.error) {
+          event.sender.send('file-read-error', result.error);
+        }
       }
+    } catch (error) {
+      console.error('Error selecting folder via FastAPI:', error);
+      event.sender.send('folder-selected', null);
+      event.sender.send('file-read-error', error.message);
     }
   });
 
@@ -1379,24 +1091,36 @@ const createWindow = async () => {
   };
 
   ipcMain.handle('get-ply-files', async (event) => {
+    console.log('Getting PLY files via FastAPI backend...');
     try {
-      const plyFiles = gatherPlyFiles(); // Your function for gathering files
-      return plyFiles;
+      const result = await fastAPIServer.apiRequest('/api/visualization/ply-files', {
+        method: 'GET',
+      });
+      
+      console.log('PLY files retrieved via FastAPI:', result);
+      return result;
     } catch (error) {
-      console.error('Error:', error);
-      throw error;
+      console.error('Error getting PLY files via FastAPI:', error);
+      // Fall back to original implementation if needed
+      const plyFiles = gatherPlyFiles();
+      return plyFiles;
     }
   });
 
   ipcMain.handle('get-ply-files-database', async (event) => {
-    console.log('HERE');
+    console.log('Getting PLY database files via FastAPI backend...');
     try {
-      const plyFiles = gatherPlyFilesDatabase();
-      console.log('Dataset Master: ', plyFiles); // Your function for gathering files
-      return plyFiles;
+      const result = await fastAPIServer.apiRequest('/api/visualization/ply-files-database', {
+        method: 'GET',
+      });
+      
+      console.log('PLY database files retrieved via FastAPI:', result);
+      return result;
     } catch (error) {
-      console.error('Error:', error);
-      throw error;
+      console.error('Error getting PLY database files via FastAPI:', error);
+      // Fall back to original implementation if needed  
+      const plyFiles = gatherPlyFilesDatabase();
+      return plyFiles;
     }
   });
 
