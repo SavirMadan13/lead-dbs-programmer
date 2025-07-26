@@ -16,7 +16,7 @@ import log from 'electron-log';
 import * as childProcess from 'child_process';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import registerFileHandlers from './ipc/ipcHandlers';
+import { FastAPIServerManager } from './pyserver';
 import { getData, setData } from './data/data';
 import {
   getPatientFolder,
@@ -96,13 +96,12 @@ function ensureClinicalScoresFile() {
 }
 
 app.on('ready', () => {
-  registerFileHandlers(); // Call this when the app is ready
   try {
     ensureClinicalScoresFile();
   } catch (error) {
     console.error('Error ensuring clinical scores file:', error);
   }
-  console.log('File handlers registered.');
+  console.log('App ready - clinical scores file ensured.');
 });
 
 // console.log = () => {};
@@ -149,6 +148,9 @@ console.log('Directory: ', __dirname);
 let mainWindow: BrowserWindow | null = null;
 let stimulationDirectory = '';
 let stimulationData = {};
+
+// FastAPI Server Manager Instance
+const fastAPIServer = new FastAPIServerManager();
 
 ipcMain.on('import-inputdata-file', async (event, arg) => {
   const fs = require('fs');
@@ -639,6 +641,19 @@ const installExtensions = async () => {
 let showResize = false;
 
 const createWindow = async () => {
+  // Start the FastAPI server first
+  console.log('Starting FastAPI backend server...');
+  const serverStarted = await fastAPIServer.startServer();
+  
+  if (!serverStarted) {
+    console.error('Failed to start FastAPI server. Exiting...');
+    app.quit();
+    return;
+  }
+
+  console.log('FastAPI server started successfully!');
+  console.log('Server URL:', fastAPIServer.getServerUrl());
+
   if (isDebug) {
     await installExtensions();
   }
@@ -1719,7 +1734,17 @@ const createWindow = async () => {
  * Add event listeners...
  */
 
+app.on('before-quit', () => {
+  // Ensure FastAPI server is stopped before quitting
+  console.log('App quitting - stopping FastAPI server...');
+  fastAPIServer.stopServer();
+});
+
 app.on('window-all-closed', () => {
+  // Stop the FastAPI server when all windows are closed
+  console.log('All windows closed - stopping FastAPI server...');
+  fastAPIServer.stopServer();
+  
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
   // if (process.platform !== 'darwin') {
@@ -1736,7 +1761,6 @@ app
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
       if (mainWindow === null) createWindow();
-      registerFileHandlers();
     });
   })
   .catch(console.log);
