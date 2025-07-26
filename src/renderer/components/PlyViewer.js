@@ -24,7 +24,12 @@ import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings
 import * as math from 'mathjs';
 import { optimizeSphereValues, projectNumContacts } from './StimOptimizer';
 import { computeSuperimposedEField } from './OssDbsStimsets';
-import { nii2Mesh, processNifti, testPlane, addSliceToSceneNew } from './NiftiUtils';
+import {
+  nii2Mesh,
+  processNifti,
+  testPlane,
+  addSliceToSceneNew,
+} from './NiftiUtils';
 // import { processNii } from './ProcessNii';
 // import { remote } from 'electron'; // Use 'electron' for Electron v12+
 import IconButton from '@mui/material/IconButton';
@@ -130,10 +135,7 @@ function PlyViewer({
         // Update the geometry with the new colors
         geometry.setAttribute('color', new THREE.BufferAttribute(newColors, 3));
 
-
-
         // geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3)); // Add color attribute to geometry
-
 
         // const material = new THREE.MeshStandardMaterial({
         //   // color: new THREE.Color(0x808080), // Set the color to grey
@@ -314,7 +316,6 @@ function PlyViewer({
           // blending: THREE.AdditiveBlending,
           // emissive: new THREE.Color(0x000000), // Reduce emissive color
           // emissiveIntensity: 0.1, // Lower emissive intensity
-
         });
         // eslint-disable-next-line no-use-before-define
         addMeshToScene('Anatomy', geometry, material);
@@ -1674,7 +1675,10 @@ function PlyViewer({
       controls.zoomSpeed = 0.5;
       controlsRef.current = controls;
 
-      const secondaryControls = new OrbitControls(secondaryCamera, secondaryRenderer.domElement);
+      const secondaryControls = new OrbitControls(
+        secondaryCamera,
+        secondaryRenderer.domElement,
+      );
       secondaryControls.enableDamping = true;
       secondaryControls.dampingFactor = 0.1;
       secondaryControls.rotateSpeed = 0.8;
@@ -3298,6 +3302,23 @@ function PlyViewer({
 
           console.log('MNI Coordinates:', mniCoordinates);
 
+          try {
+            const res = await fetch('http://localhost:8001/api/run-optimizer', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ message: elecCoords }),
+            });
+
+            if (!res.ok) throw new Error('Failed to update message');
+
+            const data = await res.json();
+            console.log('Data: ', data);
+          } catch (err) {
+            console.error('Error updating message:', err);
+          }
+
           // plotNifti(mniCoordinates);
           // Set the state with the transformed coordinates
           setNiiCoords(mniCoordinates);
@@ -3984,7 +4005,10 @@ function PlyViewer({
 
   const toggleFullScreen = () => {
     const renderer = rendererRef.current;
-    renderer.setSize(Math.min(window.innerWidth, window.innerHeight), Math.min(window.innerWidth, window.innerHeight));
+    renderer.setSize(
+      Math.min(window.innerWidth, window.innerHeight),
+      Math.min(window.innerWidth, window.innerHeight),
+    );
     const baseWidth = 500; // Base width
     const baseHeight = 500; // Base height
     const aspectRatio = baseWidth / baseHeight;
@@ -4035,7 +4059,7 @@ function PlyViewer({
   };
   const [val, setVal] = useState(-10);
   const handleSlideSlice = (val_import) => {
-    let zVal = val + val_import/100;
+    let zVal = val + val_import / 100;
     console.log('zVal: ', zVal);
     const { mniCoordinates, header, voxelCoordinates } = slice;
     const [nx, ny, nz] = header.dims.slice(1, 4);
@@ -4094,7 +4118,7 @@ function PlyViewer({
     const material = new THREE.ShaderMaterial({
       uniforms: {
         uTex: { value: texture },
-        uSlice: { value: 0 } // Uniform to select the slice
+        uSlice: { value: 0 }, // Uniform to select the slice
       },
       side: THREE.DoubleSide,
       vertexShader: `
@@ -4112,7 +4136,7 @@ function PlyViewer({
           vec4 color = texture(uTex, vec3(vUv, uSlice));
           gl_FragColor = color;
         }
-      `
+      `,
     });
 
     // Create the mesh
@@ -4120,7 +4144,7 @@ function PlyViewer({
     const position = [0, 0, zVal];
 
     addMeshToScene('NIfTI Volume', mesh.geometry, mesh.material, position);
-  }
+  };
 
   const handleZoom = (event) => {
     if (isFrozen) {
@@ -4146,7 +4170,6 @@ function PlyViewer({
     if (rendererElement) {
       // rendererElement.addEventListener('mousemove', onMouseMove);
       rendererElement.addEventListener('wheel', onWheel);
-
     }
 
     // Clean up event listeners on component unmount
@@ -4154,11 +4177,9 @@ function PlyViewer({
       if (rendererElement) {
         // rendererElement.removeEventListener('mousemove', onMouseMove);
         rendererElement.addEventListener('wheel', onWheel);
-
       }
     };
   }, [isFrozen]); // Re-run effect if isFrozen changes
-
 
   return (
     <div style={{ marginTop: '-120px' }}>
@@ -4166,13 +4187,25 @@ function PlyViewer({
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <IconButton
             onClick={toggleFullScreen}
-            style={{ position: 'absolute', top: 20, right: 20, zIndex: 1000, color: 'white' }}
+            style={{
+              position: 'absolute',
+              top: 20,
+              right: 20,
+              zIndex: 1000,
+              color: 'white',
+            }}
           >
             {isFullScreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
           </IconButton>
           <IconButton
             onClick={toggleFreeze}
-            style={{ position: 'absolute', top: 20, right: 60, zIndex: 1000, color: 'white' }} // Adjusted position
+            style={{
+              position: 'absolute',
+              top: 20,
+              right: 60,
+              zIndex: 1000,
+              color: 'white',
+            }} // Adjusted position
           >
             {isFrozen ? <LockOpenIcon /> : <LockIcon />}
           </IconButton>
@@ -4188,7 +4221,7 @@ function PlyViewer({
           />
           <div ref={secondaryMountRef} />
         </div>
-        <Dropdown drop="start" style={{zIndex: 1001}}>
+        <Dropdown drop="start" style={{ zIndex: 1001 }}>
           <Dropdown.Toggle variant="secondary" style={{ marginLeft: '-100px' }}>
             <SettingsIcon />
           </Dropdown.Toggle>

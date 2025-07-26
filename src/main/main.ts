@@ -23,6 +23,7 @@ import {
   readJSON,
   getPatientFolderPly,
 } from './helpers/helpers';
+import startPythonServer from './pyserver';
 
 ipcMain.setMaxListeners(Infinity);
 
@@ -105,9 +106,9 @@ app.on('ready', () => {
   console.log('File handlers registered.');
 });
 
-console.log = () => {};
-console.warn = () => {};
-console.error = () => {};
+// console.log = () => {};
+// console.warn = () => {};
+// console.error = () => {};
 
 // const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
 // console.log(args);
@@ -153,6 +154,7 @@ console.log('Binary path: ', app.getPath('exe'));
 console.log('Resources path: ', process.resourcesPath);
 console.log('CWD: ', process.cwd());
 console.log('Directory: ', __dirname);
+startPythonServer();
 
 let mainWindow: BrowserWindow | null = null;
 let stimulationDirectory = '';
