@@ -140,6 +140,17 @@ async def batch_import_clinical(
         logger.error(f"Error in batch import: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.post("/ensure-scores-file")
+async def ensure_clinical_scores_file():
+    """Ensure clinical scores file exists - replaces ensureClinicalScoresFile()"""
+    try:
+        await data_manager.ensure_clinical_scores_file()
+        return SuccessResponse(message="Clinical scores file ensured")
+        
+    except Exception as e:
+        logger.error(f"Error ensuring clinical scores file: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/scores-types")
 async def get_clinical_scores_types():
     """Get clinical scores types - replaces 'get-clinical-scores-types' IPC"""

@@ -58,6 +58,25 @@ class FileService:
             return False
     
     @staticmethod
+    async def write_file(file_path: Union[str, Path], content: str, ensure_dirs: bool = True) -> bool:
+        """Write text content to file"""
+        try:
+            file_path = Path(file_path)
+            
+            if ensure_dirs:
+                file_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            async with aiofiles.open(file_path, 'w', encoding='utf-8') as f:
+                await f.write(content)
+            
+            logger.debug(f"Successfully wrote file: {file_path}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error writing file {file_path}: {e}")
+            return False
+    
+    @staticmethod
     async def read_binary_file(file_path: Union[str, Path]) -> Optional[bytes]:
         """Read binary file"""
         try:

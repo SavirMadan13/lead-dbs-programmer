@@ -15,7 +15,7 @@ from models.schemas import (
 )
 from services.file_service import FileService
 from services.data_manager import data_manager
-from services.helpers import is_lead_dbs_folder, get_timelines_for_patient
+from services.helpers import is_lead_dbs_folder, get_timelines_for_patient, get_patient_folder
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -275,6 +275,134 @@ async def get_participants():
         
     except Exception as e:
         logger.error(f"Error getting participants: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/import-file-2/{patient_id}/{timeline}")
+async def import_file_2(
+    patient_id: str,
+    timeline: str,
+    directory_path: str,
+    lead_dbs: bool = False
+):
+    """Import file with path construction - replaces 'import-file-2' IPC"""
+    try:
+        if not patient_id or not timeline or not directory_path:
+            raise HTTPException(status_code=400, detail="Missing patient ID, timeline, or directoryPath")
+        
+        # Construct the file path dynamically
+        if lead_dbs:
+            patient_folder = await get_patient_folder(directory_path, patient_id, lead_dbs)
+            session_dir = Path(patient_folder) / f"ses-{timeline}"
+            filename = f"{patient_id}_ses-{timeline}_stimparameters.json"
+            file_path = session_dir / filename
+        else:
+            patient_dir = Path(directory_path) / f"sub-{patient_id}"
+            session_dir = patient_dir / f"ses-{timeline}"
+            filename = f"sub-{patient_id}_ses-{timeline}_stim.json"
+            file_path = session_dir / filename
+        
+        if not file_path.exists():
+            raise HTTPException(status_code=404, detail="File not found")
+        
+        json_data = await FileService.read_json_file(file_path)
+        if not json_data:
+            raise HTTPException(status_code=404, detail="Failed to read JSON data")
+        
+        return json_data
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in import-file-2: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/import-previous-files")
+async def import_previous_files(file_id: str, import_data: Dict[str, Any]):
+    """Import previous files - replaces 'import-previous-files' IPC"""
+    try:
+        master_import_data = import_data.get('priorStims', {})
+        file_key = ''
+        
+        # Find the file key
+        for key, value in master_import_data.items():
+            if value.get('name') == file_id:
+                file_key = key
+                break
+        
+        logger.info(f"File key: {file_key}")
+        
+        # Determine file path
+        if file_key and file_key in master_import_data:
+            prior_stim_folder = master_import_data[file_key]['folder']
+            patient_name = import_data['patientname']
+            filename = f"{patient_name}_desc-stimparameters.json"
+            file_path = Path(prior_stim_folder) / file_id / filename
+        else:
+            # Use default folder (index 3)
+            prior_stim_folder = master_import_data.get('3', {}).get('folder', '')
+            patient_name = import_data['patientname']
+            filename = f"{patient_name}_desc-stimparameters.json"
+            file_path = Path(prior_stim_folder) / file_id / filename
+            
+            # Create output folder if it doesn't exist
+            output_folder = Path(prior_stim_folder) / file_id
+            await FileService.create_directory(output_folder)
+            
+            # Create empty file if it doesn't exist
+            if not file_path.exists():
+                await FileService.write_json_file(file_path, {})
+        
+        # Read the file
+        if file_path.exists():
+            json_data = await FileService.read_json_file(file_path)
+            if json_data is None:
+                # File is empty, create it
+                await FileService.write_json_file(file_path, {})
+                logger.info("File is empty. Created a new file.")
+                return "Empty"
+            else:
+                logger.info("Data read successfully")
+                return json_data
+        else:
+            # Create the file
+            await FileService.write_json_file(file_path, {})
+            logger.info("File does not exist. Created a new file.")
+            return "Empty"
+        
+    except Exception as e:
+        logger.error(f"Error importing previous files: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/set-status")
+async def set_status(app_path: str):
+    """Set status file - replaces 'set-status' IPC"""
+    try:
+        app_path_obj = Path(app_path)
+        directories = app_path_obj.parts
+        
+        # Build result path
+        result_parts = []
+        for directory in directories:
+            result_parts.append(directory)
+            if directory == 'programmergroup':
+                break
+        
+        if result_parts:
+            result_path = Path(*result_parts) if len(result_parts) > 1 else Path(result_parts[0])
+            status_file_path = result_path / 'status.json'
+            
+            # Write status file
+            success = await FileService.write_file(status_file_path, '0')
+            
+            if success:
+                return SuccessResponse(message="Status file written successfully")
+            else:
+                raise HTTPException(status_code=500, detail="Failed to write status file")
+        
+        raise HTTPException(status_code=400, detail="Invalid app path")
+        
+    except Exception as e:
+        logger.error(f"Error setting status: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/read-file")
