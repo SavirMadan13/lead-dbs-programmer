@@ -642,13 +642,12 @@ function StimulationSettings({
                   backgroundColor: '#fff',
                   cursor: 'pointer',
                 }}
-                // disabled
               >
                 {varargout.map((electrode) => (
                   <option
                     key={electrode.value}
                     value={electrode.value}
-                    // disabled
+                    disabled
                   >
                     {electrode.displayName}
                   </option>

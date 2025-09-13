@@ -52,7 +52,7 @@ function ClinicalScores() {
   };
   const [totalScores, setTotalScores] = useState();
   const [scoreTypes, setScoreTypes] = useState([]);
-  const [selectedScoreType, setSelectedScoreType] = useState();
+  const [selectedScoreType, setSelectedScoreType] = useState('UPDRS');
   const [initialScores, setInitialScores] = useState(UPDRS);
   const [allScores, setAllScores] = useState([]);
 
@@ -94,7 +94,7 @@ function ClinicalScores() {
   }
 
   const UPDRSImages = importAll(
-    require.context('./icons/new', false, /\.(PNG|jpe?g|svg|png)$/),
+    require.context('./icons', false, /\.(PNG|jpe?g|svg|png)$/),
   );
   console.log('UPDRSImages: ', UPDRSImages);
   const YBOCS = {
@@ -231,11 +231,11 @@ function ClinicalScores() {
           if (newAllScores[score].hasOwnProperty('Timeline')) {
             delete newAllScores[score].Timeline;
           }
-          if (newAllScores[score].hasOwnProperty('Levodopa Equivalent Dose of DBS')) {
-            const updatedLEDD = {};
-            updatedLEDD['Levodopa Equivalent Daily Dose'] = newAllScores[score]['Levodopa Equivalent Dose of DBS'];
-            newAllScores[score] = updatedLEDD;
-          }
+          // if (newAllScores[score].hasOwnProperty('Levodopa Equivalent Dose of DBS')) {
+          //   const updatedLEDD = {};
+          //   updatedLEDD['Levodopa Equivalent Daily Dose'] = newAllScores[score]['Levodopa Equivalent Dose of DBS'];
+          //   newAllScores[score] = updatedLEDD;
+          // }
         });
         console.log('newAllScores: ', newAllScores);
         setAllScores(newAllScores);
@@ -371,11 +371,11 @@ function ClinicalScores() {
                             alt={key}
                             title={key}
                             className="updrs-image"
-                            style={{
-                              opacity: calculateOpacity(
-                                patients[0][timePoint][key],
-                              ),
-                            }}
+                            // style={{
+                            //   opacity: calculateOpacity(
+                            //     patients[0][timePoint][key],
+                            //   ),
+                            // }}
                           />
                           <br />
                           <span className="tooltip-text">{key}</span>

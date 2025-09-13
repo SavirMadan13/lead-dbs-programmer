@@ -1674,12 +1674,12 @@ function PlyViewer({
       controls.zoomSpeed = 0.5;
       controlsRef.current = controls;
 
-      const secondaryControls = new OrbitControls(secondaryCamera, secondaryRenderer.domElement);
-      secondaryControls.enableDamping = true;
-      secondaryControls.dampingFactor = 0.1;
-      secondaryControls.rotateSpeed = 0.8;
-      secondaryControls.zoomSpeed = 0.5;
-      secondaryControlsRef.current = secondaryControls;
+      // const secondaryControls = new OrbitControls(secondaryCamera, secondaryRenderer.domElement);
+      // secondaryControls.enableDamping = true;
+      // secondaryControls.dampingFactor = 0.1;
+      // secondaryControls.rotateSpeed = 0.8;
+      // secondaryControls.zoomSpeed = 0.5;
+      // secondaryControlsRef.current = secondaryControls;
 
       camera.position.set(0, -50, 50); // Zoomed out to start
 
@@ -4157,25 +4157,40 @@ function PlyViewer({
 
       }
     };
-  }, [isFrozen]); // Re-run effect if isFrozen changes
+  }, [isFrozen]);
 
+  const handleKeyPress = (event) => {
+    if (event.key === 'Escape') {
+      setIsFullScreen(false);
+    }
+  };
+
+  // Add keydown event listener when the component mounts
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyPress);
+
+    // Clean up event listener on component unmount
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, []);
 
   return (
     <div style={{ marginTop: '-120px' }}>
       <div style={isFullScreen ? fullScreenStyle : viewerContainerStyle}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <IconButton
+          {/* <IconButton
             onClick={toggleFullScreen}
             style={{ position: 'absolute', top: 20, right: 20, zIndex: 1000, color: 'white' }}
           >
             {isFullScreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
-          </IconButton>
-          <IconButton
+          </IconButton> */}
+          {/* <IconButton
             onClick={toggleFreeze}
             style={{ position: 'absolute', top: 20, right: 60, zIndex: 1000, color: 'white' }} // Adjusted position
           >
             {isFrozen ? <LockOpenIcon /> : <LockIcon />}
-          </IconButton>
+          </IconButton> */}
 
           <div
             ref={mountRef}
