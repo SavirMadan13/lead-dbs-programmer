@@ -1,0 +1,70 @@
+name: Build • Electron React (ERB)
+
+on:
+  push:
+    branches: [ publish ]
+    tags: [ 'v*' ]
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      # (Linux) minimal deps; you're targeting .zip so this is usually enough.
+      - name: Install Linux deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev fakeroot
+
+      - name: Install dependencies
+        run: npm ci
+
+      # ERB builds renderer/main to release/app via your scripts
+      - name: Build & Package (per OS)
+        shell: bash
+        run: |
+          if [[ "$RUNNER_OS" == "macOS" ]]; then npm run package; fi
+          if [[ "$RUNNER_OS" == "Windows" ]]; then npm run package:win; fi
+          if [[ "$RUNNER_OS" == "Linux" ]]; then npm run package:linux; fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}-artifacts
+          path: |
+            release/build/**/*
+            !release/build/*.blockmap
+            !release/build/latest*.yml
+
+  # Optional: publish artifacts to a GitHub Release when you push a tag like v1.2.3
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+          draft: false
+          prerelease: false
