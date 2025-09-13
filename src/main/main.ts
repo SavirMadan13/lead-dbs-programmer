@@ -109,37 +109,8 @@ console.log = () => {};
 console.warn = () => {};
 console.error = () => {};
 
-// const args = process.argv.slice(1); // This will include the 'input_file_path' passed from MATLAB
-// console.log(args);
-// const inputDatasetDirectory = process.argv[1]; // Get the first argument
-// const inputPath = '/Users/savirmadan/Downloads/inputData.json';
-// const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0374Output/derivatives/leaddbs/sub-CbctDbs0374/stimulations/MNI152NLin2009bAsym/inputData.json';
-// const inputPath = '/Users/savirmadan/Downloads/inputDataGroupMerge.json';
 const inputPath = process.argv[1];
 // const inputPath = '/Users/savirmadan/Documents/Localizations/BIDMCKMOutput';
-// const inputPath = '/Users/savirmadan/Documents/Localizations/Pt401Test';
-// const inputPath = '/Users/savirmadan/Downloads/testingLeadGroup/derivatives/leadgroup/20250518151522/inputData.json';
-// const inputPath = '/Users/savirmadan/Documents/Localizations/Brigham_Reprogramming';
-// const inputPath = '/Users/savirmadan/Documents/Localizations/Pt401Test';
-// const inputPath = '/Users/savirmadan/Documents/Localizations/Patient0395Output';
-// const inputPath = '/Users/savirmadan/Partners HealthCare Dropbox/Savir Madan/datasets/CbctDbs0282';
-// const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/stimulations/MNI152NLin2009bAsym/inputData.json';
-// const inputPath = '/Users/savirmadan/Downloads/Patient2Output';
-// const inputPath = null;
-// const inputPath = '/Volumes/PdBwh/Patient0395Output';
-// const inputPath = '/Volumes/Expansion/AllData';
-// const inputPath = '/Users/savirmadan/Documents/Localizations/CbctDbs0374';
-// const inputPath = '/Volumes/PdBwh/CompleteParkinsons';
-// const inputPath = '/Volumes/OneTouch/MasterDataset/AllData';
-// const inputPath = '/Users/savirmadan/Documents/LeadGroupDemo/derivatives/leadgroup/20241007203440/inputData.json';
-// const inputPath = '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset';
-// const inputPath = '/Volumes/PdBwh/CompleteParkinsons/derivatives/leadgroup/BwhParkinsons/inputData.json';
-// const inputPath = '/Users/savirmadan/Partners HealthCare Dropbox/Savir Madan/BIDMCDBS';
-// const inputPath = '/Users/savirmadan/Documents/SanteGroup/derivatives/leadgroup/2024nov5V2/inputData.json';
-// const inputPath = '/Users/savirmadan/Documents/LeadGroupDemo/derivatives/leadgroup/20241007203440/inputData.json';
-// const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0362Output/derivatives/leaddbs/sub-CbctDbs0362/stimulations/MNI152NLin2009bAsym/inputData.json';
-// const inputPath = '/Users/savirmadan/Documents/Localizations/Clinical/Patient0370Output/derivatives/leaddbs/sub-CbctDbs0370/stimulations/MNI152NLin2009bAsym/inputData.json';
-// const inputPath = '/Volumes/PdBwh/CompleteParkinsons/derivatives/leadgroup/BwhParkinsons/inputData.json';
 class AppUpdater {
   constructor() {
     // log.transports.file.level = 'info';
