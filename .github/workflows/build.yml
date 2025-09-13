@@ -1,4 +1,4 @@
-name: Build • Electron React (ERB)
+name: Build • ERB
 
 on:
   push:
@@ -9,39 +9,67 @@ on:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
+
+    env:
+      CI: "true"
+      ELECTRON_BUILDER_DEBUG: "true"
+      # avoid hard links on some runners/filesystems
+      USE_HARD_LINKS: "false"
+      # skip notarization unless creds provided
+      SKIP_NOTARIZE: "1"
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: npm
 
-      # (Linux) minimal deps; you're targeting .zip so this is usually enough.
+      # Linux system deps commonly required by Electron packaging
       - name: Install Linux deps
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev fakeroot
+          sudo apt-get install -y \
+            libx11-dev libxkbfile-dev libsecret-1-dev \
+            libgtk-3-0 libnss3 libxss1 libasound2 libgbm-dev \
+            fakeroot rpm dpkg
 
-      - name: Install dependencies
-        run: npm ci
+      # (Optional but helpful) Show environment and versions
+      - run: node -v && npm -v && npx electron-builder --version
 
-      # ERB builds renderer/main to release/app via your scripts
+      # If your postinstall is flaky in CI, uncomment the next line and the two lines after install:
+      # - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm ci --no-audit --no-fund
+
+      # If you used --ignore-scripts above, then:
+      # - run: npx electron-builder install-app-deps
+      # - run: npm run build:dll
+
       - name: Build & Package (per OS)
         shell: bash
         run: |
-          if [[ "$RUNNER_OS" == "macOS" ]]; then npm run package; fi
-          if [[ "$RUNNER_OS" == "Windows" ]]; then npm run package:win; fi
-          if [[ "$RUNNER_OS" == "Linux" ]]; then npm run package:linux; fi
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            # Force only arm64 on CI to avoid cross-arch issues
+            export CSC_IDENTITY_AUTO_DISCOVERY=false
+            npm run package
+          fi
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            npm run package:win
+          fi
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            npm run package:linux
+          fi
 
       - name: Upload artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ${{ runner.os }}-artifacts
@@ -50,7 +78,16 @@ jobs:
             !release/build/*.blockmap
             !release/build/latest*.yml
 
-  # Optional: publish artifacts to a GitHub Release when you push a tag like v1.2.3
+      - name: Upload builder logs (if present)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}-logs
+          path: |
+            ~/.cache/electron-builder/logs/**/*
+          if-no-files-found: ignore
+
+  # Optional: attach to a GitHub Release when tagging (vX.Y.Z)
   release:
     needs: build
     if: startsWith(github.ref, 'refs/tags/v')
@@ -58,12 +95,10 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           path: ./artifacts
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v2
         with:
           files: artifacts/**/*
           draft: false
