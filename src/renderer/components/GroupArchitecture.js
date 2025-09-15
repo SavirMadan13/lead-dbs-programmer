@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 // import './App.css';
 
-import Dropdown from 'react-bootstrap/dropdown';
+import Dropdown from 'react-bootstrap/Dropdown';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import InputGroup from 'react-bootstrap/InputGroup';
