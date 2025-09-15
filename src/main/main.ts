@@ -645,7 +645,7 @@ const createWindow = async () => {
     // minHeight: 1200, // Minimum height of the window
     // icon: getAssetPath('icon.png'),
     // icon: getAssetPath('lead_dbs_icon_web.png'),
-    icon: '../../assets/lead_dbs_icon_web.png',
+    icon: getAssetPath('lead_dbs_icon_web.png'),
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')

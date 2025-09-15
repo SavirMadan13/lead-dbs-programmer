@@ -23,6 +23,7 @@
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
     "build:renderer": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.prod.ts",
     "postinstall": "ts-node .erb/scripts/check-native-dep.js && electron-builder install-app-deps && npm run build:dll",
+    "install-linux-deps": "sudo apt-get update && sudo apt-get install -y build-essential libnss3-dev libatk-bridge2.0-dev libxss1 libgconf-2-4 libxrandr2 libasound2-dev libpangocairo-1.0-0 libatk1.0-dev libcairo1-dev libgtk-3-dev libgdk-pixbuf2.0-dev",
     "lint": "cross-env NODE_ENV=development eslint . --ext .js,.jsx,.ts,.tsx",
     "package": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never && npm run build:dll",
     "package:win": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --win --publish never && npm run build:dll",
@@ -201,7 +202,7 @@
     "productName": "LeadDBSProgrammer",
     "appId": "org.erb.ElectronReact",
     "asar": true,
-    "asarUnpack": "**\\*.{node,dll}",
+    "asarUnpack": "**/*.{node,dll,so}",
     "files": [
       "dist",
       "node_modules",
@@ -247,11 +248,23 @@
     "linux": {
       "target": [
         {
-          "target": "zip",
+          "target": "AppImage",
+          "arch": ["x64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["x64"]
+        },
+        {
+          "target": "tar.gz",
           "arch": ["x64"]
         }
       ],
-      "category": "Development"
+      "category": "Development",
+      "icon": "assets/icon.png",
+      "desktop": {
+        "StartupWMClass": "LeadDBSProgrammer"
+      }
     },
     "directories": {
       "app": "release/app",
@@ -267,9 +280,9 @@
       "repo": "LeadDBSDatabase"
     }
   },
-  "devEngines": {
-    "node": ">=14.x",
-    "npm": ">=7.x"
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=7.0.0"
   },
   "electronmon": {
     "patterns": [
