@@ -564,14 +564,14 @@ function PatientDatabase({ key, directoryPath }) {
               >
                 NiiVue
               </Button> */}
-              {/* <Button
+              <Button
                 // variant="contained"
                 // color="default"
                 onClick={() => navigate('/seeg')}
                 style={{ marginLeft: '5px' }}
               >
                 SEEG
-              </Button> */}
+              </Button>
               <Button
                 onClick={() => handleCreateMiniset()}
                 style={{ marginLeft: '5px' }}
