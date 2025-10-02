@@ -271,9 +271,9 @@
       "repo": "LeadDBSDatabase"
     }
   },
-  "devEngines": {
-    "node": ">=14.x",
-    "npm": ">=7.x"
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=7.0.0"
   },
   "electronmon": {
     "patterns": [
