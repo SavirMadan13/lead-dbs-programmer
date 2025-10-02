@@ -438,7 +438,7 @@ function PatientDatabase({ key, directoryPath }) {
           textAlign: 'center',
         }}
       >
-        Netstim / CBCT DBS Datasets
+        SPARK-DBS
       </Typography>
 
       <Container style={{ display: 'flex', flexDirection: 'column' }}>
