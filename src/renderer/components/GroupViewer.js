@@ -17,7 +17,7 @@ import {
 } from 'react-bootstrap';
 import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings icon
 import * as math from 'mathjs';
-import BigBrain from './untitled.jpg';
+// import BigBrain from './untitled.jpg'; // File removed - unused
 // import { remote } from 'electron'; // Use 'electron' for Electron v12+
 
 function GroupViewer({
@@ -762,7 +762,7 @@ function GroupViewer({
 
       // Load the image as a texture
       const textureLoader = new THREE.TextureLoader();
-      textureLoader.load(BigBrain, (texture) => {
+      // textureLoader.load(BigBrain, (texture) => { // BigBrain image removed
         // Create a plane geometry
         const aspectRatio = texture.image.width / texture.image.height;
 

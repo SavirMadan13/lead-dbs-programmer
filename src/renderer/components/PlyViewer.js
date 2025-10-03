@@ -32,7 +32,7 @@ import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
-import EdlowBrain from './Edlow_10mm.png';
+// import EdlowBrain from './Edlow_10mm.png'; // File removed - unused
 
 function PlyViewer({
   quantities,
@@ -1697,7 +1697,7 @@ function PlyViewer({
       animate();
 
       const textureLoader = new THREE.TextureLoader();
-      textureLoader.load(EdlowBrain, (texture) => {
+      // textureLoader.load(EdlowBrain, (texture) => { // EdlowBrain image removed
         // Calculate the aspect ratio of the texture
         const aspectRatio = texture.image.width / texture.image.height;
 
