@@ -27,7 +27,6 @@ import { Edit, Delete, Save, Cancel } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import { PatientContext } from './PatientContext';
-import DatabaseStats from './DatabaseStats';
 
 function PatientDatabase({ key, directoryPath }) {
   window.electron.ipcRenderer.sendMessage('import-inputdata-file', ['ping']);
@@ -564,14 +563,14 @@ function PatientDatabase({ key, directoryPath }) {
               >
                 NiiVue
               </Button> */}
-              {/* <Button
+              <Button
                 // variant="contained"
                 // color="default"
                 onClick={() => navigate('/seeg')}
                 style={{ marginLeft: '5px' }}
               >
                 SEEG
-              </Button> */}
+              </Button>
               <Button
                 onClick={() => handleCreateMiniset()}
                 style={{ marginLeft: '5px' }}
