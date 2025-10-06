@@ -1,0 +1,108 @@
+name: Build • ERB
+
+on:
+  push:
+    branches: [ size_reduction ]
+    tags: [ 'v1.0.0' ]       # tag like v1.2.3 to trigger a Release
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+
+    env:
+      CI: "true"
+      ELECTRON_BUILDER_DEBUG: "true"
+      USE_HARD_LINKS: "false"
+      SKIP_NOTARIZE: "1"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install Linux deps
+        if: runner.os == 'Linux'
+        run: |
+          set -euxo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libx11-dev libxkbfile-dev libsecret-1-dev \
+            libgtk-3-0 libnss3 libxss1 libgbm1 fakeroot rpm || true
+          if ! dpkg -s libasound2 >/dev/null 2>&1; then
+            sudo apt-get install -y --no-install-recommends libasound2t64
+          fi
+
+      - run: node -v && npm -v && npx electron-builder --version
+      - run: npm ci --no-audit --no-fund
+
+      - name: Build & Package (per OS)
+        shell: bash
+        run: |
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            export CSC_IDENTITY_AUTO_DISCOVERY=false
+            npm run package
+          fi
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            npm run package:win
+          fi
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            npm run package:linux
+          fi
+
+      # Upload only your distributables. Keep names distinct per OS.
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}-artifacts
+          path: |
+            release/build/**/*
+            !release/build/*.blockmap
+            !release/build/latest*.yml
+          if-no-files-found: error
+          # Optional: don't recompress large binaries (faster)
+          compression-level: 0
+
+      - name: Upload builder logs (if present)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}-logs
+          path: ~/.cache/electron-builder/logs/**/*
+          if-no-files-found: ignore
+
+  # Create/attach to a GitHub Release whenever the ref is a tag (vX.Y.Z)
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write     # REQUIRED to create releases
+    steps:
+      # Grab all "*-artifacts" from the matrix and merge into one folder
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*-artifacts"
+          merge-multiple: true
+          path: ./artifacts
+
+      - name: Create GitHub Release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+          draft: false          # set true if you want to review first
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

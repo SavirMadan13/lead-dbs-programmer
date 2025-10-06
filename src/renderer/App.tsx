@@ -15,10 +15,7 @@ import CustomTable from './components/CustomTable';
 import GroupStats from './components/GroupStats';
 import DatabaseStats from './components/DatabaseStats';
 import Import from './components/Import';
-import NiiViewer from './components/NiiViewer';
-import TestAppGroup from './niivue/ui/TestAppGroup';
 import SEEG from './components/SEEG';
-import TestApp from './niivue/ui/TestApp';
 
 export default function App() {
   const [directoryPath, setDirectoryPath] = useState(null);
@@ -43,26 +40,6 @@ export default function App() {
     }
   };
 
-  // useEffect(() => {
-  //   // Set initial size on load
-  //   updateWindowSize();
-
-  //   // Add resize observer to track dynamic changes
-  //   const resizeObserver = new ResizeObserver(() => {
-  //     updateWindowSize();
-  //   });
-
-  //   if (containerRef.current) {
-  //     resizeObserver.observe(containerRef.current);
-  //   }
-
-  //   return () => {
-  //     if (containerRef.current) {
-  //       resizeObserver.unobserve(containerRef.current);
-  //     }
-  //   };
-  // }, []);
-
   // Function to handle folder selection
   const selectFolder = () => {
     window.electron.ipcRenderer.sendMessage('select-folder', null); // Request folder selection
@@ -71,37 +48,6 @@ export default function App() {
   window.electron.ipcRenderer.sendMessage('import-inputdata-file', ['ping']);
   window.electron.ipcRenderer.sendMessage('ipc-example', ['ping']);
   // Function to check if the folder structure matches Lead-DBS
-  // const checkLeadDBSFolder = async (path) => {
-  //   try {
-  //     // Check for existence of required folders for Lead-DBS
-  //     const derivativesExists = await window.electron.ipcRenderer.invoke(
-  //       'check-folder-exists',
-  //       `${path}/derivatives/leaddbs`,
-  //     );
-  //     const rawdataExists = await window.electron.ipcRenderer.invoke(
-  //       'check-folder-exists',
-  //       `${path}/rawdata`,
-  //     );
-  //     const sourcedataExists = await window.electron.ipcRenderer.invoke(
-  //       'check-folder-exists',
-  //       `${path}/sourcedata`,
-  //     );
-  //     const isLeadGroup = path.includes('leadgroup');
-
-  //     // Set the state if all required folders are present
-  //     if (derivativesExists && rawdataExists && sourcedataExists) {
-  //       console.log('TRUE');
-  //       setIsLeadDBSFolder(true);
-  //     } else if (isLeadGroup) {
-  //       setIsLeadDBSFolder(true);
-  //     } else {
-  //       setIsLeadDBSFolder(false);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error checking folder structure:', error);
-  //     setIsLeadDBSFolder(false);
-  //   }
-  // };
 
   useEffect(() => {
     // Listen for the selected folder path when a new one is selected
@@ -262,17 +208,6 @@ export default function App() {
               element={
                 <div style={{ maxWidth: '1000px' }}>
                   <Import leadDBS={isLeadDBSFolder} />
-                </div>
-              }
-            />
-            <Route
-              path="/niivue"
-              element={
-                <div>
-                  {/* <Navbar text="" color1="#375D7A" /> */}
-                  <div style={{ marginTop: '100px' }}>
-                    <TestApp plyFilePaths={plyFilePaths} />
-                  </div>
                 </div>
               }
             />

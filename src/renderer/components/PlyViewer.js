@@ -32,7 +32,6 @@ import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
-import EdlowBrain from './Edlow_10mm.png';
 
 function PlyViewer({
   quantities,
@@ -1696,21 +1695,21 @@ function PlyViewer({
       };
       animate();
 
-      const textureLoader = new THREE.TextureLoader();
-      textureLoader.load(EdlowBrain, (texture) => {
-        // Calculate the aspect ratio of the texture
-        const aspectRatio = texture.image.width / texture.image.height;
+      // const textureLoader = new THREE.TextureLoader();
+      // textureLoader.load(EdlowBrain, (texture) => {
+      //   // Calculate the aspect ratio of the texture
+      //   const aspectRatio = texture.image.width / texture.image.height;
 
-        // Create a plane geometry with the correct aspect ratio
-        const planeGeometry = new THREE.PlaneGeometry(256 * aspectRatio, 256);
+      //   // Create a plane geometry with the correct aspect ratio
+      //   const planeGeometry = new THREE.PlaneGeometry(256 * aspectRatio, 256);
 
-        const planeMaterial = new THREE.MeshBasicMaterial({ map: texture });
-        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+      //   const planeMaterial = new THREE.MeshBasicMaterial({ map: texture });
+      //   const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 
-        // Position the plane in the scene
-        plane.position.set(-12, -15, -12); // Adjust position as needed
-        // scene.add(plane);
-      });
+      //   // Position the plane in the scene
+      //   plane.position.set(-12, -15, -12); // Adjust position as needed
+      //   // scene.add(plane);
+      // });
 
       return () => {
         // window.removeEventListener('resize', onWindowResize);
