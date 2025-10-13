@@ -2,63 +2,39 @@
 
 ## Overview
 
-Lead DBS Programmer is a comprehensive system for managing Deep Brain Stimulation (DBS) and Stereoelectroencephalography (SEEG) patient data, electrode configurations, and stimulation parameters. The application features a modern Electron-based frontend and a scalable Python FastAPI backend.
+Lead DBS Programmer is a comprehensive system designed to manage Deep Brain Stimulation (DBS) and Stereoelectroencephalography (SEEG) patient data, electrode configurations, and stimulation settings. The application uses an Electron-based frontend and a Python FastAPI backend.
 
-## Architecture Diagram (Mermaid)
+## ⚠️ Unable to display graphic architecture diagram
 
-```mermaid
-flowchart TB
-    subgraph Frontend [Frontend Layer (Electron + React)]
-        direction TB
-        Renderer[Renderer Process<br/>(React Components)]
-        IPC[IPC Communication Layer<br/>(Electron IPC)]
-        MainProcess[Main Process<br/>(Node.js)]
-        HttpClient[HTTP Client<br/>(Axios/Fetch)]
-    end
+> **Note**: The system architecture diagram uses Mermaid syntax, which can't be rendered by this markdown viewer.  
+>  
+> To view the architecture diagram, open this file in a compatible environment or refer to the alternative textual description below.
 
-    subgraph Backend [Backend Layer (Python + FastAPI)]
-        direction TB
-        APIGateway[API Gateway<br/>(FastAPI main.py)]
-        APIRoutes[API Routers<br/>{/api/patients/, /api/electrodes/, ...}]
-        ServiceLayer[Service Layer<br/>(*Service classes)]
-        DataProcessing[Data Processing Services<br/>(PLY, NIfTI, Mesh, Coord)]
-        DataAccess[Data Access Layer<br/>(Repositories, Files)]
-    end
+---
 
-    subgraph Storage [Data Storage Layer]
-        FileSystem[[File System<br/>/patients/, /reconstructions/]]
-        ConfigFiles[[Configuration Files<br/>participants.json, Preferences.json]]
-    end
+### **System Layout (Textual Overview)**
 
-    %% Frontend communication
-    Renderer -->|User Action| Renderer
-    Renderer --> IPC
-    IPC --> MainProcess
-    MainProcess --> HttpClient
+- **Frontend Layer (Electron + React):**
+  - **Renderer Process:** React Components (UI)
+  - **IPC Communication:** Electron's Inter-Process Communication
+  - **Main Process:** Node.js
+  - **HTTP Client:** Axios or Fetch API
 
-    %% Frontend-backend
-    HttpClient --> APIGateway
+- **Backend Layer (Python + FastAPI):**
+  - **API Gateway:** Entrypoint (main.py)
+  - **API Routers:** e.g. `/api/patients/`, `/api/electrodes/`
+  - **Service Layer:** Service classes for business logic
+  - **Data Processing:** Handlers for formats (PLY, NIfTI, Mesh, Coord)
+  - **Data Access Layer:** Repositories and file IO
 
-    %% Backend structure
-    APIGateway --> APIRoutes
-    APIRoutes --> ServiceLayer
-    ServiceLayer --> DataProcessing
-    ServiceLayer --> DataAccess
-    DataProcessing -- Reads/Writes --> DataAccess
+- **Data Storage:**
+  - File System (`/patients/`, `/reconstructions/`)
+  - Config files (`participants.json`, `Preferences.json`)
 
-    %% Backend-Storage
-    DataAccess --> FileSystem
-    DataAccess --> ConfigFiles
+**Frontend-backend flow:**
+User -> React Components -> Electron IPC -> Main Process -> HTTP Client -> FastAPI API -> Service Layer -> Data Processing/Data Access -> File Storage
 
-    %% Responses
-    FileSystem -- Data Response --> Renderer
-    ConfigFiles -- Config Data --> Renderer
-
-    classDef layer fill:#f3f6fb,stroke:#0e4194,stroke-width:1.5px;
-    class Frontend,Backend,Storage layer;
-    classDef endpoint fill:#dbeafe,stroke:#1066b7,stroke-width:1px;
-    class APIGateway,APIRoutes,ServiceLayer,DataProcessing,DataAccess endpoint;
-```
+---
 
 ## Technology Stack
 
@@ -88,58 +64,59 @@ flowchart TB
 ### Frontend Components
 
 #### GroupViewer.js
-- **Purpose:** 3D visualization of multiple patient electrode configurations
-- **Highlights:** Three.js scene rendering, mesh controls, coordinate search
+- **Purpose:** Visualize multiple patient electrode configurations in 3D.
+- **Highlights:** Three.js scene rendering, mesh controls, coordinate search.
 
 #### PatientDatabase.js
-- **Purpose:** Patient data management and filtering
-- **Highlights:** Listing, filtering, import/export
+- **Purpose:** Manage and filter patient data.
+- **Highlights:** Listing, filtering, import/export.
 
 #### SEEG.js
-- **Purpose:** SEEG stimulation configuration
-- **Highlights:** Electrode/contact config, amplitude/pulse width
+- **Purpose:** Configure SEEG stimulation.
+- **Highlights:** Electrode/contact configuration, amplitude/pulse width.
 
 #### StimulationSettings.js
-- **Purpose:** DBS stimulation parameter configuration
-- **Highlights:** Contact/frequency settings
+- **Purpose:** Configure DBS stimulation parameters.
+- **Highlights:** Contact and frequency settings.
 
 #### PatientDetails.js
-- **Purpose:** Individual patient data view
-- **Highlights:** Demographics, configuration, history
+- **Purpose:** View individual patient data.
+- **Highlights:** Demographics, configuration, history.
 
 #### ClinicalScores.js
-- **Purpose:** Clinical score data management
-- **Highlights:** Entry, visualization, analysis
+- **Purpose:** Manage clinical score data.
+- **Highlights:** Entry, visualization, analysis.
 
 ### Backend Services
 
 - **PatientService:** CRUD, filtering, validation
 - **ElectrodeService:** Model/configuration management
-- **StimulationService:** Params, validation, optimization
-- **ReconstructionService:** 3D reconstruction, PLY gen
-- **SEEGService:** SEEG data/process handling
+- **StimulationService:** Parameter handling, validation, optimization
+- **ReconstructionService:** 3D reconstruction, PLY generation
+- **SEEGService:** SEEG data and processing
 - **ClinicalScoreService:** Scores management, statistics
 
 ### Data Processing Services
 
-- **PLYFileProcessor:** PLY parse/generate, mesh optimization
-- **NiftiProcessor:** Read/write NIfTI, voxel and coord processing
-- **CoordinateTransformer:** System conversions, affine transformations
-- **MeshGenerator:** 3D mesh operations/rendering
+- **PLYFileProcessor:** Parse/generate PLY, mesh optimization
+- **NiftiProcessor:** Read/write NIfTI, voxel and coordinate processing
+- **CoordinateTransformer:** System conversion, affine transforms
+- **MeshGenerator:** 3D mesh operations and rendering
 
 ## Communication Flow
 
-```mermaid
-flowchart LR
-    User[User Action] --> UI[React Component]
-    UI --> IPC[IPC Handler (Electron)]
-    IPC --> HTTP[HTTP Client (Axios/Fetch)]
-    HTTP --> API[FastAPI Endpoint]
-    API --> Service[Service Layer]
-    Service --> Repo[Repository Layer]
-    Repo --> FS[File System / Data Storage]
-    FS -->|Response| UI
-```
+> **Unable to render flow diagram.**  
+> Textual flow:
+1. User performs action in UI (React Component)
+2. UI communicates via Electron IPC handler
+3. IPC sends request to HTTP client (Axios/Fetch)
+4. HTTP client calls FastAPI endpoint
+5. API invokes the Service Layer
+6. Service interacts with Repository Layer
+7. Repository accesses file system/data storage
+8. Data (or response) passed back to UI
+
+---
 
 ## Key Features
 
@@ -147,16 +124,16 @@ flowchart LR
 - Real-time rendering, overlays, camera, mesh/opacity controls
 
 ### 2. Patient Management
-- Filterable DB, multi-publication, import/export
+- Filterable database, multi-publication support, import/export
 
 ### 3. Stimulation Configuration
 - DBS/SEEG settings, contact selection, optimization
 
 ### 4. Clinical Data Management
-- Score tracking, stats, reports
+- Score tracking, statistics, reports
 
 ### 5. Electrode Management
-- Multiple models, custom config, 3D visual, contact params
+- Multiple models, custom configurations, 3D visualization, contact params
 
 ## Data Flow
 
@@ -175,7 +152,7 @@ flowchart LR
 5. Outcomes tracked
 
 **3D Visualization Flow**
-1. PLY load
+1. PLY loaded
 2. Parsed with PLYLoader
 3. Three.js mesh creation
 4. Scene composition
@@ -183,17 +160,17 @@ flowchart LR
 
 ## Security Considerations
 
-- **Data Privacy:** All patient data is stored locally
-- **File Access:** Limited to application directory
-- **API Security:** CORS-configured FastAPI
-- **Validation:** Strict at each app layer
+- **Data Privacy:** Patient data is stored locally
+- **File Access:** Access restricted to application directory
+- **API Security:** FastAPI configured with CORS
+- **Validation:** Enforced at each application layer
 
 ## Performance Optimizations
 
 - Mesh simplification/optimization
 - Lazy-load UI components
 - Data caching
-- Efficient (conditional) rendering
+- Efficient, conditional rendering
 
 ## Future Enhancements
 
@@ -208,13 +185,12 @@ flowchart LR
 
 ## Contributing
 
-We welcome contributions. Please see our contributing guidelines and submit PRs for improvements.
+We welcome contributions. Please consult our contributing guidelines and submit pull requests for improvements.
 
 ## License
 
-See LICENSE file for license details.
+See LICENSE file for details.
 
 ## Contact
 
 For questions or support, open a GitHub issue.
-
