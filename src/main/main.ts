@@ -110,7 +110,7 @@ console.warn = () => {};
 console.error = () => {};
 
 // const inputPath = process.argv[1];
-const inputPath = '/Users/savirmadan/Documents/Localizations/BIDMCKMOutput';
+const inputPath = '/Users/amygdala/Downloads/Patient0401Output2';
 class AppUpdater {
   constructor() {
     // log.transports.file.level = 'info';

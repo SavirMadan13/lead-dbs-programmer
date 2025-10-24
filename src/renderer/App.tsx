@@ -5,7 +5,7 @@ import './App.css'; // Ensure your styles are imported
 import SettingsIcon from '@mui/icons-material/Settings'; // Import the Material UI Settings Icon
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Navbar from './components/Navbar';
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 import PatientDatabase from './components/PatientDatabase';
 import PatientDetails from './components/PatientDetails';
 import { PatientProvider } from './components/PatientContext';
@@ -281,6 +281,7 @@ export default function App() {
               element={
                 <div>
                   <Navbar text="Lead-SEEG" color1="#375D7A" />
+                  <div style={{paddingBottom: '100px'}}></div>
                   <SEEG />
                 </div>
               }

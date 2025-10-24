@@ -252,6 +252,42 @@ function SEEG() {
     ]);
   };
 
+  const saveElectrodeConfigToCSV = () => {
+    const csvData = [];
+
+    // Create header row according to the selected electrode
+    const selectedElectrodeLabels = data.find(item => item.elname === selectedElectrode)?.labels[0];
+    csvData.push(selectedElectrodeLabels);
+    console.log("csvData: ", csvData);
+
+    // Check which labels are activated in each set
+    const allElectrodeSets = electrodeSets[selectedElectrode];
+    allElectrodeSets.forEach((set, setIndex) => {
+      // Print number of set
+      console.log(`Set ${setIndex + 1}:`);
+      
+      // Get activated contacts
+      const activatedContacts = set.contacts;
+      console.log("activatedContacts: ", activatedContacts);
+
+      // Get stim amplitude
+      const stimAmplitude = set.amplitude;
+      console.log("stimAmplitude: ", stimAmplitude);
+
+      // Write rows with amplitude values and None
+      const row = [];
+      selectedElectrodeLabels.forEach(label => {
+        if (activatedContacts.includes(label)) {
+          row.push(stimAmplitude);
+        } else {
+          row.push('None');
+        }
+      });
+      csvData.push(row);
+      console.log("csvData: ", csvData);
+    });
+  };
+  
   return (
     <div>
       <FormControl>
@@ -381,6 +417,19 @@ function SEEG() {
           </Button>
         </div>
       ))}
+      <Button 
+        variant="contained" 
+        color="primary" 
+        style={{ 
+          marginTop: '20px', 
+          marginBottom: '20px', 
+          marginLeft: 'auto',
+          display: 'block'
+        }}
+        onClick={saveElectrodeConfigToCSV}
+      >
+        Save Electrode Configuration
+      </Button>
     </div>
   );
 }
