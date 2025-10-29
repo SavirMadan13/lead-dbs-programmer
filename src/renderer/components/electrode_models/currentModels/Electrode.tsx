@@ -1,32 +1,30 @@
-/* eslint-disable no-lonely-if */
-/* eslint-disable camelcase */
-// /* eslint-disable no-restricted-globals */
-// /* eslint-disable react/prop-types */
-// /* eslint-disable @typescript-eslint/no-unused-vars */
-// /* eslint-disable react/function-component-definition */
+/**
+ * Electrode Component
+ * 
+ * This is a complex component that renders and manages individual electrode
+ * configurations. It handles contact selection, stimulation parameters,
+ * visualization models, and provides a comprehensive interface for electrode
+ * programming. The component supports various electrode types and IPG models.
+ */
+
 import React, { useState, useEffect, useRef } from 'react';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Form from 'react-bootstrap/Form';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import Tooltip from 'react-bootstrap/Tooltip';
-// import Popup from 'reactjs-popup';
 import { Tooltip as MuiTooltip } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import IconButton from '@mui/material/IconButton';
-// import '../AbbottDirectedTest.css';
-// import '../BostonCartesiaTest.css';
-// import './ElecModelStyling/boston_vercise_directed.css';
+
+// Styles
 import './ElecModelStyling/Styling.css';
+
+// Utilities
 import { math } from 'mathjs';
+
+// SVG Icons
 import { ReactComponent as IPG1 } from '../images/IPG.svg';
-// import { ReactComponent as RightContact } from '../images/RightContact.svg';
-// import { ReactComponent as LeftContact } from '../images/LeftContact.svg';
-// import { ReactComponent as HeadBottom } from '../images/head_bottom.svg';
-// import { ReactComponent as UpArrow } from '../images/UpArrow.svg';
-// import { ReactComponent as DownArrow } from '../images/DownArrow.svg';
-// import { ReactComponent as ClockwiseArrow } from '../images/ClockwiseArrow.svg';
-// import { ReactComponent as CounterClockwiseArrow } from '../images/CounterClockwiseArrow.svg';
 import { ReactComponent as ForwardButton } from '../images/FrontButton.svg';
 import { ReactComponent as BackButton } from '../images/BackButton.svg';
 import { ReactComponent as LeftButton } from '../images/LeftButton.svg';
@@ -38,8 +36,43 @@ import { ReactComponent as RightContact } from '../images/NewUI/RightContact.svg
 import { ReactComponent as CenterContact } from '../images/NewUI/CenterContact.svg';
 import { ReactComponent as Nondirectional } from '../images/NewUI/NonDirectionalContact.svg';
 import { ReactComponent as Background } from '../images/NewUI/Background.svg';
+
+// Components
 import PlyViewer from '../../PlyViewer';
 import ContactParameters from '../../ContactParameters';
+
+// Type definitions
+interface ElectrodeProps {
+  name: string;
+  allQuantities: Record<string, any>;
+  quantities: Record<string, any>;
+  setQuantities: (value: Record<string, any>) => void;
+  selectedValues: Record<string, any>;
+  setSelectedValues: (value: Record<string, any>) => void;
+  IPG: string;
+  totalAmplitude: number;
+  setTotalAmplitude: (value: number) => void;
+  parameters: Record<string, any>;
+  setParameters: (value: Record<string, any>) => void;
+  visModel: string;
+  setVisModel: (value: string) => void;
+  sessionTitle: string;
+  togglePosition: string;
+  setTogglePosition: (value: string) => void;
+  percAmpToggle: string;
+  setPercAmpToggle: (value: string) => void;
+  volAmpToggle: string;
+  setVolAmpToggle: (value: string) => void;
+  contactNaming: string;
+  adornment: any;
+  historical: any;
+  elspec: any;
+  electrodeLabel: string;
+  templateSpace: number;
+  setTemplateSpace: (value: number) => void;
+  showViewer: boolean;
+  setShowViewer: (value: boolean) => void;
+}
 
 function Electrode({
   name,
@@ -71,7 +104,7 @@ function Electrode({
   setTemplateSpace,
   showViewer,
   setShowViewer,
-}) {
+}: ElectrodeProps) {
   // const { elspec } = props;
   console.log('IPG: ', IPG);
   console.log(

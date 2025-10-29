@@ -1,14 +1,74 @@
-/* eslint-disable no-plusplus */
-/* eslint-disable react/prop-types */
-// import { useState } from 'react';
+/**
+ * StimulationSettings Component
+ * 
+ * This component manages the stimulation settings interface, including electrode
+ * selection, IPG configuration, and parameter management. It provides a comprehensive
+ * interface for configuring deep brain stimulation parameters.
+ */
+
 import React, { useState, useRef } from 'react';
-// import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import { Dropdown, Form } from 'react-bootstrap';
+
+// Data and Components
 import electrodeModels from './electrodeModels.json';
 import ManageElectrode from './ManageElectrode';
+
+// Styles
 import './StimulationSettings.css';
+
+// Type definitions
+interface StimulationSettingsProps {
+  rightElectrode: string;
+  setRightElectrode: (value: string) => void;
+  leftElectrode: string;
+  setLeftElectrode: (value: string) => void;
+  IPG: string;
+  setIPG: (value: string) => void;
+  allQuantities: Record<string, any>;
+  setAllQuantities: (value: Record<string, any>) => void;
+  allSelectedValues: Record<string, any>;
+  setAllSelectedValues: (value: Record<string, any>) => void;
+  allTotalAmplitudes: Record<string, any>;
+  setAllTotalAmplitudes: (value: Record<string, any>) => void;
+  allTogglePositions: Record<string, any>;
+  setAllTogglePositions: (value: Record<string, any>) => void;
+  allPercAmpToggles: Record<string, any>;
+  setAllPercAmpToggles: (value: Record<string, any>) => void;
+  allVolAmpToggles: Record<string, any>;
+  setAllVolAmpToggles: (value: Record<string, any>) => void;
+  importCount: number;
+  setImportCount: (value: number) => void;
+  importDataTest: any;
+  setImportDataTest: (value: any) => void;
+  masterImportData: any;
+  setMasterImportData: (value: any) => void;
+  matImportFile: any;
+  setMatImportFile: (value: any) => void;
+  newImportFiles: any;
+  setNewImportFiles: (value: any) => void;
+  filePath: string;
+  setFilePath: (value: string) => void;
+  stimChanged: boolean;
+  setStimChanged: (value: boolean) => void;
+  allStimulationParameters: Record<string, any>;
+  setAllStimulationParameters: (value: Record<string, any>) => void;
+  visModel: string;
+  setVisModel: (value: string) => void;
+  sessionTitle: string;
+  setSessionTitle: (value: string) => void;
+  patientStates: Record<string, any>;
+  importNewS: any;
+  selectedPatient: any;
+  historical: any;
+  mode: string;
+  type: string;
+  allTemplateSpaces: number;
+  setAllTemplateSpaces: (value: number) => void;
+  showViewer: boolean;
+  setShowViewer: (value: boolean) => void;
+}
 
 function StimulationSettings({
   rightElectrode,
@@ -59,21 +119,24 @@ function StimulationSettings({
   setAllTemplateSpaces,
   showViewer,
   setShowViewer,
-}) {
-  // const [IPG, setIPG] = useState('');
-  // const [leftElectrode, setLeftElectrode] = useState('');
-  // const [rightElectrode, setRightElectrode] = useState('');
-  let importData = [];
+}: StimulationSettingsProps) {
+  // State management
+  const [testData, setTestData] = useState<string>(importDataTest || '');
+  const [renderKey, setRenderKey] = useState<number>(0);
+  
+  // Initialize import data
+  let importData: any[] = [];
   console.log('IMPORTEDS: ', importNewS);
-  const [testData, setTestData] = useState(importDataTest || '');
-  const [renderKey, setRenderKey] = useState(0);
+  
+  // Initialize IPC communication
   if (importCount === 0) {
     window.electron.ipcRenderer.sendMessage('import-file', ['ping']);
     const newCount = importCount + 1;
     setImportCount(newCount);
   }
 
-  const varargout = [
+  // Constants
+  const electrodeModels = [
     { displayName: 'Medtronic 3389', value: 'medtronic_3389' },
     { displayName: 'Medtronic 3387', value: 'medtronic_3387' },
     { displayName: 'Medtronic 3391', value: 'medtronic_3391' },

@@ -1,23 +1,79 @@
-/* eslint-disable react/button-has-type */
-/* eslint-disable react/jsx-pascal-case */
-/* eslint-disable camelcase */
+/**
+ * ManageElectrode Component
+ * 
+ * This component manages electrode selection, configuration, and stimulation parameters.
+ * It provides a tabbed interface for different electrode types and handles the
+ * complex state management for stimulation programming.
+ */
+
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-// import 'react-tabs/style/react-tabs.css';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
+
+// Styles
 import './TabbedElectrodeIPGSelection.css';
+
+// Data and Components
 import electrodeModels from './electrodeModels.json';
 import Electrode from './electrode_models/currentModels/Electrode';
+
+// Type definitions
+interface HemisphereData {
+  unit: string;
+  value: string;
+}
+
+interface HemisphereState {
+  left: HemisphereData[];
+  right: HemisphereData[];
+}
+
+interface ManageElectrodeProps {
+  IPG: string;
+  selectedElectrodeLeft: string;
+  selectedElectrodeRight: string;
+  allQuantities: Record<string, any>;
+  setAllQuantities: (value: Record<string, any>) => void;
+  allSelectedValues: Record<string, any>;
+  setAllSelectedValues: (value: Record<string, any>) => void;
+  allTotalAmplitudes: Record<string, any>;
+  setAllTotalAmplitudes: (value: Record<string, any>) => void;
+  allStimulationParameters: Record<string, any>;
+  setAllStimulationParameters: (value: Record<string, any>) => void;
+  visModel: string;
+  setVisModel: (value: string) => void;
+  sessionTitle: string;
+  setSessionTitle: (value: string) => void;
+  allTogglePositions: Record<string, any>;
+  setAllTogglePositions: (value: Record<string, any>) => void;
+  allPercAmpToggles: Record<string, any>;
+  setAllPercAmpToggles: (value: Record<string, any>) => void;
+  allVolAmpToggles: Record<string, any>;
+  setAllVolAmpToggles: (value: Record<string, any>) => void;
+  filePath: string;
+  setFilePath: (value: string) => void;
+  matImportFile: any;
+  stimChanged: boolean;
+  setStimChanged: (value: boolean) => void;
+  namingConvention: string;
+  selectedPatient: any;
+  historical: any;
+  mode: string;
+  templateS: any;
+  type: string;
+  allTemplateSpaces: number;
+  setAllTemplateSpaces: (value: number) => void;
+  showViewer: boolean;
+  setShowViewer: (value: boolean) => void;
+}
 
 function ManageElectrode({
   IPG,
   selectedElectrodeLeft,
   selectedElectrodeRight,
-  // key,
-  // setKey,
   allQuantities,
   setAllQuantities,
   allSelectedValues,
@@ -51,16 +107,13 @@ function ManageElectrode({
   setAllTemplateSpaces,
   showViewer,
   setShowViewer,
-}) {
+}: ManageElectrodeProps) {
+  // Refs
   const testElectrodeRef = React.createRef();
-  // const [selectedElectrode, setSelectedElectrode] = useState('');
-  // const [selectedElectrodeLeft, setSelectedElectrodeLeft] = useState('');
-  // const [selectedElectrodeRight, setSelectedElectrodeRight] = useState('');
-  // const [pulseWidth, setPulseWidth] = useState(60);
-  // const [rate, setRate] = useState(130);
-  // const [selectedElectrodeLeft, setSelectedElectrodeLeft] = useState('');
-  // const [selectedElectrodeRight, setSelectedElectrodeRight] = useState('');
-  const [hemisphereData, setHemisphereData] = useState({
+  const fileInputRef = useRef(null);
+
+  // State management
+  const [hemisphereData, setHemisphereData] = useState<HemisphereState>({
     left: [
       { unit: 'V', value: '' },
       { unit: 'V', value: '' },
@@ -75,27 +128,18 @@ function ManageElectrode({
     ],
   });
 
-  // const handleElectrodeChange = (event) => {
-  //   setSelectedElectrode(event.target.value);
-  // };
+  const [key, setKey] = useState<string>('5');
+  const [visualizationModel, setVisualizationModel] = useState<string>('3');
+
+  // Constants
+  const hemisphereButtons = [
+    { name: 'Right', value: '5' },
+    { name: 'Left', value: '1' },
+  ];
+
+  // Debug logging
   console.log('Electrode models: ', electrodeModels);
   console.log('Selected electrode', selectedElectrodeLeft);
-  const [key, setKey] = useState('5');
-  // const [namingConvention, setNamingConvention] = useState('clinical');
-  const fileInputRef = useRef(null);
-  const [visualizationModel, setVisualizationModel] = useState('3');
-  const hemisphereButtons = [
-    {
-      name: 'Right',
-      value: '5',
-    },
-    {
-      name: 'Left',
-      value: '1',
-    },
-  ];
-  // const [allQuantities, setAllQuantities] = useState({});
-  // const [allSelectedValues, setAllSelectedValues] = useState({});
 
   // const handleChange = () => {
   //   console.log("key="+key + ","+ Tabs.key);
@@ -123,7 +167,11 @@ function ManageElectrode({
     }
   }, [stimChanged, setStimChanged]);
 
-  const handleTabChange = (k) => {
+  /**
+   * Handles tab change events
+   * @param k - The new tab key
+   */
+  const handleTabChange = (k: string): void => {
     setKey(k);
   };
 
@@ -131,16 +179,16 @@ function ManageElectrode({
 
   // Send a message to the main process
 
-  const saveQuantitiesandValues = () => {
-    // for (let i = 1; i < 9; i++) {
+  /**
+   * Saves quantities and values from the electrode component
+   * This function extracts all state from the electrode component and updates
+   * the parent component's state arrays
+   */
+  const saveQuantitiesandValues = (): void => {
     allQuantities[key] = testElectrodeRef.current.getStateQuantities();
-
     allSelectedValues[key] = testElectrodeRef.current.getStateSelectedValues();
-
     allTotalAmplitudes[key] = testElectrodeRef.current.getStateAmplitude();
-
-    allStimulationParameters[key] =
-      testElectrodeRef.current.getStateStimulationParameters();
+    allStimulationParameters[key] = testElectrodeRef.current.getStateStimulationParameters();
 
     try {
       visModel[key] = testElectrodeRef.current.getStateVisModel();
@@ -150,10 +198,14 @@ function ManageElectrode({
 
     sessionTitle[key] = testElectrodeRef.current.getStateSessionTitle();
     allTogglePositions[key] = testElectrodeRef.current.getStateTogglePosition();
-    // }
   };
 
-  const convertElectrode = (electrode) => {
+  /**
+   * Converts electrode model key to display name
+   * @param electrode - The electrode model key
+   * @returns The display name for the electrode
+   */
+  const convertElectrode = (electrode: string): string => {
     switch (electrode) {
       case 'boston_vercise_directed':
         return 'Boston Scientific Vercise Directed';
@@ -186,18 +238,33 @@ function ManageElectrode({
     }
   };
 
-  const [importedData, setImportedData] = useState(null);
+  // Additional state
+  const [importedData, setImportedData] = useState<any>(null);
 
-  function handleExportAmplitude(amplitudeList) {
-    const exportAmplitudeList = [];
-    Object.keys(amplitudeList).forEach((thing) => {
-      exportAmplitudeList.push(parseFloat(amplitudeList[thing]));
+  /**
+   * Handles export amplitude data processing
+   * @param amplitudeList - The amplitude list to process
+   * @returns Processed amplitude list for export
+   */
+  const handleExportAmplitude = (amplitudeList: Record<string, any>): number[] => {
+    const exportAmplitudeList: number[] = [];
+    Object.keys(amplitudeList).forEach((key) => {
+      exportAmplitudeList.push(parseFloat(amplitudeList[key]));
     });
     exportAmplitudeList.shift();
     return exportAmplitudeList;
-  }
+  };
 
-  const calculatePercentageFromAmplitude = (quantities, totalAmplitude) => {
+  /**
+   * Calculates percentage values from amplitude data
+   * @param quantities - The quantities object to update
+   * @param totalAmplitude - The total amplitude value
+   * @returns Updated quantities with percentage values
+   */
+  const calculatePercentageFromAmplitude = (
+    quantities: Record<string, any>, 
+    totalAmplitude: number
+  ): Record<string, any> => {
     const updatedQuantities = { ...quantities };
     Object.keys(updatedQuantities).forEach((element) => {
       updatedQuantities[element] =
@@ -207,7 +274,12 @@ function ManageElectrode({
     return updatedQuantities;
   };
 
-  const calculateVoltageFromAmplitude = (quantities) => {
+  /**
+   * Calculates voltage values from amplitude data
+   * @param quantities - The quantities object to update
+   * @returns Updated quantities with voltage values
+   */
+  const calculateVoltageFromAmplitude = (quantities: Record<string, any>): Record<string, any> => {
     const updatedQuantities = { ...quantities };
     Object.keys(updatedQuantities).forEach((element) => {
       if (quantities[element] !== 0) {
