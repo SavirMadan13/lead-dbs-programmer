@@ -1,0 +1,399 @@
+/**
+ * Main Styles
+ * 
+ * This is the main stylesheet that imports all other stylesheets.
+ * It provides a comprehensive design system for the LeadDBS Programmer application.
+ */
+
+/* ============================================================================
+ * Import Order
+ * 
+ * 1. Variables - CSS custom properties and design tokens
+ * 2. Base - Global resets and foundational styles
+ * 3. Layout - Grid system and layout utilities
+ * 4. Components - Reusable UI component styles
+ * ============================================================================ */
+
+@import './variables.css';
+@import './base.css';
+@import './layout.css';
+@import './components.css';
+
+/* ============================================================================
+ * Application-Specific Styles
+ * ============================================================================ */
+
+/* Main Application Container */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-background-primary);
+  color: var(--color-text-primary);
+}
+
+/* Main Content Area */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Page Container */
+.page-container {
+  flex: 1;
+  padding: var(--spacing-4);
+  overflow-y: auto;
+}
+
+/* ============================================================================
+ * LeadDBS Specific Components
+ * ============================================================================ */
+
+/* LeadDBS Header */
+.leaddbs-header {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  color: var(--color-white);
+  padding: var(--spacing-4);
+  text-align: center;
+  box-shadow: var(--shadow-md);
+}
+
+.leaddbs-title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.leaddbs-subtitle {
+  font-size: var(--font-size-lg);
+  margin: var(--spacing-2) 0 0 0;
+  opacity: 0.9;
+}
+
+/* Patient Database Specific Styles */
+.patient-database {
+  background-color: var(--color-background-primary);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.patient-database-header {
+  background-color: var(--color-background-secondary);
+  padding: var(--spacing-4);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.patient-database-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.patient-database-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: var(--spacing-1) 0 0 0;
+}
+
+.patient-table-container {
+  overflow-x: auto;
+  background-color: var(--color-background-primary);
+}
+
+.patient-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.patient-table th {
+  background-color: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+  padding: var(--spacing-3);
+  text-align: left;
+  border-bottom: 2px solid var(--color-border-medium);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.patient-table td {
+  padding: var(--spacing-3);
+  border-bottom: 1px solid var(--color-border-light);
+  vertical-align: middle;
+}
+
+.patient-table tbody tr:hover {
+  background-color: var(--color-background-secondary);
+}
+
+.patient-table tbody tr.selected {
+  background-color: rgba(var(--color-primary-rgb), 0.1);
+}
+
+/* Patient Details Specific Styles */
+.patient-details {
+  background-color: var(--color-background-primary);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.patient-details-header {
+  background-color: var(--color-background-secondary);
+  padding: var(--spacing-4);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.patient-details-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.patient-details-content {
+  padding: var(--spacing-4);
+}
+
+.patient-details-section {
+  margin-bottom: var(--spacing-6);
+}
+
+.patient-details-section-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-3) 0;
+  padding-bottom: var(--spacing-2);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.patient-details-field {
+  display: flex;
+  margin-bottom: var(--spacing-3);
+}
+
+.patient-details-field-label {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  min-width: 120px;
+  margin-right: var(--spacing-3);
+}
+
+.patient-details-field-value {
+  color: var(--color-text-primary);
+  flex: 1;
+}
+
+/* ============================================================================
+ * Animation Classes
+ * ============================================================================ */
+
+.fade-in {
+  animation: fadeIn var(--transition-normal) ease-in-out;
+}
+
+.fade-out {
+  animation: fadeOut var(--transition-normal) ease-in-out;
+}
+
+.slide-in-up {
+  animation: slideInUp var(--transition-normal) ease-out;
+}
+
+.slide-in-down {
+  animation: slideInDown var(--transition-normal) ease-out;
+}
+
+.slide-in-left {
+  animation: slideInLeft var(--transition-normal) ease-out;
+}
+
+.slide-in-right {
+  animation: slideInRight var(--transition-normal) ease-out;
+}
+
+.scale-in {
+  animation: scaleIn var(--transition-normal) ease-out;
+}
+
+.scale-out {
+  animation: scaleOut var(--transition-normal) ease-in;
+}
+
+/* ============================================================================
+ * Keyframe Animations
+ * ============================================================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleOut {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* ============================================================================
+ * Print Styles
+ * ============================================================================ */
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+  
+  .app-container {
+    background-color: white !important;
+    color: black !important;
+  }
+  
+  .patient-table {
+    border-collapse: collapse !important;
+  }
+  
+  .patient-table th,
+  .patient-table td {
+    border: 1px solid #000 !important;
+    padding: 8px !important;
+  }
+}
+
+/* ============================================================================
+ * High Contrast Mode
+ * ============================================================================ */
+
+@media (prefers-contrast: high) {
+  :root {
+    --color-border-light: #000000;
+    --color-border-medium: #000000;
+    --color-border-focus: #000000;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  }
+  
+  .btn {
+    border-width: 2px;
+  }
+  
+  .form-control {
+    border-width: 2px;
+  }
+  
+  .patient-table th,
+  .patient-table td {
+    border-width: 2px;
+  }
+}
+
+/* ============================================================================
+ * Reduced Motion
+ * ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .fade-in,
+  .fade-out,
+  .slide-in-up,
+  .slide-in-down,
+  .slide-in-left,
+  .slide-in-right,
+  .scale-in,
+  .scale-out {
+    animation: none !important;
+  }
+}

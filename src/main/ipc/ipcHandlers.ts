@@ -1,738 +1,848 @@
-import { app, ipcMain, dialog } from 'electron';
+/**
+ * IPC Handlers
+ * 
+ * This module contains all IPC (Inter-Process Communication) handlers for the main process.
+ * It provides a centralized interface for handling communication between the main and renderer processes.
+ */
+
+import { ipcMain, dialog, shell } from 'electron';
+import * as fs from 'fs/promises';
+import * as fsSync from 'fs';
 import path from 'path';
-import zlib from 'zlib';
-import { getData, setData } from '../data/data';
-import { getPatientFolder, getPatientFolderPly } from '../helpers/helpers';
+import { execSync } from 'child_process';
+import { Logger } from '../utils/Logger';
+import { FileManager } from '../core/FileManager';
+import { DataManager } from '../core/DataManager';
+import { AppError, FileOperationResult } from '../../types';
 
-const { execSync } = require('child_process');
+/**
+ * IPC Handlers class for managing all IPC communication
+ */
+export class IPCHandlers {
+  private logger: Logger;
+  private fileManager: FileManager;
+  private dataManager: DataManager;
+  private isInitialized: boolean = false;
 
-const fs = require('fs');
+  constructor(logger: Logger, fileManager: FileManager, dataManager: DataManager) {
+    this.logger = logger;
+    this.fileManager = fileManager;
+    this.dataManager = dataManager;
+  }
 
-export default function registerFileHandlers() {
-  ipcMain.on('ipc-example', async (_event, arg) => {
-    console.log('ipc-example');
-  });
-
-  // Handle writing the JSON file
-  ipcMain.on('save-patients-json', (event, folderPath, patients) => {
-    let filePath;
-    try {
-      filePath = path.join(folderPath, 'participants.json');
-    } catch (err) {
-      const stimulationData = getData('stimulationData');
-      console.log('Stimulation Data: ', stimulationData);
-      filePath = path.join(stimulationData.path, 'participants.json');
-    }
-      console.log('File path: ', filePath);
-      fs.writeFile(filePath, JSON.stringify(patients, null, 2), (err) => {
-      if (err) {
-        console.error('Error saving JSON file:', err);
-        event.sender.send('json-save-error', 'Error saving file');
-      } else {
-        event.sender.send('json-saved', 'File saved successfully');
-      }
-    });
-    console.log('');
-  });
-
-  ipcMain.handle('check-folder-exists', (event, folderPath) => {
-    return new Promise((resolve) => {
-      fs.access(folderPath, fs.constants.F_OK, (err) => {
-        if (err) {
-          resolve(false); // Folder does not exist
-        } else {
-          resolve(true); // Folder exists
-        }
-      });
-    });
-  });
-
-  ipcMain.on('revert-to-standard', async (event, arg) => {
-    const stimulationData = getData('stimulationData');
-    stimulationData.type = 'leaddbs';
-    if (stimulationData.mode !== 'standalone') {
-      stimulationData.mode = 'explore';
-    }
-    setData('stimulationData', stimulationData);
-  });
-
-  ipcMain.on('open-file', (event, arg) => {
-    const f = fs.readFileSync(arg);
-    console.log(event);
-    event.reply('open-file', `pong: ${f}`);
-  });
-
-  ipcMain.on('save-file', (event, file, data, historical) => {
-    const { patient, timeline, directoryPath, leadDBS } = historical;
-
-    if (!patient || !timeline || !directoryPath) {
-      console.error('Missing patient, timeline, or directoryPath');
+  /**
+   * Initialize the IPC handlers
+   */
+  public async initialize(): Promise<void> {
+    if (this.isInitialized) {
+      this.logger.warn('IPCHandlers already initialized');
       return;
     }
-    // const masterjsonpath = path.join(directoryPath, 'dataset_master.json');
-    // Construct the proper folder structure based on the patient ID and timeline
-    let patientDir = path.join(directoryPath, `sub-${patient.id}`);
-    let sessionDir = path.join(patientDir, `ses-${timeline}`);
-
-    if (leadDBS) {
-      const newDirectoryPath = path.join(
-        directoryPath,
-        'derivatives/leaddbs',
-        patient.id,
-        'clinical',
-      );
-      patientDir = path.join(newDirectoryPath);
-      sessionDir = path.join(patientDir, `ses-${timeline}`);
-    }
 
     try {
-      // Ensure that the directories exist, if not, create them
-      if (!fs.existsSync(patientDir))
-        fs.mkdirSync(patientDir, { recursive: true });
-      if (!fs.existsSync(sessionDir))
-        fs.mkdirSync(sessionDir, { recursive: true });
-
-      // Convert the data to a string format (JSON)
-      const dataString = JSON.stringify(data, null, 2);
-
-      // Dynamically name the file based on patient and timeline
-      let fileName = `sub-${patient.id}_ses-${timeline}_stim.json`;
-      let filePath = path.join(sessionDir, fileName);
-
-      if (leadDBS) {
-        fileName = `${patient.id}_ses-${timeline}_stimparameters.json`;
-        filePath = path.join(sessionDir, fileName);
-      }
-
-      // Write the data to the file
-      fs.writeFileSync(filePath, dataString);
-
-      // Write the filenpath to the master json script
-      const masterjsonpath = path.join(directoryPath, 'dataset_master.json');
-      const jsonData = fs.readFileSync(masterjsonpath, 'utf-8');
-      const patientId = patient.id.replace('-', '_');
-      const masterjsondata = JSON.parse(jsonData);
-      // Ensure the timeline session exists
-      if (!masterjsondata[patientId].clinicalData[`ses_${timeline}`]) {
-        masterjsondata[patientId].clinicalData[`ses_${timeline}`] = [];
-      }
-
-      // Now it's safe to push filePath
-      masterjsondata[patientId].clinicalData[`ses_${timeline}`].push(filePath);
-      fs.writeFileSync(masterjsonpath, JSON.stringify(masterjsondata));
-      // Send the file path back to the renderer process
-      event.reply('file-saved', filePath);
-
-      console.log(`Data saved successfully to ${filePath}`);
+      this.logger.info('Initializing IPC handlers...');
+      
+      // Set up all IPC handlers
+      this.setupFileHandlers();
+      this.setupDataHandlers();
+      this.setupDialogHandlers();
+      this.setupUtilityHandlers();
+      this.setupLegacyHandlers();
+      
+      this.isInitialized = true;
+      this.logger.info('IPC handlers initialized successfully');
+      
     } catch (error) {
-      // Handle any errors in the saving process
-      console.error('Error writing to file:', error);
-      event.reply('file-save-error', error.message);
+      this.logger.error('Failed to initialize IPC handlers:', error);
+      throw new AppError('IPC_HANDLERS_INIT_FAILED', 'Failed to initialize IPC handlers', error);
     }
-  });
+  }
 
-  ipcMain.on('save-file-stimulate', (event, file, data) => {
-    console.log('FILE: ', file);
-    const dataString = JSON.stringify(data);
-    // const newStimFilePath = path.join(stimulationDirectory, 'data.json');
-    const stimulationData = getData('stimulationData');
-    const newStimFilePath = path.join(stimulationData.stimDir, 'data.json');
-    console.log(newStimFilePath);
-    console.log(dataString);
-    try {
-      // fs.writeFileSync(filePath, dataString);
-      console.log(newStimFilePath);
-      fs.writeFileSync(newStimFilePath, dataString);
-    } catch (error) {
-      // Handle the error here
-      console.error('Error writing to file:', error);
-    }
-    event.reply('file-saved', newStimFilePath);
-  });
+  /**
+   * Cleanup IPC handlers
+   */
+  public async cleanup(): Promise<void> {
+    this.logger.info('Cleaning up IPC handlers...');
+    
+    // Remove all IPC handlers
+    ipcMain.removeAllListeners();
+    
+    this.isInitialized = false;
+  }
 
-  ipcMain.on('save-file-test', (event, data) => {
-    const dataString = JSON.stringify(data);
-    // const newStimFilePath = path.join(stimulationDirectory, 'data.json');
-    const newStimFilePath =
-      '/Volumes/PdBwh/CompleteParkinsons/optimized_output.json';
-    try {
-      // fs.writeFileSync(filePath, dataString);
-      console.log(newStimFilePath);
-      fs.writeFileSync(newStimFilePath, dataString);
-    } catch (error) {
-      // Handle the error here
-      console.error('Error writing to file:', error);
-    }
-    event.reply('file-saved', newStimFilePath);
-  });
-
-  ipcMain.on('save-file-clinical', (event, data, historical, scoretype) => {
-    const { patient, timeline, directoryPath, leadDBS } = historical;
-
-    if (!patient || !timeline || !directoryPath) {
-      console.error('Missing patient, timeline, or directoryPath');
-      return;
-    }
-    // Construct the proper folder structure based on the patient ID and timeline
-    let patientDir = path.join(directoryPath, `sub-${patient.id}`);
-    if (leadDBS) {
-      patientDir = path.join(
-        directoryPath,
-        'derivatives',
-        'leaddbs',
-        `${patient.id}`,
-        'clinical',
-      );
-    }
-    const sessionDir = path.join(patientDir, `ses-${timeline}`);
-
-    try {
-      // Ensure that the directories exist, if not, create them
-      if (!fs.existsSync(patientDir))
-        fs.mkdirSync(patientDir, { recursive: true });
-      if (!fs.existsSync(sessionDir))
-        fs.mkdirSync(sessionDir, { recursive: true });
-
-      // Convert the data to a string format (JSON)
-      const dataString = JSON.stringify(data, null, 2);
-
-      // Dynamically name the file based on patient and timeline
-      let fileName = `sub-${patient.id}_ses-${timeline}_clinical.json`;
-      if (leadDBS) {
-        fileName = `${patient.id}_ses-${timeline}_clinical.json`;
-      }
-      const filePath = path.join(sessionDir, fileName);
-      if (fs.existsSync(filePath)) {
-        const clinicalScores = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-        clinicalScores[scoretype] = data;
-        fs.writeFileSync(filePath, JSON.stringify(clinicalScores, null, 2));
-      } else {
-        let clinicalScores = {};
-        clinicalScores[scoretype] = data;
-        fs.writeFileSync(filePath, JSON.stringify(clinicalScores, null, 2));
-      }
-      // Send the file path back to the renderer process
-      event.reply('file-saved', filePath);
-
-      console.log(`Data saved successfully to ${filePath}`);
-    } catch (error) {
-      // Handle any errors in the saving process
-      console.error('Error writing to file:', error);
-      event.reply('file-save-error', error.message);
-    }
-  });
-
-  ipcMain.on(
-    'import-file-clinical',
-    async (event, id, timeline, directoryPath, leadDBS) => {
-      const fs = require('fs');
+  /**
+   * Set up file-related IPC handlers
+   */
+  private setupFileHandlers(): void {
+    // Select folder dialog
+    ipcMain.handle('select-folder', async (): Promise<FileOperationResult<string>> => {
       try {
-        // Validate id, timeline, and directoryPath
-        if (!id || !timeline || !directoryPath) {
-          console.error('Missing patient ID, timeline, or directoryPath');
-          event.reply(
-            'import-file-error',
-            'Missing patient ID, timeline, or directoryPath',
-          );
+        this.logger.debug('Handling select-folder request');
+        
+        const result = await dialog.showOpenDialog({
+          properties: ['openDirectory'],
+          title: 'Select Lead-DBS or LeadGroup folder'
+        });
+
+        if (result.canceled || result.filePaths.length === 0) {
+          return {
+            success: false,
+            error: 'No folder selected'
+          };
+        }
+
+        const folderPath = result.filePaths[0];
+        this.logger.info(`Selected folder: ${folderPath}`);
+        
+        return {
+          success: true,
+          data: folderPath
+        };
+        
+      } catch (error) {
+        this.logger.error('Error in select-folder handler:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
+    });
+
+    // Get saved directory
+    ipcMain.handle('get-saved-directory', async (): Promise<FileOperationResult<string | null>> => {
+      try {
+        this.logger.debug('Handling get-saved-directory request');
+        
+        // This would typically read from a config file or user preferences
+        // For now, return null to indicate no saved directory
+        return {
+          success: true,
+          data: null
+        };
+        
+      } catch (error) {
+        this.logger.error('Error in get-saved-directory handler:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
+    });
+
+    // Save patients JSON
+    ipcMain.handle('save-patients-json', async (event, directoryPath: string, patients: any[]): Promise<FileOperationResult<void>> => {
+      try {
+        this.logger.debug(`Handling save-patients-json request for directory: ${directoryPath}`);
+        
+        await this.fileManager.writePatientsData(directoryPath, patients);
+        
+        return {
+          success: true
+        };
+        
+      } catch (error) {
+        this.logger.error('Error in save-patients-json handler:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
+    });
+
+    // Load patients JSON
+    ipcMain.handle('load-patients-json', async (event, directoryPath: string): Promise<FileOperationResult<any[]>> => {
+      try {
+        this.logger.debug(`Handling load-patients-json request for directory: ${directoryPath}`);
+        
+        const patients = await this.fileManager.readPatientsData(directoryPath);
+        
+        return {
+          success: true,
+          data: patients
+        };
+        
+      } catch (error) {
+        this.logger.error('Error in load-patients-json handler:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
+    });
+
+    // Check if folder exists
+    ipcMain.handle('check-folder-exists', async (event, folderPath: string): Promise<FileOperationResult<boolean>> => {
+      try {
+        this.logger.debug(`Handling check-folder-exists request for: ${folderPath}`);
+        
+        const exists = await this.fileManager.directoryExists(folderPath);
+        
+        return {
+          success: true,
+          data: exists
+        };
+        
+      } catch (error) {
+        this.logger.error('Error in check-folder-exists handler:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
+    });
+  }
+
+  /**
+   * Set up data-related IPC handlers
+   */
+  private setupDataHandlers(): void {
+    // Get stimulation data
+    ipcMain.handle('get-stimulation-data', async (event, directoryPath: string, patientId: string, timeline: string, isLeadDBS: boolean = true): Promise<FileOperationResult<any>> => {
+      try {
+        this.logger.debug(`Handling get-stimulation-data request for patient: ${patientId}, timeline: ${timeline}`);
+        
+        const data = await this.fileManager.readStimulationParameters(directoryPath, patientId, timeline, isLeadDBS);
+        
+        return {
+          success: true,
+          data: data
+        };
+        
+      } catch (error) {
+        this.logger.error('Error in get-stimulation-data handler:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
+    });
+
+    // Save stimulation data
+    ipcMain.handle('save-stimulation-data', async (event, directoryPath: string, patientId: string, timeline: string, data: any, isLeadDBS: boolean = true): Promise<FileOperationResult<void>> => {
+      try {
+        this.logger.debug(`Handling save-stimulation-data request for patient: ${patientId}, timeline: ${timeline}`);
+        
+        await this.fileManager.writeStimulationParameters(directoryPath, patientId, timeline, data, isLeadDBS);
+        
+        return {
+          success: true
+        };
+        
+      } catch (error) {
+        this.logger.error('Error in save-stimulation-data handler:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
+    });
+
+    // Get timelines
+    ipcMain.handle('get-timelines', async (event, directoryPath: string, patientId: string, isLeadDBS: boolean = true): Promise<FileOperationResult<Array<{ timeline: string; hasClinical: boolean; hasStimulation: boolean }>>> => {
+      try {
+        this.logger.debug(`Handling get-timelines request for patient: ${patientId}`);
+        
+        const timelines = await this.fileManager.getPatientTimelines(directoryPath, patientId, isLeadDBS);
+        
+        return {
+          success: true,
+          data: timelines
+        };
+        
+      } catch (error) {
+        this.logger.error('Error in get-timelines handler:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
+    });
+
+    // Get clinical scores
+    ipcMain.handle('get-clinical-scores', async (event, directoryPath: string, patientId: string, timeline: string, isLeadDBS: boolean = true): Promise<FileOperationResult<any>> => {
+      try {
+        this.logger.debug(`Handling get-clinical-scores request for patient: ${patientId}, timeline: ${timeline}`);
+        
+        const scores = await this.fileManager.readClinicalScores(directoryPath, patientId, timeline, isLeadDBS);
+        
+        return {
+          success: true,
+          data: scores
+        };
+        
+      } catch (error) {
+        this.logger.error('Error in get-clinical-scores handler:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
+    });
+
+    // Save clinical scores
+    ipcMain.handle('save-clinical-scores', async (event, directoryPath: string, patientId: string, timeline: string, scoreType: string, data: any, isLeadDBS: boolean = true): Promise<FileOperationResult<void>> => {
+      try {
+        this.logger.debug(`Handling save-clinical-scores request for patient: ${patientId}, timeline: ${timeline}, scoreType: ${scoreType}`);
+        
+        await this.fileManager.writeClinicalScores(directoryPath, patientId, timeline, scoreType, data, isLeadDBS);
+        
+        return {
+          success: true
+        };
+        
+      } catch (error) {
+        this.logger.error('Error in save-clinical-scores handler:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
+    });
+  }
+
+  /**
+   * Set up dialog-related IPC handlers
+   */
+  private setupDialogHandlers(): void {
+    // Show error dialog
+    ipcMain.handle('show-error-dialog', async (event, title: string, content: string): Promise<void> => {
+      try {
+        this.logger.debug(`Showing error dialog: ${title}`);
+        
+        await dialog.showErrorBox(title, content);
+        
+      } catch (error) {
+        this.logger.error('Error in show-error-dialog handler:', error);
+      }
+    });
+
+    // Show info dialog
+    ipcMain.handle('show-info-dialog', async (event, title: string, content: string): Promise<void> => {
+      try {
+        this.logger.debug(`Showing info dialog: ${title}`);
+        
+        await dialog.showMessageBox({
+          type: 'info',
+          title: title,
+          message: content
+        });
+        
+      } catch (error) {
+        this.logger.error('Error in show-info-dialog handler:', error);
+      }
+    });
+
+    // Show confirmation dialog
+    ipcMain.handle('show-confirmation-dialog', async (event, title: string, content: string): Promise<FileOperationResult<boolean>> => {
+      try {
+        this.logger.debug(`Showing confirmation dialog: ${title}`);
+        
+        const result = await dialog.showMessageBox({
+          type: 'question',
+          title: title,
+          message: content,
+          buttons: ['Yes', 'No'],
+          defaultId: 0,
+          cancelId: 1
+        });
+        
+        return {
+          success: true,
+          data: result.response === 0
+        };
+        
+      } catch (error) {
+        this.logger.error('Error in show-confirmation-dialog handler:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
+    });
+  }
+
+  /**
+   * Set up utility IPC handlers
+   */
+  private setupUtilityHandlers(): void {
+    // Open external URL
+    ipcMain.handle('open-external-url', async (event, url: string): Promise<FileOperationResult<void>> => {
+      try {
+        this.logger.debug(`Opening external URL: ${url}`);
+        
+        await shell.openExternal(url);
+        
+        return {
+          success: true
+        };
+        
+      } catch (error) {
+        this.logger.error('Error in open-external-url handler:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
+    });
+
+    // Get app version
+    ipcMain.handle('get-app-version', async (): Promise<FileOperationResult<string>> => {
+      try {
+        this.logger.debug('Handling get-app-version request');
+        
+        const version = require('../../package.json').version;
+        
+        return {
+          success: true,
+          data: version
+        };
+        
+      } catch (error) {
+        this.logger.error('Error in get-app-version handler:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
+    });
+
+    // Get platform info
+    ipcMain.handle('get-platform-info', async (): Promise<FileOperationResult<{ platform: string; arch: string; version: string }>> => {
+      try {
+        this.logger.debug('Handling get-platform-info request');
+        
+        const info = {
+          platform: process.platform,
+          arch: process.arch,
+          version: process.version
+        };
+        
+        return {
+          success: true,
+          data: info
+        };
+        
+      } catch (error) {
+        this.logger.error('Error in get-platform-info handler:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
+    });
+  }
+
+  /**
+   * Set up legacy IPC handlers for backward compatibility
+   */
+  private setupLegacyHandlers(): void {
+    // Legacy file save handler
+    ipcMain.on('save-file', async (event, file, data, historical) => {
+      try {
+        const { patient, timeline, directoryPath, leadDBS } = historical;
+        
+        if (!patient || !timeline || !directoryPath) {
+          this.logger.error('Missing patient, timeline, or directoryPath');
+          event.reply('file-save-error', 'Missing required parameters');
           return;
         }
 
-        // Construct the file path dynamically based on the directoryPath, patient id, and timeline
-        // let patientDir = path.join(directoryPath, `sub-${id}`);
-        const patientDir = getPatientFolder(directoryPath, id, leadDBS);
-        let fileName = `sub-${id}_ses-${timeline}_clinical.json`;
-        if (leadDBS) {
-          // patientDir = path.join(
-          //   directoryPath,
-          //   'derivatives/leaddbs',
-          //   id,
-          //   'clinical',
-          // );
-          fileName = `${id}_ses-${timeline}_clinical.json`;
-        }
+        await this.fileManager.writeStimulationParameters(directoryPath, patient.id, timeline, data, leadDBS);
+        
+        event.reply('file-saved', 'File saved successfully');
+        this.logger.info(`Data saved successfully for patient ${patient.id}, timeline ${timeline}`);
+        
+      } catch (error) {
+        this.logger.error('Error in save-file handler:', error);
+        event.reply('file-save-error', error instanceof Error ? error.message : 'Unknown error');
+      }
+    });
 
-        const sessionDir = path.join(patientDir, `ses-${timeline}`);
-        const filePath = path.join(sessionDir, fileName);
-
-        // Check if the file exists before trying to read it
-        if (!fs.existsSync(filePath)) {
-          console.error('File not found:', filePath);
-          event.reply('import-file-clinical', 'File not found');
+    // Legacy clinical file save handler
+    ipcMain.on('save-file-clinical', async (event, data, historical, scoreType) => {
+      try {
+        const { patient, timeline, directoryPath, leadDBS } = historical;
+        
+        if (!patient || !timeline || !directoryPath) {
+          this.logger.error('Missing patient, timeline, or directoryPath');
+          event.reply('file-save-error', 'Missing required parameters');
           return;
         }
 
-        // Read the file
-        const fileData = fs.readFileSync(filePath);
-
-        // Parse the JSON data
-        const jsonData = JSON.parse(fileData);
-
-        // Log and send the data back to the renderer process
-        console.log(jsonData);
-        event.reply('import-file-clinical', jsonData);
-      } catch (err) {
-        // Handle specific errors
-        if (err.code === 'ENOENT') {
-          console.error('File not found:', filePath);
-          event.reply('import-file-error', 'File not found');
-        } else if (err.name === 'SyntaxError') {
-          console.error('Error parsing JSON:', err.message);
-          event.reply('import-file-error', 'Error parsing JSON');
-        } else {
-          console.error('An unexpected error occurred:', err);
-          event.reply('import-file-error', err.message);
-        }
+        await this.fileManager.writeClinicalScores(directoryPath, patient.id, timeline, scoreType, data, leadDBS);
+        
+        event.reply('file-saved', 'Clinical scores saved successfully');
+        this.logger.info(`Clinical scores saved successfully for patient ${patient.id}, timeline ${timeline}`);
+        
+      } catch (error) {
+        this.logger.error('Error in save-file-clinical handler:', error);
+        event.reply('file-save-error', error instanceof Error ? error.message : 'Unknown error');
       }
-    },
-  );
+    });
 
-  ipcMain.on(
-    'import-file-clinical-group',
-    async (event, id, timeline, directoryPath, leadDBS) => {
-      // const path = require('path');
-      console.log('Timeline: ', timeline);
-      const outputData = {};
-      Object.keys(timeline).forEach((key) => {
-        try {
-          // Loop through each timeline item and process it individually
-          // Construct the file path dynamically
-          // let patientDir = path.join(directoryPath, `${id}`);
-          const patientDir = getPatientFolder(directoryPath, id, leadDBS);
-          let fileName = `${id}_ses-${timeline[key]}_clinical.json`;
-          if (leadDBS) {
-            // patientDir = path.join(
-            //   directoryPath,
-            //   'derivatives/leaddbs',
-            //   `${id}`,
-            //   'clinical',
-            // );
-            fileName = `${id}_ses-${timeline[key]}_clinical.json`;
-          }
-
-          const sessionDir = path.join(patientDir, `ses-${timeline[key]}`);
-          const filePath = path.join(sessionDir, fileName);
-
-          // Check if the file exists before trying to read it
-          if (!fs.existsSync(filePath)) {
-            console.error('File not found:', filePath);
-            // event.reply(`import-file-clinical-${timeline}`, 'File not found');
-            return;
-          }
-
-          // Read and parse the JSON data
-          const fileData = fs.readFileSync(filePath);
-          const jsonData = JSON.parse(fileData);
-
-          // Send the data back to the renderer process for this specific timeline
-          console.log(`Sending data for ${timeline[key]}`, jsonData);
-          outputData[timeline[key]] = jsonData;
-          // event.reply(`import-file-clinical-${timeline}`, jsonData);
-        } catch (err) {
-          outputData[timeline[key]] = 'Does not exist';
-          console.error('An unexpected error occurred:', err);
-
-          // event.reply('import-file-error', err.message);
-        }
-      });
-      event.reply('import-file-clinical-group', outputData);
-    },
-  );
-
-  // PLY Viewer ipc functions
-
-  ipcMain.handle('load-ply-file', async (event, historical) => {
-    const { patient, timeline, directoryPath, leadDBS } = historical;
-    if (leadDBS) {
-      const patientPath = getPatientFolderPly(
-        directoryPath,
-        patient.id,
-        leadDBS,
-      );
-      const filePath = path.join(
-        patientPath,
-        'export/ply/combined_electrodes.ply',
-      );
-      const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
-      return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
-    }
-    return 'No ply file found'; // Return as ArrayBuffer // send the file contents back to renderer process
-  });
-
-  ipcMain.handle('load-ply-file-anatomy', async (event, historical) => {
-    const { patient, timeline, directoryPath, leadDBS } = historical;
-    if (leadDBS) {
-      const patientPath = getPatientFolderPly(
-        directoryPath,
-        patient.id,
-        leadDBS,
-      );
-      const filePath = path.join(patientPath, 'export/ply/anatomy.ply');
-      const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
-      return fileData.buffer; // Return as ArrayBuffer // send the file contents back to renderer process
-    }
-    return 'No ply file found'; // Return as ArrayBuffer // send the file contents back to renderer process
-  });
-
-  ipcMain.handle('load-vis-coords', async (event, historical) => {
-    const { patient, timeline, directoryPath, leadDBS } = historical;
-    console.log(patient);
-    if (leadDBS) {
-      const patientPath = getPatientFolderPly(
-        directoryPath,
-        patient.id,
-        leadDBS,
-      );
-      const filePath = path.join(
-        patientPath,
-        'clinical',
-        `${patient.id}_desc-reconstruction.json`,
-      );
-      const fileData = fs.readFileSync(filePath, 'utf8'); // Read the PLY file as binary
-      const jsonData = JSON.parse(fileData); // Parse the string into a JSON object
-      return jsonData; // Return as ArrayBuffer // send the file contents back to renderer process
-    }
-    return 'No coords found'; // Return as ArrayBuffer // send the file contents back to renderer process
-  });
-
-  // ipcMain.handle('load-ply-file-2', async (event, filePath) => {
-
-  //   const niiFiles = [];
-  //   const atlasesPath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI152NLin2009bAsym/atlases';
-  //   try {
-  //     const findNiiFiles = (dirPath) => {
-  //       const entries = fs.readdirSync(dirPath, { withFileTypes: true });
-  //       for (const entry of entries) {
-  //         const fullPath = path.join(dirPath, entry.name);
-  //         if (entry.isDirectory()) {
-  //           findNiiFiles(fullPath);
-  //         } else if (entry.isFile() && (entry.name.endsWith('.nii') || entry.name.endsWith('.nii.gz'))) {
-  //           niiFiles.push({
-  //             fileName: entry.name,
-  //             filePath: fullPath,
-  //           });
-  //         }
-  //       }
-  //     };
-
-  //     findNiiFiles(atlasesPath);
-  //     console.log(niiFiles);
-  //   } catch (error) {
-  //     console.error('Error reading atlas folders:', error);
-  //   }
-  //   console.log(niiFiles);
-  //   return niiFiles;
-  //   // try {
-  //   //   // const stnFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI_ICBM_2009b_NLIN_ASYM/atlases/DISTAL Nano (Ewert 2017)/lh/STN.nii';
-  //   //   // const fileData = fs.readFileSync(stnFilePath);
-  //   //   const stnFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI_ICBM_2009b_NLIN_ASYM/atlases/DISTAL Nano (Ewert 2017)/lh/STN.nii.gz';
-  //   //   const compressedData = fs.readFileSync(stnFilePath);
-  //   //   const fileData = zlib.gunzipSync(compressedData); // Decompress the .nii.gz file
-  //   //   return fileData.buffer;
-  //   //   // const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
-  //   //   // return fileData.buffer; // Return as ArrayBuffer
-  //   // } catch (error) {
-  //   //   return null;
-  //   // }
-  // });
-
-  ipcMain.handle('load-ply-file-2', async (event, filePath) => {
-    try {
-      const plyData = fs.readFileSync(filePath);
-      return plyData.buffer;
-    } catch (error) {
-      console.error('Error reading atlas folders:', error);
-    }
-    // try {
-    //   // const stnFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI_ICBM_2009b_NLIN_ASYM/atlases/DISTAL Nano (Ewert 2017)/lh/STN.nii';
-    //   // const fileData = fs.readFileSync(stnFilePath);
-    //   const stnFilePath = '/Users/savirmadan/Documents/GitHub/leaddbs/templates/space/MNI_ICBM_2009b_NLIN_ASYM/atlases/DISTAL Nano (Ewert 2017)/lh/STN.nii.gz';
-    //   const compressedData = fs.readFileSync(stnFilePath);
-    //   const fileData = zlib.gunzipSync(compressedData); // Decompress the .nii.gz file
-    //   return fileData.buffer;
-    //   // const fileData = fs.readFileSync(filePath); // Read the PLY file as binary
-    //   // return fileData.buffer; // Return as ArrayBuffer
-    // } catch (error) {
-    //   return null;
-    // }
-  });
-
-  ipcMain.handle('load-file-buffer', async (event, filePath) => {
-    const fileData = fs.readFileSync(filePath);
-    if (filePath.endsWith('.gz')) {
-      const compressedData = fs.readFileSync(filePath);
-      const fileData = zlib.gunzipSync(compressedData); // Decompress the .gz file
-      return fileData.buffer;
-    }
-    return fileData.buffer;
-  });
-
-  // Import
-
-  ipcMain.on('batch-import', async (event, data, leadDBS) => {
-    const stimulationData = getData('stimulationData');
-    const directoryPath = stimulationData.filepath;
-    console.log(Object.keys(data));
-    Object.keys(data).forEach((key) => {
-      const { id, timeline, scores } = data[key];
-      console.log('ID: ', id);
-      const tempId = id.trim();
-      const patientFolder = getPatientFolder(directoryPath, tempId, leadDBS);
-      console.log('Patient Folder: ', patientFolder);
-      console.log('Scores: ', scores);
-      const scoretype = scores['Score Type'];
-      // Remove 'Score Type' from scores
-      delete scores['Score Type'];
-      const sessionDir = path.join(patientFolder, `ses-${timeline}`);
+    // Legacy import file handler
+    ipcMain.handle('import-file-2', async (event, directoryPath: string, patientId: string, timeline: string, isLeadDBS: boolean = true): Promise<any> => {
       try {
-        // Ensure that the directories exist, if not, create them
-        if (!fs.existsSync(patientFolder))
-          fs.mkdirSync(patientFolder, { recursive: true });
-        if (!fs.existsSync(sessionDir))
-          fs.mkdirSync(sessionDir, { recursive: true });
-        // Convert the data to a string format (JSON)
-        const dataString = JSON.stringify(scores, null, 2);
-        // Dynamically name the file based on patient and timeline
-        let fileName = `sub-${tempId}_ses-${timeline}_clinical.json`;
+        this.logger.debug(`Handling import-file-2 request for patient: ${patientId}, timeline: ${timeline}`);
+        
+        const data = await this.fileManager.readStimulationParameters(directoryPath, patientId, timeline, isLeadDBS);
+        return data;
+        
+      } catch (error) {
+        this.logger.error('Error in import-file-2 handler:', error);
+        throw error;
+      }
+    });
+
+    // Legacy clinical import handler
+    ipcMain.on('import-file-clinical', async (event, patientId: string, timeline: string, directoryPath: string, isLeadDBS: boolean = true) => {
+      try {
+        this.logger.debug(`Handling import-file-clinical request for patient: ${patientId}, timeline: ${timeline}`);
+        
+        const data = await this.fileManager.readClinicalScores(directoryPath, patientId, timeline, isLeadDBS);
+        event.reply('import-file-clinical', data);
+        
+      } catch (error) {
+        this.logger.error('Error in import-file-clinical handler:', error);
+        event.reply('import-file-error', error instanceof Error ? error.message : 'Unknown error');
+      }
+    });
+
+    // Legacy PLY file loader
+    ipcMain.handle('load-ply-file', async (event, historical) => {
+      try {
+        const { patient, timeline, directoryPath, leadDBS } = historical;
+        
         if (leadDBS) {
-          fileName = `${tempId}_ses-${timeline}_clinical.json`;
-        }
-        const filePath = path.join(sessionDir, fileName);
-        // Write the data to the file
-        if (fs.existsSync(filePath)) {
-          const clinicalScores = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-          clinicalScores[scoretype] = scores;
-          fs.writeFileSync(filePath, JSON.stringify(clinicalScores, null, 2));
-        } else {
-          let clinicalScores = {};
-          clinicalScores[scoretype] = scores;
-          fs.writeFileSync(filePath, JSON.stringify(clinicalScores, null, 2));
-        }
-        // Send the file path back to the renderer process
-        console.log(`Data saved successfully to ${filePath}`);
-      } catch (error) {
-        // Handle any errors in the saving process
-        console.error('Error writing to file:', error);
-      }
-    });
-    event.reply('batch-import', 'success');
-  });
-
-  ipcMain.on('batch-import-stimulation', async (event, data, leadDBS) => {
-    const stimulationData = getData('stimulationData');
-    const directoryPath = stimulationData.filepath;
-    console.log(Object.keys(data));
-    console.log(data);
-    Object.keys(data).forEach((key) => {
-      const { id, S, timeline } = data[key];
-      console.log(directoryPath, id);
-      const patientFolder = getPatientFolder(directoryPath, id, leadDBS);
-      console.log('Patient Folder: ', patientFolder);
-      console.log('Scores: ', S);
-      const sessionDir = path.join(patientFolder, `ses-${timeline}`);
-      try {
-        // Ensure that the directories exist, if not, create them
-        if (!fs.existsSync(patientFolder))
-          fs.mkdirSync(patientFolder, { recursive: true });
-        if (!fs.existsSync(sessionDir))
-          fs.mkdirSync(sessionDir, { recursive: true });
-
-        // Wrap the S object in an outer shell
-        const dataToSave = { S };
-
-        // Convert the data to a string format (JSON)
-        const dataString = JSON.stringify(dataToSave, null, 2);
-
-        // Dynamically name the file based on patient and timeline
-        let fileName = `sub-${id}_ses-${timeline}_stim.json`;
-        if (leadDBS) {
-          fileName = `${id}_ses-${timeline}_stimparameters.json`;
-        }
-        const filePath = path.join(sessionDir, fileName);
-
-        // Write the data to the file
-        fs.writeFileSync(filePath, dataString);
-
-        // Send the file path back to the renderer process
-        console.log(`Data saved successfully to ${filePath}`);
-      } catch (error) {
-        // Handle any errors in the saving process
-        console.error('Error writing to file:', error);
-      }
-    });
-    event.reply('batch-import-stimulation', 'success');
-  });
-
-  ipcMain.handle('get-clinical-scores-types', async (event, text) => {
-    console.log('text: ', text);
-    const userDataPath = app.getPath('userData');
-    const scoresFilePath = path.join(userDataPath, 'ClinicalScores.json');
-    console.log('scoresFilePath: ', scoresFilePath);
-    try {
-      const data = fs.readFileSync(scoresFilePath, 'utf8');
-      const scores = JSON.parse(data);
-      return scores;
-    } catch (err) {
-      console.error('Error reading scores file:', err);
-      return null;
-    }
-  });
-
-  ipcMain.on('add-score-type', async (event, name, newScore) => {
-    console.log('newScore: ', newScore);
-    const userDataPath = app.getPath('userData');
-    const scoresFilePath = path.join(userDataPath, 'ClinicalScores.json');
-    const data = fs.readFileSync(scoresFilePath, 'utf8');
-    const scores = JSON.parse(data);
-    console.log('scores: ', scores);
-    console.log('name: ', name);
-    console.log('newScore: ', newScore);
-    scores[name] = newScore[name];
-    console.log('scores: ', scores);
-    // scores[newScore.name] = newScore.values;
-    fs.writeFileSync(scoresFilePath, JSON.stringify(scores, null, 2));
-  });
-
-  ipcMain.handle('get-unit-solutions', async (event, filePath) => {
-    const patientFolder = '/Users/savirmadan/Documents/Localizations/Patient0401Output/derivatives/leaddbs/sub-CbctDbs0401/stimulations/MNI152NLin2009bAsym/initialize';
-    const side = 'rh';
-    const OSSFolder = path.join(patientFolder, `OSS_sim_files_${side}`);
-    const numContacts = 8;
-    const results = {};
-
-    for (let i = 1; i <= numContacts; i++) {
-      const contactFolder = path.join(OSSFolder, `ResultsE1C${i}`);
-      const niiFilePath = path.join(contactFolder, 'E_field_solution_Lattice.nii');
-      // const fileName = `sub-15454_sim-4D_efield_model-ossdbs_hemi-R_desc-C${i}.nii`;
-      // const niiFilePath = path.join(patientFolder, fileName);
-      try {
-        const fileBuffer = fs.readFileSync(niiFilePath);
-        results[i-1] = fileBuffer.buffer;
-      } catch (error) {
-        console.error(`Error reading file for contact E1C${i}:`, error);
-        results[`E1C${i}`] = null;
-      }
-    }
-    // const arrayBufferArray = Object.values(results).map(buffer => {
-    //   if (buffer) {
-    //     return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
-    //   }
-    //   return null;
-    // });
-
-    return results;
-  });
-
-  ipcMain.handle('get-participants', async (event, text) => {
-    const stimulationData = getData('stimulationData');
-    const userDataPath = stimulationData.path;
-    const participantsFilePath = path.join(userDataPath, 'participants.json');
-    console.log('participantsFilePath: ', participantsFilePath);
-    const data = fs.readFileSync(participantsFilePath, 'utf8');
-    const participants = JSON.parse(data);
-    return participants;
-  });
-
-  ipcMain.handle('read-file', async (event, filePath) => {
-    try {
-      const data = await fs.promises.readFile(filePath);
-      return data.buffer;
-    } catch (error) {
-      console.error('Error reading file:', error);
-      throw error;
-    }
-  });
-
-  ipcMain.handle('file-reader', async () => {
-    const result = await dialog.showOpenDialog({
-      properties: ['openDirectory']
-    });
-    return result.canceled ? null : result.filePaths[0];
-  });
-
-  ipcMain.on('create-miniset', async (event, folderPath, selectedPatients) => {
-    console.log('folderPath: ', folderPath);
-    console.log('selectedPatients: ', selectedPatients);
-    const stimulationData = getData('stimulationData');
-    const userDataPath = stimulationData.path;
-    const uniqueFolderName = `miniset_${Date.now()}`;
-    for (const patientId of selectedPatients) {
-      const patientFolder = path.join(userDataPath, 'derivatives', 'leaddbs', patientId);
-      const rawdataFolder = path.join(userDataPath, 'rawdata', patientId);
-      const newPatientFolder = path.join(folderPath, uniqueFolderName, 'derivatives', 'leaddbs', patientId);
-      const newRawdataFolder = path.join(folderPath, uniqueFolderName, 'rawdata', patientId);
-      // Ensure the new patient directory exists
-      if (!fs.existsSync(newPatientFolder)) {
-        fs.mkdirSync(newPatientFolder, { recursive: true });
-      }
-      if (!fs.existsSync(newRawdataFolder)) {
-        fs.mkdirSync(newRawdataFolder, { recursive: true });
-      }
-
-      // Define the subfolders to copy
-      const subfolders = ['clinical', 'stimulations', 'reconstruction'];
-
-      // Use system command to copy each subfolder
-      subfolders.forEach((subfolder) => {
-        const srcFolder = path.join(patientFolder, subfolder);
-        const destFolder = path.join(newPatientFolder, subfolder);
-
-        try {
-          if (process.platform === 'win32') {
-            // Windows
-            execSync(`xcopy "${srcFolder}" "${destFolder}" /E /I /Y`);
-          } else {
-            // Unix-like (Linux, macOS)
-            execSync(`cp -R "${srcFolder}/." "${destFolder}/"`);
+          const patientDir = this.getPatientDirectory(directoryPath, patient.id, leadDBS);
+          const plyPath = path.join(patientDir, 'export', 'ply', 'combined_electrodes.ply');
+          
+          if (await this.fileManager.fileExists(plyPath)) {
+            const data = await fs.readFile(plyPath);
+            return data.buffer;
           }
-          console.log(`Copied ${subfolder} data to: `, destFolder);
-        } catch (error) {
-          console.error(`Error copying ${subfolder} directory:`, error);
+        }
+        
+        return null;
+        
+      } catch (error) {
+        this.logger.error('Error in load-ply-file handler:', error);
+        return null;
+      }
+    });
+
+    // Legacy anatomy PLY file loader
+    ipcMain.handle('load-ply-file-anatomy', async (event, historical) => {
+      try {
+        const { patient, timeline, directoryPath, leadDBS } = historical;
+        
+        if (leadDBS) {
+          const patientDir = this.getPatientDirectory(directoryPath, patient.id, leadDBS);
+          const plyPath = path.join(patientDir, 'export', 'ply', 'anatomy.ply');
+          
+          if (await this.fileManager.fileExists(plyPath)) {
+            const data = await fs.readFile(plyPath);
+            return data.buffer;
+          }
+        }
+        
+        return null;
+        
+      } catch (error) {
+        this.logger.error('Error in load-ply-file-anatomy handler:', error);
+        return null;
+      }
+    });
+
+    // Legacy visualization coordinates loader
+    ipcMain.handle('load-vis-coords', async (event, historical) => {
+      try {
+        const { patient, timeline, directoryPath, leadDBS } = historical;
+        
+        if (leadDBS) {
+          const patientDir = this.getPatientDirectory(directoryPath, patient.id, leadDBS);
+          const coordsPath = path.join(patientDir, `${patient.id}_desc-reconstruction.json`);
+          
+          if (await this.fileManager.fileExists(coordsPath)) {
+            const data = await this.fileManager.readJSONFile(coordsPath);
+            return data;
+          }
+        }
+        
+        return null;
+        
+      } catch (error) {
+        this.logger.error('Error in load-vis-coords handler:', error);
+        return null;
+      }
+    });
+
+    // Legacy file reader
+    ipcMain.handle('file-reader', async () => {
+      try {
+        const result = await dialog.showOpenDialog({
+          properties: ['openDirectory']
+        });
+        
+        return result.canceled ? null : result.filePaths[0];
+        
+      } catch (error) {
+        this.logger.error('Error in file-reader handler:', error);
+        return null;
+      }
+    });
+
+    // Legacy batch import handler
+    ipcMain.on('batch-import', async (event, data, isLeadDBS: boolean = true) => {
+      try {
+        this.logger.debug('Handling batch-import request');
+        
+        const stimulationData = this.dataManager.getData('stimulationData');
+        const directoryPath = stimulationData?.filepath || stimulationData?.path;
+        
+        if (!directoryPath) {
+          throw new Error('No directory path available');
         }
 
+        for (const key of Object.keys(data)) {
+          const { id, timeline, scores } = data[key];
+          const scoreType = scores['Score Type'];
+          delete scores['Score Type'];
+          
+          await this.fileManager.writeClinicalScores(directoryPath, id.trim(), timeline, scoreType, scores, isLeadDBS);
+        }
+        
+        event.reply('batch-import', 'success');
+        this.logger.info('Batch import completed successfully');
+        
+      } catch (error) {
+        this.logger.error('Error in batch-import handler:', error);
+        event.reply('batch-import-error', error instanceof Error ? error.message : 'Unknown error');
+      }
+    });
 
-      });
-
-        // Define the subfolders to copy
-        const rawSubfolders = ['rawdata'];
-        const rawSrcFile = path.join(rawdataFolder, 'ses-preop', 'anat', `${patientId}_ses-preop_acq-iso_T1w.nii.gz`);
-        const rawDestFolder = newRawdataFolder;
-
-        // Ensure the raw destination directory exists
-        if (!fs.existsSync(rawDestFolder)) {
-          fs.mkdirSync(rawDestFolder, { recursive: true });
+    // Legacy batch import stimulation handler
+    ipcMain.on('batch-import-stimulation', async (event, data, isLeadDBS: boolean = true) => {
+      try {
+        this.logger.debug('Handling batch-import-stimulation request');
+        
+        const stimulationData = this.dataManager.getData('stimulationData');
+        const directoryPath = stimulationData?.filepath || stimulationData?.path;
+        
+        if (!directoryPath) {
+          throw new Error('No directory path available');
         }
 
-        const rawDestFile = path.join(rawDestFolder, `${patientId}_ses-preop_acq-iso_T1w.nii.gz`);
-        fs.copyFileSync(rawSrcFile, rawDestFile);
+        for (const key of Object.keys(data)) {
+          const { id, S, timeline } = data[key];
+          
+          await this.fileManager.writeStimulationParameters(directoryPath, id, timeline, { S }, isLeadDBS);
+        }
+        
+        event.reply('batch-import-stimulation', 'success');
+        this.logger.info('Batch import stimulation completed successfully');
+        
+      } catch (error) {
+        this.logger.error('Error in batch-import-stimulation handler:', error);
+        event.reply('batch-import-stimulation-error', error instanceof Error ? error.message : 'Unknown error');
+      }
+    });
+
+    // Legacy clinical scores types handler
+    ipcMain.handle('get-clinical-scores-types', async (event, text: string) => {
+      try {
+        this.logger.debug('Handling get-clinical-scores-types request');
+        
+        const userDataPath = require('electron').app.getPath('userData');
+        const scoresFilePath = path.join(userDataPath, 'ClinicalScores.json');
+        
+        const data = await fs.readFile(scoresFilePath, 'utf8');
+        const scores = JSON.parse(data);
+        
+        return scores;
+        
+      } catch (error) {
+        this.logger.error('Error in get-clinical-scores-types handler:', error);
+        return null;
+      }
+    });
+
+    // Legacy add score type handler
+    ipcMain.on('add-score-type', async (event, name: string, newScore: any) => {
+      try {
+        this.logger.debug(`Handling add-score-type request for: ${name}`);
+        
+        const userDataPath = require('electron').app.getPath('userData');
+        const scoresFilePath = path.join(userDataPath, 'ClinicalScores.json');
+        
+        const data = await fs.readFile(scoresFilePath, 'utf8');
+        const scores = JSON.parse(data);
+        
+        scores[name] = newScore[name];
+        
+        await fs.writeFile(scoresFilePath, JSON.stringify(scores, null, 2));
+        
+        this.logger.info(`Added new score type: ${name}`);
+        
+      } catch (error) {
+        this.logger.error('Error in add-score-type handler:', error);
+      }
+    });
+
+    // Legacy participants handler
+    ipcMain.handle('get-participants', async (event, text: string) => {
+      try {
+        this.logger.debug('Handling get-participants request');
+        
+        const stimulationData = this.dataManager.getData('stimulationData');
+        const userDataPath = stimulationData?.path;
+        
+        if (!userDataPath) {
+          throw new Error('No data path available');
+        }
+        
+        const participantsFilePath = path.join(userDataPath, 'participants.json');
+        const data = await fs.readFile(participantsFilePath, 'utf8');
+        const participants = JSON.parse(data);
+        
+        return participants;
+        
+      } catch (error) {
+        this.logger.error('Error in get-participants handler:', error);
+        return null;
+      }
+    });
+
+    // Legacy file read handler
+    ipcMain.handle('read-file', async (event, filePath: string) => {
+      try {
+        this.logger.debug(`Handling read-file request for: ${filePath}`);
+        
+        const data = await fs.readFile(filePath);
+        return data.buffer;
+        
+      } catch (error) {
+        this.logger.error('Error in read-file handler:', error);
+        throw error;
+      }
+    });
+
+    // Legacy miniset creation handler
+    ipcMain.on('create-miniset', async (event, folderPath: string, selectedPatients: string[]) => {
+      try {
+        this.logger.debug(`Handling create-miniset request for ${selectedPatients.length} patients`);
+        
+        const stimulationData = this.dataManager.getData('stimulationData');
+        const userDataPath = stimulationData?.path;
+        
+        if (!userDataPath) {
+          throw new Error('No data path available');
+        }
+        
+        const uniqueFolderName = `miniset_${Date.now()}`;
+        
+        for (const patientId of selectedPatients) {
+          const patientFolder = path.join(userDataPath, 'derivatives', 'leaddbs', patientId);
+          const rawdataFolder = path.join(userDataPath, 'rawdata', patientId);
+          const newPatientFolder = path.join(folderPath, uniqueFolderName, 'derivatives', 'leaddbs', patientId);
+          const newRawdataFolder = path.join(folderPath, uniqueFolderName, 'rawdata', patientId);
+          
+          // Ensure directories exist
+          await fs.mkdir(newPatientFolder, { recursive: true });
+          await fs.mkdir(newRawdataFolder, { recursive: true });
+          
+          // Copy subfolders
+          const subfolders = ['clinical', 'stimulations', 'reconstruction'];
+          
+          for (const subfolder of subfolders) {
+            const srcFolder = path.join(patientFolder, subfolder);
+            const destFolder = path.join(newPatientFolder, subfolder);
+            
+            if (await this.fileManager.directoryExists(srcFolder)) {
+              try {
+                if (process.platform === 'win32') {
+                  execSync(`xcopy "${srcFolder}" "${destFolder}" /E /I /Y`);
+                } else {
+                  execSync(`cp -R "${srcFolder}/." "${destFolder}/"`);
+                }
+                this.logger.debug(`Copied ${subfolder} data to: ${destFolder}`);
+              } catch (error) {
+                this.logger.error(`Error copying ${subfolder} directory:`, error);
+              }
+            }
+          }
+          
+          // Copy raw data
+          const rawSrcFile = path.join(rawdataFolder, 'ses-preop', 'anat', `${patientId}_ses-preop_acq-iso_T1w.nii.gz`);
+          const rawDestFile = path.join(newRawdataFolder, `${patientId}_ses-preop_acq-iso_T1w.nii.gz`);
+          
+          if (await this.fileManager.fileExists(rawSrcFile)) {
+            await fs.mkdir(newRawdataFolder, { recursive: true });
+            await fs.copyFile(rawSrcFile, rawDestFile);
+          }
+        }
+        
+        this.logger.info(`Miniset created successfully: ${uniqueFolderName}`);
+        
+      } catch (error) {
+        this.logger.error('Error in create-miniset handler:', error);
+      }
+    });
+
+    // Legacy download clinical data handler
+    ipcMain.on('download-clinical-data', async (event, clinicalData: any) => {
+      try {
+        this.logger.debug('Handling download-clinical-data request');
+        
+        const filePath = path.join(require('os').homedir(), 'Downloads', 'allClinicalScores.json');
+        const dataString = JSON.stringify(clinicalData, null, 2);
+        
+        await fs.writeFile(filePath, dataString);
+        
+        event.reply('download-clinical-data-success', filePath);
+        this.logger.info(`Clinical data saved successfully to ${filePath}`);
+        
+      } catch (error) {
+        this.logger.error('Error in download-clinical-data handler:', error);
+        event.reply('download-clinical-data-error', error instanceof Error ? error.message : 'Unknown error');
+      }
+    });
+
+    // Legacy clinical data for plotting handler
+    ipcMain.handle('get-clinical-data-for-plotting', async (event, message: any) => {
+      try {
+        this.logger.debug('Handling get-clinical-data-for-plotting request');
+        
+        const clinicalDataPath = path.join(require('os').homedir(), 'Downloads', 'allClinicalScores.json');
+        const data = await fs.readFile(clinicalDataPath, 'utf8');
+        const clinicalData = JSON.parse(data);
+        
+        return clinicalData;
+        
+      } catch (error) {
+        this.logger.error('Error in get-clinical-data-for-plotting handler:', error);
+        return null;
+      }
+    });
+  }
+
+  /**
+   * Get patient directory path based on the directory structure type
+   */
+  private getPatientDirectory(directoryPath: string, patientId: string, isLeadDBS: boolean): string {
+    if (isLeadDBS) {
+      return path.join(directoryPath, 'derivatives', 'leaddbs', patientId, 'clinical');
+    } else {
+      return path.join(directoryPath, `sub-${patientId}`);
     }
-  });
+  }
+}
 
-  ipcMain.on('download-clinical-data', async (event, clinicalData) => {
-    console.log('clinicalData: ', clinicalData);
-
-    // Define the file path where you want to save the JSON data
-    const filePath = path.join('/Users/savirmadan/Downloads', 'allClinicalScores.json');
-
-    try {
-      // Convert the clinicalData to a JSON string
-      const dataString = JSON.stringify(clinicalData, null, 2);
-
-      // Write the JSON string to the file
-      fs.writeFileSync(filePath, dataString);
-
-      console.log(`Clinical data saved successfully to ${filePath}`);
-      event.reply('download-clinical-data-success', filePath);
-    } catch (error) {
-      console.error('Error saving clinical data:', error);
-      event.reply('download-clinical-data-error', error.message);
-    }
-  });
-
-  ipcMain.handle('get-clinical-data-for-plotting', async (event, message) => {
-    const clinicalDataPath = path.join('/Users/savirmadan/Downloads', 'allClinicalScores.json');
-    const data = fs.readFileSync(clinicalDataPath, 'utf8');
-    const clinicalData = JSON.parse(data);
-    return clinicalData;
-  });
-
+/**
+ * Default export function for backward compatibility
+ */
+export default function registerFileHandlers(): void {
+  // This function is kept for backward compatibility
+  // The actual registration is now handled by the IPCHandlers class
+  console.warn('registerFileHandlers() is deprecated. Use IPCHandlers class instead.');
 }

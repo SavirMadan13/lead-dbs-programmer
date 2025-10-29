@@ -1,3 +1,11 @@
+/**
+ * Navigation Bar Component
+ * 
+ * This component provides the main navigation bar for the application.
+ * It supports both single and dual-row layouts with customizable colors and text.
+ */
+
+import React, { useState } from 'react';
 import {
   AppBar,
   Drawer,
@@ -9,111 +17,159 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-// import { FaHamburger, FaSun, FaMoon } from 'react-icons/fa';
 
-// eslint-disable-next-line import/prefer-default-export
-export default function Navbar({ text, text2, color1, color2 }) {
-  const [drawerOpen, setDrawerOpen] = useState(false);
+/**
+ * Props interface for the Navbar component
+ */
+interface NavbarProps {
+  /** Primary text to display in the main navigation bar */
+  text: string;
+  /** Secondary text to display in the second navigation bar (optional) */
+  text2?: string;
+  /** Primary color for the main navigation bar */
+  color1: string;
+  /** Secondary color for the second navigation bar (optional) */
+  color2?: string;
+  /** Additional CSS class name for styling */
+  className?: string;
+}
+
+/**
+ * Navigation Bar Component
+ * 
+ * Provides a responsive navigation bar with support for dual-row layouts.
+ * The component automatically adjusts for mobile devices and provides a clean,
+ * professional appearance.
+ */
+export default function Navbar({ 
+  text, 
+  text2, 
+  color1, 
+  color2, 
+  className 
+}: NavbarProps): JSX.Element {
+  // State management
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+
+  // Theme and responsive design
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const toggleDrawer = (open: boolean) => {
+  /**
+   * Toggle the mobile drawer open/closed state
+   * @param open - Whether the drawer should be open
+   */
+  const toggleDrawer = (open: boolean): void => {
     setDrawerOpen(open);
   };
 
-  const menuItems = (
+  /**
+   * Render navigation menu items
+   * Currently contains commented-out menu items for future use
+   */
+  const renderMenuItems = (): JSX.Element => (
     <>
-      {/* <NavLink
-        to="/testing"
-        style={{ textDecoration: 'none', color: 'inherit' }}
-      >
+      {/* Future menu items can be added here */}
+      {/* Example:
+      <NavLink to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
         <IconButton>
-          <Typography>Component Testing</Typography>
-        </IconButton>
-      </NavLink> */}
-      {/* <NavLink to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <IconButton>
-          <Typography>Setup</Typography>
+          <Typography>Home</Typography>
         </IconButton>
       </NavLink>
-      <NavLink
-        to="/tabbed-selection"
-        style={{ textDecoration: 'none', color: 'inherit' }}
-      >
-        <IconButton>
-          <Typography>Electrode Model</Typography>
-        </IconButton>
-      </NavLink> */}
-      {/* <NavLink
-        to="/end-session"
-        style={{ textDecoration: 'none', color: 'inherit' }}
-      >
-        <IconButton>
-          <Typography>Finish Session</Typography>
-        </IconButton>
-      </NavLink> */}
-      {/* {isDarkMode ? (
-        <Button onClick={toggleTheme}>
-          <FaSun style={{ color: 'yellow' }} />
-        </Button>
-      ) : (
-        <Button onClick={toggleTheme} style={{ color: 'blue' }}>
-          <FaMoon />
-        </Button>
-      )} */}
+      */}
     </>
+  );
+
+  /**
+   * Render the main navigation bar
+   */
+  const renderMainAppBar = (): JSX.Element => (
+    <AppBar 
+      position="fixed" 
+      style={{ backgroundColor: color1 }}
+      className={className}
+    >
+      <Toolbar>
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            flexGrow: 1, 
+            textAlign: 'center', 
+            fontSize: '24px', 
+            fontWeight: 'bold' 
+          }}
+        >
+          {text}
+        </Typography>
+        {/* Additional elements can be added here */}
+      </Toolbar>
+    </AppBar>
+  );
+
+  /**
+   * Render the secondary navigation bar (if color2 and text2 are provided)
+   */
+  const renderSecondaryAppBar = (): JSX.Element | null => {
+    if (!color2 || !text2) {
+      return null;
+    }
+
+    return (
+      <AppBar
+        position="fixed"
+        style={{ 
+          backgroundColor: color2, 
+          top: 'auto', 
+          marginTop: '-140px' 
+        }}
+      >
+        <Toolbar>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              flexGrow: 1, 
+              textAlign: 'center', 
+              fontSize: '24px', 
+              fontWeight: 'bold', 
+              color: 'black' 
+            }}
+          >
+            {text2}
+          </Typography>
+          {/* Additional elements can be added here */}
+        </Toolbar>
+      </AppBar>
+    );
+  };
+
+  /**
+   * Render mobile drawer for responsive navigation
+   */
+  const renderMobileDrawer = (): JSX.Element => (
+    <Drawer
+      anchor="right"
+      open={drawerOpen}
+      onClose={() => toggleDrawer(false)}
+    >
+      <List>
+        <ListItem>
+          {renderMenuItems()}
+        </ListItem>
+      </List>
+    </Drawer>
   );
 
   return (
     <div>
-      {/* <AppBar position="fixed" style={{ backgroundColor: color1 }}>
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            {text}
-          </Typography>
-          {isMobile ? (
-          <>
-            <IconButton color="inherit" onClick={() => toggleDrawer(true)}>
-              Button
-            </IconButton>
-            <Drawer
-              anchor="right"
-              open={drawerOpen}
-              onClick={() => toggleDrawer(false)}
-            >
-              <List>
-                <ListItem>{menuItems}</ListItem>
-              </List>
-            </Drawer>
-          </>
-        ) : (
-          menuItems
-        )}
-        </Toolbar>
-      </AppBar> */}
-      <AppBar position="fixed" style={{ backgroundColor: color1 }}>
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center', fontSize: '24px', fontWeight: 'bold' }}>
-            {text}
-          </Typography>
-          {/* Add any additional elements for the first row here */}
-        </Toolbar>
-      </AppBar>
-      {color2 && (
-        <AppBar
-          position="fixed"
-          style={{ backgroundColor: color2, top: 'auto', marginTop: '-140px' }}
-        >
-          <Toolbar>
-            <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center', fontSize: '24px', fontWeight: 'bold', color: 'black',  }}>
-              {text2}
-            </Typography>
-            {/* Add any additional elements for the second row here */}
-          </Toolbar>
-        </AppBar>
-      )}
+      {/* Main navigation bar */}
+      {renderMainAppBar()}
+      
+      {/* Secondary navigation bar (if provided) */}
+      {renderSecondaryAppBar()}
+      
+      {/* Mobile drawer (if needed for future menu items) */}
+      {isMobile && renderMobileDrawer()}
     </div>
   );
 }

@@ -1,293 +1,343 @@
-/* eslint-disable import/no-duplicates */
-import { useState, useEffect, useRef } from 'react';
+/**
+ * Main Application Component
+ * 
+ * This is the root component of the LeadDBS Programmer application.
+ * It manages the overall application state, routing, and provides the main UI structure.
+ */
+
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import './App.css'; // Ensure your styles are imported
-import SettingsIcon from '@mui/icons-material/Settings'; // Import the Material UI Settings Icon
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import Navbar from './components/Navbar';
+import SettingsIcon from '@mui/icons-material/Settings';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+// Import error handling
+import { ErrorBoundary, ErrorFallback } from './utils/ErrorHandler';
+import { initializeErrorHandling } from './utils/GlobalErrorHandler';
+
+// Import performance monitoring
+import PerformanceMonitor from './components/PerformanceMonitor';
+import { usePerformanceMonitor } from './utils/PerformanceUtils';
+
+// Import components
+import Navbar from './components/Navbar';
 import PatientDatabase from './components/PatientDatabase';
 import PatientDetails from './components/PatientDetails';
-import { PatientProvider } from './components/PatientContext';
 import Programmer from './Programmer';
 import ClinicalScores from './components/ClinicalScores';
 import CustomTable from './components/CustomTable';
 import GroupStats from './components/GroupStats';
 import DatabaseStats from './components/DatabaseStats';
 import Import from './components/Import';
-import NiiViewer from './components/NiiViewer';
-import TestAppGroup from './niivue/ui/TestAppGroup';
 import SEEG from './components/SEEG';
 import TestApp from './niivue/ui/TestApp';
 
-export default function App() {
-  const [directoryPath, setDirectoryPath] = useState(null);
-  const [showSettings, setShowSettings] = useState(false); // New state to control visibility
-  const [renderKey, setRenderKey] = useState(0);
-  const [isLeadDBSFolder, setIsLeadDBSFolder] = useState(null); // New state to track if it's a Lead-DBS folder
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const containerRef = useRef(null);
-  const plyFilePaths = [
-    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/anatomy.ply',
-    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
-    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-29781/export/ply/combined_electrodes.ply',
-    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-33544/export/ply/combined_electrodes.ply',
-    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-80206/export/ply/combined_electrodes.ply',
-    '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-93127/export/ply/combined_electrodes.ply',
-  ];
-  const updateWindowSize = () => {
+// Import context providers
+import { PatientProvider } from './components/PatientContext';
+
+// Import styles
+import './App.css';
+
+/**
+ * Application state interface
+ */
+interface AppState {
+  directoryPath: string | null;
+  showSettings: boolean;
+  renderKey: number;
+  isLeadDBSFolder: boolean | null;
+  dimensions: { width: number; height: number };
+  zoomLevel: number;
+}
+
+/**
+ * Default PLY file paths for testing
+ */
+const DEFAULT_PLY_PATHS = [
+  '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/anatomy.ply',
+  '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
+  '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-29781/export/ply/combined_electrodes.ply',
+  '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-33544/export/ply/combined_electrodes.ply',
+  '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-80206/export/ply/combined_electrodes.ply',
+  '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-93127/export/ply/combined_electrodes.ply',
+];
+
+/**
+ * Main Application Component
+ */
+export default function App(): JSX.Element {
+  // Performance monitoring
+  const performanceMetrics = usePerformanceMonitor('App');
+
+  // State management
+  const [state, setState] = useState<AppState>({
+    directoryPath: null,
+    showSettings: false,
+    renderKey: 0,
+    isLeadDBSFolder: null,
+    dimensions: { width: 0, height: 0 },
+    zoomLevel: -1,
+  });
+
+  // Refs
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * Update window size based on container dimensions
+   */
+  const updateWindowSize = useCallback(() => {
     if (containerRef.current) {
       const { width, height } = containerRef.current.getBoundingClientRect();
-      setDimensions({ width, height });
+      setState(prevState => ({
+        ...prevState,
+        dimensions: { width, height }
+      }));
+      
+      // Notify main process of window size change
       window.electron.ipcRenderer.sendMessage('resize-window-2', width, height);
     }
-  };
-
-  // useEffect(() => {
-  //   // Set initial size on load
-  //   updateWindowSize();
-
-  //   // Add resize observer to track dynamic changes
-  //   const resizeObserver = new ResizeObserver(() => {
-  //     updateWindowSize();
-  //   });
-
-  //   if (containerRef.current) {
-  //     resizeObserver.observe(containerRef.current);
-  //   }
-
-  //   return () => {
-  //     if (containerRef.current) {
-  //       resizeObserver.unobserve(containerRef.current);
-  //     }
-  //   };
-  // }, []);
-
-  // Function to handle folder selection
-  const selectFolder = () => {
-    window.electron.ipcRenderer.sendMessage('select-folder', null); // Request folder selection
-  };
-  // window.electron.ipcRenderer.sendMessage('load-ply-file', null);
-  window.electron.ipcRenderer.sendMessage('import-inputdata-file', ['ping']);
-  window.electron.ipcRenderer.sendMessage('ipc-example', ['ping']);
-  // Function to check if the folder structure matches Lead-DBS
-  // const checkLeadDBSFolder = async (path) => {
-  //   try {
-  //     // Check for existence of required folders for Lead-DBS
-  //     const derivativesExists = await window.electron.ipcRenderer.invoke(
-  //       'check-folder-exists',
-  //       `${path}/derivatives/leaddbs`,
-  //     );
-  //     const rawdataExists = await window.electron.ipcRenderer.invoke(
-  //       'check-folder-exists',
-  //       `${path}/rawdata`,
-  //     );
-  //     const sourcedataExists = await window.electron.ipcRenderer.invoke(
-  //       'check-folder-exists',
-  //       `${path}/sourcedata`,
-  //     );
-  //     const isLeadGroup = path.includes('leadgroup');
-
-  //     // Set the state if all required folders are present
-  //     if (derivativesExists && rawdataExists && sourcedataExists) {
-  //       console.log('TRUE');
-  //       setIsLeadDBSFolder(true);
-  //     } else if (isLeadGroup) {
-  //       setIsLeadDBSFolder(true);
-  //     } else {
-  //       setIsLeadDBSFolder(false);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error checking folder structure:', error);
-  //     setIsLeadDBSFolder(false);
-  //   }
-  // };
-
-  useEffect(() => {
-    // Listen for the selected folder path when a new one is selected
-    const unsubscribe = window.electron.ipcRenderer.on(
-      'folder-selected',
-      (selectedPath) => {
-        setDirectoryPath(selectedPath); // Set the selected folder path
-        setRenderKey((prevKey) => prevKey + 1); // Use functional update to ensure it increments correctly
-        // checkLeadDBSFolder(selectedPath); // Check if the folder is a Lead-DBS folder
-        setIsLeadDBSFolder(true);
-      },
-    );
-
-    // Load the saved directory path on initial load
-    const loadSavedDirectory = async () => {
-      const savedPath = await window.electron.ipcRenderer.invoke(
-        'get-saved-directory',
-      );
-      if (savedPath) {
-        setDirectoryPath(savedPath); // Set the saved folder path if it exists
-        window.electron.ipcRenderer.sendMessage('select-folder', savedPath); // Request folder selection
-        // checkLeadDBSFolder(savedPath); // Check if it's a Lead-DBS folder
-      }
-    };
-
-    loadSavedDirectory(); // Call the function to load the saved path
-
-    return () => {
-      unsubscribe(); // Clean up the listener when the component unmounts
-    };
   }, []);
 
-  const [zoomLevel, setZoomLevel] = useState(-1);
+  /**
+   * Handle folder selection
+   */
+  const handleSelectFolder = useCallback(() => {
+    window.electron.ipcRenderer.sendMessage('select-folder', null);
+  }, []);
 
+  /**
+   * Toggle settings panel visibility
+   */
+  const toggleSettings = useCallback(() => {
+    setState(prevState => ({
+      ...prevState,
+      showSettings: !prevState.showSettings
+    }));
+  }, []);
+
+  /**
+   * Handle folder selection from IPC
+   */
+  const handleFolderSelected = useCallback((selectedPath: string) => {
+    setState(prevState => ({
+      ...prevState,
+      directoryPath: selectedPath,
+      renderKey: prevState.renderKey + 1,
+      isLeadDBSFolder: true // Default to true for now
+    }));
+  }, []);
+
+  /**
+   * Load saved directory path on application start
+   */
+  const loadSavedDirectory = useCallback(async () => {
+    try {
+      const savedPath = await window.electron.ipcRenderer.invoke('get-saved-directory');
+      if (savedPath) {
+        setState(prevState => ({
+          ...prevState,
+          directoryPath: savedPath
+        }));
+        window.electron.ipcRenderer.sendMessage('select-folder', savedPath);
+      }
+    } catch (error) {
+      console.error('Failed to load saved directory:', error);
+    }
+  }, []);
+
+  /**
+   * Initialize application on mount
+   */
   useEffect(() => {
-    window.electron.zoom.setZoomLevel(zoomLevel);
-  }, [zoomLevel]);
+    // Initialize error handling
+    initializeErrorHandling();
+
+    // Set up IPC listeners
+    const unsubscribe = window.electron.ipcRenderer.on('folder-selected', handleFolderSelected);
+
+    // Load saved directory
+    loadSavedDirectory();
+
+    // Send initial IPC messages
+    window.electron.ipcRenderer.sendMessage('import-inputdata-file', ['ping']);
+    window.electron.ipcRenderer.sendMessage('ipc-example', ['ping']);
+
+    // Cleanup on unmount
+    return () => {
+      unsubscribe();
+    };
+  }, [handleFolderSelected, loadSavedDirectory]);
+
+  /**
+   * Update zoom level when it changes
+   */
+  useEffect(() => {
+    window.electron.zoom.setZoomLevel(state.zoomLevel);
+  }, [state.zoomLevel]);
+
+  /**
+   * Render settings panel
+   */
+  const renderSettingsPanel = (): JSX.Element => (
+    <div className="settings-panel">
+      <button className="select-button" onClick={handleSelectFolder}>
+        Change Directory
+      </button>
+      {state.directoryPath && (
+        <p className="selected-directory">
+          Selected Directory: {state.directoryPath}
+        </p>
+      )}
+      {state.isLeadDBSFolder !== null && (
+        <p className="lead-dbs-status">
+          {state.isLeadDBSFolder 
+            ? 'This is a Lead-DBS folder.' 
+            : 'This is not a Lead-DBS folder.'
+          }
+        </p>
+      )}
+    </div>
+  );
+
+  /**
+   * Render main dashboard
+   */
+  const renderMainDashboard = (): JSX.Element => (
+    <div style={{ marginTop: '0px' }}>
+      <Navbar text="" color1="#375D7A" />
+      <div className="Navbar">
+        <SettingsIcon
+          className="settings-icon"
+          onClick={toggleSettings}
+          style={{
+            cursor: 'pointer',
+            fontSize: '24px',
+            color: '#6c757d',
+            zIndex: '10',
+            marginLeft: '-70px',
+          }}
+        />
+        {state.showSettings && renderSettingsPanel()}
+      </div>
+      <PatientDatabase
+        key={state.renderKey}
+        directoryPath={state.directoryPath}
+      />
+    </div>
+  );
+
+  /**
+   * Render patient details page
+   */
+  const renderPatientDetails = (): JSX.Element => (
+    <div>
+      <Navbar text="" color1="#375D7A" />
+      <div style={{ paddingTop: '50px' }}></div>
+      <PatientDetails
+        directoryPath={state.directoryPath}
+        leadDBS={state.isLeadDBSFolder}
+      />
+    </div>
+  );
+
+  /**
+   * Render clinical scores page
+   */
+  const renderClinicalScores = (): JSX.Element => (
+    <div>
+      <ClinicalScores />
+    </div>
+  );
+
+  /**
+   * Render custom table page
+   */
+  const renderCustomTable = (): JSX.Element => (
+    <div style={{ maxWidth: '1000px' }}>
+      <CustomTable />
+    </div>
+  );
+
+  /**
+   * Render group stats page
+   */
+  const renderGroupStats = (): JSX.Element => (
+    <div style={{ maxWidth: '1000px' }}>
+      <GroupStats />
+    </div>
+  );
+
+  /**
+   * Render database stats page
+   */
+  const renderDatabaseStats = (): JSX.Element => (
+    <div>
+      <Navbar text="" color1="#375D7A" />
+      <div style={{ paddingTop: '100px' }}></div>
+      <DatabaseStats directoryPath={state.directoryPath} />
+    </div>
+  );
+
+  /**
+   * Render import page
+   */
+  const renderImport = (): JSX.Element => (
+    <div style={{ maxWidth: '1000px' }}>
+      <Import leadDBS={state.isLeadDBSFolder} />
+    </div>
+  );
+
+  /**
+   * Render NiiVue viewer page
+   */
+  const renderNiiVue = (): JSX.Element => (
+    <div>
+      <div style={{ marginTop: '100px' }}>
+        <TestApp plyFilePaths={DEFAULT_PLY_PATHS} />
+      </div>
+    </div>
+  );
+
+  /**
+   * Render SEEG page
+   */
+  const renderSEEG = (): JSX.Element => (
+    <div>
+      <Navbar text="Lead-SEEG" color1="#375D7A" />
+      <SEEG />
+    </div>
+  );
 
   return (
-    <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
-      <PatientProvider>
-        <Router>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <div style={{ marginTop: '0px' }}>
-                  <Navbar text="" color1="#375D7A" />
-                  <div className="Navbar">
-                    <SettingsIcon
-                      className="settings-icon"
-                      onClick={() => setShowSettings(!showSettings)}
-                      style={{
-                        cursor: 'pointer',
-                        fontSize: '24px',
-                        color: '#6c757d',
-                        zIndex: '10',
-                        marginLeft: '-70px',
-                        // marginTop: '-50px',
-                      }} // Optional styling
-                    />
-                    {/* <MoreVertIcon
-                      className="settings-icon"
-                      onClick={() => setShowSettings(!showSettings)}
-                      style={{
-                        cursor: 'pointer',
-                        fontSize: '24px',
-                        color: '#6c757d',
-                        zIndex: '10',
-                      }} // Optional styling
-                    /> */}
-
-                    {showSettings && (
-                      <div className="settings-panel">
-                        <button className="select-button" onClick={selectFolder}>
-                          Change Directory
-                        </button>
-                        {directoryPath && (
-                          <p className="selected-directory">
-                            Selected Directory: {directoryPath}
-                          </p>
-                        )}
-                        {isLeadDBSFolder ? (
-                          <p className="lead-dbs-status">This is a Lead-DBS folder.</p>
-                        ) : (
-                          <p className="lead-dbs-status">This is not a Lead-DBS folder.</p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  <PatientDatabase
-                    key={renderKey}
-                    directoryPath={directoryPath}
-                  />
-                </div>
-              }
-            />
-            <Route
-              path="/patient/:id"
-              element={
-                <div>
-                  <Navbar text="" color1="#375D7A" />
-                  <div style={{paddingTop: '50px'}}></div>
-                  <PatientDetails
-                    directoryPath={directoryPath}
-                    leadDBS={isLeadDBSFolder}
-                  />
-                </div>
-              }
-            />
-            <Route path="/programmer" element={<Programmer />} />
-            <Route
-              path="/clinical-scores"
-              element={
-                // <div style={{ maxWidth: '1000px' }}>
-                //   <ClinicalScores />
-                // </div>
-                <div>
-                  <ClinicalScores />
-                </div>
-              }
-            />
-            <Route
-              path="/viewer"
-              element={
-                <div style={{ maxWidth: '1000px' }}>{/* <PlyViewer /> */}</div>
-              }
-            />
-            <Route
-              path="/custom-table"
-              element={
-                <div style={{ maxWidth: '1000px' }}>
-                  {/* <PlyViewer /> */}
-                  <CustomTable />
-                </div>
-              }
-            />
-            <Route
-              path="/group"
-              element={
-                <div style={{ maxWidth: '1000px' }}>
-                  <GroupStats />
-                </div>
-              }
-            />
-            <Route
-              path="/groupstats"
-              element={
-                <div style={{}}>
-                  <Navbar text="" color1="#375D7A" />
-                  <div style={{paddingTop: '100px'}}></div>
-                  <DatabaseStats directoryPath={directoryPath} />
-                </div>
-              }
-            />
-            <Route
-              path="/import"
-              element={
-                <div style={{ maxWidth: '1000px' }}>
-                  <Import leadDBS={isLeadDBSFolder} />
-                </div>
-              }
-            />
-            <Route
-              path="/niivue"
-              element={
-                <div>
-                  {/* <Navbar text="" color1="#375D7A" /> */}
-                  <div style={{ marginTop: '100px' }}>
-                    <TestApp plyFilePaths={plyFilePaths} />
-                  </div>
-                </div>
-              }
-            />
-            <Route
-              path="/seeg"
-              element={
-                <div>
-                  <Navbar text="Lead-SEEG" color1="#375D7A" />
-                  <SEEG />
-                </div>
-              }
-            />
-          </Routes>
-        </Router>
-      </PatientProvider>
-    </div>
+    <ErrorBoundary fallback={ErrorFallback}>
+      <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
+        <PatientProvider>
+          <Router>
+            <Routes>
+              <Route path="/" element={renderMainDashboard()} />
+              <Route path="/patient/:id" element={renderPatientDetails()} />
+              <Route path="/programmer" element={<Programmer />} />
+              <Route path="/clinical-scores" element={renderClinicalScores()} />
+              <Route path="/viewer" element={<div style={{ maxWidth: '1000px' }}></div>} />
+              <Route path="/custom-table" element={renderCustomTable()} />
+              <Route path="/group" element={renderGroupStats()} />
+              <Route path="/groupstats" element={renderDatabaseStats()} />
+              <Route path="/import" element={renderImport()} />
+              <Route path="/niivue" element={renderNiiVue()} />
+              <Route path="/seeg" element={renderSEEG()} />
+            </Routes>
+          </Router>
+        </PatientProvider>
+        
+        {/* Performance Monitor - only in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <PerformanceMonitor
+            visible={true}
+            position="top-right"
+            showDetails={true}
+            customMetrics={performanceMetrics}
+          />
+        )}
+      </div>
+    </ErrorBoundary>
   );
 }

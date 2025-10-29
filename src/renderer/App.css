@@ -2,17 +2,19 @@
  * @NOTE: Prepend a `~` to css file paths that are in your node_modules
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
+
+/* Import the main styles */
+@import './styles/main.css';
+
 body {
   position: relative;
-  color: white;
-  /* height: 100vh; */
-  /* background: #212121; */
-  font-family: sans-serif;
+  color: var(--color-text-primary);
+  font-family: var(--font-family-primary);
   overflow-y: visible;
-  /* Scroll for overflow-y is an option */
   display: flex;
   justify-content: center;
   align-items: left;
+  background-color: var(--color-background-primary);
 }
 
 .my-svg {
@@ -97,40 +99,40 @@ a:hover {
 
 /* In App.css or a separate CSS file */
 .select-button {
-  background-color: #007bff;
-  color: white;
-  padding: 10px 20px;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  padding: var(--spacing-2) var(--spacing-4);
   border: none;
-  border-radius: 5px;
+  border-radius: var(--border-radius-base);
   cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
+  font-size: var(--font-size-base);
+  transition: background-color var(--transition-normal);
 }
 
 .select-button:hover {
-  background-color: #0056b3;
+  background-color: var(--color-primary-dark);
 }
 
 .selected-directory {
-  font-size: 14px;
-  color: #333;
-  margin-top: 10px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-2);
 }
 
 .settings-icon {
-  cursor: pointer; /* Hand cursor for clickable interaction */
-  font-size: 24px; /* Default size for the icon */
-  color: #6c757d; /* Initial color for the icon */
-  transition: color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+  cursor: pointer;
+  font-size: var(--font-size-2xl);
+  color: var(--color-secondary);
+  transition: color var(--transition-normal), transform var(--transition-fast);
 }
 
 .settings-icon:hover {
-  color: #007bff; /* Change color on hover (Bootstrap blue) */
-  transform: rotate(20deg); /* Add a slight rotation effect */
+  color: var(--color-primary);
+  transform: rotate(20deg);
 }
 
 .settings-icon:active {
-  transform: rotate(0deg) scale(0.95); /* Scale down slightly on click */
-  color: #0056b3; /* Darker color on click */
+  transform: rotate(0deg) scale(0.95);
+  color: var(--color-primary-dark);
 }
 
