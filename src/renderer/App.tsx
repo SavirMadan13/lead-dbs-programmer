@@ -1,11 +1,14 @@
 /* eslint-disable import/no-duplicates */
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import './App.css'; // Ensure your styles are imported
-import SettingsIcon from '@mui/icons-material/Settings'; // Import the Material UI Settings Icon
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import Navbar from './components/Navbar';
+import SettingsIcon from '@mui/icons-material/Settings';
+
+// Styles
+import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+// Components
+import Navbar from './components/Navbar';
 import PatientDatabase from './components/PatientDatabase';
 import PatientDetails from './components/PatientDetails';
 import { PatientProvider } from './components/PatientContext';
@@ -16,18 +19,30 @@ import GroupStats from './components/GroupStats';
 import DatabaseStats from './components/DatabaseStats';
 import Import from './components/Import';
 import NiiViewer from './components/NiiViewer';
-import TestAppGroup from './niivue/ui/TestAppGroup';
 import SEEG from './components/SEEG';
 import TestApp from './niivue/ui/TestApp';
 
+/**
+ * Main App Component
+ * 
+ * This is the root component of the Lead-DBS Programmer application.
+ * It manages the overall application state including directory selection,
+ * settings visibility, and routing between different views.
+ */
 export default function App() {
-  const [directoryPath, setDirectoryPath] = useState(null);
-  const [showSettings, setShowSettings] = useState(false); // New state to control visibility
-  const [renderKey, setRenderKey] = useState(0);
-  const [isLeadDBSFolder, setIsLeadDBSFolder] = useState(null); // New state to track if it's a Lead-DBS folder
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const containerRef = useRef(null);
-  const plyFilePaths = [
+  // State management
+  const [directoryPath, setDirectoryPath] = useState<string | null>(null);
+  const [showSettings, setShowSettings] = useState<boolean>(false);
+  const [renderKey, setRenderKey] = useState<number>(0);
+  const [isLeadDBSFolder, setIsLeadDBSFolder] = useState<boolean | null>(null);
+  const [dimensions, setDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
+  const [zoomLevel, setZoomLevel] = useState<number>(-1);
+  
+  // Refs
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Constants
+  const plyFilePaths: string[] = [
     '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/anatomy.ply',
     '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-15454/export/ply/combined_electrodes.ply',
     '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-29781/export/ply/combined_electrodes.ply',
@@ -35,7 +50,10 @@ export default function App() {
     '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-80206/export/ply/combined_electrodes.ply',
     '/Users/savirmadan/Documents/Localizations/OSF/LeadDBSTrainingDataset/derivatives/leaddbs/sub-93127/export/ply/combined_electrodes.ply',
   ];
-  const updateWindowSize = () => {
+  /**
+   * Updates the window dimensions and notifies the main process
+   */
+  const updateWindowSize = (): void => {
     if (containerRef.current) {
       const { width, height } = containerRef.current.getBoundingClientRect();
       setDimensions({ width, height });
@@ -43,101 +61,57 @@ export default function App() {
     }
   };
 
-  // useEffect(() => {
-  //   // Set initial size on load
-  //   updateWindowSize();
-
-  //   // Add resize observer to track dynamic changes
-  //   const resizeObserver = new ResizeObserver(() => {
-  //     updateWindowSize();
-  //   });
-
-  //   if (containerRef.current) {
-  //     resizeObserver.observe(containerRef.current);
-  //   }
-
-  //   return () => {
-  //     if (containerRef.current) {
-  //       resizeObserver.unobserve(containerRef.current);
-  //     }
-  //   };
-  // }, []);
-
-  // Function to handle folder selection
-  const selectFolder = () => {
-    window.electron.ipcRenderer.sendMessage('select-folder', null); // Request folder selection
+  /**
+   * Handles folder selection by sending IPC message to main process
+   */
+  const selectFolder = (): void => {
+    window.electron.ipcRenderer.sendMessage('select-folder', null);
   };
-  // window.electron.ipcRenderer.sendMessage('load-ply-file', null);
+
+  // Initialize IPC communication
   window.electron.ipcRenderer.sendMessage('import-inputdata-file', ['ping']);
   window.electron.ipcRenderer.sendMessage('ipc-example', ['ping']);
-  // Function to check if the folder structure matches Lead-DBS
-  // const checkLeadDBSFolder = async (path) => {
-  //   try {
-  //     // Check for existence of required folders for Lead-DBS
-  //     const derivativesExists = await window.electron.ipcRenderer.invoke(
-  //       'check-folder-exists',
-  //       `${path}/derivatives/leaddbs`,
-  //     );
-  //     const rawdataExists = await window.electron.ipcRenderer.invoke(
-  //       'check-folder-exists',
-  //       `${path}/rawdata`,
-  //     );
-  //     const sourcedataExists = await window.electron.ipcRenderer.invoke(
-  //       'check-folder-exists',
-  //       `${path}/sourcedata`,
-  //     );
-  //     const isLeadGroup = path.includes('leadgroup');
-
-  //     // Set the state if all required folders are present
-  //     if (derivativesExists && rawdataExists && sourcedataExists) {
-  //       console.log('TRUE');
-  //       setIsLeadDBSFolder(true);
-  //     } else if (isLeadGroup) {
-  //       setIsLeadDBSFolder(true);
-  //     } else {
-  //       setIsLeadDBSFolder(false);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error checking folder structure:', error);
-  //     setIsLeadDBSFolder(false);
-  //   }
-  // };
-
+  /**
+   * Effect hook to handle folder selection and initialization
+   */
   useEffect(() => {
-    // Listen for the selected folder path when a new one is selected
+    // Listen for folder selection events from main process
     const unsubscribe = window.electron.ipcRenderer.on(
       'folder-selected',
-      (selectedPath) => {
-        setDirectoryPath(selectedPath); // Set the selected folder path
-        setRenderKey((prevKey) => prevKey + 1); // Use functional update to ensure it increments correctly
-        // checkLeadDBSFolder(selectedPath); // Check if the folder is a Lead-DBS folder
+      (selectedPath: string) => {
+        setDirectoryPath(selectedPath);
+        setRenderKey((prevKey) => prevKey + 1);
         setIsLeadDBSFolder(true);
       },
     );
 
-    // Load the saved directory path on initial load
-    const loadSavedDirectory = async () => {
-      const savedPath = await window.electron.ipcRenderer.invoke(
-        'get-saved-directory',
-      );
-      if (savedPath) {
-        setDirectoryPath(savedPath); // Set the saved folder path if it exists
-        window.electron.ipcRenderer.sendMessage('select-folder', savedPath); // Request folder selection
-        // checkLeadDBSFolder(savedPath); // Check if it's a Lead-DBS folder
+    // Load saved directory path on component mount
+    const loadSavedDirectory = async (): Promise<void> => {
+      try {
+        const savedPath = await window.electron.ipcRenderer.invoke('get-saved-directory');
+        if (savedPath) {
+          setDirectoryPath(savedPath);
+          window.electron.ipcRenderer.sendMessage('select-folder', savedPath);
+        }
+      } catch (error) {
+        console.error('Error loading saved directory:', error);
       }
     };
 
-    loadSavedDirectory(); // Call the function to load the saved path
+    loadSavedDirectory();
 
     return () => {
-      unsubscribe(); // Clean up the listener when the component unmounts
+      unsubscribe();
     };
   }, []);
 
-  const [zoomLevel, setZoomLevel] = useState(-1);
-
+  /**
+   * Effect hook to handle zoom level changes
+   */
   useEffect(() => {
-    window.electron.zoom.setZoomLevel(zoomLevel);
+    if (window.electron?.zoom) {
+      window.electron.zoom.setZoomLevel(zoomLevel);
+    }
   }, [zoomLevel]);
 
   return (
@@ -145,11 +119,14 @@ export default function App() {
       <PatientProvider>
         <Router>
           <Routes>
+            {/* Main Dashboard Route */}
             <Route
               path="/"
               element={
                 <div style={{ marginTop: '0px' }}>
                   <Navbar text="" color1="#375D7A" />
+                  
+                  {/* Settings Panel */}
                   <div className="Navbar">
                     <SettingsIcon
                       className="settings-icon"
@@ -160,19 +137,8 @@ export default function App() {
                         color: '#6c757d',
                         zIndex: '10',
                         marginLeft: '-70px',
-                        // marginTop: '-50px',
-                      }} // Optional styling
+                      }}
                     />
-                    {/* <MoreVertIcon
-                      className="settings-icon"
-                      onClick={() => setShowSettings(!showSettings)}
-                      style={{
-                        cursor: 'pointer',
-                        fontSize: '24px',
-                        color: '#6c757d',
-                        zIndex: '10',
-                      }} // Optional styling
-                    /> */}
 
                     {showSettings && (
                       <div className="settings-panel">
@@ -184,14 +150,17 @@ export default function App() {
                             Selected Directory: {directoryPath}
                           </p>
                         )}
-                        {isLeadDBSFolder ? (
-                          <p className="lead-dbs-status">This is a Lead-DBS folder.</p>
-                        ) : (
-                          <p className="lead-dbs-status">This is not a Lead-DBS folder.</p>
-                        )}
+                        <p className="lead-dbs-status">
+                          {isLeadDBSFolder 
+                            ? 'This is a Lead-DBS folder.' 
+                            : 'This is not a Lead-DBS folder.'
+                          }
+                        </p>
                       </div>
                     )}
                   </div>
+                  
+                  {/* Main Patient Database Component */}
                   <PatientDatabase
                     key={renderKey}
                     directoryPath={directoryPath}
@@ -199,12 +168,13 @@ export default function App() {
                 </div>
               }
             />
+            {/* Patient Details Route */}
             <Route
               path="/patient/:id"
               element={
                 <div>
                   <Navbar text="" color1="#375D7A" />
-                  <div style={{paddingTop: '50px'}}></div>
+                  <div style={{ paddingTop: '50px' }} />
                   <PatientDetails
                     directoryPath={directoryPath}
                     leadDBS={isLeadDBSFolder}
@@ -212,33 +182,41 @@ export default function App() {
                 </div>
               }
             />
+            
+            {/* Programmer Route */}
             <Route path="/programmer" element={<Programmer />} />
+            
+            {/* Clinical Scores Route */}
             <Route
               path="/clinical-scores"
               element={
-                // <div style={{ maxWidth: '1000px' }}>
-                //   <ClinicalScores />
-                // </div>
                 <div>
                   <ClinicalScores />
                 </div>
               }
             />
+            
+            {/* Viewer Route */}
             <Route
               path="/viewer"
               element={
-                <div style={{ maxWidth: '1000px' }}>{/* <PlyViewer /> */}</div>
+                <div style={{ maxWidth: '1000px' }}>
+                  {/* Placeholder for future viewer component */}
+                </div>
               }
             />
+            
+            {/* Custom Table Route */}
             <Route
               path="/custom-table"
               element={
                 <div style={{ maxWidth: '1000px' }}>
-                  {/* <PlyViewer /> */}
                   <CustomTable />
                 </div>
               }
             />
+            
+            {/* Group Statistics Route */}
             <Route
               path="/group"
               element={
@@ -247,16 +225,20 @@ export default function App() {
                 </div>
               }
             />
+            
+            {/* Database Statistics Route */}
             <Route
               path="/groupstats"
               element={
-                <div style={{}}>
+                <div>
                   <Navbar text="" color1="#375D7A" />
-                  <div style={{paddingTop: '100px'}}></div>
+                  <div style={{ paddingTop: '100px' }} />
                   <DatabaseStats directoryPath={directoryPath} />
                 </div>
               }
             />
+            
+            {/* Import Route */}
             <Route
               path="/import"
               element={
@@ -265,17 +247,20 @@ export default function App() {
                 </div>
               }
             />
+            
+            {/* NiiVue Viewer Route */}
             <Route
               path="/niivue"
               element={
                 <div>
-                  {/* <Navbar text="" color1="#375D7A" /> */}
                   <div style={{ marginTop: '100px' }}>
                     <TestApp plyFilePaths={plyFilePaths} />
                   </div>
                 </div>
               }
             />
+            
+            {/* SEEG Route */}
             <Route
               path="/seeg"
               element={

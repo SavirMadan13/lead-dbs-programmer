@@ -1,36 +1,89 @@
-/* eslint-disable promise/always-return */
-import { useLocation, useNavigate } from 'react-router-dom';
+/**
+ * Programmer Component
+ * 
+ * This is the main programming interface for the Lead-DBS application.
+ * It handles stimulation parameter configuration, electrode management,
+ * and data import/export functionality. The component supports both
+ * individual patient programming and group programming modes.
+ */
+
 import React, { useState, useEffect, useContext } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+// Styles
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+// Components
 import GroupArchitecture from './components/GroupArchitecture';
 import { PatientContext } from './components/PatientContext';
 import initializeS from './components/InitializeS';
 import electrodeModels from './components/electrodeModels.json';
 
+// Type definitions
+interface Patient {
+  id: string;
+  name?: string;
+  elmodel?: string;
+  [key: string]: any;
+}
+
+interface PatientState {
+  IPG: string;
+  leftElectrode: string;
+  rightElectrode: string;
+  allQuantities: Record<string, any>;
+  allSelectedValues: Record<string, any>;
+  allTotalAmplitudes: Record<string, any>;
+  allStimulationParameters: Record<string, any>;
+  visModel: string;
+  sessionTitle: string;
+  allTogglePositions: Record<string, any>;
+  allPercAmpToggles: Record<string, any>;
+  allVolAmpToggles: Record<string, any>;
+  importCount: number;
+  importData: string;
+  masterImportData: string;
+  matImportFile: any;
+  newImportFiles: any;
+  showDropdown: boolean;
+  filePath: string;
+  stimChanged: boolean;
+  allTemplateSpaces: number;
+}
+
+interface LocationState {
+  patient?: Patient;
+  timeline?: string;
+  directoryPath?: string;
+  leadDBS?: boolean;
+}
+
 function Programmer() {
-  const electrodeList: any[] = [];
-  const [patientName, setPatientName] = useState('');
-  const [patients, setPatients] = useState([]);
-  const [patientStates, setPatientStates] = useState({});
-  const [importNewS, setImportNewS] = useState({});
-  const [electrodeMaster, setElectrodeMaster] = useState('');
-  const [ipgMaster, setIpgMaster] = useState('');
+  // Context and navigation
   const allPatients = useContext(PatientContext);
-  const [totalS, setTotalS] = useState({});
-  console.log('All Patients: ', allPatients);
-
   const location = useLocation();
-  const { patient, timeline, directoryPath, leadDBS } = location.state || {};
-  console.log(patient);
-  // Access patient and timeline from state
-  console.log(location.state);
-  const navigate = useNavigate(); // Initialize the navigate hook
-  const [mode, setMode] = useState('');
-  const [type, setType] = useState('');
-  // const { patient } = location.state || {}; // Retrieve patient data from navigation state
+  const navigate = useNavigate();
+  
+  // Extract data from location state
+  const { patient, timeline, directoryPath, leadDBS } = (location.state as LocationState) || {};
+  
+  // State management
+  const electrodeList: any[] = [];
+  const [patientName, setPatientName] = useState<string>('');
+  const [patients, setPatients] = useState<string[]>([]);
+  const [patientStates, setPatientStates] = useState<Record<string, PatientState>>({});
+  const [importNewS, setImportNewS] = useState<Record<string, any>>({});
+  const [electrodeMaster, setElectrodeMaster] = useState<string>('');
+  const [ipgMaster, setIpgMaster] = useState<string>('');
+  const [totalS, setTotalS] = useState<Record<string, any>>({});
+  const [mode, setMode] = useState<string>('');
+  const [type, setType] = useState<string>('');
+  const [zoomLevel, setZoomLevel] = useState<number>(-3);
+  const [historical, setHistorical] = useState<LocationState | null>(location.state);
 
-  const initialState = {
+  // Constants
+  const initialState: PatientState = {
     IPG: '',
     leftElectrode: '',
     rightElectrode: '',
@@ -54,7 +107,8 @@ function Programmer() {
     allTemplateSpaces: 0,
   };
 
-  const varargout = [
+  // Electrode models configuration
+  const electrodeModels = [
     { displayName: 'Medtronic 3389', value: 'medtronic_3389' },
     { displayName: 'Medtronic 3387', value: 'medtronic_3387' },
     { displayName: 'Medtronic 3391', value: 'medtronic_3391' },
@@ -156,14 +210,24 @@ function Programmer() {
     },
   ];
 
-  const handleImportedElectrode = (importedElectrode) => {
-    const electrodeInfo = varargout.find(
+  /**
+   * Maps imported electrode name to internal electrode model value
+   * @param importedElectrode - The display name of the electrode
+   * @returns The internal value for the electrode model
+   */
+  const handleImportedElectrode = (importedElectrode: string): string => {
+    const electrodeInfo = electrodeModels.find(
       (item) => item.displayName === importedElectrode,
     );
     return electrodeInfo ? electrodeInfo.value : 'boston_vercise_directed';
   };
 
-  const handleIPG = (importedElectrode) => {
+  /**
+   * Determines the IPG (Implantable Pulse Generator) type based on electrode name
+   * @param importedElectrode - The display name of the electrode
+   * @returns The IPG type string
+   */
+  const handleIPG = (importedElectrode: string): string => {
     if (importedElectrode.includes('Boston')) {
       return 'Boston';
     }

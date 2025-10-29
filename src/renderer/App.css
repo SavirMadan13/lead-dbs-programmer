@@ -1,58 +1,37 @@
-/*
- * @NOTE: Prepend a `~` to css file paths that are in your node_modules
- *        See https://github.com/webpack-contrib/sass-loader#imports
+/**
+ * Main Application Styles
+ * 
+ * This file contains the global styles for the Lead-DBS Programmer application.
+ * It includes base styles, component-specific styles, and utility classes.
  */
+
+/* ==========================================================================
+   Base Styles
+   ========================================================================== */
+
 body {
   position: relative;
   color: white;
-  /* height: 100vh; */
-  /* background: #212121; */
   font-family: sans-serif;
   overflow-y: visible;
-  /* Scroll for overflow-y is an option */
   display: flex;
   justify-content: center;
-  align-items: left;
+  align-items: flex-start;
+  margin: 0;
+  padding: 0;
 }
+
+/* ==========================================================================
+   Utility Classes
+   ========================================================================== */
 
 .my-svg {
   fill: red;
 }
 
-/* button {
-  background-color: white;
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: none;
-  appearance: none;
-  font-size: 1.3rem;
-  box-shadow: 0px 8px 28px -6px rgba(24, 39, 75, 0.12),
-    0px 18px 88px -4px rgba(24, 39, 75, 0.14);
-  transition: all ease-in 0.1s;
-  cursor: pointer;
-  opacity: 0.9;
-} */
-
-/* button:hover {
-  transform: scale(1.05);
-  opacity: 1;
-} */
-
-/* li {
-  list-style: none;
-} */
-
-/* a {
-  text-decoration: none;
-  height: fit-content;
-  width: fit-content;
-  margin: 10px;
-}
-
-a:hover {
-  opacity: 1;
-  text-decoration: none;
-} */
+/* ==========================================================================
+   Layout Components
+   ========================================================================== */
 
 .Navbar {
   margin: 100px;
@@ -61,17 +40,11 @@ a:hover {
 .Hello {
   flex: 2;
   position: relative;
-  /* justify-content: center;
-  align-items: center;
-  margin: 20px 0; */
 }
 
 .stimulation-parameters {
   flex: 1;
   position: relative;
-  /* top: 200px;
-  left: -500px; */
-  /* left: -300px; */
 }
 
 .footer {
@@ -79,23 +52,24 @@ a:hover {
   bottom: 0;
   width: 100%;
   text-align: center;
-  /* background-color: #f1f1f1; */
   padding: 10px 0;
 }
 
 .divider {
   border: none;
-  /* border-top: 2px solid #ccc; */
   margin-bottom: 10px;
   width: 100%;
 }
 
 .footer-image {
-  max-width: 100px; /* Adjust size to fit your design */
+  max-width: 100px;
   height: auto;
 }
 
-/* In App.css or a separate CSS file */
+/* ==========================================================================
+   Interactive Elements
+   ========================================================================== */
+
 .select-button {
   background-color: #007bff;
   color: white;
@@ -111,26 +85,30 @@ a:hover {
   background-color: #0056b3;
 }
 
+.settings-icon {
+  cursor: pointer;
+  font-size: 24px;
+  color: #6c757d;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.settings-icon:hover {
+  color: #007bff;
+  transform: rotate(20deg);
+}
+
+.settings-icon:active {
+  transform: rotate(0deg) scale(0.95);
+  color: #0056b3;
+}
+
+/* ==========================================================================
+   Text and Status Elements
+   ========================================================================== */
+
 .selected-directory {
   font-size: 14px;
   color: #333;
   margin-top: 10px;
-}
-
-.settings-icon {
-  cursor: pointer; /* Hand cursor for clickable interaction */
-  font-size: 24px; /* Default size for the icon */
-  color: #6c757d; /* Initial color for the icon */
-  transition: color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
-}
-
-.settings-icon:hover {
-  color: #007bff; /* Change color on hover (Bootstrap blue) */
-  transform: rotate(20deg); /* Add a slight rotation effect */
-}
-
-.settings-icon:active {
-  transform: rotate(0deg) scale(0.95); /* Scale down slightly on click */
-  color: #0056b3; /* Darker color on click */
 }
 

@@ -1,4 +1,17 @@
+/**
+ * Patient Database Component
+ * 
+ * This component displays and manages the patient database. It provides functionality
+ * for viewing, editing, searching, sorting, and exporting patient data. The component
+ * integrates with the PatientContext for global state management and provides
+ * navigation to individual patient details.
+ */
+
 import React, { useState, useContext, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
+
+// Material-UI Components
 import {
   TextField,
   Button,
@@ -24,22 +37,37 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Edit, Delete, Save, Cancel } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-import * as XLSX from 'xlsx';
+
+// Local Components
 import { PatientContext } from './PatientContext';
 import DatabaseStats from './DatabaseStats';
 
-function PatientDatabase({ key, directoryPath }) {
+// Type definitions
+interface Patient {
+  id: string;
+  [key: string]: any;
+}
+
+interface PatientDatabaseProps {
+  key?: string;
+  directoryPath: string | null;
+}
+
+function PatientDatabase({ directoryPath }: PatientDatabaseProps) {
+  // Initialize IPC communication
   window.electron.ipcRenderer.sendMessage('import-inputdata-file', ['ping']);
+  
+  // Context and navigation
   const { patients, setPatients } = useContext(PatientContext);
-  console.log('Patients: ', patients);
-  const [editRowId, setEditRowId] = useState(null); // Track the row being edited
-  const [editedPatient, setEditedPatient] = useState({}); // Hold the patient data while editing
-  const [searchTerm, setSearchTerm] = useState('');
-  const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('id');
-  const [editMode, setEditMode] = useState(false);
   const navigate = useNavigate();
+  
+  // State management
+  const [editRowId, setEditRowId] = useState<string | null>(null);
+  const [editedPatient, setEditedPatient] = useState<Partial<Patient>>({});
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
+  const [orderBy, setOrderBy] = useState<string>('id');
+  const [editMode, setEditMode] = useState<boolean>(false);
   // const [columns, setColumns] = useState(() => {
   //   if (patients.length > 0) {
   //     return Object.keys(patients[0])
