@@ -1,15 +1,23 @@
+/**
+ * PlyViewer Component
+ * 
+ * This is a complex 3D visualization component that handles PLY file rendering,
+ * NIfTI file processing, and 3D brain visualization. It provides tools for
+ * electrode visualization, stimulation field modeling, and interactive 3D
+ * manipulation of brain models and electrode data.
+ */
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import * as THREE from 'three';
 import { PLYLoader, OrbitControls } from 'three-stdlib';
-// import { Niivue } from 'niivue/niivue';
-// import * as nifti from 'nifti-reader-js'; // Correctly importing the nifti module
 import * as nifti from 'nifti-reader-js';
 import { getTypedArray } from 'nifti-reader-js';
 import * as iso from 'isosurface';
 import ndarray from 'ndarray';
 import * as fflate from 'fflate';
-// import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
+
+// UI Components
 import {
   Tabs,
   Tab,
@@ -20,19 +28,39 @@ import {
   Dropdown,
   DropdownButton,
 } from 'react-bootstrap';
-import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings icon
-import * as math from 'mathjs';
-import { optimizeSphereValues, projectNumContacts } from './StimOptimizer';
-import { computeSuperimposedEField } from './OssDbsStimsets';
-import { nii2Mesh, processNifti, testPlane, addSliceToSceneNew } from './NiftiUtils';
-// import { processNii } from './ProcessNii';
-// import { remote } from 'electron'; // Use 'electron' for Electron v12+
+import SettingsIcon from '@mui/icons-material/Settings';
 import IconButton from '@mui/material/IconButton';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
+
+// Utilities
+import * as math from 'mathjs';
+
+// Local Components and Utils
+import { optimizeSphereValues, projectNumContacts } from './StimOptimizer';
+import { computeSuperimposedEField } from './OssDbsStimsets';
+import { nii2Mesh, processNifti, testPlane, addSliceToSceneNew } from './NiftiUtils';
+
+// Assets
 import EdlowBrain from './Edlow_10mm.png';
+
+// Type definitions
+interface PlyViewerProps {
+  quantities: Record<string, any>;
+  setQuantities: (value: Record<string, any>) => void;
+  selectedValues: Record<string, any>;
+  setSelectedValues: (value: Record<string, any>) => void;
+  amplitude: number;
+  setAmplitude: (value: number) => void;
+  side: string;
+  historical: any;
+  togglePosition: string;
+  tab: string;
+  names: string[];
+  elspec: any;
+}
 
 function PlyViewer({
   quantities,
@@ -47,7 +75,7 @@ function PlyViewer({
   tab,
   names,
   elspec,
-}) {
+}: PlyViewerProps) {
   const [plyFile, setPlyFile] = useState(null);
   const mountRef = useRef(null);
   const secondaryMountRef = useRef(null); // Ref for the secondary view

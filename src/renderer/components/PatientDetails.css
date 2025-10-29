@@ -1,27 +1,35 @@
+/**
+ * Patient Details Component Styles
+ * 
+ * This file contains styles for the PatientDetails component, including
+ * layout, typography, and interactive element styling.
+ */
+
+/* ==========================================================================
+   Main Container
+   ========================================================================== */
+
 .patient-details {
   font-family: Arial, sans-serif;
-  width: 90%; /* Take up 90% of the screen width for a more balanced layout */
-  max-width: 1000px; /* Maximum width for larger screens */
-  margin: 40px auto; /* Center the component horizontally and add margin on top */
+  width: 90%;
+  max-width: 1000px;
+  margin: 40px auto;
   padding: 20px;
-  background-color: #f9f9f9; /* Light background for better readability */
+  background-color: #f9f9f9;
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for a modern look */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
 
 .patient-title {
   font-size: 32px;
   font-weight: bold;
   margin-bottom: 20px;
   color: #333;
-  text-align: center; /* Center the title for better emphasis */
-}
-
-.divider {
-  height: 1px;
-  background-color: #ddd;
-  margin: 20px 0; /* Space around divider */
-  width: 100%;
+  text-align: center;
 }
 
 .section-title {
@@ -33,23 +41,42 @@
   padding-bottom: 5px;
 }
 
+/* ==========================================================================
+   Layout Elements
+   ========================================================================== */
+
+.divider {
+  height: 1px;
+  background-color: #ddd;
+  margin: 20px 0;
+  width: 100%;
+}
+
+/* ==========================================================================
+   Patient Information Layout
+   ========================================================================== */
+
 .patient-info-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  margin-bottom: 20px; /* Better separation between sections */
+  margin-bottom: 20px;
 }
 
 .patient-info {
   font-size: 18px;
   margin: 10px 0;
-  flex-basis: 48%; /* Take up 48% of the container width */
+  flex-basis: 48%;
 }
 
 .patient-info strong {
   font-weight: bold;
-  color: #007BFF; /* Use blue to highlight key information */
+  color: #007BFF;
 }
+
+/* ==========================================================================
+   Button Styles
+   ========================================================================== */
 
 .export-button {
   background-color: #007BFF;
@@ -79,18 +106,22 @@
 
 .timeline-button:hover {
   background-color: #0056b3;
-  transform: translateY(-2px); /* Lift effect on hover */
+  transform: translateY(-2px);
 }
 
+/* ==========================================================================
+   Timeline Management
+   ========================================================================== */
+
 .quick-add-timelines {
-  margin: 20px 0; /* Add more spacing between sections */
+  margin: 20px 0;
   text-align: center;
 }
 
 .quick-add-timelines div {
   display: flex;
   gap: 10px;
-  justify-content: center; /* Center the buttons */
+  justify-content: center;
   flex-wrap: wrap;
 }
 
