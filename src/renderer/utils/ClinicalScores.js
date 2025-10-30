@@ -5,10 +5,10 @@ import { Form, Button, Table, Container, Dropdown } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import * as XLSX from 'xlsx';
 // import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
-import PairedTTestComponent from './PairedTTestComponent';
-import BoxPlotComponent from './BoxPlotComponent';
-import UPDRSAnalysisComponent from './UPDRSAnalysisComponent';
-import './icons/icons.css';
+import PairedTTestComponent from '../components/analysis/PairedTTestComponent';
+import BoxPlotComponent from '../components/analysis/BoxPlotComponent';
+import UPDRSAnalysisComponent from '../components/analysis/UPDRSAnalysisComponent';
+import '../assets/icons/icons.css';
 
 function ClinicalScores() {
   const location = useLocation();

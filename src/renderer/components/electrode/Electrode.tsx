@@ -18,28 +18,28 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import IconButton from '@mui/material/IconButton';
 
 // Styles
-import './ElecModelStyling/Styling.css';
+import '../../styles/electrode/Styling.css';
 
 // Utilities
-import { math } from 'mathjs';
+import * as math from 'mathjs';
 
 // SVG Icons
-import { ReactComponent as IPG1 } from '../images/IPG.svg';
-import { ReactComponent as ForwardButton } from '../images/FrontButton.svg';
-import { ReactComponent as BackButton } from '../images/BackButton.svg';
-import { ReactComponent as LeftButton } from '../images/LeftButton.svg';
-import { ReactComponent as RightButton } from '../images/RightButton.svg';
-import { ReactComponent as SplitEvenButton } from '../images/SplitEvenButton.svg';
-import { ReactComponent as NewBottomContact } from '../images/NewUI/BottomContact.svg';
-import { ReactComponent as LeftContact } from '../images/NewUI/LeftContact.svg';
-import { ReactComponent as RightContact } from '../images/NewUI/RightContact.svg';
-import { ReactComponent as CenterContact } from '../images/NewUI/CenterContact.svg';
-import { ReactComponent as Nondirectional } from '../images/NewUI/NonDirectionalContact.svg';
-import { ReactComponent as Background } from '../images/NewUI/Background.svg';
+import { ReactComponent as IPG1 } from '../../assets/electrode-images/IPG.svg';
+import { ReactComponent as ForwardButton } from '../../assets/electrode-images/FrontButton.svg';
+import { ReactComponent as BackButton } from '../../assets/electrode-images/BackButton.svg';
+import { ReactComponent as LeftButton } from '../../assets/electrode-images/LeftButton.svg';
+import { ReactComponent as RightButton } from '../../assets/electrode-images/RightButton.svg';
+import { ReactComponent as SplitEvenButton } from '../../assets/electrode-images/SplitEvenButton.svg';
+import { ReactComponent as NewBottomContact } from '../../assets/images/NewUI/BottomContact.svg';
+import { ReactComponent as LeftContact } from '../../assets/images/NewUI/LeftContact.svg';
+import { ReactComponent as RightContact } from '../../assets/images/NewUI/RightContact.svg';
+import { ReactComponent as CenterContact } from '../../assets/images/NewUI/CenterContact.svg';
+import { ReactComponent as Nondirectional } from '../../assets/images/NewUI/NonDirectionalContact.svg';
+import { ReactComponent as Background } from '../../assets/images/NewUI/Background.svg';
 
 // Components
-import PlyViewer from '../../PlyViewer';
-import ContactParameters from '../../ContactParameters';
+import PlyViewer from '../viewers/PlyViewer';
+import ContactParameters from './ContactParameters';
 
 // Type definitions
 interface ElectrodeProps {

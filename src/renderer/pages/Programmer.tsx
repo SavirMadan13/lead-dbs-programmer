@@ -11,14 +11,14 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 // Styles
-import './App.css';
+import '../styles/App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Components
-import GroupArchitecture from './components/GroupArchitecture';
-import { PatientContext } from './components/PatientContext';
-import initializeS from './components/InitializeS';
-import electrodeModels from './components/electrodeModels.json';
+import GroupArchitecture from '../components/group/GroupArchitecture';
+import { PatientContext } from '../contexts/PatientContext';
+import initializeS from '../utils/InitializeS';
+import electrodeModels from '../assets/data/electrodeModels.json';
 
 // Type definitions
 interface Patient {

@@ -19,18 +19,18 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import * as XLSX from 'xlsx';
 import * as nifti from 'nifti-reader-js';
 import { Niivue, SLICE_TYPE } from '@niivue/niivue';
-import DatabasePlot from './DatabasePlot';
-import GroupAveragePlot from './GroupAveragePlot';
-import { PatientContext } from './PatientContext';
-import GroupLateralityAnalysisPlot from './GroupLateralityAnalysisPlot';
-import GroupSubscoreAnalysisPlot from './GroupSubscoreAnalysisPlot';
-import CombinedPlot from './CombinedPlot';
-import './DatabaseStats.css'; // Ensure this CSS file is correctly linked
+import DatabasePlot from '../components/analysis/DatabasePlot';
+import GroupAveragePlot from '../components/group/GroupAveragePlot';
+import { PatientContext } from '../contexts/PatientContext';
+import GroupLateralityAnalysisPlot from '../components/group/GroupLateralityAnalysisPlot';
+import GroupSubscoreAnalysisPlot from '../components/group/GroupSubscoreAnalysisPlot';
+import CombinedPlot from '../components/analysis/CombinedPlot';
+import '../styles/DatabaseStats.css'; // Ensure this CSS file is correctly linked
 import { optimizeDatabase } from './OptimizeDatabase';
-import electrodeModels from './electrodeModels.json';
+import electrodeModels from '../assets/data/electrodeModels.json';
 import * as math from 'mathjs';
-import GroupViewer from './GroupViewer';
-import Raincloud from './Raincloud';
+import GroupViewer from '../components/group/GroupViewer';
+import Raincloud from '../components/analysis/Raincloud';
 
 function DatabaseStats({ directoryPath }) {
   const { patients } = useContext(PatientContext);

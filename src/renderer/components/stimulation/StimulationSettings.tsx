@@ -12,11 +12,11 @@ import ToggleButton from 'react-bootstrap/ToggleButton';
 import { Dropdown, Form } from 'react-bootstrap';
 
 // Data and Components
-import electrodeModels from './electrodeModels.json';
-import ManageElectrode from './ManageElectrode';
+import electrodeModels from '../../assets/data/electrodeModels.json';
+import ManageElectrode from '../electrode/ManageElectrode';
 
 // Styles
-import './StimulationSettings.css';
+import '../../styles/StimulationSettings.css';
 
 // Type definitions
 interface StimulationSettingsProps {

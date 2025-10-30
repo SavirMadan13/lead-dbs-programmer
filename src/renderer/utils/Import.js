@@ -1,9 +1,9 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import React, { useState, useContext } from 'react';
 import * as XLSX from 'xlsx'; // Import xlsx for Excel parsing
-import { PatientContext } from './PatientContext';
+import { PatientContext } from '../contexts/PatientContext';
 import initializeS from './InitializeS';
-import electrodeData from './electrodeModels.json';
+import electrodeData from '../assets/data/electrodeModels.json';
 
 function Import({ leadDBS }) {
   const allPatients = useContext(PatientContext);
