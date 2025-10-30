@@ -52,7 +52,7 @@ const configuration: webpack.Configuration = {
   target: ['web', 'electron-renderer'],
 
   entry: [
-    `webpack-dev-server/client?http://localhost:${port}/dist`,
+    `webpack-dev-server/client?http://localhost:${port}`,
     'webpack/hot/only-dev-server',
     path.join(webpackPaths.srcRendererPath, 'index.tsx'),
   ],
@@ -156,8 +156,9 @@ const configuration: webpack.Configuration = {
     new ReactRefreshWebpackPlugin(),
 
     new HtmlWebpackPlugin({
-      filename: path.join('index.html'),
+      filename: 'index.html',
       template: path.join(webpackPaths.srcRendererPath, 'index.ejs'),
+      inject: true,
       minify: {
         collapseWhitespace: true,
         removeAttributeQuotes: true,
@@ -181,10 +182,11 @@ const configuration: webpack.Configuration = {
     hot: true,
     headers: { 'Access-Control-Allow-Origin': '*' },
     static: {
-      publicPath: '/',
+      directory: webpackPaths.distRendererPath,
     },
     historyApiFallback: {
       verbose: true,
+      index: '/index.html',
     },
     setupMiddlewares(middlewares) {
       // console.log('Starting preload.js builder...');
