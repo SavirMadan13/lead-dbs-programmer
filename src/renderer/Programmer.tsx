@@ -741,7 +741,7 @@ function Programmer() {
     fetchData();
   }, [directoryPath, patient, leadDBS, allPatients]);
 
-  const [zoomLevel, setZoomLevel] = useState(-3);
+  // Use the existing zoomLevel state defined above
 
   const handleZoomChange = (event, newValue) => {
     setZoomLevel(newValue);
@@ -1149,7 +1149,7 @@ function Programmer() {
     window.electron.ipcRenderer.sendMessage('close-window');
   };
 
-  const [historical, setHistorical] = useState(location.state);
+  // historical state already defined above
 
   return (
     <div style={{}}>

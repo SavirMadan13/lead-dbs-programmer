@@ -14,11 +14,6 @@ import checkNodeEnv from '../scripts/check-node-env';
 // When an ESLint server is running, we can't set the NODE_ENV so we'll check if it's
 // at the dev webpack config is not accidentally run in a production environment
 
-console.log = () => {};
-console.error = () => {};
-console.warn = () => {};
-console.info = () => {};
-
 if (process.env.NODE_ENV === 'production') {
   checkNodeEnv('development');
 }
@@ -187,6 +182,11 @@ const configuration: webpack.Configuration = {
       verbose: true,
     },
     setupMiddlewares(middlewares) {
+      if (process.env.NO_SPAWN === '1') {
+        // Allow running dev server without spawning Electron processes (useful for CI/tests)
+        return middlewares;
+      }
+
       // console.log('Starting preload.js builder...');
       const preloadProcess = spawn('npm', ['run', 'start:preload'], {
         shell: true,
