@@ -1,6 +1,6 @@
 /**
  * StimulationSettings Component
- * 
+ *
  * This component manages the stimulation settings interface, including electrode
  * selection, IPG configuration, and parameter management. It provides a comprehensive
  * interface for configuring deep brain stimulation parameters.
@@ -123,11 +123,11 @@ function StimulationSettings({
   // State management
   const [testData, setTestData] = useState<string>(importDataTest || '');
   const [renderKey, setRenderKey] = useState<number>(0);
-  
+
   // Initialize import data
   let importData: any[] = [];
   console.log('IMPORTEDS: ', importNewS);
-  
+
   // Initialize IPC communication
   if (importCount === 0) {
     window.electron.ipcRenderer.sendMessage('import-file', ['ping']);
@@ -706,7 +706,7 @@ function StimulationSettings({
                   cursor: 'pointer',
                 }}
               >
-                {varargout.map((electrode) => (
+                {electrodeModels.map((electrode) => (
                   <option
                     key={electrode.value}
                     value={electrode.value}
@@ -732,7 +732,7 @@ function StimulationSettings({
                   cursor: 'pointer',
                 }}
               >
-                {varargout.map((electrode, index) => (
+                {electrodeModels.map((electrode, index) => (
                   <option key={index} value={electrode.value} disabled>
                     {electrode.displayName}
                   </option>
