@@ -123,17 +123,11 @@ export class Application {
    * Setup error handling
    */
   private setupErrorHandling(): void {
-    if (app && app.isReady()) {
-      app.on('error', (error) => {
-        this.logger.error('Application error:', error);
-      });
-    }
-
-    process.on('uncaughtException', (error) => {
+    process.on('uncaughtException', (error: Error) => {
       this.logger.error('Uncaught exception:', error);
     });
 
-    process.on('unhandledRejection', (reason, promise) => {
+    process.on('unhandledRejection', (reason: any, promise: Promise<any>) => {
       this.logger.error('Unhandled rejection:', reason);
     });
   }
