@@ -9,7 +9,7 @@ import { RichTreeView } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import HomeIcon from '@mui/icons-material/Home';
-import { PatientContext } from './PatientContext';
+import { PatientContext } from '../context/PatientContext';
 import PatientStats from './PatientStats';
 // import NiivueViewer from './NiivueViewer';
 // import NiftiViewer from './NiftiViewer';

@@ -39,7 +39,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Edit, Delete, Save, Cancel } from '@mui/icons-material';
 
 // Local Components
-import { PatientContext } from './PatientContext';
+import { PatientContext } from '../context/PatientContext';
 import DatabaseStats from './DatabaseStats';
 
 // Type definitions

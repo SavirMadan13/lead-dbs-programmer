@@ -21,7 +21,7 @@ import * as nifti from 'nifti-reader-js';
 import { Niivue, SLICE_TYPE } from '@niivue/niivue';
 import DatabasePlot from './DatabasePlot';
 import GroupAveragePlot from './GroupAveragePlot';
-import { PatientContext } from './PatientContext';
+import { PatientContext } from '../context/PatientContext';
 import GroupLateralityAnalysisPlot from './GroupLateralityAnalysisPlot';
 import GroupSubscoreAnalysisPlot from './GroupSubscoreAnalysisPlot';
 import CombinedPlot from './CombinedPlot';

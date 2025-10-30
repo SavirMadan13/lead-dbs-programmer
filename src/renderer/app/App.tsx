@@ -8,19 +8,19 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Components
-import Navbar from './components/Navbar';
-import PatientDatabase from './components/PatientDatabase';
-import PatientDetails from './components/PatientDetails';
-import { PatientProvider } from './components/PatientContext';
-import Programmer from './Programmer';
-import ClinicalScores from './components/ClinicalScores';
-import CustomTable from './components/CustomTable';
-import GroupStats from './components/GroupStats';
-import DatabaseStats from './components/DatabaseStats';
-import Import from './components/Import';
-import NiiViewer from './components/NiiViewer';
-import SEEG from './components/SEEG';
-import TestApp from './niivue/ui/TestApp';
+import Navbar from '../components/Navbar';
+import PatientDatabase from '../components/PatientDatabase';
+import PatientDetails from '../components/PatientDetails';
+import { PatientProvider } from '../context/PatientContext';
+import Programmer from '../pages/Programmer';
+import ClinicalScores from '../components/ClinicalScores';
+import CustomTable from '../components/CustomTable';
+import GroupStats from '../components/GroupStats';
+import DatabaseStats from '../components/DatabaseStats';
+import Import from '../components/Import';
+import NiiViewer from '../components/NiiViewer';
+import SEEG from '../components/SEEG';
+import TestApp from '../niivue/ui/TestApp';
 
 /**
  * Main App Component
@@ -78,7 +78,8 @@ export default function App() {
     // Listen for folder selection events from main process
     const unsubscribe = window.electron.ipcRenderer.on(
       'folder-selected',
-      (selectedPath: string) => {
+      (...args: unknown[]) => {
+        const [selectedPath] = args as [string];
         setDirectoryPath(selectedPath);
         setRenderKey((prevKey) => prevKey + 1);
         setIsLeadDBSFolder(true);
