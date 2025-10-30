@@ -7,19 +7,18 @@
 import { Logger } from '../utils/Logger';
 import { DataManager } from './DataManager';
 import { FileManager } from './FileManager';
-import { IPCHandlers } from '../ipc/ipcHandlers';
+import registerFileHandlers from '../ipc/ipcHandlers';
 
 export class IPCManager {
   private logger: Logger;
   private dataManager: DataManager;
   private fileManager: FileManager;
-  private ipcHandlers: IPCHandlers;
+  private initialized: boolean = false;
 
   constructor(logger: Logger, dataManager: DataManager, fileManager: FileManager) {
     this.logger = logger;
     this.dataManager = dataManager;
     this.fileManager = fileManager;
-    this.ipcHandlers = new IPCHandlers(logger, dataManager, fileManager);
   }
 
   /**
@@ -28,7 +27,8 @@ export class IPCManager {
   public async initialize(): Promise<void> {
     try {
       this.logger.info('Initializing IPC handlers...');
-      await this.ipcHandlers.initialize();
+      registerFileHandlers();
+      this.initialized = true;
       this.logger.info('IPC handlers initialized successfully');
     } catch (error) {
       this.logger.error('Failed to initialize IPC handlers:', error);
@@ -42,6 +42,7 @@ export class IPCManager {
   public async cleanup(): Promise<void> {
     try {
       this.logger.info('Cleaning up IPCManager...');
+      this.initialized = false;
     } catch (error) {
       this.logger.error('Error cleaning up IPCManager:', error);
     }

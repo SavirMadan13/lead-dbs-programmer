@@ -42,7 +42,6 @@ export class WindowManager {
         webPreferences: {
           nodeIntegration: false,
           contextIsolation: true,
-          enableRemoteModule: false,
           preload: preloadPath,
         },
       });

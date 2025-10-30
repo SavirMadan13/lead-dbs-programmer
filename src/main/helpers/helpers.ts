@@ -97,8 +97,12 @@ function fileExistsInDirectory(
   return fs.existsSync(fullPath);
 }
 
-// Function to read JSON from the provided path
-function readJSON(filePath) {
+/**
+ * Function to read JSON from the provided path
+ * @param filePath - The path to the JSON file
+ * @returns The parsed JSON data or null if error
+ */
+function readJSON(filePath: string): any {
   try {
     const data = fs.readFileSync(filePath, 'utf8'); // Synchronous file read
     return JSON.parse(data); // Parse and return the JSON data
@@ -108,9 +112,16 @@ function readJSON(filePath) {
   }
 }
 
-function getPatientFolderPly(directoryPath, patientId, leadDBS) {
+/**
+ * Helper Function: Get the patient's folder path for PLY files.
+ * @param directoryPath - The base directory path.
+ * @param patientId - The unique identifier for the patient.
+ * @param leadDBS - Boolean indicating whether LeadDBS mode is enabled.
+ * @returns The constructed patient folder path.
+ */
+function getPatientFolderPly(directoryPath: string, patientId: string, leadDBS: boolean): string {
   let newFolderPath = ''; // Declare newFolderPath with a default value
-  const stimulationData = getData('stimulationData');
+  const stimulationData: any = getData('stimulationData');
   let outputFolderPath = '';
   if (stimulationData.mode === 'standalone') {
     outputFolderPath = path.join(
@@ -127,7 +138,7 @@ function getPatientFolderPly(directoryPath, patientId, leadDBS) {
   ) {
     // Ensure patientname is an array
     const patientIndex = stimulationData.patientname.findIndex(
-      (name) => name === patientId,
+      (name: string) => name === patientId,
     );
     console.log('Patient Index: ', patientIndex);
     // Check if patientIndex is valid

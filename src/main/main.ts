@@ -128,7 +128,7 @@ console.log('Directory: ', __dirname);
 
 let mainWindow: BrowserWindow | null = null;
 let stimulationDirectory = '';
-let stimulationData = {};
+let stimulationData: any = {};
 
 ipcMain.on('import-inputdata-file', async (event, arg) => {
   const fs = require('fs');
