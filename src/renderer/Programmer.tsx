@@ -264,17 +264,17 @@ function Programmer() {
     return `${year}${month}${day}${randomNums}`;
   }
 
-  const gatherImportedDataNew = (jsonData, importedElectrode) => {
+  const gatherImportedDataNew = (jsonData: any, importedElectrode: any) => {
     console.log('S: ', jsonData);
     setImportNewS(jsonData);
     let outputIPG = handleIPG(importedElectrode);
     console.log('OutputIPG: ', outputIPG);
-    const newQuantities = {};
-    const newSelectedValues = {};
-    const newTotalAmplitude = {};
-    const newAllQuantities = {};
-    const newAllVolAmpToggles = {};
-    const newAllTogglePositions = {};
+    const newQuantities: Record<number, any> = {};
+    const newSelectedValues: Record<number, any> = {};
+    const newTotalAmplitude: Record<number, any> = {};
+    const newAllQuantities: Record<number, any> = {};
+    const newAllVolAmpToggles: Record<number, any> = {};
+    const newAllTogglePositions: Record<number, any> = {};
 
     console.log('Imported Amplitude: ', jsonData.amplitude);
 
@@ -741,9 +741,7 @@ function Programmer() {
     fetchData();
   }, [directoryPath, patient, leadDBS, allPatients]);
 
-  const [zoomLevel, setZoomLevel] = useState(-3);
-
-  const handleZoomChange = (event, newValue) => {
+  const handleZoomChange = (event: any, newValue: number) => {
     setZoomLevel(newValue);
     if (window.electron && window.electron.zoom) {
       window.electron.zoom.setZoomLevel(newValue);
@@ -1148,8 +1146,6 @@ function Programmer() {
     );
     window.electron.ipcRenderer.sendMessage('close-window');
   };
-
-  const [historical, setHistorical] = useState(location.state);
 
   return (
     <div style={{}}>

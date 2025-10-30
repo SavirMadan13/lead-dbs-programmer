@@ -162,7 +162,7 @@ export default function App() {
                   
                   {/* Main Patient Database Component */}
                   <PatientDatabase
-                    key={renderKey}
+                    key={String(renderKey)}
                     directoryPath={directoryPath}
                   />
                 </div>
@@ -254,7 +254,7 @@ export default function App() {
               element={
                 <div>
                   <div style={{ marginTop: '100px' }}>
-                    <TestApp plyFilePaths={plyFilePaths} />
+                    <TestApp />
                   </div>
                 </div>
               }

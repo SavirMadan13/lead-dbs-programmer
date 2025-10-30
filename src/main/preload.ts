@@ -35,7 +35,7 @@ import {
   webFrame,
 } from 'electron';
 
-export type Channels = 'ipc-example';
+export type Channels = string; // Allow any channel name for flexibility
 
 const electronHandler = {
   ipcRenderer: {
@@ -54,7 +54,7 @@ const electronHandler = {
     once(channel: Channels, func: (...args: unknown[]) => void) {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
     },
-    invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args), // Add invoke method
+    invoke: (channel: string, ...args: unknown[]) => ipcRenderer.invoke(channel, ...args), // Add invoke method with proper typing
   },
   // zoom: {
   //   zoomIn() {
