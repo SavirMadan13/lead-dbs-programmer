@@ -94,7 +94,7 @@ function ClinicalScores() {
   }
 
   const UPDRSImages = importAll(
-    require.context('./icons', false, /\.(PNG|jpe?g|svg|png)$/),
+    require.context('../assets/icons', false, /\.(PNG|jpe?g|svg|png)$/),
   );
   console.log('UPDRSImages: ', UPDRSImages);
   const YBOCS = {

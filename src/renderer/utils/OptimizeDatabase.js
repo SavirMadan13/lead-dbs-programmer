@@ -5,7 +5,7 @@
 
 const THREE = require('three');
 const math = require('mathjs');
-const { optimizeSphereValues, projectNumContacts } = require('./StimOptimizer');
+const { optimizeSphereValues, projectNumContacts } = require('../components/stimulation/StimOptimizer');
 
 const initializeS = (label, numContacts) => {
   const S = {};

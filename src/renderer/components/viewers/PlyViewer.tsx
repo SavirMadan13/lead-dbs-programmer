@@ -1,6 +1,6 @@
 /**
  * PlyViewer Component
- * 
+ *
  * This is a complex 3D visualization component that handles PLY file rendering,
  * NIfTI file processing, and 3D brain visualization. It provides tools for
  * electrode visualization, stimulation field modeling, and interactive 3D
@@ -39,7 +39,7 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import * as math from 'mathjs';
 
 // Local Components and Utils
-import { optimizeSphereValues, projectNumContacts } from '../../utils/StimOptimizer';
+import { optimizeSphereValues, projectNumContacts } from '../stimulation/StimOptimizer';
 import { computeSuperimposedEField } from '../../utils/OssDbsStimsets';
 import { nii2Mesh, processNifti, testPlane, addSliceToSceneNew } from '../../utils/NiftiUtils';
 
