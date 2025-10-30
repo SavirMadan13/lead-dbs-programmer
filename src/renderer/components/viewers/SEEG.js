@@ -10,7 +10,7 @@ import {
   Button,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import data from './sub-SEEG73_desc-reconstruction.json';
+import data from '../../assets/data/sub-SEEG73_desc-reconstruction.json';
 
 // Define styles for the grid and checkbox
 const useStyles = makeStyles({

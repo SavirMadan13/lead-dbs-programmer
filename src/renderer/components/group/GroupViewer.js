@@ -17,7 +17,7 @@ import {
 } from 'react-bootstrap';
 import SettingsIcon from '@mui/icons-material/Settings'; // Material UI settings icon
 import * as math from 'mathjs';
-import BigBrain from './untitled.jpg';
+import BigBrain from '../../assets/images/untitled.jpg';
 // import { remote } from 'electron'; // Use 'electron' for Electron v12+
 
 function GroupViewer({

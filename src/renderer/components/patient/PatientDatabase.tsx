@@ -39,8 +39,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Edit, Delete, Save, Cancel } from '@mui/icons-material';
 
 // Local Components
-import { PatientContext } from './PatientContext';
-import DatabaseStats from './DatabaseStats';
+import { PatientContext } from '../../contexts/PatientContext';
+import DatabaseStats from '../../utils/DatabaseStats';
 
 // Type definitions
 interface Patient {

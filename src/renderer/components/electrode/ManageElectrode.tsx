@@ -14,11 +14,11 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
 
 // Styles
-import './TabbedElectrodeIPGSelection.css';
+import '../../styles/TabbedElectrodeIPGSelection.css';
 
 // Data and Components
-import electrodeModels from './electrodeModels.json';
-import Electrode from './electrode_models/currentModels/Electrode';
+import electrodeModels from '../../assets/data/electrodeModels.json';
+import Electrode from './Electrode';
 
 // Type definitions
 interface HemisphereData {

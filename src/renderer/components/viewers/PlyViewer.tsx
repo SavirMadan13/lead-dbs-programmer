@@ -39,12 +39,12 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import * as math from 'mathjs';
 
 // Local Components and Utils
-import { optimizeSphereValues, projectNumContacts } from './StimOptimizer';
-import { computeSuperimposedEField } from './OssDbsStimsets';
-import { nii2Mesh, processNifti, testPlane, addSliceToSceneNew } from './NiftiUtils';
+import { optimizeSphereValues, projectNumContacts } from '../../utils/StimOptimizer';
+import { computeSuperimposedEField } from '../../utils/OssDbsStimsets';
+import { nii2Mesh, processNifti, testPlane, addSliceToSceneNew } from '../../utils/NiftiUtils';
 
 // Assets
-import EdlowBrain from './Edlow_10mm.png';
+import EdlowBrain from '../../assets/images/Edlow_10mm.png';
 
 // Type definitions
 interface PlyViewerProps {

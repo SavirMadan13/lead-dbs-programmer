@@ -4,23 +4,23 @@ import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 // Styles
-import './App.css';
+import '../styles/App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Components
-import Navbar from './components/Navbar';
-import PatientDatabase from './components/PatientDatabase';
-import PatientDetails from './components/PatientDetails';
-import { PatientProvider } from './components/PatientContext';
+import Navbar from '../components/common/Navbar';
+import PatientDatabase from '../components/patient/PatientDatabase';
+import PatientDetails from '../components/patient/PatientDetails';
+import { PatientProvider } from '../contexts/PatientContext';
 import Programmer from './Programmer';
-import ClinicalScores from './components/ClinicalScores';
-import CustomTable from './components/CustomTable';
-import GroupStats from './components/GroupStats';
-import DatabaseStats from './components/DatabaseStats';
-import Import from './components/Import';
-import NiiViewer from './components/NiiViewer';
-import SEEG from './components/SEEG';
-import TestApp from './niivue/ui/TestApp';
+import ClinicalScores from '../utils/ClinicalScores';
+import CustomTable from '../components/common/CustomTable';
+import GroupStats from '../components/group/GroupStats';
+import DatabaseStats from '../utils/DatabaseStats';
+import Import from '../utils/Import';
+import NiiViewer from '../components/viewers/NiiViewer';
+import SEEG from '../components/viewers/SEEG';
+import TestApp from '../niivue/ui/TestApp';
 
 /**
  * Main App Component

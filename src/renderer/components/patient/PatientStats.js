@@ -7,9 +7,9 @@ import 'react-tabs/style/react-tabs.css';
 import * as XLSX from 'xlsx';
 import HomeIcon from '@mui/icons-material/Home';
 // import './electrode_models/currentModels/ElecModelStyling/boston_vercise_directed.css';
-import PairedTTestComponent from './PairedTTestComponent';
-import BoxPlotComponent from './BoxPlotComponent';
-import UPDRSAnalysisComponent from './UPDRSAnalysisComponent';
+import PairedTTestComponent from '../analysis/PairedTTestComponent';
+import BoxPlotComponent from '../analysis/BoxPlotComponent';
+import UPDRSAnalysisComponent from '../analysis/UPDRSAnalysisComponent';
 
 function PatientStats({ patient, timeline, directoryPath, leadDBS }) {
   const navigate = useNavigate();
