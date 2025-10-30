@@ -109,8 +109,8 @@ console.log = () => {};
 console.warn = () => {};
 console.error = () => {};
 
-const inputPath = process.argv[1];
-// const inputPath = '/Users/savirmadan/Documents/Localizations/BIDMCKMOutput';
+// const inputPath = process.argv[1];
+const inputPath = '/Users/savirmadan/Documents/Localizations/BIDMCKMOutput';
 class AppUpdater {
   constructor() {
     // log.transports.file.level = 'info';
