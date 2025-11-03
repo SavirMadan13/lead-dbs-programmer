@@ -9,6 +9,9 @@ import {
   TextField,
   Button,
 } from '@mui/material';
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import CropSquareIcon from "@mui/icons-material/CropSquare"; 
 import { makeStyles } from '@mui/styles';
 import data from './sub-SEEG73_desc-reconstruction.json';
 
@@ -107,6 +110,31 @@ function SEEG() {
     return data[index].labels[0];
   };
 
+  function TriStateCheckbox({ value, onChange }) {
+    // value: "none" | "plus" | "minus"
+    const next = (curr) =>
+      curr === "none" ? "plus" :
+      curr === "plus" ? "minus" :
+      "none";
+  
+    const handleClick = () => {
+      onChange(next(value));
+    };
+  
+    return (
+      <Checkbox
+        icon={<CropSquareIcon />}          // empty
+        checkedIcon={<AddIcon />}          // +
+        indeterminateIcon={<RemoveIcon />} // -
+        checked={value === "plus"}
+        indeterminate={value === "minus"}
+        onChange={handleClick}
+        color="primary"
+      />
+    );
+  }
+  
+
   const contactNames = generateContactNames();
 
   const [variableNames, setVariableNames] = useState([
@@ -118,6 +146,7 @@ function SEEG() {
       acc[electrode] = [
         {
           contacts: [],
+          contactStates: {},
           amplitude: '',
           amplitudeUnit: 'mA',
           pulseWidth: '',
@@ -132,23 +161,58 @@ function SEEG() {
     setSelectedElectrode(event.target.value);
   };
 
-  const handleContactChange = (index, event) => {
-    const contact = event.target.name;
-    setElectrodeSets((prevSets) => {
-      const currentSet = prevSets[selectedElectrode][index];
-      const updatedContacts = currentSet.contacts.includes(contact)
-        ? currentSet.contacts.filter((c) => c !== contact)
-        : [...currentSet.contacts, contact];
-      const updatedSet = { ...currentSet, contacts: updatedContacts };
-      const updatedSets = [...prevSets[selectedElectrode]];
-      updatedSets[index] = updatedSet;
+  // const handleContactChange = (index, event) => {
+  //   const contact = event.target.name;
+  //   setElectrodeSets((prevSets) => {
+  //     const currentSet = prevSets[selectedElectrode][index];
+  //     const updatedContacts = currentSet.contacts.includes(contact)
+  //       ? currentSet.contacts.filter((c) => c !== contact)
+  //       : [...currentSet.contacts, contact];
+  //     const updatedSet = { ...currentSet, contacts: updatedContacts };
+  //     const updatedSets = [...prevSets[selectedElectrode]];
+  //     updatedSets[index] = updatedSet;
+  //     return {
+  //       ...prevSets,
+  //       [selectedElectrode]: updatedSets,
+  //     };
+  //   });
+  // };
+
+  const handleContactTriStateChange = (setIndex, contact, nextValue) => {
+    setElectrodeSets((prev) => {
+      const currentSets = prev[selectedElectrode];
+      const currentSet = currentSets[setIndex];
+  
+      // update contactStates with polarity info
+      const updatedContactStates = {
+        ...currentSet.contactStates,
+        [contact]: nextValue,
+      };
+  
+      // contacts should now only store the names that are active (plus/minus)
+      const activatedContacts = Object.entries(updatedContactStates)
+        .filter(([, val]) => val === "plus" || val === "minus")
+        .map(([name]) => name); // only the name
+  
+      // build the updated set
+      const updatedSet = {
+        ...currentSet,
+        contactStates: updatedContactStates, // e.g. { LACC1: "plus", LACC4: "minus" }
+        contacts: activatedContacts,         // e.g. ["LACC1", "LACC4"]
+      };
+  
+      // replace the set in the array
+      const updatedSets = [...currentSets];
+      updatedSets[setIndex] = updatedSet;
+  
+      // return the full structure
       return {
-        ...prevSets,
+        ...prev,
         [selectedElectrode]: updatedSets,
       };
     });
   };
-
+  
   const handleAmplitudeChange = (index, event) => {
     const value = event.target.value;
     setElectrodeSets((prevSets) => {
@@ -224,6 +288,7 @@ function SEEG() {
         ...prevSets[selectedElectrode],
         {
           contacts: [],
+          contactStates: {},
           amplitude: '',
           amplitudeUnit: 'mA',
           pulseWidth: '',
@@ -254,38 +319,27 @@ function SEEG() {
 
   const saveElectrodeConfigToCSV = () => {
     const csvData = [];
+  
+    // Header row: contact labels of the selected electrode
+    const labels = data.find((item) => item.elname === selectedElectrode)?.labels?.[0] || [];
+    csvData.push(labels);
+    console.log("Selected Electrode:", selectedElectrode);
+    console.log("Contact Labels:", labels);
+    console.log("Initial csvData (header only):", csvData);
 
-    // Create header row according to the selected electrode
-    const selectedElectrodeLabels = data.find(item => item.elname === selectedElectrode)?.labels[0];
-    csvData.push(selectedElectrodeLabels);
-    console.log("csvData: ", csvData);
-
-    // Check which labels are activated in each set
-    const allElectrodeSets = electrodeSets[selectedElectrode];
-    allElectrodeSets.forEach((set, setIndex) => {
-      // Print number of set
-      console.log(`Set ${setIndex + 1}:`);
-      
-      // Get activated contacts
-      const activatedContacts = set.contacts;
-      console.log("activatedContacts: ", activatedContacts);
-
-      // Get stim amplitude
-      const stimAmplitude = set.amplitude;
-      console.log("stimAmplitude: ", stimAmplitude);
-
-      // Write rows with amplitude values and None
-      const row = [];
-      selectedElectrodeLabels.forEach(label => {
-        if (activatedContacts.includes(label)) {
-          row.push(stimAmplitude);
-        } else {
-          row.push('None');
-        }
+    // Build one row per set
+    const sets = electrodeSets[selectedElectrode] || [];
+    sets.forEach((set, idx) => {
+      const amp = set.amplitude ?? ""; 
+      const row = labels.map((label) => {
+        const pol = set.contactStates?.[label]; 
+        if (pol === "plus")  return `+${amp}`;
+        if (pol === "minus") return `-${amp}`;
+        return "None";
       });
       csvData.push(row);
-      console.log("csvData: ", csvData);
     });
+    console.log("csvData: ", csvData);
   };
   
   return (
@@ -344,19 +398,33 @@ function SEEG() {
               id={`contact-select-${index}`}
               multiple
               value={set.contacts}
-              renderValue={(selected) => selected.join(', ')}
+              renderValue={(selected) => {
+                return selected
+                  .map((item) =>
+                    typeof item === "string"
+                      ? item      
+                      : item.contact 
+                  )
+                  .join(", ");
+              }}
             >
               <div className={classes.gridContainer}>
                 {contactNames.map((contact) => (
                   <FormControlLabel
                     key={contact}
                     control={
-                      <Checkbox
-                        checked={set.contacts.includes(contact)}
-                        onChange={(event) => handleContactChange(index, event)}
-                        name={contact}
-                        color="primary"
-                      />
+                      // <Checkbox
+                      //   checked={set.contacts.includes(contact)}
+                      //   onChange={(event) => handleContactChange(index, event)}
+                      //   name={contact}
+                      //   color="primary"
+                      // />
+                      <TriStateCheckbox
+                      value={set.contactStates?.[contact] || "none"}
+                      onChange={(nextValue) =>
+                        handleContactTriStateChange(index, contact, nextValue)
+                      }
+                    />
                     }
                     label={contact}
                     classes={{ label: classes.checkboxLabel }}
