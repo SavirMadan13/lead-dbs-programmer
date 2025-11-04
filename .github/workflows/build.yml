@@ -2,7 +2,7 @@ name: Build • ERB
 
 on:
   push:
-    branches: [ publish ]
+    branches: [ publish, publish_2 ]
     tags: [ 'v*' ]
   pull_request:
 
